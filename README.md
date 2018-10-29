@@ -1,10 +1,10 @@
-Lockstep Framework
+Lockstep RTS Engine
 ------------------------
-The Lockstep Framework (LSF) is a framework designed for games that especially need lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LSF is integrated with Unity, but can be abstracted away.
+The Lockstep RTS Engine (LRE) is an engine designed for 3d RTS games with lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LRE is integrated with Unity, but can be abstracted away.
 
-Special thanks to Liv Games (http://www.livgames.com) and 360 Studio (http://www.360studio.me) for supporting the development of Lockstep Framework.
+Special thanks to John Pan (https://github.com/SnpM) for the hard work and dedication he put into his Lockstep Framework (https://github.com/SnpM/LockstepFramework). Also to Elgar Storm for the amazing tutorial he created for developing an RTS game (http://www.stormtek.geek.nz/rts_tutorial/part1.php).
 
-Under development by [John Pan](https://github.com/SnpM) and  mrdav30 (https://github.com/mrdav30).
+Under development by mrdav30 (https://github.com/mrdav30).
 
 Features
 __________
@@ -18,12 +18,12 @@ __________
 
 Quick Setup
 -----------
-1. Import the framework into a Unity project and open Lockstep-Framework/Example/ExampleScene
-2. Set up the database and settings by navigating to the Lockstep/Database window or pressing Control - Shift - L.
-3. In the Settings foldout of the database window, click Load and navigate to Lockstep-Framework/Example/ExampleDatabase/Example_Database.asset to load the preconfigured database for the example.
+1. Import the engine into a Unity project and open RTS-Engine/Example/ExampleScene
+2. Set up the database and settings by navigating to the RTS-Engine/Database window or pressing Control - Shift - L.
+3. In the Settings foldout of the database window, click Load and navigate to RTS-Engine/Example/ExampleDatabase/Example_Database.asset to load the preconfigured database for the example.
 4. Play!
 
-Note: The example only shows the basic functionality of the framework. Comprehensive examples will be added close to the end of core development.
+Note: The example only shows the basic functionality of the engine. Comprehensive examples will be added close to the end of core development.
 
 To use in an existing scene, locate the Manager prefab in Core/Example/ and add that into your scene. This prefab comes with 3 components attached: LockstepManager, TestManager, and PlayerManager. LockstepManager contains settings for simulation and non-simulation related things that many other pieces of the LSF use.
 
