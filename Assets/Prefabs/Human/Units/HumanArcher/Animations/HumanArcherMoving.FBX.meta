@@ -1,0 +1,228 @@
+fileFormatVersion: 2
+guid: b43c4dc08dde1e148b9953cb48ce634f
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: _M3_Anim_Data
+    100002: Arrow
+    100004: Bone_Arm1_L
+    100006: Bone_Arm1_R
+    100008: Bone_Arm2_L
+    100010: Bone_Arm2_R
+    100012: Bone_Chest
+    100014: Bone_Foot_L
+    100016: Bone_Foot_R
+    100018: Bone_Hand_L
+    100020: Bone_Head
+    100022: Bone_Leg1_L
+    100024: Bone_Leg1_R
+    100026: Bone_Leg2_L
+    100028: Bone_Leg2_R
+    100030: Bone_Pelvis
+    100032: Bone_Root
+    100034: Chest Ref
+    100036: 'Foot Left Ref '
+    100038: 'Foot Right Ref '
+    100040: gutz00
+    100042: 'Hand Left Ref '
+    100044: 'Hand Right Ref '
+    100046: Head mesh
+    100048: Head Ref
+    100050: Human Archer1
+    100052: Human Archer2
+    100054: Human Archer3
+    100056: Human Archer4
+    100058: Human Archer5
+    100060: //RootNode
+    100062: m3bone_root
+    100064: Mesh04x
+    100066: Mesh06
+    100068: Mesh08
+    100070: Mesh09x
+    100072: Mesh10x
+    100074: Mesh13
+    100076: Mesh17
+    100078: Mesh23
+    100080: Object02
+    100082: Object03
+    100084: Object04
+    100086: 'Origin Ref '
+    100088: 'OverHead Ref '
+    100090: Weapon Ref
+    400000: _M3_Anim_Data
+    400002: Arrow
+    400004: Bone_Arm1_L
+    400006: Bone_Arm1_R
+    400008: Bone_Arm2_L
+    400010: Bone_Arm2_R
+    400012: Bone_Chest
+    400014: Bone_Foot_L
+    400016: Bone_Foot_R
+    400018: Bone_Hand_L
+    400020: Bone_Head
+    400022: Bone_Leg1_L
+    400024: Bone_Leg1_R
+    400026: Bone_Leg2_L
+    400028: Bone_Leg2_R
+    400030: Bone_Pelvis
+    400032: Bone_Root
+    400034: Chest Ref
+    400036: 'Foot Left Ref '
+    400038: 'Foot Right Ref '
+    400040: gutz00
+    400042: 'Hand Left Ref '
+    400044: 'Hand Right Ref '
+    400046: Head mesh
+    400048: Head Ref
+    400050: Human Archer1
+    400052: Human Archer2
+    400054: Human Archer3
+    400056: Human Archer4
+    400058: Human Archer5
+    400060: //RootNode
+    400062: m3bone_root
+    400064: Mesh04x
+    400066: Mesh06
+    400068: Mesh08
+    400070: Mesh09x
+    400072: Mesh10x
+    400074: Mesh13
+    400076: Mesh17
+    400078: Mesh23
+    400080: Object02
+    400082: Object03
+    400084: Object04
+    400086: 'Origin Ref '
+    400088: 'OverHead Ref '
+    400090: Weapon Ref
+    2100000: 'Material #41'
+    2100002: 'Material #44'
+    2100004: 'Material #45'
+    2100006: 'Material #43'
+    2100008: 'Material #42'
+    2300000: Human Archer1
+    2300002: Human Archer2
+    2300004: Human Archer3
+    2300006: Human Archer4
+    3300000: Human Archer1
+    3300002: Human Archer2
+    3300004: Human Archer3
+    3300006: Human Archer4
+    4300000: Human Archer5
+    4300002: Human Archer1
+    4300004: Human Archer4
+    4300006: Human Archer3
+    4300008: Human Archer2
+    7400000: Moving
+    9500000: //RootNode
+    13700000: Human Archer5
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Moving
+      takeName: Moving
+      firstFrame: 571
+      lastFrame: 597
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.0254
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

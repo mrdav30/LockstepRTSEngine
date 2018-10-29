@@ -1,0 +1,180 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a99731abc5464ee48a94e6f7dabd49f7, type: 3}
+  m_Name: RTSDatabase
+  m_EditorClassIdentifier: 
+  _agentData:
+  - _name: StoneDeposit
+    _description: Stone Deposit
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1687852583994148, guid: 0d0738dfacef668489aa12bcc6d825b7, type: 2}
+  - _name: OreDeposit
+    _description: Ore Deposit
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1312883334417478, guid: 9f9dbfa5103b9a7489e4b0758e47e27f, type: 2}
+  - _name: GoldDeposit
+    _description: Gold Deposit
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1689033263610340, guid: 6ad6e8a5b776cc9499c813279712a6c3, type: 2}
+  - _name: CrystalDeposit
+    _description: Crystal Deposit
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1911411376021232, guid: a3d4bb5362cd86d4f9ed0698d72a0d1f, type: 2}
+  - _name: HumanWorker
+    _description: Worker
+    _icon: {fileID: 21300000, guid: 0fef698d97b0c2b438bc29e74a0e3823, type: 3}
+    _prefab: {fileID: 1845799108638348, guid: 6b8b858e86de6ac46bc4825b8da17c14, type: 2}
+  - _name: HumanFootman
+    _description: Footman
+    _icon: {fileID: 21300000, guid: 03d06866974d9d54e8b077710a8886c6, type: 3}
+    _prefab: {fileID: 1588637964981362, guid: e34475f6925afad429e57a0fa293ea57, type: 2}
+  - _name: HumanArcher
+    _description: Archer
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1626604714047302, guid: e77979885ed3e1c488b7189d24a28c4e, type: 2}
+  - _name: HumanWonder
+    _description: Wonder
+    _icon: {fileID: 21300000, guid: 2eadb7d2ef4646442ae17800ad94e7b3, type: 3}
+    _prefab: {fileID: 1788796594848350, guid: d476455ddfd069c4398a4391ffdbf4ba, type: 2}
+  - _name: HumanWatchTower
+    _description: Watch Tower
+    _icon: {fileID: 21300000, guid: 56c0493a352b108468a3669dc9fc2c27, type: 3}
+    _prefab: {fileID: 1667462521772482, guid: cb0a1c7eff9ab7c43b28213850b1bdac, type: 2}
+  - _name: HumanTownHall
+    _description: Town Hall
+    _icon: {fileID: 21300000, guid: b79c65f9c05124746991bbe4f545da27, type: 3}
+    _prefab: {fileID: 1061207286704144, guid: fe3a46b396d1601469fe664aca968019, type: 2}
+  - _name: HumanHouse
+    _description: House
+    _icon: {fileID: 21300000, guid: 751f999f638c3a14a8aab4bde3c0374a, type: 3}
+    _prefab: {fileID: 1703202911422822, guid: dd533115d6ca57f419ee2915de4aeca5, type: 2}
+  - _name: HumanBarracks
+    _description: Barracks
+    _icon: {fileID: 21300000, guid: 1065bd2316b281646a2889ce57357a2a, type: 3}
+    _prefab: {fileID: 1197058999540568, guid: 33d97bd711c9d9b48a1c66f464a30a80, type: 2}
+  _worldObjectData:
+  - _name: Sun
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1192182045702688, guid: e7fc641f62ca86a46b2a77a821393dfd, type: 2}
+  - _name: Ground
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1492072546167288, guid: 128830cd048d508489d67e66eb42a2f1, type: 2}
+  - _name: AgentCommander
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1048473000217382, guid: 82a2a2fe36414064aa801e58d913d25f, type: 2}
+  _inputData:
+  - _name: Move
+  - _name: Attack
+  - _name: Stop
+  - _name: Spawner
+  - _name: Build
+  - _name: Harvest
+  _projectileData:
+  - _name: Melee
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1001316084172816, guid: 5000cb37265d10946ab5df8aa6537c79, type: 2}
+  - _name: Arrow
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1454817680262554, guid: 40884fb93fdcfdb4f8174c11f1c6684a, type: 2}
+  _effectData: []
+  _abilityData:
+  - _name: Attack
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Attack, Assembly-CSharp
+    _listenInputCode: Attack
+    _informationGather: 3
+  - _name: Build
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Build, Assembly-CSharp
+    _listenInputCode: Build
+    _informationGather: 4
+  - _name: DurationAbility
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.DurationAbility, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: Harvest
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Harvest, Assembly-CSharp
+    _listenInputCode: Harvest
+    _informationGather: 3
+  - _name: Move
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Move, Assembly-CSharp
+    _listenInputCode: Move
+    _informationGather: 1
+  - _name: Spawner
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Spawner, Assembly-CSharp
+    _listenInputCode: Spawner
+    _informationGather: 4
+  - _name: Stop
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Stop, Assembly-CSharp
+    _listenInputCode: Stop
+    _informationGather: 0
+  _unitConfigElementData: []
+  _unitConfigData: []
+  _avatarData:
+  - _name: Alien
+    _description: 
+    _icon: {fileID: 21300000, guid: 58a1bbee9553b294784bde72a4afcfa9, type: 3}
+  - _name: Astronaut
+    _description: 
+    _icon: {fileID: 21300000, guid: d32450afa7d25e84d97bab0c02e45fbc, type: 3}
+  - _name: Cowboy
+    _description: 
+    _icon: {fileID: 21300000, guid: a36ef6a1c1adee34e8f9153dcccdeb40, type: 3}
+  - _name: Detective
+    _description: 
+    _icon: {fileID: 21300000, guid: 1c81fcef38c3f504192dd1d094e96a53, type: 3}
+  - _name: Egyptian
+    _description: 
+    _icon: {fileID: 21300000, guid: 3a488162ac4143c4f9097b2b6cf1a1de, type: 3}
+  - _name: Knight
+    _description: 
+    _icon: {fileID: 21300000, guid: caadf9d4c34b6ce418ee241c58d36172, type: 3}
+  _agentControllerData:
+  - _name: Hostile
+    _defaultAllegiance: 4
+    _playerManaged: 0
+    _commanderCode: 
+  - _name: Neutral
+    _defaultAllegiance: 1
+    _playerManaged: 0
+    _commanderCode: 
+  - _name: Player 1
+    _defaultAllegiance: 4
+    _playerManaged: 1
+    _commanderCode: 
+  - _name: Player 2
+    _defaultAllegiance: 4
+    _playerManaged: 1
+    _commanderCode: 

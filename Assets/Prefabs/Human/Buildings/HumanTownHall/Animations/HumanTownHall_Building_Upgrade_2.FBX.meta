@@ -1,0 +1,260 @@
+fileFormatVersion: 2
+guid: 95f3b5d3de4bf764d986da55ac9c5384
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: _M3_Anim_Data
+    100002: bone_null
+    100004: door
+    100006: Explosion
+    100008: //RootNode
+    100010: m3bone_root
+    100012: Main house
+    100014: Origin Ref
+    100016: Overhead Ref
+    100018: Roof
+    100020: Sprite first ref
+    100022: Sprite second ref
+    100024: Sprite third ref
+    100026: Town hall1
+    100028: Town hall10
+    100030: Town hall11
+    100032: Town hall12
+    100034: Town hall13
+    100036: Town hall14
+    100038: Town hall15
+    100040: Town hall16
+    100042: Town hall17
+    100044: Town hall18
+    100046: Town hall19
+    100048: Town hall2
+    100050: Town hall20
+    100052: Town hall21
+    100054: Town hall22
+    100056: Town hall23
+    100058: Town hall24
+    100060: Town hall25
+    100062: Town hall26
+    100064: Town hall27
+    100066: Town hall28
+    100068: Town hall3
+    100070: Town hall4
+    100072: Town hall5
+    100074: Town hall6
+    100076: Town hall7
+    100078: Town hall8
+    100080: Town hall9
+    400000: _M3_Anim_Data
+    400002: bone_null
+    400004: door
+    400006: Explosion
+    400008: //RootNode
+    400010: m3bone_root
+    400012: Main house
+    400014: Origin Ref
+    400016: Overhead Ref
+    400018: Roof
+    400020: Sprite first ref
+    400022: Sprite second ref
+    400024: Sprite third ref
+    400026: Town hall1
+    400028: Town hall10
+    400030: Town hall11
+    400032: Town hall12
+    400034: Town hall13
+    400036: Town hall14
+    400038: Town hall15
+    400040: Town hall16
+    400042: Town hall17
+    400044: Town hall18
+    400046: Town hall19
+    400048: Town hall2
+    400050: Town hall20
+    400052: Town hall21
+    400054: Town hall22
+    400056: Town hall23
+    400058: Town hall24
+    400060: Town hall25
+    400062: Town hall26
+    400064: Town hall27
+    400066: Town hall28
+    400068: Town hall3
+    400070: Town hall4
+    400072: Town hall5
+    400074: Town hall6
+    400076: Town hall7
+    400078: Town hall8
+    400080: Town hall9
+    2100000: 'Material #128'
+    2100002: 'Material #129'
+    2100004: 'Material #130'
+    2100006: 'Material #117'
+    2100008: No Name
+    2100010: 'Material #111'
+    2100012: 'Material #132'
+    2100014: 'Material #127'
+    2100016: 'Material #150'
+    2100018: 'Material #133'
+    2100020: 'Material #122'
+    2300000: Town hall1
+    2300002: Town hall11
+    2300004: Town hall12
+    2300006: Town hall14
+    2300008: Town hall16
+    2300010: Town hall17
+    2300012: Town hall19
+    2300014: Town hall2
+    2300016: Town hall21
+    2300018: Town hall22
+    2300020: Town hall23
+    2300022: Town hall24
+    2300024: Town hall25
+    2300026: Town hall26
+    2300028: Town hall27
+    2300030: Town hall28
+    2300032: Town hall3
+    2300034: Town hall4
+    2300036: Town hall5
+    2300038: Town hall6
+    2300040: Town hall7
+    2300042: Town hall8
+    3300000: Town hall1
+    3300002: Town hall11
+    3300004: Town hall12
+    3300006: Town hall14
+    3300008: Town hall16
+    3300010: Town hall17
+    3300012: Town hall19
+    3300014: Town hall2
+    3300016: Town hall21
+    3300018: Town hall22
+    3300020: Town hall23
+    3300022: Town hall24
+    3300024: Town hall25
+    3300026: Town hall26
+    3300028: Town hall27
+    3300030: Town hall28
+    3300032: Town hall3
+    3300034: Town hall4
+    3300036: Town hall5
+    3300038: Town hall6
+    3300040: Town hall7
+    3300042: Town hall8
+    4300000: Town hall9
+    4300002: Town hall10
+    4300004: Town hall13
+    4300006: Town hall15
+    4300008: Town hall18
+    4300010: Town hall20
+    4300012: Town hall1
+    4300014: Town hall2
+    4300016: Town hall5
+    4300018: Town hall16
+    4300020: Town hall22
+    4300022: Town hall24
+    4300024: Town hall25
+    4300026: Town hall26
+    4300028: Town hall3
+    4300030: Town hall6
+    4300032: Town hall7
+    4300034: Town hall8
+    4300036: Town hall11
+    4300038: Town hall12
+    4300040: Town hall14
+    4300042: Town hall17
+    4300044: Town hall19
+    4300046: Town hall21
+    4300048: Town hall23
+    4300050: Town hall27
+    4300052: Town hall28
+    4300054: Town hall4
+    7400000: Building_Upgrade_2
+    9500000: //RootNode
+    13700000: Town hall10
+    13700002: Town hall13
+    13700004: Town hall15
+    13700006: Town hall18
+    13700008: Town hall20
+    13700010: Town hall9
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.0254
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

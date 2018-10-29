@@ -1,0 +1,247 @@
+fileFormatVersion: 2
+guid: a5bbff2d6d3c8104baa56ef544c4a5e7
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: _M3_Anim_Data
+    100002: Barracks1
+    100004: Barracks10
+    100006: Barracks11
+    100008: Barracks12
+    100010: Barracks13
+    100012: Barracks14
+    100014: Barracks15
+    100016: Barracks16
+    100018: Barracks17
+    100020: Barracks18
+    100022: Barracks19
+    100024: Barracks2
+    100026: Barracks20
+    100028: Barracks21
+    100030: Barracks22
+    100032: Barracks23
+    100034: Barracks24
+    100036: Barracks3
+    100038: Barracks4
+    100040: Barracks5
+    100042: Barracks6
+    100044: Barracks7
+    100046: Barracks8
+    100048: Barracks9
+    100050: bone_null
+    100052: door
+    100054: Explosion
+    100056: Flag1
+    100058: Flag2
+    100060: //RootNode
+    100062: m3bone_root
+    100064: Main house
+    100066: Origin Ref
+    100068: Overhead Ref
+    100070: Sprite first ref
+    100072: Sprite second ref
+    400000: _M3_Anim_Data
+    400002: Barracks1
+    400004: Barracks10
+    400006: Barracks11
+    400008: Barracks12
+    400010: Barracks13
+    400012: Barracks14
+    400014: Barracks15
+    400016: Barracks16
+    400018: Barracks17
+    400020: Barracks18
+    400022: Barracks19
+    400024: Barracks2
+    400026: Barracks20
+    400028: Barracks21
+    400030: Barracks22
+    400032: Barracks23
+    400034: Barracks24
+    400036: Barracks3
+    400038: Barracks4
+    400040: Barracks5
+    400042: Barracks6
+    400044: Barracks7
+    400046: Barracks8
+    400048: Barracks9
+    400050: bone_null
+    400052: door
+    400054: Explosion
+    400056: Flag1
+    400058: Flag2
+    400060: //RootNode
+    400062: m3bone_root
+    400064: Main house
+    400066: Origin Ref
+    400068: Overhead Ref
+    400070: Sprite first ref
+    400072: Sprite second ref
+    2100000: No Name
+    2100002: 'Material #153'
+    2100004: 'Material #155'
+    2100006: 'Material #156'
+    2100008: 'Material #152'
+    2100010: 'Material #158'
+    2100012: 'Material #151'
+    2100014: 'Material #163'
+    2100016: 'Material #154'
+    2100018: 'Material #161'
+    2100020: 'Material #162'
+    2100022: 'Material #159'
+    2100024: 'Material #157'
+    2300000: Barracks1
+    2300002: Barracks10
+    2300004: Barracks11
+    2300006: Barracks12
+    2300008: Barracks13
+    2300010: Barracks14
+    2300012: Barracks15
+    2300014: Barracks16
+    2300016: Barracks17
+    2300018: Barracks18
+    2300020: Barracks19
+    2300022: Barracks2
+    2300024: Barracks20
+    2300026: Barracks21
+    2300028: Barracks22
+    2300030: Barracks23
+    2300032: Barracks24
+    2300034: Barracks3
+    2300036: Barracks4
+    2300038: Barracks5
+    2300040: Barracks6
+    2300042: Barracks7
+    2300044: Barracks8
+    3300000: Barracks1
+    3300002: Barracks10
+    3300004: Barracks11
+    3300006: Barracks12
+    3300008: Barracks13
+    3300010: Barracks14
+    3300012: Barracks15
+    3300014: Barracks16
+    3300016: Barracks17
+    3300018: Barracks18
+    3300020: Barracks19
+    3300022: Barracks2
+    3300024: Barracks20
+    3300026: Barracks21
+    3300028: Barracks22
+    3300030: Barracks23
+    3300032: Barracks24
+    3300034: Barracks3
+    3300036: Barracks4
+    3300038: Barracks5
+    3300040: Barracks6
+    3300042: Barracks7
+    3300044: Barracks8
+    4300000: Barracks9
+    4300002: Barracks11
+    4300004: Barracks1
+    4300006: Barracks3
+    4300008: Barracks5
+    4300010: Barracks6
+    4300012: Barracks8
+    4300014: Barracks12
+    4300016: Barracks16
+    4300018: Barracks18
+    4300020: Barracks21
+    4300022: Barracks24
+    4300024: Barracks10
+    4300026: Barracks2
+    4300028: Barracks4
+    4300030: Barracks7
+    4300032: Barracks13
+    4300034: Barracks14
+    4300036: Barracks15
+    4300038: Barracks17
+    4300040: Barracks19
+    4300042: Barracks20
+    4300044: Barracks22
+    4300046: Barracks23
+    7400000: Dying
+    9500000: //RootNode
+    13700000: Barracks9
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.0254
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
