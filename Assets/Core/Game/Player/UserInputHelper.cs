@@ -316,7 +316,7 @@ public class UserInputHelper : BehaviourHelper
             {
                 if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(cachedCommander.CachedController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                    if (Selector.MainSelectedAgent.GetAbility<Spawner>() && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
                         Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
                         cachedCommander.CachedHud.SetCursorState(CursorState.Select);
@@ -324,20 +324,27 @@ public class UserInputHelper : BehaviourHelper
 
                     if (RTSInterfacing.MousedAgent.IsNotNull())
                     {
-                        if (Selector.MainSelectedAgent.GetAbility<Harvest>() != null && (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource
-                                || Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0 && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building))
+                        // if moused agent is a resource, send selected agent to harvest
+                        if (Selector.MainSelectedAgent.GetAbility<Harvest>() && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
                         {
                             //call harvest command
                             ProcessInterfacer((QuickHarvest));
                         }
-                        else if (Selector.MainSelectedAgent.GetAbility<Build>() != null && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
+                        // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
+                        else if (Selector.MainSelectedAgent.GetAbility<Harvest>() && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0 
+                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction() 
+                            && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
+                        {
+                            //call harvest command 
+                            ProcessInterfacer((QuickHarvest));
+                        }
                         else if (Selector.MainSelectedAgent.GetAbility<Construct>() && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
                                 && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                         {
                             //call build command
                             ProcessInterfacer((QuickBuild));
                         }
-                        else if (Selector.MainSelectedAgent.GetAbility<Attack>() != null && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
+                        else if (Selector.MainSelectedAgent.GetAbility<Attack>() && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
                         {
                             //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
                             ProcessInterfacer((QuickTarget));

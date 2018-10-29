@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System.Linq;
 namespace RTSLockstep.Data
 {
 	//PROTECTED NOT PRIVATE... private dun serialize in derived class
     [System.Serializable]
-
     public class RTSDatabase : LSDatabase, IEssentialDataProvider, IAvatarDataProvider, IUnitConfigDataProvider
     , IAgentControllerDataProvider, IWorldObjectDataProvider
     {

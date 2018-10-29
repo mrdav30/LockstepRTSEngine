@@ -78,7 +78,7 @@ MonoBehaviour:
   - _name: Attack
   - _name: Stop
   - _name: Spawner
-  - _name: Build
+  - _name: Construct
   - _name: Harvest
   _projectileData:
   - _name: Melee
@@ -98,13 +98,6 @@ MonoBehaviour:
       _classRef: RTSLockstep.Attack, Assembly-CSharp
     _listenInputCode: Attack
     _informationGather: 3
-  - _name: Build
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: RTSLockstep.Build, Assembly-CSharp
-    _listenInputCode: Build
-    _informationGather: 4
   - _name: DurationAbility
     _description: 
     _icon: {fileID: 0}
@@ -140,6 +133,13 @@ MonoBehaviour:
       _classRef: RTSLockstep.Stop, Assembly-CSharp
     _listenInputCode: Stop
     _informationGather: 0
+  - _name: Construct
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Construct, Assembly-CSharp
+    _listenInputCode: Construct
+    _informationGather: 3
   _unitConfigElementData: []
   _unitConfigData: []
   _avatarData:

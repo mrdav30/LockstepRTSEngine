@@ -117,7 +117,8 @@ namespace RTSLockstep
                     {
                         if (cachedHarvest)
                         {
-                            if (SelectionManager.MousedAgent.MyAgentType == AgentType.Resource)
+                            if (SelectionManager.MousedAgent.MyAgentType == AgentType.Resource
+                                && !SelectionManager.MousedAgent.GetAbility<ResourceDeposit>().IsEmpty())
                             {
                                 cachedCommander.CachedHud.SetCursorState(CursorState.Harvest);
                             }
