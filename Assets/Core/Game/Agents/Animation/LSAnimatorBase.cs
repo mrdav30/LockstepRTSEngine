@@ -53,7 +53,7 @@ namespace RTSLockstep
             Play(animImpulse, rate);
         }
 
-        public virtual void Play(AnimState state)
+        public virtual void Play(AnimState state, bool baseAnimate = true)
         {
             if (OnStatePlay.IsNotNull())
                 OnStatePlay(state);

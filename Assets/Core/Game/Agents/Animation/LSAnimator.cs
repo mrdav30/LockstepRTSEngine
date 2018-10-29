@@ -26,8 +26,12 @@ namespace RTSLockstep
         [SerializeField]
         private string extra = "extra";
         //sounds that accompany animations
+        [Space(10f), SerializeField]
+        private AudioClip attackSound;
         [SerializeField]
-        private AudioClip attackSound, selectSound, useWeaponSound;
+        private AudioClip selectSound;
+        [SerializeField]
+        private AudioClip useWeaponSound;
         [SerializeField]
         private float attackVolume = 1.0f, selectVolume = 1.0f, useWeaponVolume = 1.0f;
         [SerializeField]
@@ -47,6 +51,7 @@ namespace RTSLockstep
         private AnimationClip extraClip;
 
         protected Animator animator;
+        protected const float fadeLength = .5f;
 
         public override void Setup()
         {
@@ -112,10 +117,10 @@ namespace RTSLockstep
             Play(AnimState.Idling);
         }
 
-        public override void Play(AnimState state)
+        public override void Play(AnimState state, bool baseAnimate = true)
         {
             base.Play(state);
-            if (CanAnimate)
+            if (CanAnimate && baseAnimate)
             {
                 AnimationClip clip = GetStateClip(state);
                 if (clip.IsNotNull())
@@ -124,8 +129,6 @@ namespace RTSLockstep
                 }
             }
         }
-
-        protected const float fadeLength = .5f;
 
         public override void Play(AnimImpulse impulse, int rate = 0)
         {

@@ -7,7 +7,7 @@ namespace RTSLockstep
 {
     public class WorkerAnimator : LSAnimator
     {
-        [SerializeField]
+        [Space(10f), SerializeField]
         private string idlingWood = "idlingWood";
         [SerializeField]
         private string idlingOre = "idlingOre";
@@ -20,12 +20,16 @@ namespace RTSLockstep
         [SerializeField]
         private string engagingOre = "engagingOre";
         [SerializeField]
-        private string building = "building";
+        private string constructing = "constructing";
         //sounds that accompany animations
-        public AudioClip finishedJobSound;
-        public float finishedJobVolume = 1.0f;
-        public AudioClip emptyHarvestSound, harvestSound, startHarvestSound;
-        public float emptyHarvestVolume = 0.5f, harvestVolume = 0.5f, startHarvestVolume = 1.0f;
+        [Space(10f), SerializeField]
+        private AudioClip finishedJobSound;
+        [SerializeField]
+        private float finishedJobVolume = 1.0f;
+        [SerializeField]
+        private AudioClip emptyHarvestSound, harvestSound, startHarvestSound;
+        [SerializeField]
+        private float emptyHarvestVolume = 0.5f, harvestVolume = 0.5f, startHarvestVolume = 1.0f;
 
         private AnimationClip idlingWoodClip;
         private AnimationClip idlingOreClip;
@@ -33,7 +37,7 @@ namespace RTSLockstep
         private AnimationClip movingOreClip;
         private AnimationClip engagingWoodClip;
         private AnimationClip engagingOreClip;
-        private AnimationClip buildingClip;
+        private AnimationClip constructingClip;
 
         public override void Setup()
         {
@@ -74,10 +78,27 @@ namespace RTSLockstep
                     {
                         engagingOreClip = clip;
                     }
-                    else if (clip.name == building)
+                    else if (clip.name == constructing)
                     {
-                        buildingClip = clip;
+                        constructingClip = clip;
                     }
+                }
+            }
+        }
+
+        public override void Play(AnimState state, bool baseAnimate = true)
+        {
+            if (CanAnimate)
+            {
+                AnimationClip clip = GetStateClip(state);
+                if (clip.IsNotNull())
+                {
+                    base.Play(state, false);
+                    animator.CrossFade(clip.name, fadeLength);
+                }
+                else
+                {
+                    base.Play(state, true);
                 }
             }
         }
@@ -98,8 +119,8 @@ namespace RTSLockstep
                     return engagingWoodClip;
                 case AnimState.EngagingOre:
                     return engagingOreClip;
-                case AnimState.Building:
-                    return buildingClip;
+                case AnimState.Constructing:
+                    return constructingClip;
             }
             return base.GetStateClip(state);
         }
@@ -120,8 +141,8 @@ namespace RTSLockstep
                     return engagingWood;
                 case AnimState.EngagingOre:
                     return engagingOre;
-                case AnimState.Building:
-                    return building;
+                case AnimState.Constructing:
+                    return constructing;
             }
             return base.GetStateName(state);
         }

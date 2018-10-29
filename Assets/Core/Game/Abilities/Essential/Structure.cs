@@ -9,13 +9,28 @@ namespace RTSLockstep
         public Texture2D sellImage;
 
         private bool _needsBuilding = false;
+        private bool _needsRepair = false;
         private Health cachedHealth;
         private Spawner cachedSpawner;
+        private int upgradeLevel = 1;
 
         protected override void OnSetup()
         {
             cachedHealth = Agent.GetAbility<Health>();
             cachedSpawner = Agent.GetAbility<Spawner>();
+
+            if(cachedHealth.HealthAmount == cachedHealth.MaxHealth)
+            {
+                Agent.SetState(AnimState.Idling);
+            }
+        }
+
+        protected override void OnSimulate()
+        {
+            if(!_needsBuilding && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
+            {
+                _needsRepair = true;
+            }
         }
 
         public void Sell()
@@ -31,6 +46,7 @@ namespace RTSLockstep
         {
             Agent.Body.CalculateBounds();
             _needsBuilding = true;
+            IsCasting = true;
             cachedHealth.HealthAmount = 0;
             if (cachedSpawner)
             {
@@ -48,10 +64,17 @@ namespace RTSLockstep
             cachedHealth.HealthAmount += amount;
             if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
             {
+              //  Agent.SetState(AnimState.Idling);
                 cachedHealth.HealthAmount = cachedHealth.BaseHealth;
                 _needsBuilding = false;
+                IsCasting = false;
                 (Agent as RTSAgent).SetTeamColor();
             }
+        }
+
+        public int GetUpgradeLevel()
+        {
+            return this.upgradeLevel;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
