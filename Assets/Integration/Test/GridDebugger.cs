@@ -8,7 +8,7 @@ namespace RTSLockstep
         public bool Show;
         //Show the grid debugging?
         public GridType LeGridType;
-        //type of grid to show... can be changed in runtime. Possibilities: Build grid, LOS grid
+        //type of grid to show... can be changed in runtime. Possibilities: Construct grid, LOS grid
         public float LeHeight;
         //Height of the grid
         [Range(.1f, .9f)]

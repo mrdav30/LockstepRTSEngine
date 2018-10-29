@@ -56,7 +56,7 @@ public class BuildGridManager
 	}
 
 
-	public bool Build(IBuildable buildable)
+	public bool Construct(IBuildable buildable)
     {
 		if (CanBuild(buildable.GridPosition, buildable.BuildSize))
         {

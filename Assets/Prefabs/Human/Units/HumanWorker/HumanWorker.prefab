@@ -1559,7 +1559,7 @@ MonoBehaviour:
   movingOre: MovingOre
   engagingWood: EngagingWood
   engagingOre: EngagingOre
-  building: Building
+  constructing: Constructing
   finishedJobSound: {fileID: 0}
   finishedJobVolume: 1
   emptyHarvestSound: {fileID: 0}

@@ -101,13 +101,14 @@ public class BuildManager : MonoBehaviour
         RTSAgent newBuilding = cachedCommander.CachedController.CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
         Destroy(tempBuilding.gameObject);
 
+        newBuilding.SetState(AnimState.Building);
         newBuilding.RestoreMaterials();
         newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
         newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
         newBuilding.SetCommander();
 
         // send build command
-        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Build").ListenInputID);
+        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
         buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
         UserInputHelper.SendCommand(buildCom);
 

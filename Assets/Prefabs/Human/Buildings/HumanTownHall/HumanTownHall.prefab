@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 114844726585989748}
   - component: {fileID: 114582453884945862}
   - component: {fileID: 114902712059205450}
-  - component: {fileID: 114832276289969082}
+  - component: {fileID: 114648547403992962}
   - component: {fileID: 95505682122902318}
   - component: {fileID: 114802893862281402}
   m_Layer: 0
@@ -2311,6 +2311,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114648547403992962
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1061207286704144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb4c5550f0b41c48af6c4d79a2a3229, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAnimState: 0
+  idling:
+  - intValue: 1
+    stringValue: Idling
+  - intValue: 2
+    stringValue: Idling_Upgrade_1
+  - intValue: 3
+    stringValue: Ilding_Upgrade_2
+  - intValue: 4
+    stringValue: Idling_Upgrade_3
+  building:
+  - intValue: 1
+    stringValue: Building
+  - intValue: 2
+    stringValue: Building_Upgrade_1
+  - intValue: 3
+    stringValue: Building_Upgrade_2
+  - intValue: 4
+    stringValue: Building_Upgrade_3
+  working:
+  - intValue: 1
+    stringValue: working
+  - intValue: 2
+    stringValue: working_upgrade_1
+  - intValue: 3
+    stringValue: working_upgrade_2
+  - intValue: 4
+    stringValue: working_upgrade_3
+  dying:
+  - intValue: 1
+    stringValue: Dying
+  - intValue: 2
+    stringValue: Dying_Upgrade_1
+  - intValue: 3
+    stringValue: Dying_Upgrade_2
+  - intValue: 4
+    stringValue: Dying_Upgrade_3
+  engaging: engaging
+  attackSound: {fileID: 0}
+  selectSound: {fileID: 0}
+  useWeaponSound: {fileID: 0}
+  attackVolume: 1
+  selectVolume: 1
+  useWeaponVolume: 1
+  finishedJobSound: {fileID: 0}
+  finishedJobVolume: 1
 --- !u!114 &114752751758093076
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2353,37 +2410,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c3e17636be9820419ae7c07de02b4ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114832276289969082
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1061207286704144}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10ab47e8be691884ea9e3dc0b8a53e50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentAnimState: 0
-  idling: idling
-  moving: moving
-  engaging: engaging
-  specialEngaging: specialEngaging
-  dying: dying
-  fire: fire
-  specialFire: specialFire
-  specialAttack: specialAttack
-  extra: extra
-  attackSound: {fileID: 0}
-  selectSound: {fileID: 0}
-  useWeaponSound: {fileID: 0}
-  attackVolume: 1
-  selectVolume: 1
-  useWeaponVolume: 1
-  driveSound: {fileID: 0}
-  moveSound: {fileID: 0}
-  driveVolume: 0.5
-  moveVolume: 1
 --- !u!114 &114844726585989748
 MonoBehaviour:
   m_ObjectHideFlags: 1

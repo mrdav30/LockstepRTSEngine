@@ -85,7 +85,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4202374847975352}
-  - component: {fileID: 65699365307129596}
   m_Layer: 0
   m_Name: HumanBarracks
   m_TagString: Untagged
@@ -126,7 +125,7 @@ GameObject:
   - component: {fileID: 114101414404568314}
   - component: {fileID: 114686156804767258}
   - component: {fileID: 114958349450188848}
-  - component: {fileID: 114174580180165744}
+  - component: {fileID: 114474203312825904}
   - component: {fileID: 95563551641728878}
   - component: {fileID: 114759572138077454}
   m_Layer: 0
@@ -2137,18 +2136,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1070757287211460}
   m_Mesh: {fileID: 4300010, guid: 5ca7af977c5b1454e9df6b7c705f5e10, type: 3}
---- !u!65 &65699365307129596
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188499760507754}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.03659997, y: 1, z: 0.038971327}
-  m_Center: {x: -0.0019209587, y: 0, z: -0.0030940347}
 --- !u!95 &95563551641728878
 Animator:
   serializedVersion: 3
@@ -2180,37 +2167,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 32768000
   _currentHealth: 0
---- !u!114 &114174580180165744
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1197058999540568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10ab47e8be691884ea9e3dc0b8a53e50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentAnimState: 0
-  idling: idling
-  moving: moving
-  engaging: engaging
-  specialEngaging: specialEngaging
-  dying: dying
-  fire: fire
-  specialFire: specialFire
-  specialAttack: specialAttack
-  extra: extra
-  attackSound: {fileID: 0}
-  selectSound: {fileID: 0}
-  useWeaponSound: {fileID: 0}
-  attackVolume: 1
-  selectVolume: 1
-  useWeaponVolume: 1
-  driveSound: {fileID: 0}
-  moveSound: {fileID: 0}
-  driveVolume: 0.5
-  moveVolume: 1
 --- !u!114 &114469940066893222
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2231,6 +2187,147 @@ MonoBehaviour:
   objectName: HumanBarracks
   cost: 250
   sellValue: 175
+--- !u!114 &114474203312825904
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1197058999540568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bb4c5550f0b41c48af6c4d79a2a3229, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAnimState: 0
+  idling:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 01000000020000000300000004000000
+    _keys: 01000000020000000300000004000000
+    _values:
+    - Idling
+    - Idling_Upgrade_1
+    - Idling_Upgrade_2
+    - Idling_Upgrade_3
+  building:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 01000000020000000300000004000000
+    _keys: 01000000020000000300000004000000
+    _values:
+    - Building
+    - Building_Upgrade_1
+    - Building_Upgrade_2
+    - Building_Upgrade_3
+  working:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 01000000020000000300000004000000
+    _keys: 01000000020000000300000004000000
+    _values:
+    - Working
+    - Working_Upgrade_1
+    - Working_Upgrade_2
+    - Working_Upgrade_3
+  dying:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 01000000020000000300000004000000
+    _keys: 01000000020000000300000004000000
+    _values:
+    - Dying
+    - Dying_Upgrade_1
+    - Dying_Upgrade_2
+    - Dying_Upgrade_3
+  engaging: engaging
+  attackSound: {fileID: 0}
+  selectSound: {fileID: 0}
+  useWeaponSound: {fileID: 0}
+  attackVolume: 1
+  selectVolume: 1
+  useWeaponVolume: 1
+  finishedJobSound: {fileID: 0}
+  finishedJobVolume: 1
 --- !u!114 &114686156804767258
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2311,7 +2408,7 @@ MonoBehaviour:
     _halfWidth: 32768
     _halfHeight: 32768
     _radius: 425984
-    _immovable: 0
+    _immovable: 1
     _basePriority: 0
     _vertices: []
     _height: 65536

@@ -276,9 +276,9 @@ public class HUD : MonoBehaviour
             {
                 sliderValue = 0.0f;
             }
-            if (selectedAgent.MyAgentType == AgentType.Unit && selectedAgent.GetAbility<Build>())
+            if (selectedAgent.MyAgentType == AgentType.Unit && selectedAgent.GetAbility<Construct>())
             {
-                DrawActions(selectedAgent.GetAbility<Build>().GetBuildActions());
+                DrawActions(selectedAgent.GetAbility<Construct>().GetBuildActions());
             }
             else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>())
             {
@@ -520,7 +520,7 @@ public class HUD : MonoBehaviour
                     {
                         PlayClick();
 
-                        if (agent.MyAgentType == AgentType.Unit && agent.GetAbility<Build>())
+                        if (agent.MyAgentType == AgentType.Unit && agent.GetAbility<Construct>())
                         {
                             cachedCommander.CachedBuilderManager.CreateBuilding(agent, actions[i]);
                         }

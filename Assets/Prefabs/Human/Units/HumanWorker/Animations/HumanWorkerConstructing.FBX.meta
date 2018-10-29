@@ -103,7 +103,7 @@ ModelImporter:
     4300006: peasant5
     4300008: peasant6
     4300010: peasant4
-    7400000: Building
+    7400000: Constructing
     9500000: //RootNode
     13700000: peasant1
     13700002: peasant2
@@ -137,7 +137,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Building
+      name: Constructing
       takeName: Build
       firstFrame: 865
       lastFrame: 904

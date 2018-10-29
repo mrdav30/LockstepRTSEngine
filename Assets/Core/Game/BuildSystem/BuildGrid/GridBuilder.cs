@@ -54,7 +54,7 @@ public static class GridBuilder
 	private static bool EndPlace()
 	{
 		Coordinate coor = Target.GridPosition;
-		bool canBuild = (BuildGridAPI.Build(coor, Target));
+		bool canBuild = (BuildGridAPI.Construct(coor, Target));
 		Target.IsValidOnGrid = (canBuild);
 		Target.IsMoving = false;
 		return canBuild;
@@ -102,7 +102,7 @@ public static class GridBuilder
 		if (TargetOriginalValid)
 		{
 			Target.GridPosition = TargetOriginalPosition;
-			BuildGridAPI.Build(TargetOriginalPosition, Target);
+			BuildGridAPI.Construct(TargetOriginalPosition, Target);
 			Target.IsValidOnGrid = true;
 			return PlacementResult.Returned;
 		}

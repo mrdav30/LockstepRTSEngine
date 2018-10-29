@@ -74,7 +74,7 @@ public class UserInputHelper : BehaviourHelper
         QuickMove = AbilityDataItem.FindInterfacer("Move");
         QuickTarget = AbilityDataItem.FindInterfacer("Attack");
         QuickHarvest = AbilityDataItem.FindInterfacer("Harvest");
-        QuickBuild = AbilityDataItem.FindInterfacer("Build");
+        QuickBuild = AbilityDataItem.FindInterfacer("Construct");
         QuickRally = AbilityDataItem.FindInterfacer("Spawner");
 
         if (GUIManager == null)
@@ -331,6 +331,7 @@ public class UserInputHelper : BehaviourHelper
                             ProcessInterfacer((QuickHarvest));
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Build>() != null && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
+                        else if (Selector.MainSelectedAgent.GetAbility<Construct>() && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
                                 && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                         {
                             //call build command

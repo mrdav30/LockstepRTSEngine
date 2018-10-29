@@ -8,7 +8,7 @@ namespace RTSLockstep
 {
     public class WorkerAI: DeterminismAI
     {
-        protected Build cachedBuild;
+        protected Construct cachedBuild;
         protected Harvest cachedHarvest;
 
         #region Serialized Values (Further description in properties)
@@ -17,7 +17,7 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             base.OnInitialize();
-            cachedBuild = Agent.GetAbility<Build>();
+            cachedBuild = Agent.GetAbility<Construct>();
             cachedHarvest = Agent.GetAbility<Harvest>();
         }
 
@@ -100,7 +100,7 @@ namespace RTSLockstep
                     if (closestBuilding)
                     {
                         // send build command
-                        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Build").ListenInputID);
+                        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
                         buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, closestBuilding.GlobalID));
                         UserInputHelper.SendCommand(buildCom);
                     }

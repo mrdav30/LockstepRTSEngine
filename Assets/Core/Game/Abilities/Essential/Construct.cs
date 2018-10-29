@@ -7,7 +7,7 @@ using UnityEngine;
 namespace RTSLockstep
 {
     [UnityEngine.DisallowMultipleComponent]
-    public class Build : ActiveAbility
+    public class Construct : ActiveAbility
     {
         private const int searchRate = LockstepManager.FrameRate / 2;
         //need a better way to determine time spent...
@@ -137,7 +137,7 @@ namespace RTSLockstep
                     cachedMove.StopMove();
                     inRange = true;
                 }
-                Agent.SetState(BuildingAnimState);
+                Agent.SetState(ConstructingAnimState);
 
                 //Use fixed math?
                 currentAmountBuilt += Mathf.RoundToInt((_buildSpeed * Time.deltaTime) + 1);
@@ -243,9 +243,9 @@ namespace RTSLockstep
             return fastMag <= fastRangeToTarget;
         }
 
-        protected virtual AnimState BuildingAnimState
+        protected virtual AnimState ConstructingAnimState
         {
-            get { return AnimState.Building; }
+            get { return AnimState.Constructing; }
         }
 
         public void SetBuilding(RTSAgent project)

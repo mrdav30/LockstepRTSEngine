@@ -60,8 +60,10 @@
         EngagingWood,
         EngagingOre,
         SpecialEngaging,
+        Constructing,
         Building,
-        Spawning
+        Spawning,
+        Working
     }
 
     public enum AnimImpulse
