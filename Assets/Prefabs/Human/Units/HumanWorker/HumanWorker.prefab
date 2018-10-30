@@ -1520,11 +1520,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  _buildSpeed: 655360
+  constructAmount: 3276800
+  _constructInterval: 65536
   _buildActions:
   - HumanBarracks
   - HumanTownHall
   - HumanWatchTower
+  _windup: 196608
+  _increasePriority: 1
 --- !u!114 &114552794059523324
 MonoBehaviour:
   m_ObjectHideFlags: 1

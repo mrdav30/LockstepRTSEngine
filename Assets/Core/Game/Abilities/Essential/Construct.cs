@@ -10,37 +10,48 @@ namespace RTSLockstep
     public class Construct : ActiveAbility
     {
         private const int searchRate = LockstepManager.FrameRate / 2;
-        //need a better way to determine time spent...
         private long currentAmountBuilt = 0;
-
-        //Stuff for the logic
-        private bool inRange;
-        private int basePriority;
-        private int searchCount;
         private long fastRangeToTarget;
         private Move cachedMove;
         private Turn cachedTurn;
         private Attack cachedAttack;
         protected LSBody CachedBody { get { return Agent.Body; } }
-
         private RTSAgent CurrentProject;
         private bool IsBuildMoving;
         public bool IsBuilding { get; private set; }
         public bool IsFocused { get; private set; }
+
+        //Stuff for the logic
+        private bool inRange;
+        private int basePriority;
+        private int searchCount;
+        private long constructCount;
         private int loadedProjectId = -1;
 
         #region Serialized Values (Further description in properties)
-        [FixedNumber, SerializeField, Tooltip("Used to determine how fast agent can build.")]
-        private long _buildSpeed = FixedMath.One;
+        [SerializeField, FixedNumber]
+        private long constructAmount = FixedMath.One;
+        [SerializeField, FixedNumber, Tooltip("Used to determine how fast agent can build.")]
+        private long _constructInterval = 1 * FixedMath.One;
         [SerializeField, Tooltip("Enter object names for prefabs this agent can build.")]
         private String[] _buildActions;
+        [SerializeField, FixedNumber]
+        private long _windup = 0;
+        [SerializeField]
+        private bool _increasePriority = true;
         #endregion
+
+        public long Windup { get { return _windup; } }
+        [Lockstep(true)]
+        public bool IsWindingUp { get; set; }
+
+        long windupCount;
 
         #region variables for quick fix for repathing to target's new position
         private const long repathDistance = FixedMath.One * 2;
         private FrameTimer repathTimer = new FrameTimer();
         private const int repathInterval = LockstepManager.FrameRate * 2;
-        private readonly int repathRandom = 0;
+        private int repathRandom = 0;
         #endregion
 
         protected override void OnSetup()
@@ -48,13 +59,12 @@ namespace RTSLockstep
             cachedTurn = Agent.GetAbility<Turn>();
             cachedMove = Agent.GetAbility<Move>();
             cachedAttack = Agent.GetAbility<Attack>();
-
             cachedMove.onStartMove += HandleStartMove;
 
             basePriority = CachedBody.Priority;
 
             // if agent doesn't have tag, set as builder by default
-            if(Agent.Tag == AgentTag.None)
+            if (Agent.Tag == AgentTag.None)
             {
                 Agent.Tag = AgentTag.Builder;
             }
@@ -75,12 +85,15 @@ namespace RTSLockstep
         {
             basePriority = Agent.Body.Priority;
             searchCount = LSUtility.GetRandom(searchRate) + 1;
+            constructCount = 0;
             CurrentProject = null;
             IsBuilding = false;
             IsBuildMoving = false;
             inRange = false;
             IsFocused = false;
-            //    this.Destination = new Vector2d(0, 0);
+
+            repathTimer.Reset(repathInterval);
+            repathRandom = LSUtility.GetRandom(repathInterval);
 
             //caching parameters
             var spawnVersion = Agent.SpawnVersion;
@@ -100,6 +113,17 @@ namespace RTSLockstep
         {
             if (Agent.Tag == AgentTag.Builder)
             {
+                if (constructCount > _constructInterval)
+                {
+                    //reset attackCount overcharge if left idle
+                    constructCount = _constructInterval;
+                }
+                else if (constructCount < _constructInterval)
+                {
+                    //charge up attack
+                    constructCount += LockstepManager.DeltaTime;
+                }
+
                 if (IsBuilding)
                 {
                     BehaveWithTarget();
@@ -116,6 +140,12 @@ namespace RTSLockstep
             }
         }
 
+        void StartWindup()
+        {
+            windupCount = 0;
+            IsWindingUp = true;
+        }
+
         void BehaveWithTarget()
         {
             if (CurrentProject && (CurrentProject.IsActive == false || !CurrentProject.GetAbility<Structure>().UnderConstruction()))
@@ -129,82 +159,111 @@ namespace RTSLockstep
             Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
             long fastMag = targetDirection.FastMagnitude();
 
-            if (CheckRange())
+            if (!IsWindingUp)
             {
-                IsBuildMoving = false;
-                if (!inRange)
+                if (CheckRange())
                 {
-                    cachedMove.StopMove();
-                    inRange = true;
-                }
-                Agent.SetState(ConstructingAnimState);
+                    IsBuildMoving = false;
+                    if (!inRange)
+                    {
+                        cachedMove.StopMove();
+                        inRange = true;
+                    }
+                    Agent.SetState(ConstructingAnimState);
 
-                //Use fixed math?
-                currentAmountBuilt += Mathf.RoundToInt((_buildSpeed * Time.deltaTime) + 1);
-                long amountBuilt = currentAmountBuilt;
-                if (amountBuilt > 0)
-                {
-                    currentAmountBuilt -= amountBuilt;
-                    CurrentProject.GetAbility<Structure>().Construct(amountBuilt);
+
+                    long mag;
+                    targetDirection.Normalize(out mag);
+                    bool withinTurn = cachedAttack.TrackAttackAngle == false ||
+                                      (fastMag != 0 &&
+                                      CachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                      && CachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+                    bool needTurn = mag != 0 && !withinTurn;
+                    if (needTurn)
+                    {
+                        cachedTurn.StartTurnDirection(targetDirection);
+                    }
+                    else
+                    {
+                        if (constructCount >= _constructInterval)
+                        {
+                            StartWindup();
+                        }
+                    }
                 }
-                if (!CurrentProject.GetAbility<Structure>().UnderConstruction())
+                else
                 {
-                    //if (audioElement != null)
-                    //{
-                    //    audioElement.Play(finishedJobSound);
-                    //}
-                    StopBuilding();
+                    cachedMove.PauseAutoStop();
+                    cachedMove.PauseCollisionStop();
+                    if (cachedMove.IsMoving == false)
+                    {
+                        cachedMove.StartMove(CurrentProject.Body._position);
+                        CachedBody.Priority = basePriority;
+                    }
+                    else
+                    {
+                        if (inRange)
+                        {
+                            cachedMove.Destination = CurrentProject.Body.Position;
+                        }
+                        else
+                        {
+                            if (repathTimer.AdvanceFrame())
+                            {
+                                if (CurrentProject.Body.PositionChangedBuffer &&
+                                    CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                {
+                                    cachedMove.StartMove(CurrentProject.Body._position);
+                                    //So units don't sync up and path on the same frame
+                                    repathTimer.AdvanceFrames(repathRandom);
+                                }
+                            }
+                        }
+                    }
+
+                    if (IsBuildMoving || IsFocused == false)
+                    {
+                        searchCount -= 1;
+                        if (searchCount <= 0)
+                        {
+                            searchCount = searchRate;
+                            //if (ScanAndEngage())
+                            //{
+                            //}
+                            //else
+                            //{
+                            //}
+                        }
+                    }
+                    if (inRange == true)
+                    {
+                        inRange = false;
+                    }
+                }
+            }
+
+            if (IsWindingUp)
+            {
+                //TODO: Do we need AgentConditional checks here?
+                windupCount += LockstepManager.DeltaTime;
+                if (windupCount >= Windup)
+                {
+                    windupCount = 0;
+                    Build();
+                    while (this.constructCount >= _constructInterval)
+                    {
+                        //resetting back down after attack is fired
+                        this.constructCount -= (this._constructInterval);
+                    }
+                    this.constructCount += Windup;
+                    IsWindingUp = false;
                 }
             }
             else
             {
-                cachedMove.PauseAutoStop();
-                cachedMove.PauseCollisionStop();
-                if (cachedMove.IsMoving == false)
-                {
-                    cachedMove.StartMove(CurrentProject.Body._position);
-                    CachedBody.Priority = basePriority;
-                }
-                else
-                {
-                    if (inRange)
-                    {
-                        cachedMove.Destination = CurrentProject.Body.Position;
-                    }
-                    else
-                    {
-                        if (repathTimer.AdvanceFrame())
-                        {
-                            if (CurrentProject.Body.PositionChangedBuffer &&
-                                CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
-                            {
-                                cachedMove.StartMove(CurrentProject.Body._position);
-                                //So units don't sync up and path on the same frame
-                                repathTimer.AdvanceFrames(repathRandom);
-                            }
-                        }
-                    }
-                }
-
-                if (IsBuildMoving || IsFocused == false)
-                {
-                    searchCount -= 1;
-                    if (searchCount <= 0)
-                    {
-                        searchCount = searchRate;
-                        //if (ScanAndEngage())
-                        //{
-                        //}
-                        //else
-                        //{
-                        //}
-                    }
-                }
-                if (inRange == true)
-                {
-                    inRange = false;
-                }
+                windupCount = 0;
             }
+
             if (inRange)
             {
                 cachedMove.PauseAutoStop();
@@ -214,7 +273,7 @@ namespace RTSLockstep
 
         void BehaveWithNoTarget()
         {
-            if (IsBuildMoving)
+            if (IsBuildMoving)// || Agent.IsCasting == false
             {
                 if (IsBuildMoving)
                 {
@@ -232,6 +291,23 @@ namespace RTSLockstep
                     //{
                     //}
                 }
+            }
+        }
+
+        void Build()
+        {
+            cachedMove.StopMove();
+            CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+
+            CurrentProject.GetAbility<Structure>().Construct(constructAmount);
+
+            if (!CurrentProject.GetAbility<Structure>().UnderConstruction())
+            {
+                //if (audioElement != null)
+                //{
+                //    audioElement.Play(finishedJobSound);
+                //}
+                StopBuilding();
             }
         }
 

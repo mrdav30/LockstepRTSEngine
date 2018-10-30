@@ -13,25 +13,48 @@ namespace RTSLockstep
         private Vector3d rallyPoint;
         private FlagState _flagState;
         private Queue<string> buildQueue;
-        private long currentSpawnProgress = 0;
+        private long currentSpawnProgress;
         private LSBody CachedBody { get { return Agent.Body; } }
 
+        //Stuff for the logic
+        private int basePriority;
+        private long spawnCount;
+        public bool IsFocused { get; private set; }
+
         #region Serialized Values (Further description in properties)
-        [SerializeField, Tooltip("Used to determine how fast agent can spawn.")]
-        private int _maxBuildProgress;         // By adjusting, make some buildings take longer to complete their work than others 
         public Texture2D rallyPointImage;
+        [SerializeField]
+        private long spawnIncrement = FixedMath.One;
+        [SerializeField]
+        private long _maxSpawnProgress = FixedMath.One;
         [SerializeField, Tooltip("Enter object names for prefabs this agent can spawn.")]
         private String[] _spawnActions;
+        [SerializeField, FixedNumber, Tooltip("Used to determine how fast agent can spawn.")]
+        private long _spawnInterval = 1 * FixedMath.One;
+        [SerializeField, FixedNumber]
+        private long _windup;
         #endregion
+
+        public long Windup { get { return _windup; } }
+        [Lockstep(true)]
+        public bool IsWindingUp { get; set; }
+
+        long windupCount;
 
         protected override void OnSetup()
         {
             Agent.onSelectedChange += HandleSelectedChange;
             buildQueue = new Queue<string>();
+
+            basePriority = CachedBody.Priority;
         }
 
         protected override void OnInitialize()
         {
+            basePriority = Agent.Body.Priority;
+            spawnCount = 0;
+            IsFocused = false;
+
             //caching parameters
             var spawnVersion = Agent.SpawnVersion;
             var controller = Agent.Controller;
@@ -39,7 +62,27 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            ProcessBuildQueue();
+            if (spawnCount > _spawnInterval)
+            {
+                //reset attackCount overcharge if left idle
+                spawnCount = _spawnInterval;
+            }
+            else if (spawnCount < _spawnInterval)
+            {
+                //charge up attack
+                spawnCount += LockstepManager.DeltaTime;
+            }
+
+            if (buildQueue.Count > 0)
+            {
+                BehaveWithBuildQueue();
+            }
+        }
+
+        void StartWindup()
+        {
+            windupCount = 0;
+            IsWindingUp = true;
         }
 
         public string[] getBuildQueueValues()
@@ -87,7 +130,7 @@ namespace RTSLockstep
 
         public float getBuildPercentage()
         {
-            return (float)currentSpawnProgress / (float)_maxBuildProgress;
+            return (float)currentSpawnProgress / (float)_maxSpawnProgress;
         }
 
         public void CreateUnit(string unitName)
@@ -102,29 +145,60 @@ namespace RTSLockstep
             buildQueue.Enqueue(unitName);
         }
 
+        protected void BehaveWithBuildQueue()
+        {
+
+            if (!IsWindingUp)
+            {
+                if (spawnCount >= _spawnInterval)
+                {
+                    StartWindup();
+                }
+            }
+
+            if (IsWindingUp)
+            {
+                //TODO: Do we need AgentConditional checks here?
+                windupCount += LockstepManager.DeltaTime;
+                if (windupCount >= Windup)
+                {
+                    windupCount = 0;
+                    ProcessBuildQueue();
+                    while (this.spawnCount >= _spawnInterval)
+                    {
+                        //resetting back down after attack is fired
+                        this.spawnCount -= (this._spawnInterval);
+                    }
+                    this.spawnCount += Windup;
+                    IsWindingUp = false;
+                }
+            }
+            else
+            {
+                windupCount = 0;
+            }
+        }
+
         protected void ProcessBuildQueue()
         {
-            if (buildQueue.Count > 0)
+            currentSpawnProgress += spawnIncrement;
+            if (currentSpawnProgress > _maxSpawnProgress)
             {
-                currentSpawnProgress += Mathf.RoundToInt(ResourceManager.BuildSpeed + Time.deltaTime);
-                if (currentSpawnProgress > _maxBuildProgress)
+                if (PlayerManager.MainController.Commander)
                 {
-                    if (PlayerManager.MainController.Commander)
+                    //if (audioElement != null)
+                    //{
+                    //    audioElement.Play(finishedJobSound);
+                    //}
+                    Vector2d spawnOutside = new Vector2d(this.transform.position);
+                    LSAgent agent = PlayerManager.MainController.CreateAgent(buildQueue.Dequeue(), spawnOutside);
+                    RTSAgent newUnit = agent.GetComponent<RTSAgent>();
+                    if (newUnit && spawnPoint != rallyPoint)
                     {
-                        //if (audioElement != null)
-                        //{
-                        //    audioElement.Play(finishedJobSound);
-                        //}
-                        Vector2d spawnOutside = new Vector2d(this.transform.position);
-                        LSAgent agent = PlayerManager.MainController.CreateAgent(buildQueue.Dequeue(), spawnOutside);
-                        RTSAgent newUnit = agent.GetComponent<RTSAgent>();
-                        if (newUnit && spawnPoint != rallyPoint)
-                        {
-                            newUnit.GetAbility<Move>().StartMove(rallyPoint.ToVector2d());
-                        }
+                        newUnit.GetAbility<Move>().StartMove(rallyPoint.ToVector2d());
                     }
-                    currentSpawnProgress = 0;
                 }
+                currentSpawnProgress = 0;
             }
         }
 

@@ -22,10 +22,6 @@ namespace RTSLockstep
         private Attack cachedAttack;
         private WorkerAI cachedAI;
         private LSBody CachedBody { get { return Agent.Body; } }
-        public bool IsHarvestMoving { get; private set; }
-        public bool IsHarvesting { get; private set; }
-        public bool IsEmptying { get; private set; }
-        public bool IsFocused { get; private set; }
 
         //Stuff for the logic
         private bool inRange;
@@ -33,6 +29,11 @@ namespace RTSLockstep
         private int searchCount;
         private long harvestCount;
         private int loadedDepositId = -1;
+
+        public bool IsHarvestMoving { get; private set; }
+        public bool IsHarvesting { get; private set; }
+        public bool IsEmptying { get; private set; }
+        public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
         public string ResourceStoreName = String.Empty;
@@ -422,7 +423,7 @@ namespace RTSLockstep
 
         void BehaveWithNoTarget()
         {
-            if (IsHarvestMoving || IsHarvesting == false && IsEmptying == false)
+            if (IsHarvestMoving || IsHarvesting == false && IsEmptying == false)// || Agent.IsCasting == false
             {
                 if (IsHarvestMoving)
                 {
@@ -479,19 +480,17 @@ namespace RTSLockstep
             CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
             currentDepositAmount += DepositAmount;
-            long deposit = currentDepositAmount;
+            long deposit = DepositAmount;
 
-            if (deposit >= 1)
+            if (deposit > currentLoadAmount)
             {
-                if (deposit > currentLoadAmount)
-                {
-                    deposit = currentLoadAmount;
-                }
-                currentDepositAmount -= deposit;
-                currentLoadAmount -= deposit;
-                ResourceType depositType = HarvestType;
-                Agent.Controller.Commander.AddResource(depositType, deposit);
+                deposit = currentLoadAmount;
             }
+            currentDepositAmount -= deposit;
+            currentLoadAmount -= deposit;
+
+            ResourceType depositType = HarvestType;
+            Agent.Controller.Commander.AddResource(depositType, deposit);
 
             if (currentLoadAmount <= 0)
             {
