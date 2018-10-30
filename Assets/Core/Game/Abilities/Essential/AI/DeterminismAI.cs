@@ -7,6 +7,7 @@ namespace RTSLockstep
 {
     public class DeterminismAI : Ability
     {
+        protected bool canAttack;
         protected Health cachedHealth;
         protected Attack cachedAttack;
         protected Move cachedMove;

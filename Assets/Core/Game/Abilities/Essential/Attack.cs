@@ -12,7 +12,6 @@ namespace RTSLockstep
         private const int SearchRate = (int)(LockstepManager.FrameRate / 2);
         public const long MissModifier = FixedMath.One / 2;
 
-        public bool CanAttack;
         public virtual bool CanMove { get; private set; }
 
         protected bool CanTurn { get; private set; }

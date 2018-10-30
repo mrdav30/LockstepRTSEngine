@@ -30,9 +30,9 @@ namespace RTSLockstep
         {
             if (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying || cachedBuild.IsBuilding)
             {
-                cachedAttack.CanAttack = false;
+                canAttack = false;
             }
-            cachedAttack.CanAttack = true;
+            canAttack = true;
         }
 
         public override bool ShouldMakeDecision()

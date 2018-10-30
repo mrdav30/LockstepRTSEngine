@@ -1593,7 +1593,7 @@ MonoBehaviour:
   _visualCenter: {fileID: 4548112688198874}
   VisualPositionChanged: 0
   objectName: HumanWorker
-  sellValue: 50
+  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
       canAdd: 1
@@ -1601,7 +1601,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 1
+      isExpanded: 0
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -1616,7 +1616,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
+    isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 000000001900000000000000190000000a0000000000000001000000

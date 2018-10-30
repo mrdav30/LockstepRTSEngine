@@ -5,7 +5,6 @@ namespace RTSLockstep
 {
     public class Structure : Ability
     {
-        public Texture2D sellImage;
         public bool provisioner;
         public int provisionAmount;
 
@@ -46,19 +45,6 @@ namespace RTSLockstep
                     (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
-        }
-
-        public void Sell()
-        {
-            if ((Agent as RTSAgent).GetCommander())
-            {
-                (Agent as RTSAgent).GetCommander().AddResource(ResourceType.Gold, (Agent as RTSAgent).sellValue);
-                if (provisioner)
-                {
-                    (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
-                }
-            }
-            Agent.Die(true);
         }
 
         public void StartConstruction()

@@ -30,11 +30,11 @@ namespace RTSLockstep
             {
                 if (cachedStructure.UnderConstruction() || cachedHealth.HealthAmount == 0)
                 {
-                    cachedAttack.CanAttack = false;
+                    canAttack = false;
                 }
-                cachedAttack.CanAttack = true;
+                canAttack = true;
             }
-            cachedAttack.CanAttack = false;
+            canAttack = false;
         }
 
         public override bool ShouldMakeDecision()

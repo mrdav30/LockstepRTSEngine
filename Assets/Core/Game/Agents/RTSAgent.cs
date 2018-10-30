@@ -12,7 +12,7 @@ public class RTSAgent : LSAgent
 {
     #region Properties
     public string objectName;
-    public int sellValue;
+    public Texture2D destroyImage;
 
     [SerializeField]
     public ResourceCost resourceCost = new ResourceCost
@@ -162,6 +162,11 @@ public class RTSAgent : LSAgent
     public AgentCommander GetCommander()
     {
         return cachedCommander;
+    }
+
+    public void Destroy()
+    {
+        GetAbility<Health>().Die();
     }
     #endregion
 

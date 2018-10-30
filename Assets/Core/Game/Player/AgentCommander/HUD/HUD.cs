@@ -270,7 +270,6 @@ public class HUD : MonoBehaviour
         selectionName = selectedAgent.GetComponent<RTSAgent>().objectName;
         if (selectedAgent.IsOwnedBy(cachedCommander.CachedController))
         {
-
             // reset slider value if the selected object has changed
             if (lastSelection && lastSelection != Selector.MainSelectedAgent)
             {
@@ -292,7 +291,10 @@ public class HUD : MonoBehaviour
                 {
                     DrawBuildQueue(lastSelection.GetAbility<Spawner>().getBuildQueueValues(), lastSelection.GetAbility<Spawner>().getBuildPercentage());
                 }
-                DrawStandardBuildingOptions(lastSelection as RTSAgent);
+            }
+            if(lastSelection.MyAgentType == AgentType.Building || lastSelection.MyAgentType == AgentType.Unit)
+            {
+                DrawStandardOptions(lastSelection as RTSAgent);
             }
         }
         if (!selectionName.Equals(""))
@@ -325,7 +327,7 @@ public class HUD : MonoBehaviour
         }
     }
 
-    private void DrawStandardBuildingOptions(RTSAgent building)
+    private void DrawStandardOptions(RTSAgent agent)
     {
         GUIStyle buttons = new GUIStyle();
         buttons.hover.background = smallButtonHover;
@@ -335,26 +337,26 @@ public class HUD : MonoBehaviour
         int topPos = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
-        if (GUI.Button(new Rect(leftPos, topPos, width, height), building.GetAbility<Structure>().sellImage))
+        if (cachedCommander.CachedController.SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
         {
             PlayClick();
-            building.GetAbility<Structure>().Sell();
+            agent.Destroy();
         }
-        if (building.GetAbility<Spawner>() != null && building.GetAbility<Spawner>().hasSpawnPoint())
+        if (agent.GetAbility<Spawner>() && agent.GetAbility<Spawner>().hasSpawnPoint())
         {
             leftPos += width + BUTTON_SPACING;
-            if (GUI.Button(new Rect(leftPos, topPos, width, height), building.GetAbility<Spawner>().rallyPointImage))
+            if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Spawner>().rallyPointImage))
             {
                 PlayClick();
                 if (activeCursorState != CursorState.RallyPoint && previousCursorState != CursorState.RallyPoint)
                 {
-                    building.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
+                    agent.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
                     SetCursorState(CursorState.RallyPoint);
                 }
                 else
                 {
                     // dirty hack to ensure toggle between RallyPoint and not works ...
-                    building.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
+                    agent.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
                     SetCursorState(CursorState.PanRight);
                     SetCursorState(CursorState.Select);
                 }

@@ -20,7 +20,7 @@ namespace RTSLockstep
 
         public override void CanAttack()
         {
-            cachedAttack.CanAttack = true;
+            canAttack = true;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
