@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using RTSLockstep;
-using RTSLockstep;
-using UnityEngine;
+﻿using RTSLockstep;
 using RTSLockstep.Data;
+using UnityEngine;
 
 public class BuildManager : MonoBehaviour
 {
@@ -53,17 +50,26 @@ public class BuildManager : MonoBehaviour
         GameObject newBuilding = Instantiate(ResourceManager.GetAgentTemplate(buildingName).gameObject);
 
         tempBuilding = newBuilding.GetComponent<RTSAgent>();
-        if (tempBuilding.MyAgentType == AgentType.Building)
+
+        if (!cachedCommander.CheckResources(tempBuilding))
         {
-            tempBuilding.name = buildingName;
-            tempBuilding.gameObject.transform.position = buildPoint.ToVector3();
-            tempCreator = creator;
-            findingPlacement = true;
-            tempBuilding.SetTransparentMaterial(notAllowedMaterial, true);
+            Destroy(newBuilding);
+          //  Debug.Log("not enough resources");
         }
         else
         {
-            Destroy(newBuilding);
+            if (tempBuilding.MyAgentType == AgentType.Building)
+            {
+                tempBuilding.name = buildingName;
+                tempBuilding.gameObject.transform.position = buildPoint.ToVector3();
+                tempCreator = creator;
+                findingPlacement = true;
+                tempBuilding.SetTransparentMaterial(notAllowedMaterial, true);
+            }
+            else
+            {
+                Destroy(newBuilding);
+            }
         }
     }
 
@@ -93,28 +99,34 @@ public class BuildManager : MonoBehaviour
         return canPlace;
     }
 
-    // move to build ability?
     public void StartConstruction()
     {
-        findingPlacement = false;
-        Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-        RTSAgent newBuilding = cachedCommander.CachedController.CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
-        Destroy(tempBuilding.gameObject);
-
-        newBuilding.SetState(AnimState.Building);
-        newBuilding.RestoreMaterials();
-        newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
-        newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-        newBuilding.SetCommander();
-
-        // send build command
-        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
-        UserInputHelper.SendCommand(buildCom);
-
-        newBuilding.GetAbility<Structure>().StartConstruction();
         // check that the Player has the resources available before allowing them to create a new Unit / Building
-        cachedCommander.RemoveResource(ResourceType.Gold, newBuilding.cost);
+        if (cachedCommander.CheckResources(tempBuilding))
+        {
+            cachedCommander.RemoveResources(tempBuilding);
+            findingPlacement = false;
+            Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
+            RTSAgent newBuilding = cachedCommander.CachedController.CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
+            Destroy(tempBuilding.gameObject);
+
+            newBuilding.SetState(AnimState.Building);
+            newBuilding.RestoreMaterials();
+            newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
+            newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+            newBuilding.SetCommander();
+
+            // send build command
+            Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+            buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
+            UserInputHelper.SendCommand(buildCom);
+
+            newBuilding.GetAbility<Structure>().StartConstruction();
+        }
+        else
+        {
+          //  Debug.Log("not enough resources!");
+        }
     }
 
     public void CancelBuildingPlacement()

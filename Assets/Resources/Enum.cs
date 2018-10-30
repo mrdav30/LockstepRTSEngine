@@ -18,7 +18,7 @@
     public enum ResourceType
     {
         Gold, 
-        Army,
+        Provision,
         Ore,
         Crystal,
         Stone,

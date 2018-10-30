@@ -544,9 +544,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4116631394849956}
   VisualPositionChanged: 0
   objectName: HumanWatchTower
-  cost: 200
   sellValue: 100
-  provisionCost: 0
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: fa000000640000006400000064000000000000000000000000000000
 --- !u!114 &114148155134134476
 MonoBehaviour:
   m_ObjectHideFlags: 1

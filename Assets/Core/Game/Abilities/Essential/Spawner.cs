@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,7 +77,8 @@ namespace RTSLockstep
                 IsCasting = true;
                 Agent.SetState(AnimState.Working);
                 BehaveWithBuildQueue();
-            } else
+            }
+            else
             {
                 IsCasting = false;
             }
@@ -135,7 +135,7 @@ namespace RTSLockstep
 
         public float getBuildPercentage()
         {
-            return (float)currentSpawnProgress / (float)_maxSpawnProgress;
+            return currentSpawnProgress / (float)_maxSpawnProgress;
         }
 
         public void CreateUnit(string unitName)
@@ -145,10 +145,16 @@ namespace RTSLockstep
             // check that the Player has the resources available before allowing them to create a new Unit / Building
             if ((Agent as RTSAgent).GetCommander() && unitObject)
             {
-                (Agent as RTSAgent).GetCommander().AddResource(ResourceType.Army, unitObject.provisionCost);
-                (Agent as RTSAgent).GetCommander().RemoveResource(ResourceType.Gold, unitObject.cost);
+                if ((Agent as RTSAgent).GetCommander().CheckResources(unitObject))
+                {
+                    (Agent as RTSAgent).GetCommander().RemoveResources(unitObject);
+                    spawnQueue.Enqueue(unitName);
+                }
+                else
+                {
+                //    Debug.Log("not enough resources!");
+                }
             }
-            spawnQueue.Enqueue(unitName);
         }
 
         protected void BehaveWithBuildQueue()

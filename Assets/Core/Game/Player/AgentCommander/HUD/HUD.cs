@@ -90,9 +90,9 @@ public class HUD : MonoBehaviour
                         resourceLimits.Add(ResourceType.Food, 0);
                         break;
                     case "Army":
-                        resourceImages.Add(ResourceType.Army, resources[i]);
-                        resourceValues.Add(ResourceType.Army, 0);
-                        resourceLimits.Add(ResourceType.Army, 0);
+                        resourceImages.Add(ResourceType.Provision, resources[i]);
+                        resourceValues.Add(ResourceType.Provision, 0);
+                        resourceLimits.Add(ResourceType.Provision, 0);
                         break;
                     default: break;
                 }
@@ -386,7 +386,7 @@ public class HUD : MonoBehaviour
         DrawResourceIcon(ResourceType.Crystal, iconLeft, textLeft, topPos);
         iconLeft += TEXT_WIDTH;
         textLeft += TEXT_WIDTH;
-        DrawResourceIcon(ResourceType.Army, iconLeft, textLeft, topPos);
+        DrawResourceIcon(ResourceType.Provision, iconLeft, textLeft, topPos);
         int padding = 7;
         int buttonWidth = ORDERS_BAR_WIDTH - 2 * padding - SCROLL_BAR_WIDTH;
         int buttonHeight = RESOURCE_BAR_HEIGHT - 2 * padding;

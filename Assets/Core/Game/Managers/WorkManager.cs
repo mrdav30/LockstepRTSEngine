@@ -78,7 +78,7 @@ namespace RTSLockstep
                 case "Gold":
                     return ResourceType.Gold;
                 case "Army":
-                    return ResourceType.Army;
+                    return ResourceType.Provision;
                 case "Ore":
                     return ResourceType.Ore;
                 case "Crystal":

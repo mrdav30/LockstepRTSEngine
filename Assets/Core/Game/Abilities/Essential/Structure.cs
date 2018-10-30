@@ -43,7 +43,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Army, provisionAmount);
+                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace RTSLockstep
                 (Agent as RTSAgent).GetCommander().AddResource(ResourceType.Gold, (Agent as RTSAgent).sellValue);
                 if (provisioner)
                 {
-                    (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Army, provisionAmount);
+                    (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
             Agent.Die(true);
@@ -91,7 +91,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Army, provisionAmount);
+                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace RTSLockstep
         {
             if (provisioner)
             {
-                (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Army, provisionAmount);
+                (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
         }
 

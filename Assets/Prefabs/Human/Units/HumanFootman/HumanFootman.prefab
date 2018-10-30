@@ -884,9 +884,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4916245628546948}
   VisualPositionChanged: 0
   objectName: HumanFootman
-  cost: 150
   sellValue: 75
-  provisionCost: 1
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 4b000000190000000000000000000000050000000000000001000000
 --- !u!114 &114307706126300774
 MonoBehaviour:
   m_ObjectHideFlags: 1

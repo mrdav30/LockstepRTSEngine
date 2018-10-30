@@ -593,9 +593,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4453475863889296}
   VisualPositionChanged: 0
   objectName: HumanHouse
-  cost: 75
   sellValue: 25
-  provisionCost: 0
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 00000000000000006400000064000000000000000000000000000000
 --- !u!114 &114947321780327122
 MonoBehaviour:
   m_ObjectHideFlags: 1

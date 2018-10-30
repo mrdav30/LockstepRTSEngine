@@ -151,6 +151,11 @@ public class AgentCommander : BehaviourHelper
         return resources[type];
     }
 
+    public long GetResourceLimit(ResourceType type)
+    {
+        return resourceLimits[type];
+    }
+
     public void RemoveResource(ResourceType type, int amount)
     {
         resources[type] -= amount;
@@ -159,6 +164,54 @@ public class AgentCommander : BehaviourHelper
     public void DecrementResourceLimit(ResourceType type, int amount)
     {
         resourceLimits[type] -= amount;
+    }
+
+    public bool CheckResources(RTSAgent agent)
+    {
+        bool validResources = true;
+        foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
+        {
+            if (entry.Value > 0)
+            {
+                switch (entry.Key.ToString())
+                {
+                    case "Provision":
+                        if ((entry.Value + GetResourceAmount(entry.Key)) >= GetResourceLimit(entry.Key))
+                        {
+                            validResources = false;
+                            Debug.Log("not enough supplies!");
+                        }
+                        break;
+                    default:
+                        if (entry.Value > GetResourceAmount(entry.Key))
+                        {
+                            validResources = false;
+                            Debug.Log("not enough resources!");
+                        }
+                        break;
+                };
+            };
+        }
+        return validResources;
+    }
+
+    public void RemoveResources(RTSAgent agent)
+    {
+        foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
+        {
+            if (entry.Value > 0)
+            {
+                switch (entry.Key.ToString())
+                {
+                    case "Provision":
+                        AddResource(entry.Key, entry.Value);
+                        break;
+                    default:
+                        RemoveResource(entry.Key, entry.Value);
+                        break;
+                };
+            };
+        }
     }
 
     public void SetController(AgentController controller)
@@ -177,7 +230,7 @@ public class AgentCommander : BehaviourHelper
         list.Add(ResourceType.Wood, 0);
         list.Add(ResourceType.Crystal, 0);
         list.Add(ResourceType.Food, 0);
-        list.Add(ResourceType.Army, 0);
+        list.Add(ResourceType.Provision, 0);
         return list;
     }
 
@@ -189,7 +242,7 @@ public class AgentCommander : BehaviourHelper
         IncrementResourceLimit(ResourceType.Wood, startWoodLimit);
         IncrementResourceLimit(ResourceType.Crystal, startCrystalLimit);
         IncrementResourceLimit(ResourceType.Food, startFoodLimit);
-        IncrementResourceLimit(ResourceType.Army, startArmyLimit);
+        IncrementResourceLimit(ResourceType.Provision, startArmyLimit);
     }
 
     private void AddStartResources()
@@ -200,7 +253,7 @@ public class AgentCommander : BehaviourHelper
         AddResource(ResourceType.Wood, startWood);
         AddResource(ResourceType.Crystal, startCrystal);
         AddResource(ResourceType.Food, startFood);
-        AddResource(ResourceType.Army, startArmy);
+        AddResource(ResourceType.Provision, startArmy);
     }
 
     private void LoadResources(JsonTextReader reader)

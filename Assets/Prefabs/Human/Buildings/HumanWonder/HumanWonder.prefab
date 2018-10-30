@@ -613,6 +613,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sellImage: {fileID: 2800000, guid: 2162af2a4c201bb41a304496d2697c4c, type: 3}
+  provisioner: 0
+  provisionAmount: 0
 --- !u!114 &114962212148504410
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -631,5 +633,30 @@ MonoBehaviour:
   _visualCenter: {fileID: 4176247825277596}
   VisualPositionChanged: 0
   objectName: HumanWonder
-  cost: 500
   sellValue: 250
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: f4010000f4010000f4010000f4010000f4010000f401000000000000

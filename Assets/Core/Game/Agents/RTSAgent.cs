@@ -1,15 +1,30 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using Newtonsoft.Json;
+using RotaryHeart.Lib.SerializableDictionary;
 using RTSLockstep;
-using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-// RTS integration ability
+[Serializable]
+public class ResourceCost : SerializableDictionaryBase<ResourceType, int> { };
+
 public class RTSAgent : LSAgent
 {
     #region Properties
     public string objectName;
-    public int cost, sellValue;
-    public int provisionCost;
+    public int sellValue;
+
+    [SerializeField]
+    public ResourceCost resourceCost = new ResourceCost
+    {
+        {ResourceType.Gold, 0 },
+        {ResourceType.Ore, 0 },
+        {ResourceType.Stone, 0 },
+        {ResourceType.Wood, 0 },
+        {ResourceType.Food, 0 },
+        {ResourceType.Crystal, 0 },
+        {ResourceType.Provision, 0 }
+    };
 
     public bool _provisioned { get; private set; }
     private Rect _playingArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
@@ -40,7 +55,7 @@ public class RTSAgent : LSAgent
         if (!_provisioned)
         {
             _provisioned = true;
-            cachedCommander.AddResource(ResourceType.Army, provisionCost);
+            cachedCommander.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
         }
         base.Simulate();
     }

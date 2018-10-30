@@ -3,7 +3,6 @@ using UnityEngine;
 
 public abstract class VictoryCondition : BehaviourHelper
 {
-    // private VictoryCondition[] victoryConditions;
     private HUD hud;
     private static bool Setted = false;
 

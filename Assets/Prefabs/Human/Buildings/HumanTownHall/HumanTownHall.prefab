@@ -2244,12 +2244,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldown: 0
   rallyPointImage: {fileID: 2800000, guid: c6c3f7a569545784780afde54bc6ee25, type: 3}
-  spawnIncrement: 2
+  spawnIncrement: 1
   _maxSpawnProgress: 25
   _spawnActions:
   - HumanWorker
   _spawnInterval: 65536
-  _windup: 65536
+  _windup: 131072
 --- !u!114 &114180653622063118
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2475,8 +2475,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4116143295185150}
   VisualPositionChanged: 0
   objectName: HumanTownHall
-  cost: 500
   sellValue: 250
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 64000000000000005e0100005e010000000000000000000000000000
 --- !u!114 &114802893862281402
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -1466,9 +1466,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4525782206356458}
   VisualPositionChanged: 0
   objectName: HumanArcher
-  cost: 175
   sellValue: 50
-  provisionCost: 1
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 4b000000000000000000000019000000050000000000000001000000
 --- !u!114 &114130895806642106
 MonoBehaviour:
   m_ObjectHideFlags: 1
