@@ -284,7 +284,7 @@ public class UserInputHelper : BehaviourHelper
             }
             else
             {
-                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(cachedCommander.CachedController))
+                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.IsOwnedBy(cachedCommander.CachedController))
                 {
                     if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {

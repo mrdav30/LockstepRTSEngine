@@ -89,7 +89,7 @@ namespace RTSLockstep
                     else if (Agent.Controller.GetAllegiance(cachedController) != AllegianceType.Friendly && cachedController.SelectedAgents.Count > 0
                         && Agent.MyAgentType != AgentType.Resource)
                     {
-                        if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Agent.GetAbility<Attack>())
+                        if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.GetAbility<Attack>())
                         {
                             cachedCommander.CachedHud.SetCursorState(CursorState.Attack);
                         }
