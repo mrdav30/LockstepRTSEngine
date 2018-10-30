@@ -40,7 +40,6 @@ namespace RTSLockstep
 
             if (cachedHealth.HealthAmount == cachedHealth.MaxHealth)
             {
-                Agent.SetState(AnimState.Idling);
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;

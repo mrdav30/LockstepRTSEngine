@@ -75,7 +75,12 @@ namespace RTSLockstep
 
             if (spawnQueue.Count > 0)
             {
+                IsCasting = true;
+                Agent.SetState(AnimState.Working);
                 BehaveWithBuildQueue();
+            } else
+            {
+                IsCasting = false;
             }
         }
 
@@ -266,6 +271,11 @@ namespace RTSLockstep
         public void SetFlagState(FlagState value)
         {
             this._flagState = value;
+        }
+
+        public int GetSpawnQueueCount()
+        {
+            return this.spawnQueue.Count;
         }
 
         public String[] GetSpawnActions()
