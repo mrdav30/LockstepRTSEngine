@@ -163,11 +163,6 @@ public class RTSAgent : LSAgent
     {
         return cachedCommander;
     }
-
-    public void Destroy()
-    {
-        GetAbility<Health>().Die();
-    }
     #endregion
 
     #region Private

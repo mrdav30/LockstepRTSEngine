@@ -340,7 +340,7 @@ public class HUD : MonoBehaviour
         if (cachedCommander.CachedController.SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
         {
             PlayClick();
-            agent.Destroy();
+            agent.Die();
         }
         if (agent.GetAbility<Spawner>() && agent.GetAbility<Spawner>().hasSpawnPoint())
         {
