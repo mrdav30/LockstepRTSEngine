@@ -720,6 +720,7 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
             SaveManager.WriteInt(writer, "SearchCount", searchCount);
+            SaveManager.WriteLong(writer, "HarvestCount", harvestCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
 
@@ -757,6 +758,9 @@ namespace RTSLockstep
                     break;
                 case "SearchCount":
                     searchCount = (int)readValue;
+                    break;
+                case "HarvestCount":
+                    harvestCount = (long)readValue;
                     break;
                 case "FastRangeToTarget":
                     fastRangeToTarget = (long)readValue;

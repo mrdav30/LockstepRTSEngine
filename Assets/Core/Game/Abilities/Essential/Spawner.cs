@@ -12,7 +12,7 @@ namespace RTSLockstep
         private Vector3d spawnPoint;
         private Vector3d rallyPoint;
         private FlagState _flagState;
-        private Queue<string> buildQueue;
+        private Queue<string> spawnQueue;
         private long currentSpawnProgress;
         private LSBody CachedBody { get { return Agent.Body; } }
 
@@ -44,7 +44,7 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             Agent.onSelectedChange += HandleSelectedChange;
-            buildQueue = new Queue<string>();
+            spawnQueue = new Queue<string>();
 
             basePriority = CachedBody.Priority;
         }
@@ -73,7 +73,7 @@ namespace RTSLockstep
                 spawnCount += LockstepManager.DeltaTime;
             }
 
-            if (buildQueue.Count > 0)
+            if (spawnQueue.Count > 0)
             {
                 BehaveWithBuildQueue();
             }
@@ -87,9 +87,9 @@ namespace RTSLockstep
 
         public string[] getBuildQueueValues()
         {
-            string[] values = new string[buildQueue.Count];
+            string[] values = new string[spawnQueue.Count];
             int pos = 0;
-            foreach (string unit in buildQueue)
+            foreach (string unit in spawnQueue)
             {
                 values[pos++] = unit;
             }
@@ -142,7 +142,7 @@ namespace RTSLockstep
             {
                 PlayerManager.MainController.Commander.RemoveResource(ResourceType.Gold, unitObject.cost);
             }
-            buildQueue.Enqueue(unitName);
+            spawnQueue.Enqueue(unitName);
         }
 
         protected void BehaveWithBuildQueue()
@@ -191,7 +191,7 @@ namespace RTSLockstep
                     //    audioElement.Play(finishedJobSound);
                     //}
                     Vector2d spawnOutside = new Vector2d(this.transform.position);
-                    LSAgent agent = PlayerManager.MainController.CreateAgent(buildQueue.Dequeue(), spawnOutside);
+                    LSAgent agent = PlayerManager.MainController.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
                     RTSAgent newUnit = agent.GetComponent<RTSAgent>();
                     if (newUnit && spawnPoint != rallyPoint)
                     {
@@ -277,8 +277,9 @@ namespace RTSLockstep
             SaveManager.WriteVector3d(writer, "SpawnPoint", spawnPoint);
             SaveManager.WriteVector3d(writer, "RallyPoint", rallyPoint);
             SaveManager.WriteString(writer, "FlagState", _flagState.ToString());
-            SaveManager.WriteFloat(writer, "BuildProgress", currentSpawnProgress);
-            SaveManager.WriteStringArray(writer, "BuildQueue", buildQueue.ToArray());
+            SaveManager.WriteFloat(writer, "SpawnProgress", currentSpawnProgress);
+            SaveManager.WriteLong(writer, "SpawnCount", spawnCount);
+            SaveManager.WriteStringArray(writer, "SpawnQueue", spawnQueue.ToArray());
         }
 
         protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
@@ -295,11 +296,14 @@ namespace RTSLockstep
                 case "FlagState":
                     _flagState = WorkManager.GetFlagState((string)readValue);
                     break;
-                case "BuildProgress":
+                case "SpawnProgress":
                     currentSpawnProgress = (long)readValue;
                     break;
-                case "BuildQueue":
-                    buildQueue = new Queue<string>(LoadManager.LoadStringArray(reader));
+                case "SpawnCount":
+                    spawnCount = (long)readValue;
+                    break;
+                case "SpawnQueue":
+                    spawnQueue = new Queue<string>(LoadManager.LoadStringArray(reader));
                     break;
                 default: break;
             }

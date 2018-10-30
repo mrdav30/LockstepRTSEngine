@@ -830,7 +830,6 @@ namespace RTSLockstep
             base.SaveDetails(writer);
             SaveManager.WriteVector2d(writer, "Destination", Destination);
             SaveManager.WriteUInt(writer, "TargetVersion", targetVersion);
-            SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteBoolean(writer, "AttackMoving", IsAttackMoving);
             if (Target)
             {
@@ -840,6 +839,7 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Focused", isFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
             SaveManager.WriteInt(writer, "SearchCount", searchCount);
+            SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
 
@@ -855,9 +855,6 @@ namespace RTSLockstep
                 case "TargetVersion":
                     targetVersion = (uint)readValue;
                     break;
-                case "AttackCount":
-                    attackCount = (long)readValue;
-                    break;
                 case "AttackMoving":
                     IsAttackMoving = (bool)readValue;
                     break;
@@ -872,6 +869,9 @@ namespace RTSLockstep
                     break;
                 case "SearchCount":
                     searchCount = (int)readValue;
+                    break;
+                case "AttackCount":
+                    attackCount = (long)readValue;
                     break;
                 case "FastRangeToTarget":
                     fastRangeToTarget = (long)readValue;
