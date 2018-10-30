@@ -98,9 +98,9 @@ namespace RTSLockstep
 
         public void HandleSelectedChange()
         {
-            if (Agent.Controller.Commander == PlayerManager.MainController.Commander)
+            if ((Agent as RTSAgent).GetCommander() == PlayerManager.MainController.Commander)
             {
-                RallyPoint flag = PlayerManager.MainController.Commander.GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = (Agent as RTSAgent).GetCommander().GetComponentInChildren<RallyPoint>();
                 if (Agent.IsSelected)
                 {
                     if (flag && spawnPoint != ResourceManager.InvalidPosition && rallyPoint != ResourceManager.InvalidPosition)
@@ -138,9 +138,10 @@ namespace RTSLockstep
             GameObject unit = ResourceManager.GetAgentTemplate(unitName).gameObject;
             RTSAgent unitObject = unit.GetComponent<RTSAgent>();
             // check that the Player has the resources available before allowing them to create a new Unit / Building
-            if (PlayerManager.MainController.Commander && unitObject)
+            if ((Agent as RTSAgent).GetCommander() && unitObject)
             {
-                PlayerManager.MainController.Commander.RemoveResource(ResourceType.Gold, unitObject.cost);
+                (Agent as RTSAgent).GetCommander().AddResource(ResourceType.Army, unitObject.provisionCost);
+                (Agent as RTSAgent).GetCommander().RemoveResource(ResourceType.Gold, unitObject.cost);
             }
             spawnQueue.Enqueue(unitName);
         }
@@ -184,17 +185,18 @@ namespace RTSLockstep
             currentSpawnProgress += spawnIncrement;
             if (currentSpawnProgress > _maxSpawnProgress)
             {
-                if (PlayerManager.MainController.Commander)
+                if ((Agent as RTSAgent).GetCommander())
                 {
                     //if (audioElement != null)
                     //{
                     //    audioElement.Play(finishedJobSound);
                     //}
                     Vector2d spawnOutside = new Vector2d(this.transform.position);
-                    LSAgent agent = PlayerManager.MainController.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
-                    RTSAgent newUnit = agent.GetComponent<RTSAgent>();
+                    LSAgent agent = Agent.Controller.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
+                    RTSAgent newUnit = agent as RTSAgent;
                     if (newUnit && spawnPoint != rallyPoint)
                     {
+                        newUnit.SetProvision(true);
                         newUnit.GetAbility<Move>().StartMove(rallyPoint.ToVector2d());
                     }
                 }
@@ -210,9 +212,9 @@ namespace RTSLockstep
         public void SetRallyPoint(Vector3d position)
         {
             rallyPoint = position;
-            if (PlayerManager.MainController.Commander && Agent.IsSelected)
+            if ((Agent as RTSAgent).GetCommander() && Agent.IsSelected)
             {
-                RallyPoint flag = PlayerManager.MainController.Commander.GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = (Agent as RTSAgent).GetCommander().GetComponentInChildren<RallyPoint>();
                 if (flag)
                 {
                     if (!flag.ActiveStatus)

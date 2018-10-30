@@ -546,6 +546,7 @@ MonoBehaviour:
   objectName: HumanWatchTower
   cost: 200
   sellValue: 100
+  provisionCost: 0
 --- !u!114 &114148155134134476
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -571,6 +572,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sellImage: {fileID: 2800000, guid: 2162af2a4c201bb41a304496d2697c4c, type: 3}
+  provisioner: 0
+  provisionAmount: 0
 --- !u!114 &114279839518768826
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -674,5 +677,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 16384000
+  _maxHealth: 22937600
   _currentHealth: 0

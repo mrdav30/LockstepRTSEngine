@@ -1526,6 +1526,7 @@ MonoBehaviour:
   - HumanBarracks
   - HumanTownHall
   - HumanWatchTower
+  - HumanHouse
   _windup: 196608
   _increasePriority: 1
 --- !u!114 &114552794059523324
@@ -1594,6 +1595,7 @@ MonoBehaviour:
   objectName: HumanWorker
   cost: 100
   sellValue: 50
+  provisionCost: 1
 --- !u!114 &114659132644954090
 MonoBehaviour:
   m_ObjectHideFlags: 1

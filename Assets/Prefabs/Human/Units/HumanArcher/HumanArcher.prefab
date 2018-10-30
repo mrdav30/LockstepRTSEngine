@@ -1468,6 +1468,7 @@ MonoBehaviour:
   objectName: HumanArcher
   cost: 175
   sellValue: 50
+  provisionCost: 1
 --- !u!114 &114130895806642106
 MonoBehaviour:
   m_ObjectHideFlags: 1

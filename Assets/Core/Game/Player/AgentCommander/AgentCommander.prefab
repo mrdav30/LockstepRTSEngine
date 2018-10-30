@@ -347,8 +347,8 @@ MonoBehaviour:
   human: 0
   startGold: 500
   startGoldLimit: 1000
-  startArmy: 10
-  startArmyLimit: 25
+  startArmy: 0
+  startArmyLimit: 0
   startOre: 100
   startOreLimit: 1000
   startCrystal: 100

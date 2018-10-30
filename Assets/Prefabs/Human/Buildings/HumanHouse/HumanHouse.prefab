@@ -525,6 +525,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sellImage: {fileID: 2800000, guid: 2162af2a4c201bb41a304496d2697c4c, type: 3}
+  provisioner: 1
+  provisionAmount: 5
 --- !u!114 &114035366893611324
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -547,7 +549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 9830400
+  _maxHealth: 16384000
   _currentHealth: 0
 --- !u!114 &114637899558616386
 MonoBehaviour:
@@ -593,6 +595,7 @@ MonoBehaviour:
   objectName: HumanHouse
   cost: 75
   sellValue: 25
+  provisionCost: 0
 --- !u!114 &114947321780327122
 MonoBehaviour:
   m_ObjectHideFlags: 1

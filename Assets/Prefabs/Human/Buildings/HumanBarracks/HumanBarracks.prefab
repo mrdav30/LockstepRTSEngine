@@ -2351,6 +2351,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sellImage: {fileID: 2800000, guid: 2162af2a4c201bb41a304496d2697c4c, type: 3}
+  provisioner: 0
+  provisionAmount: 0
 --- !u!114 &114759572138077454
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2439,10 +2441,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  _maxBuildProgress: 5
   rallyPointImage: {fileID: 2800000, guid: c6c3f7a569545784780afde54bc6ee25, type: 3}
+  spawnIncrement: 2
+  _maxSpawnProgress: 25
   _spawnActions:
   - HumanFootman
+  _spawnInterval: 65536
+  _windup: 65536
 --- !u!137 &137563664028444554
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

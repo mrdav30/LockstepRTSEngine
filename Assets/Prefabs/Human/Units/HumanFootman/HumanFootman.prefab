@@ -886,6 +886,7 @@ MonoBehaviour:
   objectName: HumanFootman
   cost: 150
   sellValue: 75
+  provisionCost: 1
 --- !u!114 &114307706126300774
 MonoBehaviour:
   m_ObjectHideFlags: 1

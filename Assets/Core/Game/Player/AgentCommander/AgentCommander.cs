@@ -155,7 +155,12 @@ public class AgentCommander : BehaviourHelper
     {
         resources[type] -= amount;
     }
-    
+
+    public void DecrementResourceLimit(ResourceType type, int amount)
+    {
+        resourceLimits[type] -= amount;
+    }
+
     public void SetController(AgentController controller)
     {
         CachedController = controller;

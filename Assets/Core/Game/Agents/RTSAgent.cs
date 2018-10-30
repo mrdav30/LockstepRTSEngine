@@ -9,7 +9,9 @@ public class RTSAgent : LSAgent
     #region Properties
     public string objectName;
     public int cost, sellValue;
+    public int provisionCost;
 
+    public bool _provisioned { get; private set; }
     private Rect _playingArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
     private List<Material> oldMaterials = new List<Material>();
     protected bool loadedSavedValues = false;
@@ -31,7 +33,16 @@ public class RTSAgent : LSAgent
                 SetTeamColor();
             }
         }
+    }
 
+    public override void Simulate()
+    {
+        if (!_provisioned)
+        {
+            _provisioned = true;
+            cachedCommander.AddResource(ResourceType.Army, provisionCost);
+        }
+        base.Simulate();
     }
     #endregion
 
@@ -78,6 +89,11 @@ public class RTSAgent : LSAgent
     public Rect GetPlayerArea()
     {
         return this._playingArea;
+    }
+
+    public void SetProvision(bool value)
+    {
+        this._provisioned = value;
     }
 
     // integrate with LSF

@@ -13,6 +13,7 @@ namespace RTSLockstep
     public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
         private bool isCasting;
+        bool IsFirstFrame = true;
 
         private LSAgent _agent;
 
@@ -129,11 +130,11 @@ namespace RTSLockstep
         {
         }
 
-        bool IsFirstFrame = true;
         private void FirstFrame()
         {
             OnFirstFrame();
         }
+
         protected virtual void OnFirstFrame()
         {
 
