@@ -1,11 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using RTSLockstep;
-using RTSLockstep;
+﻿using RTSLockstep;
 
 public class BuildWonder : VictoryCondition
 {
-
     public override string GetDescription()
     {
         return "Building Wonder";

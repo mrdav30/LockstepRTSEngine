@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public class Conquest : VictoryCondition
+﻿public class Conquest : VictoryCondition
 {
 
     public override string GetDescription()

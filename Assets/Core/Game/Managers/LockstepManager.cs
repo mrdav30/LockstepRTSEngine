@@ -152,8 +152,6 @@ namespace RTSLockstep
 				Loaded = true;
 			}
 
-
-
 			DefaultMessageRaiser.EarlyInitialize ();
 
 			LSDatabaseManager.Initialize ();

@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using RTSLockstep;
 using RTSLockstep;
 
 // If critical that the unit survives, then you could always override GameFinished() 
@@ -27,7 +25,7 @@ public class EscortConvoy : VictoryCondition
 
     public override string GetDescription()
     {
-        return "Escort Convoy Truck";
+        return "Escort Convoy";
     }
 
     public override bool CommanderMeetsConditions(AgentCommander commander)

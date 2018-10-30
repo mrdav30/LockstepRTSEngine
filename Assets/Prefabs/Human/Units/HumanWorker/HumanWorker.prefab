@@ -1500,7 +1500,7 @@ MonoBehaviour:
   _cooldown: 0
   ResourceStoreName: HumanTownHall
   CollectionAmount: 15
-  DepositAmount: 15
+  DepositAmount: 25
   Capacity: 75
   _harvestInterval: 65536
   _windup: 196608

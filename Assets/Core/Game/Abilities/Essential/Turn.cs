@@ -6,11 +6,9 @@ namespace RTSLockstep
 {
 	public class Turn : Ability
 	{
-
 		#region Serialized
 		[SerializeField, VectorRotation (true)]
-		private Vector2d
-		_turnRate = Vector2d.CreateRotation (FixedMath.One / 8);
+		private Vector2d _turnRate = Vector2d.CreateRotation (FixedMath.One / 8);
 		#endregion
 		private bool targetReached;
 		private Vector2d targetRotation;
@@ -154,7 +152,6 @@ namespace RTSLockstep
 		{
 			StopTurn ();
 		}
-
 
 		private void HandleContact (LSBody other)
 		{
