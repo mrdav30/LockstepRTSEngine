@@ -1502,6 +1502,9 @@ MonoBehaviour:
   CollectionAmount: 15
   DepositAmount: 15
   Capacity: 75
+  _harvestInterval: 65536
+  _windup: 196608
+  _increasePriority: 1
   HarvestingAnimState: 0
   MovingAnimState: 0
   IdlingAnimState: 0
