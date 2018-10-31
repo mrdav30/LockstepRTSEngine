@@ -7,18 +7,7 @@ public class UserInputHelper : BehaviourHelper
 {
     #region Properties
     //LSF
-    private static RTSGUIManager _guiManager;
-    public static RTSGUIManager GUIManager
-    {
-        get
-        {
-            return _guiManager;
-        }
-        set
-        {
-            _guiManager = value;
-        }
-    }
+    public static RTSGUIManager GUIManager;
 
     /// <summary>
     /// The current ability to cast. Set this to a non-null value to automatically start the gathering process.
@@ -60,10 +49,10 @@ public class UserInputHelper : BehaviourHelper
     }
 
     [SerializeField]
-    private readonly GUIStyle _boxStyle;
+    private GUIStyle _boxStyle;
 
     private static bool Setted = false;
-    private static readonly Command curCom;
+    private static Command curCom;
     #endregion
 
     #region BehaviorHelper
@@ -199,14 +188,14 @@ public class UserInputHelper : BehaviourHelper
 
         // make sure movement is in the direction the camera is pointing
         // but ignore the vertical tilt of the camera to get sensible scrolling
-        movement = Camera.main.transform.TransformDirection(movement);
+        movement = GUIManager.MainCam.transform.TransformDirection(movement);
         movement.y = 0;
 
         // away from ground movement
         movement.y -= ResourceManager.ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
 
         // calculate desiered camera position based on received input
-        Vector3 origin = Camera.main.transform.position;
+        Vector3 origin = GUIManager.MainCam.transform.position;
         Vector3 destination = origin;
         destination.x += movement.x;
         destination.y += movement.y;
@@ -225,7 +214,7 @@ public class UserInputHelper : BehaviourHelper
         // if a change in position is destected, perform necessary update
         if (destination != origin)
         {
-            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
+            GUIManager.MainCam.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
         }
 
         //!Selector.MainSelectedAgent && 
@@ -240,7 +229,7 @@ public class UserInputHelper : BehaviourHelper
 
     private void RotateCamera()
     {
-        Vector3 origin = Camera.main.transform.eulerAngles;
+        Vector3 origin = GUIManager.MainCam.transform.eulerAngles;
         Vector3 destination = origin;
 
         // detect rotation amount if no agents selected & Right mouse button is down
@@ -253,7 +242,7 @@ public class UserInputHelper : BehaviourHelper
         // if a change in position is detected, perform necessary update
         if (destination != origin)
         {
-            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
+            GUIManager.MainCam.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
         }
     }
 
