@@ -43,13 +43,13 @@ namespace RTSLockstep
                                                                 );
         static readonly FastList<LSAgent> BoxedAgents = new FastList<LSAgent>();
 
+        private static bool _selectionLocked = false;
+
         public static void Initialize()
         {
             mainCamera = Camera.main;
             ClearSelection();
         }
-
-        public static bool CanClearSelection;
 
         public static void Update()
         {
@@ -177,7 +177,7 @@ namespace RTSLockstep
                 if (Input.GetMouseButtonUp(0))
                 {
 
-                    if (CanClearSelection && !Input.GetKey(KeyCode.LeftShift))
+                    if (_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                     {
                         ClearSelection();
                     }
@@ -214,7 +214,7 @@ namespace RTSLockstep
 
         public static void QuickSelect()
         {
-            if (CanClearSelection)
+            if (_selectionLocked)
                 ClearSelection();
             SelectAgent(MousedAgent);
         }
@@ -263,6 +263,19 @@ namespace RTSLockstep
         {
             Selector.Clear();
         }
+
+        public static void SetSelectionLock(bool lockState)
+        {
+            if (lockState)
+            {
+                _selectionLocked = true;
+            }
+            else
+            {
+                _selectionLocked = false;
+            }
+        }
+
 
         public static void ClearBox()
         {

@@ -84,18 +84,18 @@ namespace RTSLockstep
                     if ((Agent as RTSAgent).Controller.Commander && (Agent as RTSAgent).Controller.Commander == cachedCommander)
                     {
                         //belongs to current cachedCommander
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Select);
+                        cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
                     }
                     else if (Agent.Controller.GetAllegiance(cachedController) != AllegianceType.Friendly && cachedController.SelectedAgents.Count > 0
                         && Agent.MyAgentType != AgentType.Resource)
                     {
                         if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.GetAbility<Attack>())
                         {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.Attack);
+                            cachedCommander.CachedHud.SetCursorState(CursorState.Attack, false);
                         }
                         else
                         {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.Select);
+                            cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
                         }
                     }
                 }
@@ -105,11 +105,11 @@ namespace RTSLockstep
                     {
                         if (Agent.MyAgentType == AgentType.Building && cachedSpawner && cachedSpawner.GetFlagState() == FlagState.SettingFlag)
                         {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.RallyPoint);
+                            cachedCommander.CachedHud.SetCursorState(CursorState.RallyPoint, true);
                         }
                         else if (Agent.GetAbility<Move>() && Agent.GetAbility<Move>().CanMove)
                         {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.Move);
+                            cachedCommander.CachedHud.SetCursorState(CursorState.Move, false);
                         }
                     }
                     else
@@ -119,12 +119,12 @@ namespace RTSLockstep
                             if (SelectionManager.MousedAgent.MyAgentType == AgentType.Resource
                                 && !SelectionManager.MousedAgent.GetAbility<ResourceDeposit>().IsEmpty())
                             {
-                                cachedCommander.CachedHud.SetCursorState(CursorState.Harvest);
+                                cachedCommander.CachedHud.SetCursorState(CursorState.Harvest, false);
                             }
                             else if (SelectionManager.MousedAgent.MyAgentType == AgentType.Building && (Agent as RTSAgent).objectName == cachedHarvest.ResourceStoreName
                                 && cachedHarvest.GetCurrentLoad() > 0)
                             {
-                                cachedCommander.CachedHud.SetCursorState(CursorState.Deposit);
+                                cachedCommander.CachedHud.SetCursorState(CursorState.Deposit, false);
                             }
                         }
                     }

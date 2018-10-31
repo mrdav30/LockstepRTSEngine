@@ -26,11 +26,13 @@ public class HUD : MonoBehaviour
     public float clickVolume = 1.0f;
 
     private AgentCommander cachedCommander;
+    private bool _cursorLocked = false;
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40;
     private const int SELECTION_NAME_HEIGHT = 15;
     private CursorState activeCursorState;
     private int currentFrame = 0;
-    private Dictionary<ResourceType, long> resourceValues, resourceLimits;
+    private Dictionary<ResourceType, long> resourceValues;
+    private Dictionary<ResourceType, long> resourceLimits;
     private const int ICON_WIDTH = 32, ICON_HEIGHT = 32, TEXT_WIDTH = 128, TEXT_HEIGHT = 32;
     private static Dictionary<ResourceType, Texture2D> resourceImages;
     private LSAgent lastSelection;
@@ -127,7 +129,7 @@ public class HUD : MonoBehaviour
             ResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
             ResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
-            SetCursorState(CursorState.Select);
+            SetCursorState(CursorState.Select, false);
 
             List<AudioClip> sounds = new List<AudioClip>();
             List<float> volumes = new List<float>();
@@ -186,8 +188,14 @@ public class HUD : MonoBehaviour
         return new Rect(0, RESOURCE_BAR_HEIGHT, screenWidth, screenHeight);
     }
 
-    public void SetCursorState(CursorState newState)
+    public void SetCursorState(CursorState newState, bool lockState)
     {
+        SetCursorLock(lockState);
+        if (_cursorLocked)
+        {
+            return;
+        }
+
         if (activeCursorState != newState)
         {
             previousCursorState = activeCursorState;
@@ -234,6 +242,18 @@ public class HUD : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    public void SetCursorLock(bool lockState)
+    {
+        if (lockState)
+        {
+            _cursorLocked = true;
+        }
+        else
+        {
+            _cursorLocked = false;
         }
     }
 
@@ -292,7 +312,7 @@ public class HUD : MonoBehaviour
                     DrawBuildQueue(lastSelection.GetAbility<Spawner>().getBuildQueueValues(), lastSelection.GetAbility<Spawner>().getBuildPercentage());
                 }
             }
-            if(lastSelection.MyAgentType == AgentType.Building || lastSelection.MyAgentType == AgentType.Unit)
+            if (lastSelection.MyAgentType == AgentType.Building || lastSelection.MyAgentType == AgentType.Unit)
             {
                 DrawStandardOptions(lastSelection as RTSAgent);
             }
@@ -351,14 +371,14 @@ public class HUD : MonoBehaviour
                 if (activeCursorState != CursorState.RallyPoint && previousCursorState != CursorState.RallyPoint)
                 {
                     agent.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
-                    SetCursorState(CursorState.RallyPoint);
+                    SetCursorState(CursorState.RallyPoint, true);
                 }
                 else
                 {
                     // dirty hack to ensure toggle between RallyPoint and not works ...
                     agent.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
-                    SetCursorState(CursorState.PanRight);
-                    SetCursorState(CursorState.Select);
+                  //  SetCursorState(CursorState.PanRight);
+                    SetCursorState(CursorState.Select, false);
                 }
             }
         }
@@ -429,8 +449,8 @@ public class HUD : MonoBehaviour
 
         if (mouseOverHud)
         {
-            SelectionManager.CanClearSelection = false;
-            SetCursorState(CursorState.Pointer);
+            SelectionManager.SetSelectionLock(false);
+            SetCursorState(CursorState.Pointer, false);
         }
 
         if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
@@ -570,7 +590,7 @@ public class HUD : MonoBehaviour
         float height = ResourceManager.TextHeight;
         float leftPos = ResourceManager.Padding;
         float topPos = Screen.height - height - ResourceManager.Padding;
-        Texture2D avatar = RTSLockstep.PlayerManager.GetPlayerAvatar();
+        Texture2D avatar = PlayerManager.GetPlayerAvatar();
         if (avatar)
         {
             //we want the texture to be drawn square at all times
@@ -578,7 +598,7 @@ public class HUD : MonoBehaviour
             leftPos += height + ResourceManager.Padding;
         }
         float minWidth = 0, maxWidth = 0;
-        string playerName = RTSLockstep.PlayerManager.GetPlayerName();
+        string playerName = PlayerManager.GetPlayerName();
         playerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(playerName), out minWidth, out maxWidth);
         GUI.Label(new Rect(leftPos, topPos, maxWidth, height), playerName);
         GUI.EndGroup();

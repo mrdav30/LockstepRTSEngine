@@ -178,13 +178,13 @@ public class UserInputHelper : BehaviourHelper
         if (xpos >= 0 && xpos < ResourceManager.ScrollWidth)
         {
             movement.x -= ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanLeft);
+            cachedCommander.CachedHud.SetCursorState(CursorState.PanLeft, false);
             mouseScroll = true;
         }
         else if (xpos <= Screen.width && xpos > Screen.width - ResourceManager.ScrollWidth)
         {
             movement.x += ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanRight);
+            cachedCommander.CachedHud.SetCursorState(CursorState.PanRight, false);
             mouseScroll = true;
         }
 
@@ -192,13 +192,13 @@ public class UserInputHelper : BehaviourHelper
         if (ypos >= 0 && ypos < ResourceManager.ScrollWidth)
         {
             movement.z -= ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanDown);
+            cachedCommander.CachedHud.SetCursorState(CursorState.PanDown, false);
             mouseScroll = true;
         }
         else if (ypos <= Screen.height && ypos > Screen.height - ResourceManager.ScrollWidth)
         {
             movement.z += ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanUp);
+            cachedCommander.CachedHud.SetCursorState(CursorState.PanUp, false);
             mouseScroll = true;
         }
 
@@ -235,7 +235,7 @@ public class UserInputHelper : BehaviourHelper
 
         if (!SelectionManager.MousedAgent && !mouseScroll)
         {
-            cachedCommander.CachedHud.SetCursorState(CursorState.Select);
+            cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
         }
     }
 
@@ -289,16 +289,17 @@ public class UserInputHelper : BehaviourHelper
                     if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
                         //call harvest command
-                        SelectionManager.CanClearSelection = false;
+                        SelectionManager.SetSelectionLock(false);
                         ProcessInterfacer((QuickRally));
                     }
                     else
                     {
-                        SelectionManager.CanClearSelection = true;
+                        SelectionManager.SetSelectionLock(true);
                     }
-                } else
+                }
+                else
                 {
-                    SelectionManager.CanClearSelection = true;
+                    SelectionManager.SetSelectionLock(true);
                 }
             }
         }
@@ -319,7 +320,7 @@ public class UserInputHelper : BehaviourHelper
                     if (Selector.MainSelectedAgent.GetAbility<Spawner>() && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
                         Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Select);
+                        cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
                     }
 
                     if (RTSInterfacing.MousedAgent.IsNotNull())
@@ -331,8 +332,8 @@ public class UserInputHelper : BehaviourHelper
                             ProcessInterfacer((QuickHarvest));
                         }
                         // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
-                        else if (Selector.MainSelectedAgent.GetAbility<Harvest>() && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0 
-                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction() 
+                        else if (Selector.MainSelectedAgent.GetAbility<Harvest>() && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0
+                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction()
                             && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                         {
                             //call harvest command 

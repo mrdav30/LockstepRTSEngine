@@ -15,7 +15,8 @@ public class AgentCommander : BehaviourHelper
         startWood, startWoodLimit, startStone, startStoneLimit, startFood, startFoodLimit;
     public Color teamColor;
 
-    private Dictionary<ResourceType, long> resources, resourceLimits;
+    private Dictionary<ResourceType, long> resources;
+    private Dictionary<ResourceType, long> resourceLimits;
     private bool Setted = false;
     #endregion
 
