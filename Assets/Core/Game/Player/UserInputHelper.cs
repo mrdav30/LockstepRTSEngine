@@ -243,8 +243,8 @@ public class UserInputHelper : BehaviourHelper
         Vector3 origin = Camera.main.transform.eulerAngles;
         Vector3 destination = origin;
 
-        // detect rotation amount if ALT is being heald and the Right mouse button is down
-        if ((Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) && Input.GetMouseButton(1))
+        // detect rotation amount if no agents selected & Right mouse button is down
+        if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1))
         {
             destination.x -= Input.GetAxis("Mouse Y") * ResourceManager.RotateAmount;
             destination.y += Input.GetAxis("Mouse X") * ResourceManager.RotateAmount;
