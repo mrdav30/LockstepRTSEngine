@@ -20,8 +20,8 @@ namespace RTSLockstep {
         public Selection() {}
 
 
-        static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
-        public Selection(FastEnumerable<LSAgent> selectedAgents) {
+        static readonly FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
+        public Selection(FastEnumerable<RTSAgent> selectedAgents) {
             bufferAgents.FastClear();
             selectedAgents.Enumerate(bufferAgents);
             this.AddAgents(bufferAgents.ToArray());
@@ -51,7 +51,7 @@ namespace RTSLockstep {
             return bufferBites.ToArray();
         }
 
-        public void AddAgents (params LSAgent[] agents) {
+        public void AddAgents (params RTSAgent[] agents) {
             for (int i = 0; i < agents.Length; i++) {
                 selectedAgentLocalIDs.Add(agents[i].LocalID);
             }

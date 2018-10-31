@@ -138,7 +138,7 @@ namespace RTSLockstep.Legacy
 
 		public Vector3 VisualPosition { get { return _visualPosition; } }
 
-		public LSAgent Agent { get; private set; }
+		public RTSAgent Agent { get; private set; }
 
 		public long FastRadius { get; private set; }
 
@@ -345,7 +345,7 @@ namespace RTSLockstep.Legacy
 
 		private Vector2d[] RotatedPoints;
 
-		public void Setup (LSAgent agent)
+		public void Setup (RTSAgent agent)
 		{
 
 		}

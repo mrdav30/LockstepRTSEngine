@@ -624,7 +624,7 @@ namespace RTSLockstep
         private readonly int collidedCount;
         private readonly ushort collidedID;
 
-        static LSAgent tempAgent;
+        static RTSAgent tempAgent;
         readonly bool paused;
         private void HandleCollision(LSBody other)
         {

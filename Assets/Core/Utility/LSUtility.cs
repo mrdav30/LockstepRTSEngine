@@ -9,7 +9,7 @@ namespace RTSLockstep
 	public static class LSUtility
 	{
 		public static readonly byte[] EmptyBytes = new byte[0];
-		public static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
+		public static readonly FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
 		public static readonly FastList<Health> bufferHealths = new FastList<Health>();
 		public static readonly FastList<byte> bufferBytes = new FastList<byte>();
         public static readonly FastList<int> bufferInts = new FastList<int> ();

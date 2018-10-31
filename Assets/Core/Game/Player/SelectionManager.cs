@@ -17,7 +17,7 @@ namespace RTSLockstep
 
         public static bool IsGathering { get; set; }
 
-        public static LSAgent MousedAgent { get; private set; }
+        public static RTSAgent MousedAgent { get; private set; }
 
         public static Vector2 MousePosition;
         public static Vector2 MouseWorldPosition;
@@ -38,10 +38,10 @@ namespace RTSLockstep
         private static Camera MainCamera { get { return mainCamera; } }
 
         static Vector2 agentPos;
-        static readonly FastSorter<LSAgent> bufferBoxedAgents = new FastSorter<LSAgent>(
+        static readonly FastSorter<RTSAgent> bufferBoxedAgents = new FastSorter<RTSAgent>(
                                                                     ((source, other) => source.BoxPriority - other.BoxPriority)
                                                                 );
-        static readonly FastList<LSAgent> BoxedAgents = new FastList<LSAgent>();
+        static readonly FastList<RTSAgent> BoxedAgents = new FastList<RTSAgent>();
 
         private static bool _selectionLocked = false;
 
@@ -161,7 +161,7 @@ namespace RTSLockstep
                             int peakBoxPriority = bufferBoxedAgents.PeekMax().BoxPriority;
                             while (bufferBoxedAgents.Count > 0)
                             {
-                                LSAgent agent = bufferBoxedAgents.PopMax();
+                                RTSAgent agent = bufferBoxedAgents.PopMax();
                                 if (agent.BoxPriority < peakBoxPriority)
                                     break;
                                 BoxAgent(agent);
@@ -219,7 +219,7 @@ namespace RTSLockstep
             SelectAgent(MousedAgent);
         }
 
-        public static void SelectAgent(LSAgent agent)
+        public static void SelectAgent(RTSAgent agent)
         {
 
             if (agent.IsNotNull())
@@ -228,7 +228,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void UnselectAgent(LSAgent agent)
+        public static void UnselectAgent(RTSAgent agent)
         {
             if (agent.IsNotNull())
             {
@@ -236,7 +236,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void BoxAgent(LSAgent agent)
+        public static void BoxAgent(RTSAgent agent)
         {
             if (System.Object.ReferenceEquals(agent, null))
                 return;
@@ -244,7 +244,7 @@ namespace RTSLockstep
             agent.IsHighlighted = true;
         }
 
-        static readonly FastList<LSAgent> bufferBoxable = new FastList<LSAgent>();
+        static readonly FastList<RTSAgent> bufferBoxable = new FastList<RTSAgent>();
 
         private static void CullBoxedAgents()
         {
@@ -307,7 +307,7 @@ namespace RTSLockstep
             }
         }
 
-        static LSAgent curAgent;
+        static RTSAgent curAgent;
         static RaycastHit hit;
         static Ray ray;
         static Vector2 Point;
@@ -335,7 +335,7 @@ namespace RTSLockstep
 
         }
 
-        private static void MouseOver(LSAgent agent)
+        private static void MouseOver(RTSAgent agent)
         {
             if (MousedAgent.RefEquals(agent))
             {

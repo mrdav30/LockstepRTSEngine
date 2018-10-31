@@ -138,7 +138,7 @@ namespace RTSLockstep
 
 		public Vector3 VisualPosition { get { return _visualPosition; } }
 
-		public LSAgent Agent { get; private set; }
+		public RTSAgent Agent { get; private set; }
 
 		public long FastRadius { get; private set; }
 
@@ -359,7 +359,7 @@ namespace RTSLockstep
 		private Vector3 velocityPosition;
 
 		#endregion
-		public void Setup(LSAgent agent)
+		public void Setup(RTSAgent agent)
 		{
 			if (Shape == ColliderType.Polygon) {
 			}

@@ -15,8 +15,8 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            Agent.onSelectedChange += HandleSelectedChange;
-            Agent.onHighlightedChange += HandleHighlightedChange;
+            Agent.OnSelectedChange += HandleSelectedChange;
+            Agent.OnHighlightedChange += HandleHighlightedChange;
 
             cachedHealth = Agent.GetAbility<Health>();
             cachedHarvest = Agent.GetAbility<Harvest>();
@@ -62,7 +62,7 @@ namespace RTSLockstep
                 return;
             }
 
-            (Agent as RTSAgent).SetPlayingArea((Agent as RTSAgent).Controller.GetCommanderHUD().GetPlayingArea());
+            Agent.SetPlayingArea(Agent.Controller.GetCommanderHUD().GetPlayingArea());
         }
 
         public void HandleHighlightedChange()
@@ -78,7 +78,7 @@ namespace RTSLockstep
                 {
                     if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
-                        if ((Selector.MainSelectedAgent as RTSAgent).GetCommander() == (Agent as RTSAgent).GetCommander())
+                        if (Selector.MainSelectedAgent.GetCommander() == Agent.GetCommander())
                         {
                             //agent belongs to current player
                             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
@@ -98,7 +98,7 @@ namespace RTSLockstep
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Harvest);
                             }
-                            else if (Agent.MyAgentType == AgentType.Building && (Agent as RTSAgent).objectName == Selector.MainSelectedAgent.GetAbility<Harvest>().ResourceStoreName
+                            else if (Agent.MyAgentType == AgentType.Building && Agent.objectName == Selector.MainSelectedAgent.GetAbility<Harvest>().ResourceStoreName
                                 && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Deposit);
@@ -117,9 +117,9 @@ namespace RTSLockstep
         private void DrawSelection()
         {
             GUI.skin = ResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), (Agent as RTSAgent).GetPlayerArea());
+            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
             // Draw the selection box around the currently selected object, within the bounds of the playing area
-            GUI.BeginGroup((Agent as RTSAgent).GetPlayerArea());
+            GUI.BeginGroup(Agent.GetPlayerArea());
             DrawSelectionBox(selectBox);
             GUI.EndGroup();
         }
@@ -185,9 +185,9 @@ namespace RTSLockstep
         private void DrawBuildProgress()
         {
             GUI.skin = ResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), (Agent as RTSAgent).GetPlayerArea());
+            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
-            GUI.BeginGroup((Agent as RTSAgent).GetPlayerArea());
+            GUI.BeginGroup(Agent.GetPlayerArea());
             CalculateCurrentHealth(0.5f, 0.99f);
             DrawHealthBar(selectBox, "Building ...");
             GUI.EndGroup();

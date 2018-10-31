@@ -42,7 +42,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -69,15 +69,14 @@ namespace RTSLockstep
             cachedHealth.HealthAmount += amount;
             if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
             {
-                //  Agent.SetState(AnimState.Idling);
                 cachedHealth.HealthAmount = cachedHealth.BaseHealth;
                 _needsBuilding = false;
                 IsCasting = false;
-                (Agent as RTSAgent).SetTeamColor();
+                Agent.SetTeamColor();
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    (Agent as RTSAgent).GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -91,7 +90,7 @@ namespace RTSLockstep
         {
             if (provisioner)
             {
-                (Agent as RTSAgent).GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+                Agent.GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
         }
 
@@ -102,7 +101,7 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "NeedsRepair", _needsRepair);
             if (_needsBuilding)
             {
-                SaveManager.WriteRect(writer, "PlayingArea", (Agent as RTSAgent).GetPlayerArea());
+                SaveManager.WriteRect(writer, "PlayingArea", Agent.GetPlayerArea());
             }
         }
 
@@ -118,7 +117,7 @@ namespace RTSLockstep
                     _needsRepair = (bool)readValue;
                     break;
                 case "PlayingArea":
-                    (Agent as RTSAgent).SetPlayingArea(LoadManager.LoadRect(reader));
+                    Agent.SetPlayingArea(LoadManager.LoadRect(reader));
                     break;
                 default: break;
             }

@@ -99,9 +99,9 @@ namespace RTSLockstep
             var spawnVersion = Agent.SpawnVersion;
             var controller = Agent.Controller;
 
-            if ((Agent as RTSAgent).GetCommander() && loadedSavedValues && loadedProjectId >= 0)
+            if (Agent.GetCommander() && loadedSavedValues && loadedProjectId >= 0)
             {
-                RTSAgent obj = (Agent as RTSAgent).GetCommander().GetObjectForId(loadedProjectId);
+                RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedProjectId);
                 if (obj.MyAgentType == AgentType.Building)
                 {
                     CurrentProject = obj;
@@ -394,7 +394,7 @@ namespace RTSLockstep
             {
                 IsFocused = true;
                 IsBuildMoving = false;
-                LSAgent tempTarget;
+                RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                 {

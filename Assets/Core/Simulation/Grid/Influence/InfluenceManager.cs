@@ -10,7 +10,7 @@ namespace RTSLockstep
 	public static class InfluenceManager
 	{
         static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
-        public static FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
+        public static FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
         private static FastList<LSBody> bufferBodies = new FastList<LSBody>();
         const int FoundScanBuffer = 5;
 
@@ -34,13 +34,13 @@ namespace RTSLockstep
 		//}
 
         #region Scanning
-        public static LSAgent Scan(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional)
+        public static RTSAgent Scan(Vector2d position, long radius, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional)
         {
             ScanAll(position, radius, agentConditional, bucketConditional, bufferAgents);
             return FindClosestAgent(position, bufferAgents);
         }
        
-		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
+		public static void ScanAll(Vector2d position, long radius, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<RTSAgent> output)
 		{
 			//If radius is too big and we scan too many tiles, performance will be bad
 			const long circleCastRadius = FixedMath.One * 16;
@@ -90,7 +90,7 @@ namespace RTSLockstep
 								{
 									if (arrayAllocation.Get(j))
 									{
-										LSAgent tempAgent = tempBucket[j].Agent;
+										RTSAgent tempAgent = tempBucket[j].Agent;
 
 										long distance = (tempAgent.Body.Position - position).FastMagnitude();
 										if (distance < fastRadius)
@@ -112,14 +112,14 @@ namespace RTSLockstep
 			}
 		}
 
-        public static LSAgent FindClosestAgent(Vector2d position, FastList<LSAgent> agents)
+        public static RTSAgent FindClosestAgent(Vector2d position, FastList<RTSAgent> agents)
         {
             long sourceX = position.x;
             long sourceY = position.y;
-            LSAgent closestAgent = null;
+            RTSAgent closestAgent = null;
             long closestDistance = 0;
             int foundBuffer = FoundScanBuffer;
-            foreach (LSAgent agent in agents)
+            foreach (RTSAgent agent in agents)
             {
 
                 if (closestAgent != null)

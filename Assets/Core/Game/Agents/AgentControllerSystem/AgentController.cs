@@ -10,10 +10,10 @@ namespace RTSLockstep
     {
         public string ControllerName { get; private set; }
 
-        public static Dictionary<string, FastStack<LSAgent>> CachedAgents;
+        public static Dictionary<string, FastStack<RTSAgent>> CachedAgents;
 
         public static readonly bool[] GlobalAgentActive = new bool[MaxAgents * 4];
-        public static readonly LSAgent[] GlobalAgents = new LSAgent[MaxAgents * 4];
+        public static readonly RTSAgent[] GlobalAgents = new RTSAgent[MaxAgents * 4];
 
         private static readonly FastStack<ushort> OpenGlobalIDs = new FastStack<ushort>();
 
@@ -22,7 +22,7 @@ namespace RTSLockstep
         public const int MaxAgents = 16384;
 
         public static Dictionary<ushort, FastList<bool>> TypeAgentsActive = new Dictionary<ushort, FastList<bool>>();
-        public static Dictionary<ushort, FastList<LSAgent>> TypeAgents = new Dictionary<ushort, FastList<LSAgent>>();
+        public static Dictionary<ushort, FastList<RTSAgent>> TypeAgents = new Dictionary<ushort, FastList<RTSAgent>>();
  
         public static void Initialize()
         {
@@ -30,7 +30,7 @@ namespace RTSLockstep
             GlobalAgentActive.Clear();
             OpenGlobalIDs.FastClear();
             PeakGlobalID = 0;
-            foreach (FastStack<LSAgent> cache in CachedAgents.Values)
+            foreach (FastStack<RTSAgent> cache in CachedAgents.Values)
             {
                 for (int j = 0; j < cache.Count; j++)
                 {
@@ -39,7 +39,7 @@ namespace RTSLockstep
             }
         }
 
-        internal static FastBucket<LSAgent> DeathingAgents = new FastBucket<LSAgent>();
+        internal static FastBucket<RTSAgent> DeathingAgents = new FastBucket<RTSAgent>();
 
         public static void Deactivate()
         {
@@ -56,7 +56,7 @@ namespace RTSLockstep
             {
                 if (DeathingAgents.arrayAllocation[i])
                 {
-                    LSAgent agent = DeathingAgents[i];
+                    RTSAgent agent = DeathingAgents[i];
                     AgentController.CompleteLife(agent);
                 }
             }
@@ -72,7 +72,7 @@ namespace RTSLockstep
             return PeakGlobalID++;
         }
 
-        public static bool TryGetAgentInstance(int globalID, out LSAgent returnAgent)
+        public static bool TryGetAgentInstance(int globalID, out RTSAgent returnAgent)
         {
             if (GlobalAgentActive[globalID])
             {
@@ -142,13 +142,13 @@ namespace RTSLockstep
             {
                 if (GlobalAgentActive[i])
                 {
-                    LSAgent agent = GlobalAgents[i];
+                    RTSAgent agent = GlobalAgents[i];
                     AgentController.DestroyAgent(agent);
                 }
             }
         }
 
-        public static void ChangeController(LSAgent agent, AgentController newCont)
+        public static void ChangeController(RTSAgent agent, AgentController newCont)
         {
 
             AgentController leController = agent.Controller;
@@ -176,10 +176,10 @@ namespace RTSLockstep
 
         public struct DeactivationData
         {
-            public LSAgent Agent;
+            public RTSAgent Agent;
             public bool Immediate;
 
-            public DeactivationData(LSAgent agent, bool immediate)
+            public DeactivationData(RTSAgent agent, bool immediate)
             {
                 Agent = agent;
                 Immediate = immediate;
@@ -188,7 +188,7 @@ namespace RTSLockstep
 
         static FastList<DeactivationData> DeactivationBuffer = new FastList<DeactivationData>();
 
-        public static void DestroyAgent(LSAgent agent, bool immediate = false)
+        public static void DestroyAgent(RTSAgent agent, bool immediate = false)
         {
             DeactivationBuffer.Add(new DeactivationData(agent, immediate));
         }
@@ -197,7 +197,7 @@ namespace RTSLockstep
 
         private static void DestroyAgentBuffer(DeactivationData data)
         {
-            LSAgent agent = data.Agent;
+            RTSAgent agent = data.Agent;
             if (agent.IsActive == false)
                 return;
             bool immediate = data.Immediate;
@@ -222,7 +222,7 @@ namespace RTSLockstep
         /// Completes the life of the agent and pools or destroys it.
         /// </summary>
         /// <param name="agent">Agent.</param>
-        public static void CompleteLife(LSAgent agent)
+        public static void CompleteLife(RTSAgent agent)
         {
             if (agent.CachedGameObject != null)
                 agent.CachedGameObject.SetActive(false);
@@ -238,7 +238,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void CacheAgent(LSAgent agent)
+        public static void CacheAgent(RTSAgent agent)
         {
             if (LockstepManager.PoolingEnabled)
                 CachedAgents[agent.MyAgentCode].Add(agent);
@@ -264,7 +264,7 @@ namespace RTSLockstep
             {
                 if (GlobalAgentActive[i])
                 {
-                    LSAgent agent = GlobalAgents[i];
+                    RTSAgent agent = GlobalAgents[i];
                     int n1 = agent.Body._position.GetHashCode() + agent.Body._rotation.GetStateHash();
                     switch (operationToggle)
                     {
@@ -294,11 +294,11 @@ namespace RTSLockstep
         //TODO: Hide this list and use methods to access it
         //Also, move static AC stuff into its own class
         public static FastList<AgentController> InstanceManagers = new FastList<AgentController>();
-        public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent>();
+        public readonly FastBucket<RTSAgent> SelectedAgents = new FastBucket<RTSAgent>();
 
         public bool SelectionChanged { get; set; }
 
-        public readonly LSAgent[] LocalAgents = new LSAgent[MaxAgents];
+        public readonly RTSAgent[] LocalAgents = new RTSAgent[MaxAgents];
         public readonly bool[] LocalAgentActive = new bool[MaxAgents];
 
         public byte ControllerID { get; private set; }
@@ -413,7 +413,7 @@ namespace RTSLockstep
            BehaviourHelperManager.InitializeOnDemand(_commander);
         }
 
-        public void AddToSelection(LSAgent agent)
+        public void AddToSelection(RTSAgent agent)
         {
             if (agent.IsSelected == false)
             {
@@ -422,7 +422,7 @@ namespace RTSLockstep
             }
         }
 
-        public void RemoveFromSelection(LSAgent agent)
+        public void RemoveFromSelection(RTSAgent agent)
         {
             SelectedAgents.Remove(agent);
             SelectionChanged = true;
@@ -464,7 +464,7 @@ namespace RTSLockstep
             //Commander.Agent.Execute (com);
         }
 
-        public void AddAgent(LSAgent agent)
+        public void AddAgent(RTSAgent agent)
         {
             ushort localID = GenerateLocalID();
             LocalAgents[localID] = agent;
@@ -477,17 +477,17 @@ namespace RTSLockstep
             agent.InitializeController(this, localID, globalID);
         }
 
-        public event Action<LSAgent> onCreateAgent;
+        public event Action<RTSAgent> onCreateAgent;
 
-        public LSAgent CreateAgent(string agentCode, Vector2d position)
+        public RTSAgent CreateAgent(string agentCode, Vector2d position)
         {
-            LSAgent agent = CreateAgent(agentCode, position, Vector2d.right);
+            RTSAgent agent = CreateAgent(agentCode, position, Vector2d.right);
             if (onCreateAgent != null)
                 onCreateAgent(agent);
             return agent;
         }
 
-        public static void RegisterRawAgent(LSAgent agent)
+        public static void RegisterRawAgent(RTSAgent agent)
         {
             var agentCodeID = ResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
             FastList<bool> typeActive;
@@ -496,10 +496,10 @@ namespace RTSLockstep
                 typeActive = new FastList<bool>();
                 TypeAgentsActive.Add(agentCodeID, typeActive);
             }
-            FastList<LSAgent> typeAgents;
+            FastList<RTSAgent> typeAgents;
             if (!TypeAgents.TryGetValue(agentCodeID, out typeAgents))
             {
-                typeAgents = new FastList<LSAgent>();
+                typeAgents = new FastList<RTSAgent>();
                 TypeAgents.Add(agentCodeID, typeAgents);
             }
 
@@ -510,19 +510,19 @@ namespace RTSLockstep
         }
 
         /// <summary>
-        /// Create an uninitialized LSAgent
+        /// Create an uninitialized RTSAgent
         /// </summary>
         /// <returns>The raw agent.</returns>
         /// <param name="agentCode">Agent code.</param>
         /// <param name="isBare">If set to <c>true</c> is bare.</param>
-        public static LSAgent CreateRawAgent(string agentCode)
+        public static RTSAgent CreateRawAgent(string agentCode)
         {
             if (!ResourceManager.IsValidAgentCode(agentCode))
             {
                 throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
-            FastStack<LSAgent> cache = CachedAgents[agentCode];
-            LSAgent curAgent = null;
+            FastStack<RTSAgent> cache = CachedAgents[agentCode];
+            RTSAgent curAgent = null;
 
             if (cache.IsNotNull() && cache.Count > 0)
             {
@@ -535,7 +535,7 @@ namespace RTSLockstep
             {
                 IAgentData interfacer = ResourceManager.AgentCodeInterfacerMap[agentCode];
 
-                curAgent = GameObject.Instantiate(ResourceManager.GetAgentTemplate(agentCode).gameObject).GetComponent<LSAgent>();
+                curAgent = GameObject.Instantiate(ResourceManager.GetAgentTemplate(agentCode).gameObject).GetComponent<RTSAgent>();
                 curAgent.Setup(interfacer);
 
                 RegisterRawAgent(curAgent);
@@ -543,7 +543,7 @@ namespace RTSLockstep
             }
             return curAgent;
         }
-        public LSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
+        public RTSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
         {
             var agent = CreateRawAgent(agentCode);
             InitializeAgent(agent, position, rotation);
@@ -556,7 +556,7 @@ namespace RTSLockstep
         /// </summary>
         /// <returns>The bare agent.</returns>
         /// <param name="agentCode">Agent code.</param>
-        public LSAgent CreateBareAgent(string agentCode)
+        public RTSAgent CreateBareAgent(string agentCode)
         {
             var agent = CreateRawAgent(agentCode);
             AddAgent(agent);
@@ -569,14 +569,14 @@ namespace RTSLockstep
         /// </summary>
         /// <returns>The dumb agent.</returns>
         /// <param name="agentCode">Agent code.</param>
-        public LSAgent CreateDumbAgent(string agentCode)
+        public RTSAgent CreateDumbAgent(string agentCode)
         {
             var agent = CreateRawAgent(agentCode);
             AddAgent(agent);
             return agent;
         }
 
-        public void InitializeAgent(LSAgent agent,
+        public void InitializeAgent(RTSAgent agent,
                                       Vector2d position,
                                       Vector2d rotation)
         {

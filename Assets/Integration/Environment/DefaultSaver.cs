@@ -110,7 +110,7 @@ namespace RTSLockstep
 		void SaveAgents ()
 		{
 			#if UNITY_EDITOR
-			LSAgent [] allAgents = GameObject.FindObjectsOfType<LSAgent> ();
+			RTSAgent [] allAgents = GameObject.FindObjectsOfType<RTSAgent> ();
 			FastList<EnvironmentAgentInfo> agentsBuffer = new FastList<EnvironmentAgentInfo> ();
 			
 			IAgentDataProvider database;
@@ -148,7 +148,7 @@ namespace RTSLockstep
         static bool IsAgent (object obj) {
             MonoBehaviour mb = obj as MonoBehaviour;
             if (mb.IsNull()) return false;
-            return mb.GetComponent<LSAgent>().IsNotNull();
+            return mb.GetComponent<RTSAgent>().IsNotNull();
         }
 
     }

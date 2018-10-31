@@ -133,7 +133,7 @@ namespace RTSLockstep
             return MainController.GetAllegiance(otherController);
         }
 
-        public static AllegianceType GetAllegiance(LSAgent agent)
+        public static AllegianceType GetAllegiance(RTSAgent agent)
         {
             return PlayerManager.GetAllegiance(agent.Controller);
         }

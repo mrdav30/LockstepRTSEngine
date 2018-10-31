@@ -16,7 +16,7 @@ namespace RTSLockstep
 
         protected bool CanTurn { get; private set; }
 
-        public LSAgent Target { get; private set; }
+        public RTSAgent Target { get; private set; }
 
         public virtual string ProjCode { get { return _projectileCode; } }
 
@@ -194,12 +194,12 @@ namespace RTSLockstep
             var controller = Agent.Controller;
             CachedOnHit = (target) => OnHit(target, spawnVersion, controller);
 
-            if ((Agent as RTSAgent).GetCommander() && loadedSavedValues && loadedTargetId >= 0)
+            if (Agent.GetCommander() && loadedSavedValues && loadedTargetId >= 0)
             {
-                RTSAgent obj = (Agent as RTSAgent).GetCommander().GetObjectForId(loadedTargetId);
+                RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedTargetId);
                 if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Building)
                 {
-                    Target = (LSAgent)obj;
+                    Target = (RTSAgent)obj;
                 }
             }
         }
@@ -433,15 +433,15 @@ namespace RTSLockstep
             }
         }
 
-        public event Action<LSAgent, bool> ExtraOnHit;
+        public event Action<RTSAgent, bool> ExtraOnHit;
 
-        protected void CallExtraOnHit(LSAgent agent, bool isCurrent)
+        protected void CallExtraOnHit(RTSAgent agent, bool isCurrent)
         {
             if (ExtraOnHit != null)
                 ExtraOnHit(agent, isCurrent);
         }
 
-        protected virtual void OnHit(LSAgent target, uint agentVersion, AgentController controller)
+        protected virtual void OnHit(RTSAgent target, uint agentVersion, AgentController controller)
         {
             //If the shooter died, certain effects or records can't be completed
             bool isCurrent = Agent != null && agentVersion == Agent.SpawnVersion;
@@ -451,7 +451,7 @@ namespace RTSLockstep
             CallExtraOnHit(target, isCurrent);
         }
 
-        private Action<LSAgent> CachedOnHit;
+        private Action<RTSAgent> CachedOnHit;
 
         public void Fire()
         {
@@ -473,7 +473,7 @@ namespace RTSLockstep
 
         public int CycleCount { get; private set; }
 
-        protected virtual void OnFire(LSAgent target)
+        protected virtual void OnFire(RTSAgent target)
         {
             if (this.CycleProjectiles)
             {
@@ -497,7 +497,7 @@ namespace RTSLockstep
 
         }
 
-        public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
+        public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
         {
             LSProjectile proj = (PrepareProjectile(projectileCode, projOffset, target));
             FireProjectile(proj);
@@ -506,7 +506,7 @@ namespace RTSLockstep
 
         public static Attack LastFire;
 
-        public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
+        public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
         {
             LastFire = this;
             LSProjectile currentProjectile = ProjectileManager.Create(
@@ -584,7 +584,7 @@ namespace RTSLockstep
             ProjectileManager.Fire(projectile);
         }
 
-        public void Engage(LSAgent other)
+        public void Engage(RTSAgent other)
         {
             if (other != Agent && other != null)
             {
@@ -607,7 +607,7 @@ namespace RTSLockstep
             }
         }
 
-        protected virtual void OnEngage(LSAgent target)
+        protected virtual void OnEngage(RTSAgent target)
         {
 
         }
@@ -693,7 +693,7 @@ namespace RTSLockstep
             {
                 isFocused = true;
                 IsAttackMoving = false;
-                LSAgent tempTarget;
+                RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                     Engage(tempTarget);
@@ -718,7 +718,7 @@ namespace RTSLockstep
 
         private bool ScanAndEngage()
         {
-            LSAgent agent = DoScan();
+            RTSAgent agent = DoScan();
             if (agent == null || agent == Target)
             {
                 return false;
@@ -730,19 +730,19 @@ namespace RTSLockstep
             }
         }
 
-        protected virtual bool AgentValid(LSAgent agent)
+        protected virtual bool AgentValid(RTSAgent agent)
         {
             return true;
         }
 
-        public Func<LSAgent, bool> CachedAgentValid { get; private set; }
+        public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
         //TODO: Consolidate the checks in LSInfluencer
-        protected Func<LSAgent, bool> AgentConditional
+        protected Func<RTSAgent, bool> AgentConditional
         {
             get
             {
-                Func<LSAgent, bool> agentConditional = null;
+                Func<RTSAgent, bool> agentConditional = null;
 
                 if (this.Damage >= 0)
                 {
@@ -782,11 +782,11 @@ namespace RTSLockstep
             return true;
         }
 
-        protected virtual LSAgent DoScan()
+        protected virtual RTSAgent DoScan()
         {
-            Func<LSAgent, bool> agentConditional = AgentConditional;
+            Func<RTSAgent, bool> agentConditional = AgentConditional;
 
-            LSAgent agent = InfluenceManager.Scan(
+            RTSAgent agent = InfluenceManager.Scan(
                                 this.cachedBody.Position,
                                 this.Sight,
                                 agentConditional,
@@ -801,7 +801,7 @@ namespace RTSLockstep
 
         public bool ScanWithinRangeAndEngage()
         {
-            LSAgent agent = this.DoScan();
+            RTSAgent agent = this.DoScan();
             if (agent == null)
             {
                 return false;

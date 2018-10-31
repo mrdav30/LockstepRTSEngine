@@ -12,7 +12,7 @@ namespace RTSLockstep {
         public ActiveAbility[] ActiveAbilitys {get; private set;}
 		public readonly FastList<AbilityDataItem> Interfacers = new FastList<AbilityDataItem>();
 
-        public void Setup(LSAgent agent) {
+        public void Setup(RTSAgent agent) {
 			setupActives.FastClear ();
 			Abilitys = agent.AttachedAbilities;
 			for (int i = 0; i < Abilitys.Length; i++) {

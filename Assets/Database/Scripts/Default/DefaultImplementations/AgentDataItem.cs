@@ -15,11 +15,11 @@ namespace RTSLockstep.Data
 
         }
 
-        public LSAgent GetAgent()
+        public RTSAgent GetAgent()
         {
             if (this.Prefab != null)
             {
-                LSAgent agent = this.Prefab.GetComponent<LSAgent>();
+                RTSAgent agent = this.Prefab.GetComponent<RTSAgent>();
                 if (agent)
                 {
                     return agent;
@@ -39,7 +39,7 @@ namespace RTSLockstep.Data
 
         public int SortDegreeFromAgentType(AgentType agentType)
         {
-            LSAgent agent = GetAgent();
+            RTSAgent agent = GetAgent();
             if (agent == null) return -1;
             if (agentType == agent.MyAgentType) return 1;
             return 0;

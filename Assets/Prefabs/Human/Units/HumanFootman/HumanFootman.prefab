@@ -849,7 +849,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  CanAttack: 0
   _projectileCode: Melee
   _range: 65536
   _sight: 655360
@@ -874,15 +873,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1588637964981362}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
+  m_Script: {fileID: 11500000, guid: d8f2db1a5e6c95d418c31b48c0fb6078, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _deathTime: 64
   _agentType: 0
   _globalID: 0
+  _boxPriority: 0
+  _selectionPriority: 0
+  _selectable: 1
   Tag: 3
   _selectionRadius: -1
   _visualCenter: {fileID: 4916245628546948}
-  VisualPositionChanged: 0
   objectName: HumanFootman
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:

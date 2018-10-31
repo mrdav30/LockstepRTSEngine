@@ -59,7 +59,7 @@ namespace RTSLockstep
 
                 for (int j = 0; j < info.Count; j++)
                 {
-                    LSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
+                    RTSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
                     if (AutoCommand)
                         Selector.Add(agent);
                 }

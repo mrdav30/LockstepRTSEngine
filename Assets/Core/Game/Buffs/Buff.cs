@@ -7,10 +7,10 @@ namespace RTSLockstep
     {     
         protected int Duration;
         protected int Timer;
-        protected LSAgent Target;
+        protected RTSAgent Target;
         internal int ID {get; set;}
         public bool Active {get; private set;}
-        public void Initialize (int duration, LSAgent target) {
+        public void Initialize (int duration, RTSAgent target) {
             Duration = duration;
             Timer = 0;
             Target = target;

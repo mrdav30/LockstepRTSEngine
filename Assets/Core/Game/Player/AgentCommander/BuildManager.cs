@@ -107,14 +107,14 @@ public class BuildManager : MonoBehaviour
             cachedCommander.RemoveResources(tempBuilding);
             findingPlacement = false;
             Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-            RTSAgent newBuilding = cachedCommander.CachedController.CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
+            RTSAgent newBuilding = cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
             Destroy(tempBuilding.gameObject);
 
             newBuilding.SetState(AnimState.Building);
             newBuilding.RestoreMaterials();
             newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
             newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-            newBuilding.SetCommander();
+            newBuilding.SetCommander(cachedCommander);
 
             // send build command
             Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);

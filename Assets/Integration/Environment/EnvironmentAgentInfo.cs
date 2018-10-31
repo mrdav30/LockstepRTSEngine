@@ -7,7 +7,7 @@ namespace RTSLockstep
 	[System.Serializable]
 	public class EnvironmentAgentInfo
 	{
-		public EnvironmentAgentInfo (string agentCode, LSAgent agent, Vector3d pos, Vector2d rot)
+		public EnvironmentAgentInfo (string agentCode, RTSAgent agent, Vector3d pos, Vector2d rot)
 		{
 			AgentCode = agentCode;
 			Agent = agent;
@@ -15,7 +15,7 @@ namespace RTSLockstep
 			Rotation = rot;
 		}
 		public string AgentCode;
-		public LSAgent Agent;
+		public RTSAgent Agent;
 		public Vector3d Position;
 		public Vector2d Rotation;
 	}

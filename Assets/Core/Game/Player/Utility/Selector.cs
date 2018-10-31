@@ -7,11 +7,11 @@ namespace RTSLockstep
 	public static class Selector
 	{
 		public static event Action onChange;
-		public static event Action<LSAgent> onAdd;
-		public static event Action<LSAgent> onRemove;
+		public static event Action<RTSAgent> onAdd;
+		public static event Action<RTSAgent> onRemove;
 		public static event Action onClear;
 
-		private static LSAgent _mainAgent;
+		private static RTSAgent _mainAgent;
 
 		static Selector ()
 		{
@@ -26,18 +26,18 @@ namespace RTSLockstep
 				onChange ();
 		}
 
-		public static LSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
+		public static RTSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
 
-		private static FastSorter<LSAgent> _selectedAgents;
+		private static FastSorter<RTSAgent> _selectedAgents;
 
-		private static FastSorter<LSAgent> SelectedAgents { get { return _selectedAgents; } }
+		private static FastSorter<RTSAgent> SelectedAgents { get { return _selectedAgents; } }
 
 		public static void Initialize ()
 		{
-			_selectedAgents = new FastSorter<LSAgent> ();
+			_selectedAgents = new FastSorter<RTSAgent> ();
 		}
 
-		public static void Add (LSAgent agent)
+		public static void Add (RTSAgent agent)
 		{
 			if (agent.IsSelected == false) {
                 if (MainSelectedAgent == null)
@@ -54,7 +54,7 @@ namespace RTSLockstep
 			}
 		}
 
-		public static void Remove (LSAgent agent)
+		public static void Remove (RTSAgent agent)
 		{
 			agent.Controller.RemoveFromSelection (agent);
 			agent.IsSelected = false;
@@ -68,7 +68,7 @@ namespace RTSLockstep
 		{
 			for (int i = 0; i < PlayerManager.AgentControllers.PeakCount; i++) {
 				if (PlayerManager.AgentControllers.arrayAllocation [i]) {
-					FastBucket<LSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
+					FastBucket<RTSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
 					for (int j = 0; j < selectedAgents.PeakCount; j++) {
 						if (selectedAgents.arrayAllocation [j]) {
 							selectedAgents [j].IsSelected = false;

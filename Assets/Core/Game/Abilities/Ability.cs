@@ -15,15 +15,15 @@ namespace RTSLockstep
         private bool isCasting;
         bool IsFirstFrame = true;
 
-        private LSAgent _agent;
+        private RTSAgent _agent;
 
-        public LSAgent Agent
+        public RTSAgent Agent
         {
             get
             {
 #if UNITY_EDITOR
                 if (_agent == null)
-                    return GetComponent<LSAgent>();
+                    return GetComponent<RTSAgent>();
 #endif
                 return _agent;
             }
@@ -69,7 +69,7 @@ namespace RTSLockstep
         }
         protected bool loadedSavedValues = false;
 
-        internal void Setup(LSAgent agent, int id)
+        internal void Setup(RTSAgent agent, int id)
         {
             System.Type mainType = this.GetType();
             if (mainType.IsSubclassOf(typeof(ActiveAbility)))

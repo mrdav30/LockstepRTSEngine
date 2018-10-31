@@ -36,7 +36,7 @@ public class HUD : MonoBehaviour
     private Dictionary<ResourceType, long> resourceLimits;
     private const int ICON_WIDTH = 32, ICON_HEIGHT = 32, TEXT_WIDTH = 128, TEXT_HEIGHT = 32;
     private static Dictionary<ResourceType, Texture2D> resourceImages;
-    private LSAgent lastSelection;
+    private RTSAgent lastSelection;
     private float sliderValue;
     private const int BUILD_IMAGE_WIDTH = 64, BUILD_IMAGE_HEIGHT = 64;
     private int buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
@@ -293,7 +293,7 @@ public class HUD : MonoBehaviour
 
         RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
         selectionName = selectedAgent.GetComponent<RTSAgent>().objectName;
-        if (selectedAgent.IsOwnedBy(cachedCommander.CachedController))
+        if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
         {
             // reset slider value if the selected object has changed
             if (lastSelection && lastSelection != Selector.MainSelectedAgent)
@@ -362,7 +362,7 @@ public class HUD : MonoBehaviour
         int topPos = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
-        if (cachedCommander.CachedController.SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
+        if (cachedCommander.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
         {
             PlayClick();
             agent.Die();

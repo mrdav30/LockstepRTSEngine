@@ -102,9 +102,9 @@ namespace RTSLockstep
             var spawnVersion = Agent.SpawnVersion;
             var controller = Agent.Controller;
 
-            if ((Agent as RTSAgent).GetCommander() && loadedSavedValues && loadedDepositId >= 0)
+            if (Agent.GetCommander() && loadedSavedValues && loadedDepositId >= 0)
             {
-                RTSAgent obj = (Agent as RTSAgent).GetCommander().GetObjectForId(loadedDepositId);
+                RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedDepositId);
                 if (obj.MyAgentType == AgentType.Resource)
                 {
                     resourceTarget = obj;
@@ -650,7 +650,7 @@ namespace RTSLockstep
             {
                 IsFocused = true;
                 IsHarvestMoving = false;
-                LSAgent tempTarget;
+                RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                 {

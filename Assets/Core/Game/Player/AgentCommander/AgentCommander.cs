@@ -10,7 +10,7 @@ public class AgentCommander : BehaviourHelper
     public bool human;
     private HUD _cachedHud;
     public BuildManager CachedBuilderManager { get; private set; }
-    public AgentController CachedController { get; private set; }
+    private AgentController cachedController;
     public int startGold, startGoldLimit, startArmy, startArmyLimit, startOre, startOreLimit, startCrystal, startCrystalLimit,
         startWood, startWoodLimit, startStone, startStoneLimit, startFood, startFoodLimit;
     public Color teamColor;
@@ -230,7 +230,12 @@ public class AgentCommander : BehaviourHelper
 
     public void SetController(AgentController controller)
     {
-        CachedController = controller;
+        cachedController = controller;
+    }
+
+    public AgentController GetController()
+    {
+        return cachedController;
     }
     #endregion
 
@@ -368,7 +373,7 @@ public class AgentCommander : BehaviourHelper
                     agent.name = agent.name.Replace("(Clone)", "").Trim();
                     agent.LoadDetails(reader);
                     agent.transform.parent = agents.transform;
-                    agent.SetCommander();
+                    agent.SetCommander(this);
                     agent.SetTeamColor();
 
                     if (agent.GetAbility<Structure>().UnderConstruction())

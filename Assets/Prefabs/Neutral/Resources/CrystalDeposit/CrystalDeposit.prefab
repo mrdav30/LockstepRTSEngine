@@ -450,18 +450,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 1911411376021232}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
+  m_Script: {fileID: 11500000, guid: d8f2db1a5e6c95d418c31b48c0fb6078, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _deathTime: 64
   _agentType: 2
   _globalID: 0
+  _boxPriority: 0
+  _selectionPriority: 0
+  _selectable: 1
   Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4255305627525500}
-  VisualPositionChanged: 0
   objectName: CrystalDeposit
-  cost: 0
-  sellValue: 0
+  destroyImage: {fileID: 0}
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114864015683344652
 MonoBehaviour:
   m_ObjectHideFlags: 1

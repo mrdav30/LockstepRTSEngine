@@ -8,7 +8,7 @@ namespace RTSLockstep
     {
         #region Static Helpers
 
-        static LSAgent tempAgent;
+        static RTSAgent tempAgent;
         static GridNode tempNode;
 
         #endregion
@@ -30,9 +30,9 @@ namespace RTSLockstep
 
         public LSBody Body { get; private set; }
 
-        public LSAgent Agent { get; private set; }
+        public RTSAgent Agent { get; private set; }
 
-        public void Setup(LSAgent agent)
+        public void Setup(RTSAgent agent)
         {
             Agent = agent;
             Body = agent.Body;

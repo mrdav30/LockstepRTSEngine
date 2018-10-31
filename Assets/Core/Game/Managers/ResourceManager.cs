@@ -46,7 +46,7 @@ namespace RTSLockstep
         private static float textHeight = 25, padding = 15;
 
         public static readonly Dictionary<string, IAgentData> AgentCodeInterfacerMap = new Dictionary<string, IAgentData>();
-        public static readonly Dictionary<string, LSAgent> AgentCodeTemplateMap = new Dictionary<string, LSAgent>();
+        public static readonly Dictionary<string, RTSAgent> AgentCodeTemplateMap = new Dictionary<string, RTSAgent>();
         public static IAgentData[] AgentData;
 
         public static Transform OrganizerObject;
@@ -73,7 +73,7 @@ namespace RTSLockstep
                 AgentData = agentDatabase.AgentData;
                 AgentCodes = new string[AgentData.Length];
 
-                AgentController.CachedAgents = new Dictionary<string, FastStack<LSAgent>>(AgentData.Length);
+                AgentController.CachedAgents = new Dictionary<string, FastStack<RTSAgent>>(AgentData.Length);
 
                 OrganizerObject = LSUtility.CreateEmpty().transform;
                 OrganizerObject.gameObject.name = "OrganizerObject";
@@ -86,7 +86,7 @@ namespace RTSLockstep
                     string agentCode = interfacer.Name;
                     AgentCodes[i] = agentCode;
 
-                    AgentController.CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
+                    AgentController.CachedAgents.Add(agentCode, new FastStack<RTSAgent>(2));
                     AgentCodeInterfacerMap.Add(agentCode, interfacer);
                     AgentCodeIndexMap.Add(agentCode, (ushort)i);
                 }
@@ -155,9 +155,9 @@ namespace RTSLockstep
             return ResourceManager.AgentCodeInterfacerMap[agentCode];
         }
 
-        public static LSAgent GetAgentTemplate(string agentCode)
+        public static RTSAgent GetAgentTemplate(string agentCode)
         {
-            LSAgent template;
+            RTSAgent template;
             if (!AgentCodeTemplateMap.TryGetValue(agentCode, out template))
             {
                 template = GameObject.Instantiate(ResourceManager.GetAgentSource(agentCode));
@@ -183,7 +183,7 @@ namespace RTSLockstep
             return AgentCodeInterfacerMap.ContainsKey(code);
         }
 
-        public static LSAgent GetAgentSource(string agentCode)
+        public static RTSAgent GetAgentSource(string agentCode)
         {
             IAgentData interfacer = ResourceManager.AgentCodeInterfacerMap[agentCode];
             return interfacer.GetAgent();

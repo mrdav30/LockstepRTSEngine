@@ -20,7 +20,7 @@ namespace RTSLockstep
         static bool agentFound;
         static float heightDif;
         static float closestDistance;
-        static LSAgent closestAgent;
+        static RTSAgent closestAgent;
 
         public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
@@ -63,7 +63,7 @@ namespace RTSLockstep
         }
 
         //change screenPos to Vector3?
-        public static LSAgent GetScreenAgent(Vector2 screenPos, Func<LSAgent, bool> conditional = null)
+        public static RTSAgent GetScreenAgent(Vector2 screenPos, Func<RTSAgent, bool> conditional = null)
         {
             if (conditional == null)
             {
@@ -80,7 +80,7 @@ namespace RTSLockstep
             {
                 if (AgentController.GlobalAgentActive[i])
                 {
-                    LSAgent agent = AgentController.GlobalAgents[i];
+                    RTSAgent agent = AgentController.GlobalAgents[i];
                     if (agent.IsVisible)
                     {
                         if (conditional(agent))
@@ -123,7 +123,7 @@ namespace RTSLockstep
             }
         }
 
-        public static LSAgent MousedAgent { get; private set; }
+        public static RTSAgent MousedAgent { get; private set; }
 
         public static Ray CachedRay { get; private set; }
 
@@ -236,7 +236,7 @@ namespace RTSLockstep
         private static Vector3 checkDir;
         private static Vector3 checkOrigin;
 
-        private static bool AgentIntersects(LSAgent agent)
+        private static bool AgentIntersects(RTSAgent agent)
         {
             if (agent.IsVisible)
             {

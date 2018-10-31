@@ -20,7 +20,7 @@ namespace RTSLockstep.UI
         Vector3 _offset;
         Vector3 Offset { get { return _offset; } }
 
-		public LSAgent TrackedAgent { get; private set; }
+		public RTSAgent TrackedAgent { get; private set; }
 
 		void Awake ()
 		{
@@ -28,7 +28,7 @@ namespace RTSLockstep.UI
 			gameObject.SetActive (false);
 		}
 
-		public void Setup (LSAgent agent)
+		public void Setup (RTSAgent agent)
 		{
 			TrackedAgent = agent;
 			GameObject.DontDestroyOnLoad (gameObject);

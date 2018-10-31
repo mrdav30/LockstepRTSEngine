@@ -4,12 +4,12 @@ namespace RTSLockstep
 {
 	public class AttackerInfo
 	{
-		public AttackerInfo (LSAgent attacker, AgentController controller)
+		public AttackerInfo (RTSAgent attacker, AgentController controller)
 		{
 			Attacker = attacker;
 			Controller = controller;
 		}
-		public LSAgent Attacker;
+		public RTSAgent Attacker;
 		public AgentController Controller;
 	}
 }
