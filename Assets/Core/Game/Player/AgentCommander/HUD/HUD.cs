@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using RTSLockstep;
+﻿using RTSLockstep;
 using RTSLockstep.Data;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class HUD : MonoBehaviour
 {
@@ -190,12 +190,10 @@ public class HUD : MonoBehaviour
 
     public void SetCursorState(CursorState newState, bool lockState)
     {
-        SetCursorLock(lockState);
         if (_cursorLocked)
         {
             return;
         }
-
         if (activeCursorState != newState)
         {
             previousCursorState = activeCursorState;
@@ -243,6 +241,8 @@ public class HUD : MonoBehaviour
             default:
                 break;
         }
+
+        SetCursorLock(lockState);
     }
 
     public void SetCursorLock(bool lockState)
@@ -375,9 +375,8 @@ public class HUD : MonoBehaviour
                 }
                 else
                 {
-                    // dirty hack to ensure toggle between RallyPoint and not works ...
                     agent.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
-                  //  SetCursorState(CursorState.PanRight);
+                    SetCursorLock(false);
                     SetCursorState(CursorState.Select, false);
                 }
             }
@@ -443,14 +442,20 @@ public class HUD : MonoBehaviour
 
     private void DrawMouseCursor()
     {
+        Cursor.visible = false;
         bool mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
 
-        Cursor.visible = false;
-
+        // toggle back to pointer if over hud
         if (mouseOverHud)
         {
             SelectionManager.SetSelectionLock(false);
+            SetCursorLock(false);
             SetCursorState(CursorState.Pointer, false);
+        }
+        //toggle back to rallypoint and lock cursor
+        else if (previousCursorState == CursorState.RallyPoint && _cursorLocked)
+        {
+            SetCursorState(CursorState.RallyPoint, true);
         }
 
         if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())

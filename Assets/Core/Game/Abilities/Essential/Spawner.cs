@@ -234,6 +234,7 @@ namespace RTSLockstep
                     }
                     flag.transform.localPosition = rallyPoint.ToVector3();
                     _flagState = FlagState.FlagSet;
+                    (Agent as RTSAgent).GetCommander().CachedHud.SetCursorLock(false);
                 }
             }
         }
