@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using RTSLockstep;
+﻿using RTSLockstep;
 using RTSLockstep.Data;
 using RTSLockstep.UI;
+using UnityEngine;
 
 public class UserInputHelper : BehaviourHelper
 {
@@ -60,12 +60,10 @@ public class UserInputHelper : BehaviourHelper
     }
 
     [SerializeField]
-    private GUIStyle _boxStyle;
+    private readonly GUIStyle _boxStyle;
 
     private static bool Setted = false;
-    private static Command curCom;
-
-    private AgentCommander cachedCommander;
+    private static readonly Command curCom;
     #endregion
 
     #region BehaviorHelper
@@ -80,8 +78,6 @@ public class UserInputHelper : BehaviourHelper
         if (GUIManager == null)
             GUIManager = new RTSGUIManager();
         Setted = true;
-
-        cachedCommander = PlayerManager.MainController.Commander;
     }
 
     protected override void OnInitialize()
@@ -96,7 +92,7 @@ public class UserInputHelper : BehaviourHelper
 
     protected override void OnVisualize()
     {
-        if (cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+        if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
         {
             SelectionManager.CanBox = false;
         }
@@ -141,10 +137,9 @@ public class UserInputHelper : BehaviourHelper
             RotateCamera();
             MouseActivity();
         }
-        // }
     }
 
-    protected virtual void OnGUI()
+    protected override void doGUI()
     {
         if (_boxStyle == null) return;
         this.DrawBox(_boxStyle);
@@ -178,13 +173,13 @@ public class UserInputHelper : BehaviourHelper
         if (xpos >= 0 && xpos < ResourceManager.ScrollWidth)
         {
             movement.x -= ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanLeft, false);
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanLeft);
             mouseScroll = true;
         }
         else if (xpos <= Screen.width && xpos > Screen.width - ResourceManager.ScrollWidth)
         {
             movement.x += ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanRight, false);
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanRight);
             mouseScroll = true;
         }
 
@@ -192,13 +187,13 @@ public class UserInputHelper : BehaviourHelper
         if (ypos >= 0 && ypos < ResourceManager.ScrollWidth)
         {
             movement.z -= ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanDown, false);
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanDown);
             mouseScroll = true;
         }
         else if (ypos <= Screen.height && ypos > Screen.height - ResourceManager.ScrollWidth)
         {
             movement.z += ResourceManager.ScrollSpeed;
-            cachedCommander.CachedHud.SetCursorState(CursorState.PanUp, false);
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanUp);
             mouseScroll = true;
         }
 
@@ -233,9 +228,13 @@ public class UserInputHelper : BehaviourHelper
             Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
         }
 
-        if (!SelectionManager.MousedAgent && !mouseScroll)
+        //!Selector.MainSelectedAgent && 
+        if (!SelectionManager.MousedAgent 
+            && !mouseScroll 
+            && !PlayerManager.MainController.GetCommanderHUD().GetCursorLockState()
+            && !PlayerManager.MainController.GetCommanderHUD().mouseOverHud)
         {
-            cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
         }
     }
 
@@ -273,18 +272,18 @@ public class UserInputHelper : BehaviourHelper
 
     private void LeftMouseClick()
     {
-        if (cachedCommander.CachedHud.MouseInBounds())
+        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
         {
-            if (cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
             {
-                if (cachedCommander.CachedBuilderManager.CanPlaceBuilding())
+                if (PlayerManager.MainController.GetCommanderBuilderManager().CanPlaceBuilding())
                 {
-                    cachedCommander.CachedBuilderManager.StartConstruction();
+                    PlayerManager.MainController.GetCommanderBuilderManager().StartConstruction();
                 }
             }
             else
             {
-                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.IsOwnedBy(cachedCommander.CachedController))
+                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
                     if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
@@ -307,20 +306,23 @@ public class UserInputHelper : BehaviourHelper
 
     private void RightMouseClick()
     {
-        if (cachedCommander.CachedHud.MouseInBounds() && !Input.GetKey(KeyCode.LeftAlt) && Selector.MainSelectedAgent)
+        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
+            && !Input.GetKey(KeyCode.LeftAlt) && Selector.MainSelectedAgent)
         {
-            if (cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
             {
-                cachedCommander.CachedBuilderManager.CancelBuildingPlacement();
+                PlayerManager.MainController.GetCommanderBuilderManager().CancelBuildingPlacement();
             }
             else
             {
-                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(cachedCommander.CachedController))
+                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>() && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                    if (Selector.MainSelectedAgent.GetAbility<Spawner>()
+                        && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
                         Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Select, false);
+                        PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
+                        PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
                     }
 
                     if (RTSInterfacing.MousedAgent.IsNotNull())
@@ -333,7 +335,8 @@ public class UserInputHelper : BehaviourHelper
                         }
                         // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
                         else if (Selector.MainSelectedAgent.GetAbility<Harvest>() && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0
-                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction()
+                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
+                            && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction()
                             && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                         {
                             //call harvest command 
@@ -345,7 +348,8 @@ public class UserInputHelper : BehaviourHelper
                             //call build command
                             ProcessInterfacer((QuickBuild));
                         }
-                        else if (Selector.MainSelectedAgent.GetAbility<Attack>() && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
+                        else if (Selector.MainSelectedAgent.GetAbility<Attack>()
+                            && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
                         {
                             //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
                             ProcessInterfacer((QuickTarget));
@@ -364,15 +368,17 @@ public class UserInputHelper : BehaviourHelper
 
     private void MouseHover()
     {
-        if (cachedCommander.CachedHud.MouseInBounds())
+        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
         {
-            if (cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
             {
-                cachedCommander.CachedBuilderManager.FindBuildingLocation();
+                PlayerManager.MainController.GetCommanderBuilderManager().FindBuildingLocation();
             }
-            else if (Selector.MainSelectedAgent)
+            else if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.GetAbility<Move>()
+                && Selector.MainSelectedAgent.GetAbility<Move>().CanMove
+                && !SelectionManager.MousedAgent)
             {
-                Selector.MainSelectedAgent.GetAbility<SelectionController>().HandleHighlightedChange();
+                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Move);
             }
         }
     }

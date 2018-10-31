@@ -8,7 +8,7 @@ public class AgentCommander : BehaviourHelper
     #region Properties
     public string username;
     public bool human;
-    public HUD CachedHud { get; private set; }
+    private HUD _cachedHud;
     public BuildManager CachedBuilderManager { get; private set; }
     public AgentController CachedController { get; private set; }
     public int startGold, startGoldLimit, startArmy, startArmyLimit, startOre, startOreLimit, startCrystal, startCrystalLimit,
@@ -25,6 +25,13 @@ public class AgentCommander : BehaviourHelper
     {
         resources = InitResourceList();
         resourceLimits = InitResourceList();
+
+        _cachedHud = GetComponentInChildren<HUD>();
+        CachedBuilderManager = GetComponentInChildren<BuildManager>();
+
+        _cachedHud.Setup();
+        CachedBuilderManager.Setup();
+
         Setted = true;
     }
 
@@ -33,8 +40,7 @@ public class AgentCommander : BehaviourHelper
     {
         if (!Setted)
             Setup();
-        CachedHud = GetComponentInChildren<HUD>();
-        CachedBuilderManager = GetComponentInChildren<BuildManager>();
+
         AddStartResourceLimits();
         AddStartResources();
     }
@@ -44,8 +50,15 @@ public class AgentCommander : BehaviourHelper
     {
         if (human)
         {
-            CachedHud.SetResourceValues(resources, resourceLimits);
+            _cachedHud.Visualize();
+            _cachedHud.SetResourceValues(resources, resourceLimits);
         }
+        CachedBuilderManager.Visualize();
+    }
+
+    protected override void doGUI()
+    {
+        _cachedHud.doGUI();
     }
     #endregion
 

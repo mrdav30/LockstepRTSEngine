@@ -26,7 +26,8 @@ public class HUD : MonoBehaviour
     public float clickVolume = 1.0f;
 
     private AgentCommander cachedCommander;
-    private bool _cursorLocked = false;
+    private bool _cursorLocked;
+    public bool mouseOverHud { get; private set; }
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40;
     private const int SELECTION_NAME_HEIGHT = 15;
     private CursorState activeCursorState;
@@ -48,7 +49,7 @@ public class HUD : MonoBehaviour
 
     #region MonoBehavior
     // Use this for initialization
-    private void Start()
+    public void Setup()
     {
         cachedCommander = transform.GetComponentInParent<AgentCommander>();
         if (cachedCommander && cachedCommander.human)
@@ -129,7 +130,7 @@ public class HUD : MonoBehaviour
             ResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
             ResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
-            SetCursorState(CursorState.Select, false);
+            SetCursorState(CursorState.Select);
 
             List<AudioClip> sounds = new List<AudioClip>();
             List<float> volumes = new List<float>();
@@ -139,8 +140,13 @@ public class HUD : MonoBehaviour
         }
     }
 
+    public void Visualize()
+    {
+        mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
+    }
+
     // Update is called once per frame
-    private void OnGUI()
+    public void doGUI()
     {
         if (cachedCommander && cachedCommander.human && cachedCommander == PlayerManager.MainController.Commander)
         {
@@ -188,12 +194,13 @@ public class HUD : MonoBehaviour
         return new Rect(0, RESOURCE_BAR_HEIGHT, screenWidth, screenHeight);
     }
 
-    public void SetCursorState(CursorState newState, bool lockState)
+    public void SetCursorState(CursorState newState)
     {
         if (_cursorLocked)
         {
             return;
         }
+
         if (activeCursorState != newState)
         {
             previousCursorState = activeCursorState;
@@ -241,8 +248,6 @@ public class HUD : MonoBehaviour
             default:
                 break;
         }
-
-        SetCursorLock(lockState);
     }
 
     public void SetCursorLock(bool lockState)
@@ -263,14 +268,14 @@ public class HUD : MonoBehaviour
         this.resourceLimits = resourceLimits;
     }
 
-    public CursorState GetPreviousCursorState()
-    {
-        return previousCursorState;
-    }
-
     public CursorState GetCursorState()
     {
         return activeCursorState;
+    }
+
+    public bool GetCursorLockState()
+    {
+        return _cursorLocked;
     }
     #endregion
 
@@ -368,16 +373,17 @@ public class HUD : MonoBehaviour
             if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Spawner>().rallyPointImage))
             {
                 PlayClick();
-                if (activeCursorState != CursorState.RallyPoint && previousCursorState != CursorState.RallyPoint)
+                if (activeCursorState != CursorState.RallyPoint)
                 {
                     agent.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
-                    SetCursorState(CursorState.RallyPoint, true);
+                    SetCursorState(CursorState.RallyPoint);
+                    SetCursorLock(true);
                 }
                 else
                 {
                     agent.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
                     SetCursorLock(false);
-                    SetCursorState(CursorState.Select, false);
+                    SetCursorState(CursorState.Select);
                 }
             }
         }
@@ -443,19 +449,20 @@ public class HUD : MonoBehaviour
     private void DrawMouseCursor()
     {
         Cursor.visible = false;
-        bool mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
 
         // toggle back to pointer if over hud
         if (mouseOverHud)
         {
             SelectionManager.SetSelectionLock(false);
-            SetCursorLock(false);
-            SetCursorState(CursorState.Pointer, false);
+            if (_cursorLocked)
+                SetCursorLock(false);
+            SetCursorState(CursorState.Pointer);
         }
-        //toggle back to rallypoint and lock cursor
-        else if (previousCursorState == CursorState.RallyPoint && _cursorLocked)
+        // toggle back to rally point after hovering over hud
+        else if (activeCursorState == CursorState.Pointer && previousCursorState == CursorState.RallyPoint)
         {
-            SetCursorState(CursorState.RallyPoint, true);
+            SetCursorState(CursorState.RallyPoint);
+            SetCursorLock(true);
         }
 
         if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())

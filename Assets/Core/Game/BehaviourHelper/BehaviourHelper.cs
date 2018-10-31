@@ -82,7 +82,16 @@ namespace RTSLockstep
 			OnLateVisualize();
 		}
 
-		protected virtual void OnLateVisualize()
+        public void OnGUI()
+        {
+            doGUI();
+        }
+
+        protected virtual void doGUI()
+        {
+        }
+
+        protected virtual void OnLateVisualize()
 		{
 
 		}

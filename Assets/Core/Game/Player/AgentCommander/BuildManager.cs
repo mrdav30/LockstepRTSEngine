@@ -14,13 +14,13 @@ public class BuildManager : MonoBehaviour
     #endregion
 
     // Use this for initialization
-    private void Start()
+    public void Setup()
     {
         cachedCommander = transform.GetComponentInParent<AgentCommander>();
     }
 
     // Update is called once per frame
-    public void Update()
+    public void Visualize()
     {
         if (findingPlacement)
         {

@@ -329,6 +329,17 @@ namespace RTSLockstep
                 }
             }
         }
+
+        public HUD GetCommanderHUD()
+        {
+            return _commander.transform.GetComponentInChildren<HUD>();
+        }
+
+        public BuildManager GetCommanderBuilderManager()
+        {
+            return _commander.transform.GetComponentInChildren<BuildManager>();
+        }
+
         public static AgentController GetInstanceManager(int index)
         {
             if (index >= AgentController.InstanceManagers.Count)

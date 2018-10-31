@@ -365,7 +365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e70b1b0becf488408db5617b6ed6dc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Capacity: 0
+  Capacity: 2000
   ResourceType: 0
   resourceFull: {fileID: 1661602373909176}
   resourceHalf: {fileID: 1742604459818202}
@@ -424,8 +424,33 @@ MonoBehaviour:
   _visualCenter: {fileID: 4541798942617490}
   VisualPositionChanged: 0
   objectName: GoldDeposit
-  cost: 0
-  sellValue: 0
+  destroyImage: {fileID: 0}
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114535224092038690
 MonoBehaviour:
   m_ObjectHideFlags: 1
