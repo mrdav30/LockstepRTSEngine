@@ -17,20 +17,16 @@ using RTSLockstep.NetworkHelpers;
  * ------------
  * Setup: Called once per run for setting up any values
  * Initialize: Called once per instance. On managers, called in new game. On agents, called when unpooled.
+ * GameStart: Called when game first starts.
+ * Execute: called when Commands are received.
  * Simulate: Called once every simulation frame. 
  * Visualize: Called once every rendering/commander interfacing frame
  * Deactivate: Called upon deactivation. On managers, called when game is ended. On agents, called when pooled.
  */
 
-using RTSLockstep.UI;
 using UnityEngine;
-
-//using RTSLockstep.Integration;
 using RTSLockstep.Data;
 using System;
-
-using FastCollections;
-using RTSLockstep;
 
 namespace RTSLockstep
 {
@@ -111,8 +107,6 @@ namespace RTSLockstep
 			DefaultMessageRaiser.LateSetup ();
 			if (onSetup != null)
 				onSetup ();
-
-
 		}
 
 		private static long _playRate = FixedMath.One;

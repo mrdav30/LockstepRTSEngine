@@ -1,26 +1,41 @@
-﻿using UnityEngine;
-using System.Collections;
-using FastCollections;
+﻿using RTSLockstep.Data;
 using System;
-using UnityEngine.EventSystems;
-using RTSLockstep.Data;
-using RTSLockstep;
+using UnityEngine;
 
 namespace RTSLockstep
 {
     public static class RTSInterfacing
     {
-        public static Camera mainCamera { get { return Camera.main; } }
+        public static RTSAgent MousedAgent { get; private set; }
+        public static Ray CachedRay { get; private set; }
+        public static Transform MousedObject { get { return CachedHit.transform; } }
+        public static RaycastHit CachedHit;
+        public static bool CachedDidHit { get; private set; }
+
+        private static bool agentFound;
+        private static float heightDif;
+        private static float closestDistance;
+        private static RTSAgent closestAgent;
+
+        private static Vector3 checkDir;
+        private static Vector3 checkOrigin;
 
         public static void Initialize()
         {
             CachedDidHit = false;
         }
 
-        static bool agentFound;
-        static float heightDif;
-        static float closestDistance;
-        static RTSAgent closestAgent;
+        public static void Visualize()
+        {
+
+            if (UserInputHelper.GUIManager.MainCam.IsNotNull())
+            {
+                CachedRay = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
+                CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
+
+                MousedAgent = GetScreenAgent(Input.mousePosition, (agent) => { return true; });
+            }
+        }
 
         public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
@@ -111,32 +126,10 @@ namespace RTSLockstep
             return null;
         }
 
-        public static void Visualize()
-        {
-
-            if (mainCamera.IsNotNull())
-            {
-                CachedRay = mainCamera.ScreenPointToRay(Input.mousePosition);
-                CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
-
-                MousedAgent = GetScreenAgent(Input.mousePosition, (agent) => { return true; });
-            }
-        }
-
-        public static RTSAgent MousedAgent { get; private set; }
-
-        public static Ray CachedRay { get; private set; }
-
-        public static Transform MousedObject { get { return CachedHit.transform; } }
-
-        public static RaycastHit CachedHit;
-
-        public static bool CachedDidHit { get; private set; }
-
         public static Vector2d GetWorldPosHeight(Vector2 screenPos, float height = 0)
         {
-            if (mainCamera == null) return Vector2d.zero;
-            Ray ray = mainCamera.ScreenPointToRay(screenPos);
+            if (UserInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
+            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             //RaycastHit hit;
 
             Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
@@ -146,8 +139,8 @@ namespace RTSLockstep
 
         public static Vector2d GetWorldPosD(Vector2 screenPos)
         {
-            if (mainCamera == null) return Vector2d.zero;
-            Ray ray = mainCamera.ScreenPointToRay(screenPos);
+            if (UserInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
+            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -162,8 +155,8 @@ namespace RTSLockstep
 
         public static Vector2 GetWorldPos(Vector2 screenPos)
         {
-            if (mainCamera == null) return default(Vector2);
-            Ray ray = mainCamera.ScreenPointToRay(screenPos);
+            if (UserInputHelper.GUIManager.MainCam == null) return default(Vector2);
+            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -171,14 +164,14 @@ namespace RTSLockstep
                 return new Vector2(hit.point.x, hit.point.z);
             }
             Vector3 hitPoint = ray.origin - ray.direction * (ray.origin.y / ray.direction.y);
-            //return new Vector2(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
+        //    return new Vector2(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
             return new Vector2(hitPoint.x, hitPoint.z);
         }
 
         public static Vector3 GetWorldPos3(Vector2 screenPos)
         {
-            if (mainCamera == null) return default(Vector2);
-            Ray ray = mainCamera.ScreenPointToRay(screenPos);
+            if (UserInputHelper.GUIManager.MainCam == null) return default(Vector2);
+            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -190,22 +183,10 @@ namespace RTSLockstep
             return hitPoint;
         }
 
-        //public static GameObject FindHitObject(Vector3 origin)
-        //{
-        //    if (mainCamera == null) return null;
-        //    Ray ray = mainCamera.ScreenPointToRay(origin);
-        //    RaycastHit hit;
-        //    if (NDRaycast.Raycast(ray, out hit))
-        //    {
-        //        return hit.collider.gameObject;
-        //    }
-        //    return null;
-        //}
-
         public static bool HitPointIsGround(Vector3 origin)
         {
-            if (mainCamera == null) return false;
-            Ray ray = mainCamera.ScreenPointToRay(origin);
+            if (UserInputHelper.GUIManager.MainCam == null) return false;
+            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -214,27 +195,10 @@ namespace RTSLockstep
                 {
                     return obj.transform.parent.name == "Ground";
                 }
-                
+
             }
             return false;
         }
-
-
-        //public static void ActivateMarkerOnMouse (MarkerType markerType)
-        //{
-        //        //  #if false
-        //          if (CachedDidHit) {
-        //         //     PlayerManager.OrderMarker.PlayOneShot (CachedHit.point, CachedHit.normal, markerType);
-        //              return;
-        //          }
-        //          Vector3 hitPoint = CachedRay.origin - CachedRay.direction * (CachedRay.origin.y / CachedRay .direction.y);
-        //        //           if (PlayerManager.OrderMarker != null)
-        //       //   PlayerManager.OrderMarker.PlayOneShot (hitPoint, Vector3.up, markerType);
-        //        //  #endif
-        //}
-
-        private static Vector3 checkDir;
-        private static Vector3 checkOrigin;
 
         private static bool AgentIntersects(RTSAgent agent)
         {

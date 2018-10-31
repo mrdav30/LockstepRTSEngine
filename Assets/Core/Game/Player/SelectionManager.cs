@@ -1,8 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using FastCollections;
-using System.Collections.Generic;
-using RTSLockstep.UI;
+﻿using FastCollections;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace RTSLockstep
@@ -34,8 +31,8 @@ namespace RTSLockstep
         private static bool CheckBoxDistance { get { return _checkBoxDistance; } }
 
         private const float MinBoxSqrDist = 4;
-        private static Camera mainCamera;
-        private static Camera MainCamera { get { return mainCamera; } }
+     //   private static Camera mainCamera;
+     //   private static Camera MainCamera { get { return mainCamera; } }
 
         static Vector2 agentPos;
         static readonly FastSorter<RTSAgent> bufferBoxedAgents = new FastSorter<RTSAgent>(
@@ -47,7 +44,7 @@ namespace RTSLockstep
 
         public static void Initialize()
         {
-            mainCamera = Camera.main;
+           // mainCamera = Camera.main;
             ClearSelection();
         }
 
@@ -192,16 +189,12 @@ namespace RTSLockstep
             }
             else
             {
-
                 if (IsGathering == false && Input.GetMouseButton(0))
                 {
                     _checkBoxDistance = true;
                     StartBoxing(MousePosition);
-
                 }
-
             }
-
         }
 
         public static void StartBoxing(Vector2 boxStart)
