@@ -27,7 +27,6 @@ namespace RTSLockstep
 
         public static void Visualize()
         {
-
             if (UserInputHelper.GUIManager.MainCam.IsNotNull())
             {
                 CachedRay = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);

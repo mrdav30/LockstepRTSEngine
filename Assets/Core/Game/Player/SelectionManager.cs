@@ -31,26 +31,25 @@ namespace RTSLockstep
         private static bool CheckBoxDistance { get { return _checkBoxDistance; } }
 
         private const float MinBoxSqrDist = 4;
-     //   private static Camera mainCamera;
-     //   private static Camera MainCamera { get { return mainCamera; } }
 
-        static Vector2 agentPos;
-        static readonly FastSorter<RTSAgent> bufferBoxedAgents = new FastSorter<RTSAgent>(
-                                                                    ((source, other) => source.BoxPriority - other.BoxPriority)
-                                                                );
-        static readonly FastList<RTSAgent> BoxedAgents = new FastList<RTSAgent>();
+        private static Vector2 agentPos;
+        private static readonly FastSorter<RTSAgent> bufferBoxedAgents = new FastSorter<RTSAgent>(((source, other) => source.BoxPriority - other.BoxPriority));
+        private static readonly FastList<RTSAgent> BoxedAgents = new FastList<RTSAgent>();
 
         private static bool _selectionLocked = false;
 
+        private static bool one_click;
+        private static float delay = 0.5f;//max time in seconds for it to be considered a double click
+        private static float timeCounter;
+
         public static void Initialize()
         {
-           // mainCamera = Camera.main;
+            timeCounter = delay;
             ClearSelection();
         }
 
         public static void Update()
         {
-
             MousePosition = Input.mousePosition;
             MouseWorldPosition = RTSInterfacing.GetWorldPos(MousePosition);
             GetMousedAgent();
@@ -121,7 +120,6 @@ namespace RTSLockstep
                                         }
                                         else
                                         {
-
                                             agentPos = curAgent.Position2;
                                             Edge = Box_TopRight - Box_TopLeft;
                                             Point = agentPos - Box_TopLeft;
@@ -147,7 +145,6 @@ namespace RTSLockstep
                                             }
                                         }
                                     }
-
                                 }
                             }
                         }
@@ -171,13 +168,14 @@ namespace RTSLockstep
                         BoxAgent(MousedAgent);
                     }
                 }
+
                 if (Input.GetMouseButtonUp(0))
                 {
-
                     if (_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                     {
                         ClearSelection();
                     }
+
                     if (IsGathering == false)
                     {
                         SelectBoxedAgents();
@@ -185,14 +183,42 @@ namespace RTSLockstep
 
                     Boxing = false;
                 }
-
             }
             else
             {
-                if (IsGathering == false && Input.GetMouseButton(0))
+                if (IsGathering == false && Input.GetMouseButtonDown(0))
                 {
-                    _checkBoxDistance = true;
-                    StartBoxing(MousePosition);
+                    if (!one_click) // first click no previous clicks
+                    {
+                        // do single click things
+                        one_click = true;
+
+                        _checkBoxDistance = true;
+                        StartBoxing(MousePosition);
+                    }
+                    else
+                    {
+                        // found a double click, now reset
+                        one_click = false;
+                        // do double click things
+
+                        if (MousedAgent)
+                        {
+                            SelectAgent(MousedAgent);
+                        }
+                    }
+                }
+
+                if (one_click)
+                {
+                    timeCounter -= Time.deltaTime;
+                    if (timeCounter <= 0)
+                    {
+                        //if thats true its been too long and we want to reset so 
+                        //the next click is simply a single click and not a double click.
+                        one_click = false;
+                        timeCounter = delay; 
+                    }
                 }
             }
         }
@@ -268,7 +294,6 @@ namespace RTSLockstep
                 _selectionLocked = false;
             }
         }
-
 
         public static void ClearBox()
         {

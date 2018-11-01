@@ -6,9 +6,11 @@ using UnityEngine;
 public class UserInputHelper : BehaviourHelper
 {
     #region Properties
-    //LSF
+#pragma warning disable 0649
+    [SerializeField]
+    private GUIStyle _boxStyle;
+#pragma warning restore 0649
     public static RTSGUIManager GUIManager;
-
     /// <summary>
     /// The current ability to cast. Set this to a non-null value to automatically start the gathering process.
     /// </summary>
@@ -47,9 +49,6 @@ public class UserInputHelper : BehaviourHelper
             _isGathering = value;
         }
     }
-
-    [SerializeField]
-    private GUIStyle _boxStyle;
 
     private static bool Setted = false;
     private static Command curCom;
@@ -218,8 +217,8 @@ public class UserInputHelper : BehaviourHelper
         }
 
         //!Selector.MainSelectedAgent && 
-        if (!SelectionManager.MousedAgent 
-            && !mouseScroll 
+        if (!SelectionManager.MousedAgent
+            && !mouseScroll
             && !PlayerManager.MainController.GetCommanderHUD().GetCursorLockState()
             && !PlayerManager.MainController.GetCommanderHUD().mouseOverHud)
         {
