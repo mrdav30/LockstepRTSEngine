@@ -78,7 +78,14 @@ namespace RTSLockstep
                 {
                     if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
-                        if (Selector.MainSelectedAgent.GetCommander() == Agent.GetCommander())
+                        //bool test = Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController);
+                        //bool test2 = Selector.MainSelectedAgent.GlobalID == Agent.GlobalID;
+
+                        ////Debug.Log("test :" + test);
+                        ////Debug.Log("test2 :" + test2 + ", id1: " + Selector.MainSelectedAgent.GlobalID + ", id2: " + Agent.GlobalID);
+
+
+                        if (Selector.MainSelectedAgent.Controller.RefEquals(Agent.Controller))
                         {
                             //agent belongs to current player
                             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);

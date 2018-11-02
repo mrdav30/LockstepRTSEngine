@@ -44,7 +44,9 @@ namespace RTSLockstep
                     MainSelectedAgent = agent;
                 }
 
-                if (agent.MyAgentType == MainSelectedAgent.MyAgentType)
+                //only add agents of the same owner
+                if (agent.MyAgentType == MainSelectedAgent.MyAgentType
+                    && agent.IsOwnedBy(MainSelectedAgent.Controller))
                 {
                     PlayerManager.MainController.AddToSelection(agent);
                     agent.IsSelected = true;
@@ -55,7 +57,7 @@ namespace RTSLockstep
 
 		public static void Remove (RTSAgent agent)
 		{
-			agent.Controller.RemoveFromSelection (agent);
+            PlayerManager.MainController.RemoveFromSelection (agent);
 			agent.IsSelected = false;
 			if (agent == MainSelectedAgent) {
 				agent = SelectedAgents.Count > 0 ? SelectedAgents.PopMax () : null;

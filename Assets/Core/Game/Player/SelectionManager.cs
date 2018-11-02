@@ -42,8 +42,8 @@ namespace RTSLockstep
 
         private static bool _selectionLocked = false;
 
-        private static bool one_click;
-        private static float delay = 0.5f;//max time in seconds for it to be considered a double click
+        private static bool one_click = false;
+        private static float delay = 0.35f;//max time in seconds for it to be considered a double click
         private static float timeCounter;
 
         public static void Initialize()
@@ -122,7 +122,7 @@ namespace RTSLockstep
                                         {
                                             bufferSelectedAgents.Add(curAgent);
                                         }
-                                        else
+                                        else if(curAgent.IsOwnedBy(PlayerManager.MainController))
                                         {
                                             agentPos = curAgent.Position2;
                                             Edge = Box_TopRight - Box_TopLeft;
@@ -160,7 +160,9 @@ namespace RTSLockstep
                             {
                                 RTSAgent agent = bufferSelectedAgents.PopMax();
                                 if (agent.BoxPriority < peakBoxPriority)
+                                {
                                     break;
+                                }
                                 BoxAgent(agent);
                             }
                         }
@@ -188,66 +190,75 @@ namespace RTSLockstep
             }
             else
             {
-                if (IsGathering == false && Input.GetMouseButtonDown(0))
+                if (IsGathering == false)
                 {
-                    if (!one_click) // first click no previous clicks
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        // do single click things
-                        one_click = true;
-
-                        CheckBoxDistance = true;
-                        StartBoxing(MousePosition);
-                    }
-                    else
-                    {
-                        // found a double click, now reset
-                        one_click = false;
-                        // do double click things
-
-                        if (MousedAgent)
+                        if (!one_click) // first click no previous clicks
                         {
-                            bufferSelectedAgents.Clear();
-                            for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                            Debug.Log("1");
+                            // do single click things
+                            one_click = true;
+
+                            CheckBoxDistance = true;
+                            StartBoxing(MousePosition);
+                        }
+                        else
+                        {
+                            Debug.Log("2");
+                            // found a double click, now reset
+                            one_click = false;
+                            Boxing = false;
+
+                            // do double click things
+                            if (MousedAgent)
                             {
-                                var agentController = PlayerManager.GetAgentController(i);
-                                for (int j = 0; j < AgentController.MaxAgents; j++)
+                                bufferSelectedAgents.Clear();
+                                for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                                 {
-                                    if (agentController.LocalAgentActive[j])
+                                    var agentController = PlayerManager.GetAgentController(i);
+                                    for (int j = 0; j < AgentController.MaxAgents; j++)
                                     {
-                                        curAgent = agentController.LocalAgents[j];
-                                        if (curAgent.CanSelect)
+                                        if (agentController.LocalAgentActive[j])
                                         {
-                                            //always selected mousedagent
-                                            if (curAgent.RefEquals(MousedAgent))
+                                            curAgent = agentController.LocalAgents[j];
+                                            if (curAgent.CanSelect)
                                             {
-                                                bufferSelectedAgents.Add(curAgent);
-                                            }
-                                            //add any other visible agents of the same type
-                                            else if (curAgent.MyAgentType == MousedAgent.MyAgentType 
-                                                && curAgent.objectName == MousedAgent.objectName
-                                                && curAgent.IsVisible)
-                                            {
-                                                bufferSelectedAgents.Add(curAgent);
+                                                //always select mousedagent
+                                                if (curAgent.RefEquals(MousedAgent))
+                                                {
+                                                    bufferSelectedAgents.Add(curAgent);
+                                                }
+                                                //add any other visible agents of the same type owned by current player
+                                                else if (curAgent.IsVisible
+                                                    && curAgent.objectName == MousedAgent.objectName
+                                                    && curAgent.IsOwnedBy(PlayerManager.MainController))
+                                                {
+                                                    bufferSelectedAgents.Add(curAgent);
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            if (bufferSelectedAgents.Count > 0)
-                            {
-                                int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
-                                while (bufferSelectedAgents.Count > 0)
+                                if (bufferSelectedAgents.Count > 0)
                                 {
-                                    RTSAgent agent = bufferSelectedAgents.PopMax();
-                                    if (agent.BoxPriority < peakBoxPriority)
-                                        break;
-                                    BoxAgent(agent);
+                                    int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                                    while (bufferSelectedAgents.Count > 0)
+                                    {
+                                        RTSAgent agent = bufferSelectedAgents.PopMax();
+                                        if (agent.BoxPriority < peakBoxPriority)
+                                            break;
+                                        BoxAgent(agent);
+                                    }
                                 }
                             }
 
-                            SelectSelectedAgents();
                         }
+                    }
+                    else if (Input.GetMouseButtonUp(0) && SelectedAgents.Count > 0)
+                    {
+                        SelectSelectedAgents();
                     }
                 }
             }
@@ -273,6 +284,14 @@ namespace RTSLockstep
             BoxEnd = MousePosition;
         }
 
+        public static void BoxAgent(RTSAgent agent)
+        {
+            if (ReferenceEquals(agent, null))
+                return;
+            SelectedAgents.Add(agent);
+            agent.IsHighlighted = true;
+        }
+
         public static void QuickSelect()
         {
             if (_selectionLocked)
@@ -295,14 +314,6 @@ namespace RTSLockstep
             {
                 Selector.Remove(agent);
             }
-        }
-
-        public static void BoxAgent(RTSAgent agent)
-        {
-            if (System.Object.ReferenceEquals(agent, null))
-                return;
-            SelectedAgents.Add(agent);
-            agent.IsHighlighted = true;
         }
 
         private static void CullSelectedAgents()

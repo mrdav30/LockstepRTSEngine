@@ -364,6 +364,7 @@ public class UserInputHelper : BehaviourHelper
             }
             else if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.GetAbility<Move>()
                 && Selector.MainSelectedAgent.GetAbility<Move>().CanMove
+                && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController)
                 && !SelectionManager.MousedAgent)
             {
                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Move);
