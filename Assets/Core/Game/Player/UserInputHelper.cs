@@ -73,6 +73,8 @@ public class UserInputHelper : BehaviourHelper
         if (!Setted)
             Setup();
         SelectionManager.Initialize();
+        SelectionManager.OnSingleLeftTap += HandleSingleLeftClick;
+        SelectionManager.OnSingleRightTap += HandleSingleRightClick;
         RTSInterfacing.Initialize();
         IsGathering = false;
         CurrentInterfacer = null;
@@ -88,7 +90,7 @@ public class UserInputHelper : BehaviourHelper
         {
             SelectionManager.CanBox = true;
         }
-        //Update the SelectionManager which handles box-selection.
+        //Update the SelectionManager which handles mouse-selection.
         SelectionManager.Update();
         //Update RTSInterfacing, a useful tool that automatically generates useful data for user-interfacing
         RTSInterfacing.Visualize();
@@ -116,14 +118,14 @@ public class UserInputHelper : BehaviourHelper
         else
         {
             //We are not gathering information. Instead, allow quickcasted abilities with the mouse. I.e. Right click to move or attack.
-
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OpenPauseMenu();
             }
+
             MoveCamera();
             RotateCamera();
-            MouseActivity();
+            MouseHover();
         }
     }
 
@@ -245,20 +247,7 @@ public class UserInputHelper : BehaviourHelper
         }
     }
 
-    private void MouseActivity()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            LeftMouseClick();
-        }
-        else if (Input.GetMouseButtonDown(1))
-        {
-            RightMouseClick();
-        }
-        MouseHover();
-    }
-
-    private void LeftMouseClick()
+    private void HandleSingleLeftClick()
     {
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
         {
@@ -292,7 +281,7 @@ public class UserInputHelper : BehaviourHelper
         }
     }
 
-    private void RightMouseClick()
+    private void HandleSingleRightClick()
     {
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
             && !Input.GetKey(KeyCode.LeftAlt) && Selector.MainSelectedAgent)

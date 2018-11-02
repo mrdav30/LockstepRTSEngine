@@ -1456,7 +1456,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1626604714047302}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8f2db1a5e6c95d418c31b48c0fb6078, type: 3}
+  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _deathTime: 64
@@ -1465,7 +1465,7 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
-  Tag: 4
+  Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4525782206356458}
   objectName: HumanArcher
@@ -1495,7 +1495,7 @@ MonoBehaviour:
     isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
-    _values: 4b000000000000000000000019000000050000000000000001000000
+    _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114130895806642106
 MonoBehaviour:
   m_ObjectHideFlags: 1

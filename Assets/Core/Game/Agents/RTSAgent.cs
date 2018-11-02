@@ -17,7 +17,7 @@ namespace RTSLockstep
     /// </summary>
     public class RTSAgent : MonoBehaviour
     {
-        #region properties
+        #region Properties
         [SerializeField, FrameCount]
         private int _deathTime = LockstepManager.FrameRate * 2;
         [SerializeField]

@@ -43,20 +43,17 @@ namespace RTSLockstep
 
         private static bool _selectionLocked = false;
 
-        public static event Action OnSingleTap;
-        public static event Action OnDoubleTap;
+        public static event Action OnSingleLeftTap;
+        public static event Action OnSingleRightTap;
+        public static event Action OnDoubleLeftTap;
         [Tooltip("Defines the maximum time between two taps to make it double tap")]
-        private static float tapThreshold = 0.35f;
-        //private static Action updateDelegate;
+        private static float tapThreshold = 0.25f;
         private static float tapTimer = 0.0f;
         private static bool tap = false;
 
         public static void Initialize()
         {
-            // timeCounter = delay;
             ClearSelection();
-            OnSingleTap = () => HandleSingleClick();
-            OnDoubleTap = () => HandleDoubleClick();
         }
 
         public static void Update()
@@ -199,114 +196,85 @@ namespace RTSLockstep
             {
                 if (IsGathering == false)
                 {
-                   // if (Input.GetMouseButtonDown(0))
-                //    {
-                        if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        if (Time.time < tapTimer + tapThreshold)
                         {
-                            if (Time.deltaTime < tapTimer + tapThreshold)
-                            {
-                                if (OnDoubleTap != null) { OnDoubleTap(); }
-                                tap = false;
-                                return;
-                            }
-                            tap = true;
-                            tapTimer = Time.deltaTime;
-                        }
-                        if (tap == true && Time.deltaTime > tapTimer + tapThreshold)
-                        {
+                            HandleDoubleLeftClick();
+                            if (OnDoubleLeftTap != null) { OnDoubleLeftTap(); }
                             tap = false;
-                            if (OnSingleTap != null) { OnSingleTap(); }
+                            return;
                         }
+                        else
+                        {
+                            HandleSingleLeftClick();
+                        }
+                        tap = true;
+                        tapTimer = Time.time;
+                    }
+                    else if (Input.GetMouseButtonDown(1))
+                    {
+                        if (OnSingleLeftTap != null){ OnSingleRightTap(); }
+                    }
 
-
-                        //if (ClickManager.DoubleClick(KeyCode.Mouse0)) 
-                        //{
-                        //    Debug.Log("2");
-                        //    Boxing = false;
-
-                        //    // do double click things
-                        //    if (MousedAgent)
-                        //    {
-                        //        bufferSelectedAgents.Clear();
-                        //        for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
-                        //        {
-                        //            var agentController = PlayerManager.GetAgentController(i);
-                        //            for (int j = 0; j < AgentController.MaxAgents; j++)
-                        //            {
-                        //                if (agentController.LocalAgentActive[j])
-                        //                {
-                        //                    curAgent = agentController.LocalAgents[j];
-                        //                    if (curAgent.CanSelect)
-                        //                    {
-                        //                        //always select mousedagent
-                        //                        if (curAgent.RefEquals(MousedAgent))
-                        //                        {
-                        //                            bufferSelectedAgents.Add(curAgent);
-                        //                        }
-                        //                        //add any other visible agents of the same type owned by current player
-                        //                        else if (curAgent.IsVisible
-                        //                            && curAgent.objectName == MousedAgent.objectName
-                        //                            && curAgent.IsOwnedBy(PlayerManager.MainController))
-                        //                        {
-                        //                            bufferSelectedAgents.Add(curAgent);
-                        //                        }
-                        //                    }
-                        //                }
-                        //            }
-                        //        }
-
-                        //        if (bufferSelectedAgents.Count > 0)
-                        //        {
-                        //            int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
-                        //            while (bufferSelectedAgents.Count > 0)
-                        //            {
-                        //                RTSAgent agent = bufferSelectedAgents.PopMax();
-                        //                if (agent.BoxPriority < peakBoxPriority)
-                        //                    break;
-                        //                BoxAgent(agent);
-                        //            }
-                        //        }
-                        //    }
-                        //}
-                        //else 
-                        //{
-                        //    Debug.Log("1");
-                        //    // do single click things
-
-                        //    CheckBoxDistance = true;
-                        //    StartBoxing(MousePosition);
-                        //}
-
-
-                   // }
-                    //else if (Input.GetMouseButtonUp(0) && SelectedAgents.Count > 0)
-                    //{
-                    //    SelectSelectedAgents();
-                    //}
+                    if (tap == true && Time.time > tapTimer + tapThreshold)
+                    {
+                        tap = false;
+                        if (OnSingleLeftTap != null) { OnSingleLeftTap(); }
+                    }
                 }
             }
-
-            //if (one_click)
-            //{
-            //    timeCounter -= Time.deltaTime;
-            //    if (timeCounter <= 0)
-            //    {
-            //        //if thats true its been too long and we want to reset so 
-            //        //the next click is simply a single click and not a double click.
-            //        one_click = false;
-            //        timeCounter = delay;
-            //    }
-            //}
         }
 
-        public static void HandleSingleClick()
+        // do single click things
+        public static void HandleSingleLeftClick()
         {
-             Debug.Log("1");
+            CheckBoxDistance = true;
+            StartBoxing(MousePosition);
         }
 
-        public static void HandleDoubleClick()
+        // do double click things
+        public static void HandleDoubleLeftClick()
         {
-             Debug.Log("1");
+            Boxing = false;
+            if (MousedAgent)
+            {
+                bufferSelectedAgents.Clear();
+                for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                {
+                    var agentController = PlayerManager.GetAgentController(i);
+                    for (int j = 0; j < AgentController.MaxAgents; j++)
+                    {
+                        if (agentController.LocalAgentActive[j])
+                        {
+                            curAgent = agentController.LocalAgents[j];
+                            if (curAgent.CanSelect)
+                            {
+                                if (curAgent.IsVisible
+                                    && curAgent.objectName == MousedAgent.objectName
+                                    && curAgent.IsOwnedBy(PlayerManager.MainController))
+                                {
+                                    bufferSelectedAgents.Add(curAgent);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (bufferSelectedAgents.Count > 0)
+                {
+                    int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                    while (bufferSelectedAgents.Count > 0)
+                    {
+                        RTSAgent agent = bufferSelectedAgents.PopMax();
+                        if (agent.BoxPriority < peakBoxPriority)
+                            break;
+                        BoxAgent(agent);
+                    }
+
+                    SelectSelectedAgents();
+                }
+            }
         }
 
         public static void StartBoxing(Vector2 boxStart)
