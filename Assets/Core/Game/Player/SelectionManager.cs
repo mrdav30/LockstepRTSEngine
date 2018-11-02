@@ -26,15 +26,19 @@ namespace RTSLockstep
         public static Vector2 Box_BottomRight;
         public static bool Boxing;
         private static float BoxingTime;
-
-        private static bool _checkBoxDistance;
-        private static bool CheckBoxDistance { get { return _checkBoxDistance; } }
-
+        private static bool CheckBoxDistance { get; set; }
         private const float MinBoxSqrDist = 4;
 
         private static Vector2 agentPos;
-        private static readonly FastSorter<RTSAgent> bufferBoxedAgents = new FastSorter<RTSAgent>(((source, other) => source.BoxPriority - other.BoxPriority));
-        private static readonly FastList<RTSAgent> BoxedAgents = new FastList<RTSAgent>();
+        private static readonly FastSorter<RTSAgent> bufferSelectedAgents = new FastSorter<RTSAgent>(((source, other) => source.BoxPriority - other.BoxPriority));
+        private static readonly FastList<RTSAgent> SelectedAgents = new FastList<RTSAgent>();
+
+        private static RTSAgent curAgent;
+        private static RaycastHit hit;
+        private static Ray ray;
+        private static Vector2 Point;
+        private static Vector2 Edge;
+        private static Vector2 dif;
 
         private static bool _selectionLocked = false;
 
@@ -103,7 +107,7 @@ namespace RTSLockstep
                     //int lecount = 0;
                     if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
                     {
-                        bufferBoxedAgents.Clear();
+                        bufferSelectedAgents.Clear();
                         for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                         {
                             var agentController = PlayerManager.GetAgentController(i);
@@ -116,7 +120,7 @@ namespace RTSLockstep
                                     {
                                         if (curAgent.RefEquals(MousedAgent))
                                         {
-                                            bufferBoxedAgents.Add(curAgent);
+                                            bufferSelectedAgents.Add(curAgent);
                                         }
                                         else
                                         {
@@ -137,7 +141,7 @@ namespace RTSLockstep
                                                         Point = agentPos - Box_BottomLeft;
                                                         if (DotEdge() < 0)
                                                         {
-                                                            bufferBoxedAgents.Add(curAgent);
+                                                            bufferSelectedAgents.Add(curAgent);
                                                             continue;
                                                         }
                                                     }
@@ -148,20 +152,18 @@ namespace RTSLockstep
                                 }
                             }
                         }
-                        bufferBoxable.FastClear();
-                        //bool noneBoxable = true;
-                        if (bufferBoxedAgents.Count > 0)
+
+                        if (bufferSelectedAgents.Count > 0)
                         {
-                            int peakBoxPriority = bufferBoxedAgents.PeekMax().BoxPriority;
-                            while (bufferBoxedAgents.Count > 0)
+                            int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                            while (bufferSelectedAgents.Count > 0)
                             {
-                                RTSAgent agent = bufferBoxedAgents.PopMax();
+                                RTSAgent agent = bufferSelectedAgents.PopMax();
                                 if (agent.BoxPriority < peakBoxPriority)
                                     break;
                                 BoxAgent(agent);
                             }
                         }
-
                     }
                     else
                     {
@@ -178,7 +180,7 @@ namespace RTSLockstep
 
                     if (IsGathering == false)
                     {
-                        SelectBoxedAgents();
+                        SelectSelectedAgents();
                     }
 
                     Boxing = false;
@@ -193,7 +195,7 @@ namespace RTSLockstep
                         // do single click things
                         one_click = true;
 
-                        _checkBoxDistance = true;
+                        CheckBoxDistance = true;
                         StartBoxing(MousePosition);
                     }
                     else
@@ -204,21 +206,61 @@ namespace RTSLockstep
 
                         if (MousedAgent)
                         {
-                            SelectAgent(MousedAgent);
+                            bufferSelectedAgents.Clear();
+                            for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                            {
+                                var agentController = PlayerManager.GetAgentController(i);
+                                for (int j = 0; j < AgentController.MaxAgents; j++)
+                                {
+                                    if (agentController.LocalAgentActive[j])
+                                    {
+                                        curAgent = agentController.LocalAgents[j];
+                                        if (curAgent.CanSelect)
+                                        {
+                                            //always selected mousedagent
+                                            if (curAgent.RefEquals(MousedAgent))
+                                            {
+                                                bufferSelectedAgents.Add(curAgent);
+                                            }
+                                            //add any other visible agents of the same type
+                                            else if (curAgent.MyAgentType == MousedAgent.MyAgentType 
+                                                && curAgent.objectName == MousedAgent.objectName
+                                                && curAgent.IsVisible)
+                                            {
+                                                bufferSelectedAgents.Add(curAgent);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (bufferSelectedAgents.Count > 0)
+                            {
+                                int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                                while (bufferSelectedAgents.Count > 0)
+                                {
+                                    RTSAgent agent = bufferSelectedAgents.PopMax();
+                                    if (agent.BoxPriority < peakBoxPriority)
+                                        break;
+                                    BoxAgent(agent);
+                                }
+                            }
+
+                            SelectSelectedAgents();
                         }
                     }
                 }
+            }
 
-                if (one_click)
+            if (one_click)
+            {
+                timeCounter -= Time.deltaTime;
+                if (timeCounter <= 0)
                 {
-                    timeCounter -= Time.deltaTime;
-                    if (timeCounter <= 0)
-                    {
-                        //if thats true its been too long and we want to reset so 
-                        //the next click is simply a single click and not a double click.
-                        one_click = false;
-                        timeCounter = delay; 
-                    }
+                    //if thats true its been too long and we want to reset so 
+                    //the next click is simply a single click and not a double click.
+                    one_click = false;
+                    timeCounter = delay;
                 }
             }
         }
@@ -259,22 +301,20 @@ namespace RTSLockstep
         {
             if (System.Object.ReferenceEquals(agent, null))
                 return;
-            BoxedAgents.Add(agent);
+            SelectedAgents.Add(agent);
             agent.IsHighlighted = true;
         }
 
-        static readonly FastList<RTSAgent> bufferBoxable = new FastList<RTSAgent>();
-
-        private static void CullBoxedAgents()
+        private static void CullSelectedAgents()
         {
 
         }
 
-        private static void SelectBoxedAgents()
+        private static void SelectSelectedAgents()
         {
-            for (int i = 0; i < BoxedAgents.Count; i++)
+            for (int i = 0; i < SelectedAgents.Count; i++)
             {
-                SelectAgent(BoxedAgents.innerArray[i]);
+                SelectAgent(SelectedAgents.innerArray[i]);
             }
         }
 
@@ -297,11 +337,11 @@ namespace RTSLockstep
 
         public static void ClearBox()
         {
-            for (int i = 0; i < BoxedAgents.Count; i++)
+            for (int i = 0; i < SelectedAgents.Count; i++)
             {
-                BoxedAgents.innerArray[i].IsHighlighted = false;
+                SelectedAgents.innerArray[i].IsHighlighted = false;
             }
-            BoxedAgents.FastClear();
+            SelectedAgents.FastClear();
         }
 
         public static void DrawRealWorldBox()
@@ -325,18 +365,10 @@ namespace RTSLockstep
             }
         }
 
-        static RTSAgent curAgent;
-        static RaycastHit hit;
-        static Ray ray;
-        static Vector2 Point;
-        static Vector2 Edge;
-
         public static float DotEdge()
         {
             return Point.x * -Edge.y + Point.y * Edge.x;
         }
-
-        static Vector2 dif;
 
         private static void GetMousedAgent()
         {

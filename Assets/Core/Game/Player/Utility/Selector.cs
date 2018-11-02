@@ -12,8 +12,9 @@ namespace RTSLockstep
 		public static event Action onClear;
 
 		private static RTSAgent _mainAgent;
+        public static RTSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
 
-		static Selector ()
+        static Selector ()
 		{
 			onAdd += (a) => Change ();
 			onRemove += (a) => Change ();
@@ -25,8 +26,6 @@ namespace RTSLockstep
 			if (onChange != null)
 				onChange ();
 		}
-
-		public static RTSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
 
 		private static FastSorter<RTSAgent> _selectedAgents;
 
@@ -41,16 +40,16 @@ namespace RTSLockstep
 		{
 			if (agent.IsSelected == false) {
                 if (MainSelectedAgent == null)
+                {
                     MainSelectedAgent = agent;
-                //	agent.Controller.AddToSelection (agent);
+                }
+
                 if (agent.MyAgentType == MainSelectedAgent.MyAgentType)
                 {
                     PlayerManager.MainController.AddToSelection(agent);
                     agent.IsSelected = true;
                     onAdd(agent);
                 }
-			}
-			else {
 			}
 		}
 
@@ -78,13 +77,8 @@ namespace RTSLockstep
 					selectedAgents.FastClear ();
 				}
 			}
-            //if (MainSelectedAgent && MainSelectedAgent.IsSelected)
-            //{
-            //    MainSelectedAgent.IsSelected = false;
-            //}
 			MainSelectedAgent = null;
 			onClear ();
-
 		}
 	}
 
