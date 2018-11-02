@@ -1,4 +1,5 @@
 ﻿using FastCollections;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -42,14 +43,20 @@ namespace RTSLockstep
 
         private static bool _selectionLocked = false;
 
-        private static bool one_click = false;
-        private static float delay = 0.35f;//max time in seconds for it to be considered a double click
-        private static float timeCounter;
+        public static event Action OnSingleTap;
+        public static event Action OnDoubleTap;
+        [Tooltip("Defines the maximum time between two taps to make it double tap")]
+        private static float tapThreshold = 0.35f;
+        //private static Action updateDelegate;
+        private static float tapTimer = 0.0f;
+        private static bool tap = false;
 
         public static void Initialize()
         {
-            timeCounter = delay;
+            // timeCounter = delay;
             ClearSelection();
+            OnSingleTap = () => HandleSingleClick();
+            OnDoubleTap = () => HandleDoubleClick();
         }
 
         public static void Update()
@@ -122,7 +129,7 @@ namespace RTSLockstep
                                         {
                                             bufferSelectedAgents.Add(curAgent);
                                         }
-                                        else if(curAgent.IsOwnedBy(PlayerManager.MainController))
+                                        else if (curAgent.IsOwnedBy(PlayerManager.MainController))
                                         {
                                             agentPos = curAgent.Position2;
                                             Edge = Box_TopRight - Box_TopLeft;
@@ -192,88 +199,114 @@ namespace RTSLockstep
             {
                 if (IsGathering == false)
                 {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        if (!one_click) // first click no previous clicks
+                   // if (Input.GetMouseButtonDown(0))
+                //    {
+                        if (Input.GetMouseButtonDown(0))
                         {
-                            Debug.Log("1");
-                            // do single click things
-                            one_click = true;
-
-                            CheckBoxDistance = true;
-                            StartBoxing(MousePosition);
-                        }
-                        else
-                        {
-                            Debug.Log("2");
-                            // found a double click, now reset
-                            one_click = false;
-                            Boxing = false;
-
-                            // do double click things
-                            if (MousedAgent)
+                            if (Time.deltaTime < tapTimer + tapThreshold)
                             {
-                                bufferSelectedAgents.Clear();
-                                for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
-                                {
-                                    var agentController = PlayerManager.GetAgentController(i);
-                                    for (int j = 0; j < AgentController.MaxAgents; j++)
-                                    {
-                                        if (agentController.LocalAgentActive[j])
-                                        {
-                                            curAgent = agentController.LocalAgents[j];
-                                            if (curAgent.CanSelect)
-                                            {
-                                                //always select mousedagent
-                                                if (curAgent.RefEquals(MousedAgent))
-                                                {
-                                                    bufferSelectedAgents.Add(curAgent);
-                                                }
-                                                //add any other visible agents of the same type owned by current player
-                                                else if (curAgent.IsVisible
-                                                    && curAgent.objectName == MousedAgent.objectName
-                                                    && curAgent.IsOwnedBy(PlayerManager.MainController))
-                                                {
-                                                    bufferSelectedAgents.Add(curAgent);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (bufferSelectedAgents.Count > 0)
-                                {
-                                    int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
-                                    while (bufferSelectedAgents.Count > 0)
-                                    {
-                                        RTSAgent agent = bufferSelectedAgents.PopMax();
-                                        if (agent.BoxPriority < peakBoxPriority)
-                                            break;
-                                        BoxAgent(agent);
-                                    }
-                                }
+                                if (OnDoubleTap != null) { OnDoubleTap(); }
+                                tap = false;
+                                return;
                             }
-
+                            tap = true;
+                            tapTimer = Time.deltaTime;
                         }
-                    }
-                    else if (Input.GetMouseButtonUp(0) && SelectedAgents.Count > 0)
-                    {
-                        SelectSelectedAgents();
-                    }
+                        if (tap == true && Time.deltaTime > tapTimer + tapThreshold)
+                        {
+                            tap = false;
+                            if (OnSingleTap != null) { OnSingleTap(); }
+                        }
+
+
+                        //if (ClickManager.DoubleClick(KeyCode.Mouse0)) 
+                        //{
+                        //    Debug.Log("2");
+                        //    Boxing = false;
+
+                        //    // do double click things
+                        //    if (MousedAgent)
+                        //    {
+                        //        bufferSelectedAgents.Clear();
+                        //        for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                        //        {
+                        //            var agentController = PlayerManager.GetAgentController(i);
+                        //            for (int j = 0; j < AgentController.MaxAgents; j++)
+                        //            {
+                        //                if (agentController.LocalAgentActive[j])
+                        //                {
+                        //                    curAgent = agentController.LocalAgents[j];
+                        //                    if (curAgent.CanSelect)
+                        //                    {
+                        //                        //always select mousedagent
+                        //                        if (curAgent.RefEquals(MousedAgent))
+                        //                        {
+                        //                            bufferSelectedAgents.Add(curAgent);
+                        //                        }
+                        //                        //add any other visible agents of the same type owned by current player
+                        //                        else if (curAgent.IsVisible
+                        //                            && curAgent.objectName == MousedAgent.objectName
+                        //                            && curAgent.IsOwnedBy(PlayerManager.MainController))
+                        //                        {
+                        //                            bufferSelectedAgents.Add(curAgent);
+                        //                        }
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
+
+                        //        if (bufferSelectedAgents.Count > 0)
+                        //        {
+                        //            int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                        //            while (bufferSelectedAgents.Count > 0)
+                        //            {
+                        //                RTSAgent agent = bufferSelectedAgents.PopMax();
+                        //                if (agent.BoxPriority < peakBoxPriority)
+                        //                    break;
+                        //                BoxAgent(agent);
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        //else 
+                        //{
+                        //    Debug.Log("1");
+                        //    // do single click things
+
+                        //    CheckBoxDistance = true;
+                        //    StartBoxing(MousePosition);
+                        //}
+
+
+                   // }
+                    //else if (Input.GetMouseButtonUp(0) && SelectedAgents.Count > 0)
+                    //{
+                    //    SelectSelectedAgents();
+                    //}
                 }
             }
 
-            if (one_click)
-            {
-                timeCounter -= Time.deltaTime;
-                if (timeCounter <= 0)
-                {
-                    //if thats true its been too long and we want to reset so 
-                    //the next click is simply a single click and not a double click.
-                    one_click = false;
-                    timeCounter = delay;
-                }
-            }
+            //if (one_click)
+            //{
+            //    timeCounter -= Time.deltaTime;
+            //    if (timeCounter <= 0)
+            //    {
+            //        //if thats true its been too long and we want to reset so 
+            //        //the next click is simply a single click and not a double click.
+            //        one_click = false;
+            //        timeCounter = delay;
+            //    }
+            //}
+        }
+
+        public static void HandleSingleClick()
+        {
+             Debug.Log("1");
+        }
+
+        public static void HandleDoubleClick()
+        {
+             Debug.Log("1");
         }
 
         public static void StartBoxing(Vector2 boxStart)
