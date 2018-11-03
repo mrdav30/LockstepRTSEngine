@@ -345,19 +345,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   username: 
   human: 0
-  startGold: 500
+  startGold: 1000
   startGoldLimit: 1000
   startArmy: 0
   startArmyLimit: 0
-  startOre: 100
+  startOre: 1000
   startOreLimit: 1000
-  startCrystal: 100
+  startCrystal: 1000
   startCrystalLimit: 1000
-  startWood: 100
+  startWood: 1000
   startWoodLimit: 1000
-  startStone: 100
+  startStone: 1000
   startStoneLimit: 1000
-  startFood: 100
+  startFood: 1000
   startFoodLimit: 1000
   teamColor: {r: 0.14983091, g: 0.8584906, b: 0.82703793, a: 0}
 --- !u!114 &114163430330928102

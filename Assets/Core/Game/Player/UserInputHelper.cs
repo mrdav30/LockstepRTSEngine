@@ -234,7 +234,8 @@ public class UserInputHelper : BehaviourHelper
         Vector3 destination = origin;
 
         // detect rotation amount if no agents selected & Right mouse button is down
-        if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1))
+        if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1)
+            || Input.GetMouseButton(1) && Input.GetKeyDown(KeyCode.LeftAlt))
         {
             destination.x -= Input.GetAxis("Mouse Y") * ResourceManager.RotateAmount;
             destination.y += Input.GetAxis("Mouse X") * ResourceManager.RotateAmount;

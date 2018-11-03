@@ -39,7 +39,7 @@ MonoBehaviour:
   - _name: HumanArcher
     _description: Archer
     _icon: {fileID: 0}
-    _prefab: {fileID: 1626604714047302, guid: e77979885ed3e1c488b7189d24a28c4e, type: 2}
+    _prefab: {fileID: 1471715215972734, guid: e77979885ed3e1c488b7189d24a28c4e, type: 2}
   - _name: HumanWonder
     _description: Wonder
     _icon: {fileID: 21300000, guid: 2eadb7d2ef4646442ae17800ad94e7b3, type: 3}

@@ -34,7 +34,7 @@ namespace RTSLockstep
 
         protected override void OnVisualize()
         {
-            if (Agent && UserInputHelper.GUIManager.CameraChanged)
+            if (Agent && Agent.IsVisible && UserInputHelper.GUIManager.CameraChanged)
             {
                 Agent.Body.CalculateBounds();
             }
@@ -44,7 +44,7 @@ namespace RTSLockstep
         {
             if (Agent && !ResourceManager.MenuOpen)
             {
-                if (Agent.IsSelected)
+                if (Agent.IsSelected && Agent.IsVisible)
                 {
                     DrawSelection();
                 }

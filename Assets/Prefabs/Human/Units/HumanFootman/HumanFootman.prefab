@@ -1006,7 +1006,7 @@ MonoBehaviour:
   moving: Moving
   engaging: Engaging
   specialEngaging: specialEngaging
-  dying: Dying
+  dying: Idling
   fire: fire
   specialFire: specialFire
   specialAttack: specialAttack
