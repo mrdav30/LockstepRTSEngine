@@ -22,13 +22,13 @@ public abstract class VictoryCondition : BehaviourHelper
     {
         if (GameFinished())
         {
-            ResultsScreen resultsScreen = hud.GetComponent<ResultsScreen>();
-            resultsScreen.SetMetVictoryCondition(this);
-            resultsScreen.enabled = true;
-            Time.timeScale = 0.0f;
-            Cursor.visible = true;
-            ResourceManager.MenuOpen = true;
-            hud.enabled = false;
+            //ResultsScreen resultsScreen = hud.GetComponent<ResultsScreen>();
+            //resultsScreen.SetMetVictoryCondition(this);
+            //resultsScreen.enabled = true;
+            //Time.timeScale = 0.0f;
+            //Cursor.visible = true;
+            //ResourceManager.MenuOpen = true;
+            //hud.enabled = false;
         }
     }
 
