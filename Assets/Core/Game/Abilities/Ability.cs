@@ -197,9 +197,12 @@ namespace RTSLockstep
 
         }
 
-        protected virtual void OnGUI()
+        public void OnGUI()
         {
+            doGUI();
         }
+
+        protected virtual void doGUI() { }
 
         public void BeginCast()
         {

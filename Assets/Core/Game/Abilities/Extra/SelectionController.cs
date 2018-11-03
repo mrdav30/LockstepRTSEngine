@@ -40,7 +40,7 @@ namespace RTSLockstep
             }
         }
 
-        protected override void OnGUI()
+        protected override void doGUI()
         {
             if (Agent && !ResourceManager.MenuOpen)
             {
@@ -78,13 +78,6 @@ namespace RTSLockstep
                 {
                     if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
-                        //bool test = Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController);
-                        //bool test2 = Selector.MainSelectedAgent.GlobalID == Agent.GlobalID;
-
-                        ////Debug.Log("test :" + test);
-                        ////Debug.Log("test2 :" + test2 + ", id1: " + Selector.MainSelectedAgent.GlobalID + ", id2: " + Agent.GlobalID);
-
-
                         if (Selector.MainSelectedAgent.Controller.RefEquals(Agent.Controller))
                         {
                             //agent belongs to current player
@@ -160,8 +153,7 @@ namespace RTSLockstep
         {
             if (Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building)
             {
-                healthPercentage = cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
-                //(float)hitPoints / (float)maxHitPoints;
+                healthPercentage = (float) cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
                 if (healthPercentage > highSplit)
                 {
                     healthStyle.normal.background = ResourceManager.HealthyTexture;
@@ -196,7 +188,7 @@ namespace RTSLockstep
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
             GUI.BeginGroup(Agent.GetPlayerArea());
             CalculateCurrentHealth(0.5f, 0.99f);
-            DrawHealthBar(selectBox, "Building ...");
+            DrawHealthBar(selectBox, "Constructing...");
             GUI.EndGroup();
         }
     }

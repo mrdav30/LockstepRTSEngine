@@ -8,29 +8,6 @@ namespace RTSLockstep
 {
     public static class WorkManager
     {
-        //public static GameObject FindHitObject(Vector3 origin)
-        //{
-        //    Ray ray = Camera.main.ScreenPointToRay(origin);
-        //    RaycastHit hit;
-        //    if (Physics.Raycast(ray, out hit))
-        //    {
-        //        return hit.collider.gameObject;
-
-        //    }
-        //    return null;
-        //}
-
-        //public static Vector3 FindHitPoint(Vector3 origin)
-        //{
-        //    Ray ray = Camera.main.ScreenPointToRay(origin);
-        //    RaycastHit hit;
-        //    if (Physics.Raycast(ray, out hit))
-        //    {
-        //        return hit.point;
-        //    }
-        //    return ResourceManager.InvalidPosition;
-        //}
-
         //not needed
         public static Rect CalculateSelectionBox(Bounds selectionBounds, Rect playingArea)
         {

@@ -139,11 +139,6 @@ namespace RTSLockstep
 
         void Initialize()
         {
-            //if (this != Instance)
-            //{
-            //    return;
-            //}
-         //   ResourceManager.SetGameObjectList(this);
             RTSLockstep.PlayerManager.Load();
             RTSLockstep.PlayerManager.SetAvatarTextures(Avatars);
         }
@@ -233,16 +228,6 @@ namespace RTSLockstep
         {
             resourceHealthBarTextures = images;
         }
-
-        //public static int GetNewObjectId()
-        //{
-        //    LevelLoader loader = (LevelLoader)GameObject.FindObjectOfType(typeof(LevelLoader));
-        //    if (loader)
-        //    {
-        //        return loader.GetNewObjectId();
-        //    }
-        //    return -1;
-        //}
         #endregion
     }
 }
