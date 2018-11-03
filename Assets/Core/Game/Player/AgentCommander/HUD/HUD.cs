@@ -27,7 +27,7 @@ public class HUD : MonoBehaviour
 
     private AgentCommander cachedCommander;
     private bool _cursorLocked;
-    public bool mouseOverHud { get; private set; }
+    public bool _mouseOverHud { get; private set; }
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40;
     private const int SELECTION_NAME_HEIGHT = 15;
     private CursorState activeCursorState;
@@ -142,7 +142,7 @@ public class HUD : MonoBehaviour
 
     public void Visualize()
     {
-        mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
+        _mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
     }
 
     // Update is called once per frame
@@ -451,18 +451,10 @@ public class HUD : MonoBehaviour
         Cursor.visible = false;
 
         // toggle back to pointer if over hud
-        if (mouseOverHud)
+        if (_mouseOverHud && !_cursorLocked)
         {
             SelectionManager.SetSelectionLock(false);
-            if (_cursorLocked)
-                SetCursorLock(false);
             SetCursorState(CursorState.Pointer);
-        }
-        // toggle back to rally point after hovering over hud
-        else if (activeCursorState == CursorState.Pointer && previousCursorState == CursorState.RallyPoint)
-        {
-            SetCursorState(CursorState.RallyPoint);
-            SetCursorLock(true);
         }
 
         if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())

@@ -222,7 +222,7 @@ public class UserInputHelper : BehaviourHelper
         if (!SelectionManager.MousedAgent
             && !mouseScroll
             && !PlayerManager.MainController.GetCommanderHUD().GetCursorLockState()
-            && !PlayerManager.MainController.GetCommanderHUD().mouseOverHud)
+            && !PlayerManager.MainController.GetCommanderHUD()._mouseOverHud)
         {
             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
         }
@@ -351,7 +351,9 @@ public class UserInputHelper : BehaviourHelper
             {
                 PlayerManager.MainController.GetCommanderBuilderManager().FindBuildingLocation();
             }
-            else if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.GetAbility<Move>()
+            else if (Selector.MainSelectedAgent 
+                && Selector.MainSelectedAgent.IsActive
+                && Selector.MainSelectedAgent.GetAbility<Move>()
                 && Selector.MainSelectedAgent.GetAbility<Move>().CanMove
                 && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController)
                 && !SelectionManager.MousedAgent)

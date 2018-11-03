@@ -214,12 +214,19 @@ namespace RTSLockstep
                     }
                     else if (Input.GetMouseButtonDown(1))
                     {
-                        if (OnSingleLeftTap != null){ OnSingleRightTap(); }
+                        if (OnSingleLeftTap != null) { OnSingleRightTap(); }
                     }
 
                     if (tap == true && Time.time > tapTimer + tapThreshold)
                     {
                         tap = false;
+                        if (Input.GetMouseButtonUp(0))
+                        {
+                            if (_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                            {
+                                ClearSelection();
+                            }
+                        }
                         if (OnSingleLeftTap != null) { OnSingleLeftTap(); }
                     }
                 }
