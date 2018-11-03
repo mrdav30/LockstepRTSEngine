@@ -236,6 +236,7 @@ namespace RTSLockstep
                     _flagState = FlagState.FlagSet;
                     Agent.Controller.GetCommanderHUD().SetCursorLock(false);
                     Agent.Controller.GetCommanderHUD().SetCursorState(CursorState.Select);
+                    SelectionManager.SetSelectionLock(false);
                 }
             }
         }

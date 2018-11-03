@@ -266,17 +266,17 @@ public class UserInputHelper : BehaviourHelper
                     if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                     {
                         //call harvest command
-                        SelectionManager.SetSelectionLock(false);
+                        SelectionManager.SetSelectionLock(true);
                         ProcessInterfacer((QuickRally));
                     }
                     else
                     {
-                        SelectionManager.SetSelectionLock(true);
+                        SelectionManager.SetSelectionLock(false);
                     }
                 }
                 else
                 {
-                    SelectionManager.SetSelectionLock(true);
+                    SelectionManager.SetSelectionLock(false);
                 }
             }
         }

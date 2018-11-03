@@ -41,7 +41,7 @@ namespace RTSLockstep
         private static Vector2 Edge;
         private static Vector2 dif;
 
-        private static bool _selectionLocked = false;
+        private static bool _selectionLocked = true;
 
         public static event Action OnSingleLeftTap;
         public static event Action OnSingleRightTap;
@@ -179,7 +179,7 @@ namespace RTSLockstep
 
                 if (Input.GetMouseButtonUp(0))
                 {
-                    if (_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                    if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                     {
                         ClearSelection();
                     }
@@ -222,7 +222,7 @@ namespace RTSLockstep
                         tap = false;
                         if (Input.GetMouseButtonUp(0))
                         {
-                            if (_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                            if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                             {
                                 ClearSelection();
                             }
@@ -302,7 +302,7 @@ namespace RTSLockstep
 
         public static void QuickSelect()
         {
-            if (_selectionLocked)
+            if (!_selectionLocked)
                 ClearSelection();
             SelectAgent(MousedAgent);
         }

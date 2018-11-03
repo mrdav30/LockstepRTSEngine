@@ -453,7 +453,7 @@ public class HUD : MonoBehaviour
         // toggle back to pointer if over hud
         if (_mouseOverHud && !_cursorLocked)
         {
-            SelectionManager.SetSelectionLock(false);
+            SelectionManager.SetSelectionLock(true);
             SetCursorState(CursorState.Pointer);
         }
 
