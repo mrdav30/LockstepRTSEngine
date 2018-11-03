@@ -8,8 +8,8 @@ namespace RTSLockstep
     [UnityEngine.DisallowMultipleComponent]
     public class Spawner : ActiveAbility
     {
-        private Vector3d spawnPoint;
-        private Vector3d rallyPoint;
+        private Vector3 spawnPoint;
+        private Vector3 rallyPoint;
         private FlagState _flagState;
         private Queue<string> spawnQueue;
         private long currentSpawnProgress;
@@ -108,11 +108,11 @@ namespace RTSLockstep
                 RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
                 if (Agent.IsSelected)
                 {
-                    if (flag && spawnPoint != ResourceManager.InvalidPosition && rallyPoint != ResourceManager.InvalidPosition)
+                    if (flag && spawnPoint != ResourceManager.InvalidPosition.ToVector3() && rallyPoint != ResourceManager.InvalidPosition.ToVector3())
                     {
                         if (_flagState == FlagState.FlagSet)
                         {
-                            flag.transform.localPosition = rallyPoint.ToVector3();
+                            flag.transform.localPosition = rallyPoint;
                             flag.transform.forward = transform.forward;
                             flag.Enable();
                         }
@@ -208,7 +208,7 @@ namespace RTSLockstep
                     if (newUnit && spawnPoint != rallyPoint)
                     {
                         newUnit.SetProvision(true);
-                        newUnit.GetAbility<Move>().StartMove(rallyPoint.ToVector2d());
+                        newUnit.GetAbility<Move>().StartMove(new Vector2d(rallyPoint));
                     }
                 }
                 currentSpawnProgress = 0;
@@ -220,7 +220,7 @@ namespace RTSLockstep
             get { return AnimState.Spawning; }
         }
 
-        public void SetRallyPoint(Vector3d position)
+        public void SetRallyPoint(Vector3 position)
         {
             rallyPoint = position;
             if (Agent.GetCommander() && Agent.IsSelected)
@@ -232,7 +232,7 @@ namespace RTSLockstep
                     {
                         flag.Enable();
                     }
-                    flag.transform.localPosition = rallyPoint.ToVector3();
+                    flag.transform.localPosition = rallyPoint;
                     _flagState = FlagState.FlagSet;
                     Agent.Controller.GetCommanderHUD().SetCursorLock(false);
                     Agent.Controller.GetCommanderHUD().SetCursorState(CursorState.Select);
@@ -244,7 +244,7 @@ namespace RTSLockstep
         {
             long spawnX = (long)(Agent.Body.GetSelectionBounds().center.x + transform.forward.x * Agent.Body.GetSelectionBounds().extents.x + transform.forward.x * 10);
             long spawnZ = (long)(Agent.Body.GetSelectionBounds().center.z + transform.forward.z * Agent.Body.GetSelectionBounds().extents.z + transform.forward.z * 10);
-            spawnPoint = new Vector3d(spawnX, 0, spawnZ);
+            spawnPoint = new Vector3(spawnX, 0, spawnZ);
             rallyPoint = spawnPoint;
         }
 
@@ -256,7 +256,7 @@ namespace RTSLockstep
             {
                 if (pos.ToVector3d() != ResourceManager.InvalidPosition)
                 {
-                    SetRallyPoint(pos.ToVector3d());
+                    SetRallyPoint(pos.ToVector3());
                 }
             }
             else if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
@@ -268,7 +268,7 @@ namespace RTSLockstep
 
         public bool hasSpawnPoint()
         {
-            return spawnPoint != ResourceManager.InvalidPosition && rallyPoint != ResourceManager.InvalidPosition;
+            return spawnPoint != ResourceManager.InvalidPosition.ToVector3() && rallyPoint != ResourceManager.InvalidPosition.ToVector3();
         }
 
         public FlagState GetFlagState()
@@ -294,8 +294,8 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            SaveManager.WriteVector3d(writer, "SpawnPoint", spawnPoint);
-            SaveManager.WriteVector3d(writer, "RallyPoint", rallyPoint);
+            SaveManager.WriteVector(writer, "SpawnPoint", spawnPoint);
+            SaveManager.WriteVector(writer, "RallyPoint", rallyPoint);
             SaveManager.WriteString(writer, "FlagState", _flagState.ToString());
             SaveManager.WriteFloat(writer, "SpawnProgress", currentSpawnProgress);
             SaveManager.WriteLong(writer, "SpawnCount", spawnCount);
@@ -308,10 +308,10 @@ namespace RTSLockstep
             switch (propertyName)
             {
                 case "SpawnPoint":
-                    spawnPoint = LoadManager.LoadVector3d(reader);
+                    spawnPoint = LoadManager.LoadVector(reader);
                     break;
                 case "RallyPoint":
-                    rallyPoint = LoadManager.LoadVector3d(reader);
+                    rallyPoint = LoadManager.LoadVector(reader);
                     break;
                 case "FlagState":
                     _flagState = WorkManager.GetFlagState((string)readValue);

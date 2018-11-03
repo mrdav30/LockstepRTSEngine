@@ -293,14 +293,22 @@ public class UserInputHelper : BehaviourHelper
             }
             else
             {
-                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
+                if (Selector.MainSelectedAgent
+                    && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>()
-                        && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                    if (Selector.MainSelectedAgent.GetAbility<Spawner>())
                     {
-                        Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
-                        PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
-                        PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                        if (Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                        {
+                            Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
+                            PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
+                            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                        }
+                        else
+                        {
+                            Vector2d rallyPoint = RTSInterfacing.GetWorldPosD(Input.mousePosition);
+                            Selector.MainSelectedAgent.GetAbility<Spawner>().SetRallyPoint(rallyPoint.ToVector3());
+                        }
                     }
 
                     if (RTSInterfacing.MousedAgent.IsNotNull())
@@ -352,7 +360,7 @@ public class UserInputHelper : BehaviourHelper
             {
                 PlayerManager.MainController.GetCommanderBuilderManager().FindBuildingLocation();
             }
-            else if (Selector.MainSelectedAgent 
+            else if (Selector.MainSelectedAgent
                 && Selector.MainSelectedAgent.IsActive
                 && Selector.MainSelectedAgent.GetAbility<Move>()
                 && Selector.MainSelectedAgent.GetAbility<Move>().CanMove
