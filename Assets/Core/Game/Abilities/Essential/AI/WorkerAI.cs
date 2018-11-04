@@ -76,6 +76,10 @@ namespace RTSLockstep
                         UserInputHelper.SendCommand(harvestCom);
                     }
                 }
+                //else
+                //{
+                //    cachedHarvest.SetResourceTarget(null);
+                //}
             }
             if (Agent.Tag == AgentTag.Builder && cachedBuild.IsFocused)
             {

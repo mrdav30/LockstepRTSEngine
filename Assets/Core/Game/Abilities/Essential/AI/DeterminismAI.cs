@@ -67,7 +67,7 @@ namespace RTSLockstep
         protected void GetNearbyObject()
         {
             Vector3 currentPosition = transform.position;
-            nearbyObjects = WorkManager.FindNearbyObjects(currentPosition, cachedAttack.Range);
+            nearbyObjects = WorkManager.FindNearbyObjects(currentPosition, cachedAttack.Sight);
         }
 
         public virtual void DecideWhatToDo()

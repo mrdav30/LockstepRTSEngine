@@ -174,7 +174,8 @@ namespace RTSLockstep
 
 			PhysicsManager.Initialize ();
 			PlayerManager.Initialize ();
-			SelectionManager.Initialize ();
+            //Initialized in UserInputHelper
+		//	SelectionManager.Initialize ();
 			InfluenceManager.Initialize ();
 			ProjectileManager.Initialize ();
 
