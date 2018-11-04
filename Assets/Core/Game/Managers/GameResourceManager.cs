@@ -7,7 +7,7 @@ using FastCollections;
 
 namespace RTSLockstep
 {
-    public class ResourceManager
+    public class GameResourceManager
     {
         #region properties
         public static int ScrollWidth { get { return 15; } }
@@ -147,7 +147,7 @@ namespace RTSLockstep
         #region Public
         public static IAgentData GetAgentInterfacer(string agentCode)
         {
-            return ResourceManager.AgentCodeInterfacerMap[agentCode];
+            return GameResourceManager.AgentCodeInterfacerMap[agentCode];
         }
 
         public static RTSAgent GetAgentTemplate(string agentCode)
@@ -155,7 +155,7 @@ namespace RTSLockstep
             RTSAgent template;
             if (!AgentCodeTemplateMap.TryGetValue(agentCode, out template))
             {
-                template = GameObject.Instantiate(ResourceManager.GetAgentSource(agentCode));
+                template = GameObject.Instantiate(GameResourceManager.GetAgentSource(agentCode));
                 AgentCodeTemplateMap.Add(agentCode, template);
                 template.transform.parent = OrganizerObject.transform;
             }
@@ -180,13 +180,13 @@ namespace RTSLockstep
 
         public static RTSAgent GetAgentSource(string agentCode)
         {
-            IAgentData interfacer = ResourceManager.AgentCodeInterfacerMap[agentCode];
+            IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[agentCode];
             return interfacer.GetAgent();
         }
 
         public static GameObject GetWorldObject(string worldObjectCode)
         {
-            IWorldObjectData interfacer = ResourceManager.WorldObjectCodeInterfacerMap[worldObjectCode];
+            IWorldObjectData interfacer = GameResourceManager.WorldObjectCodeInterfacerMap[worldObjectCode];
             return interfacer.GetWorldObject();
         }
 
@@ -197,7 +197,7 @@ namespace RTSLockstep
 
         public static Texture2D GetBuildImage(string name)
         {
-            IAgentData interfacer = ResourceManager.AgentCodeInterfacerMap[name];
+            IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[name];
             return interfacer.GetAgentIcon();
         }
 

@@ -191,7 +191,7 @@ namespace RTSLockstep
         private Rect _playingArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
         private List<Material> oldMaterials = new List<Material>();
         private bool loadedSavedValues = false;
-        private AgentCommander cachedCommander;
+        private AgentCommander _cachedCommander;
         #endregion
 
         #region CallEvents
@@ -260,7 +260,7 @@ namespace RTSLockstep
 
             SetCommander(Controller.Commander);
 
-            if (cachedCommander)
+            if (_cachedCommander)
             {
                 if (!loadedSavedValues)
                 {
@@ -274,7 +274,7 @@ namespace RTSLockstep
             if (!_provisioned)
             {
                 _provisioned = true;
-                cachedCommander.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
+                _cachedCommander.CachedResourceManager.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
             }
 
             if (Influencer.IsNotNull())
@@ -512,12 +512,12 @@ namespace RTSLockstep
 
         public void SetCommander(AgentCommander commander)
         {
-            cachedCommander = commander;
+            _cachedCommander = commander;
         }
 
         public AgentCommander GetCommander()
         {
-            return cachedCommander;
+            return _cachedCommander;
         }
 
         public void SetTeamColor()
@@ -525,7 +525,7 @@ namespace RTSLockstep
             TeamColor[] teamColors = GetComponentsInChildren<TeamColor>();
             foreach (TeamColor teamColor in teamColors)
             {
-                teamColor.GetComponent<Renderer>().material.color = cachedCommander.teamColor;
+                teamColor.GetComponent<Renderer>().material.color = _cachedCommander.teamColor;
             }
         }
 
@@ -599,14 +599,14 @@ namespace RTSLockstep
                 else if (reader.TokenType == JsonToken.EndObject)
                 {
                     //loaded position invalidates the selection bounds so they must be recalculated
-                    Body.SetSelectionBounds(ResourceManager.InvalidBounds);
+                    Body.SetSelectionBounds(GameResourceManager.InvalidBounds);
                     Body.CalculateBounds();
                     loadedSavedValues = true;
                     return;
                 }
             }
             //loaded position invalidates the selection bounds so they must be recalculated
-            Body.SetSelectionBounds(ResourceManager.InvalidBounds);
+            Body.SetSelectionBounds(GameResourceManager.InvalidBounds);
             Body.CalculateBounds();
             loadedSavedValues = true;
         }

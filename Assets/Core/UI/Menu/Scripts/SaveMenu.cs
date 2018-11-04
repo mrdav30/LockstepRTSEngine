@@ -95,9 +95,9 @@ public class SaveMenu : MonoBehaviour
     public void Activate()
     {
         SelectionList.LoadEntries(RTSLockstep.PlayerManager.GetSavedGames());
-        if (ResourceManager.LevelName != null && ResourceManager.LevelName != "")
+        if (GameResourceManager.LevelName != null && GameResourceManager.LevelName != "")
         {
-            saveName = ResourceManager.LevelName;
+            saveName = GameResourceManager.LevelName;
         }
     }
     #endregion
@@ -106,40 +106,40 @@ public class SaveMenu : MonoBehaviour
     private void DrawMenu()
     {
         float menuHeight = GetMenuHeight();
-        float groupLeft = Screen.width / 2 - ResourceManager.MenuWidth / 2;
+        float groupLeft = Screen.width / 2 - GameResourceManager.MenuWidth / 2;
         float groupTop = Screen.height / 2 - menuHeight / 2;
-        Rect groupRect = new Rect(groupLeft, groupTop, ResourceManager.MenuWidth, menuHeight);
+        Rect groupRect = new Rect(groupLeft, groupTop, GameResourceManager.MenuWidth, menuHeight);
 
         GUI.BeginGroup(groupRect);
         //background box
-        GUI.Box(new Rect(0, 0, ResourceManager.MenuWidth, menuHeight), "");
+        GUI.Box(new Rect(0, 0, GameResourceManager.MenuWidth, menuHeight), "");
         //menu buttons
-        float leftPos = ResourceManager.Padding;
-        float topPos = menuHeight - ResourceManager.Padding - ResourceManager.ButtonHeight;
-        if (GUI.Button(new Rect(leftPos, topPos, ResourceManager.ButtonWidth, ResourceManager.ButtonHeight), "Save Game"))
+        float leftPos = GameResourceManager.Padding;
+        float topPos = menuHeight - GameResourceManager.Padding - GameResourceManager.ButtonHeight;
+        if (GUI.Button(new Rect(leftPos, topPos, GameResourceManager.ButtonWidth, GameResourceManager.ButtonHeight), "Save Game"))
         {
             PlayClick();
             StartSave();
         }
-        leftPos += ResourceManager.ButtonWidth + ResourceManager.Padding;
-        if (GUI.Button(new Rect(leftPos, topPos, ResourceManager.ButtonWidth, ResourceManager.ButtonHeight), "Cancel"))
+        leftPos += GameResourceManager.ButtonWidth + GameResourceManager.Padding;
+        if (GUI.Button(new Rect(leftPos, topPos, GameResourceManager.ButtonWidth, GameResourceManager.ButtonHeight), "Cancel"))
         {
             PlayClick();
             CancelSave();
         }
         //text area for commander to type new name
-        float textTop = menuHeight - 2 * ResourceManager.Padding - ResourceManager.ButtonHeight - ResourceManager.TextHeight;
-        float textWidth = ResourceManager.MenuWidth - 2 * ResourceManager.Padding;
-        saveName = GUI.TextField(new Rect(ResourceManager.Padding, textTop, textWidth, ResourceManager.TextHeight), saveName, 60);
+        float textTop = menuHeight - 2 * GameResourceManager.Padding - GameResourceManager.ButtonHeight - GameResourceManager.TextHeight;
+        float textWidth = GameResourceManager.MenuWidth - 2 * GameResourceManager.Padding;
+        saveName = GUI.TextField(new Rect(GameResourceManager.Padding, textTop, textWidth, GameResourceManager.TextHeight), saveName, 60);
         SelectionList.SetCurrentEntry(saveName);
         GUI.EndGroup();
 
         //selection list, needs to be called outside of the group for the menu
         string prevSelection = SelectionList.GetCurrentEntry();
-        float selectionLeft = groupRect.x + ResourceManager.Padding;
-        float selectionTop = groupRect.y + ResourceManager.Padding;
-        float selectionWidth = groupRect.width - 2 * ResourceManager.Padding;
-        float selectionHeight = groupRect.height - GetMenuItemsHeight() - ResourceManager.Padding;
+        float selectionLeft = groupRect.x + GameResourceManager.Padding;
+        float selectionTop = groupRect.y + GameResourceManager.Padding;
+        float selectionWidth = groupRect.width - 2 * GameResourceManager.Padding;
+        float selectionHeight = groupRect.height - GetMenuItemsHeight() - GameResourceManager.Padding;
         SelectionList.Draw(selectionLeft, selectionTop, selectionWidth, selectionHeight, selectionSkin);
         string newSelection = SelectionList.GetCurrentEntry();
         //set saveName to be name selected in list if selection has changed
@@ -156,7 +156,7 @@ public class SaveMenu : MonoBehaviour
 
     private float GetMenuItemsHeight()
     {
-        return ResourceManager.ButtonHeight + ResourceManager.TextHeight + 3 * ResourceManager.Padding;
+        return GameResourceManager.ButtonHeight + GameResourceManager.TextHeight + 3 * GameResourceManager.Padding;
     }
 
     private void StartSave()
@@ -184,7 +184,7 @@ public class SaveMenu : MonoBehaviour
     private void SaveGame()
     {
         SaveManager.SaveGame(saveName);
-        ResourceManager.LevelName = saveName;
+        GameResourceManager.LevelName = saveName;
         GetComponent<SaveMenu>().enabled = false;
         PauseMenu pause = GetComponent<PauseMenu>();
         if (pause)

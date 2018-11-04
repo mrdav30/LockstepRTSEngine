@@ -21,5 +21,9 @@ namespace RotaryHeart.Lib.SerializableDictionary
         private UserInputKeyMappings _userInputKeyMappings;
         [SerializeField]
         private KeyCode _keyCode;
+        [SerializeField]
+        private ResourceType _resourceType;
+        [SerializeField]
+        private StartingResourceInfo _startingResourceInfo;
     }
 }

@@ -50,22 +50,22 @@ public class LoadMenu : MonoBehaviour
 
         GUI.skin = mainSkin;
         float menuHeight = GetMenuHeight();
-        float groupLeft = Screen.width / 2 - ResourceManager.MenuWidth / 2;
+        float groupLeft = Screen.width / 2 - GameResourceManager.MenuWidth / 2;
         float groupTop = Screen.height / 2 - menuHeight / 2;
-        Rect groupRect = new Rect(groupLeft, groupTop, ResourceManager.MenuWidth, menuHeight);
+        Rect groupRect = new Rect(groupLeft, groupTop, GameResourceManager.MenuWidth, menuHeight);
         GUI.BeginGroup(groupRect);
         //background box
-        GUI.Box(new Rect(0, 0, ResourceManager.MenuWidth, menuHeight), "");
+        GUI.Box(new Rect(0, 0, GameResourceManager.MenuWidth, menuHeight), "");
         //menu buttons
-        float leftPos = ResourceManager.Padding;
-        float topPos = menuHeight - ResourceManager.Padding - ResourceManager.ButtonHeight;
-        if (GUI.Button(new Rect(leftPos, topPos, ResourceManager.ButtonWidth, ResourceManager.ButtonHeight), "Load Game"))
+        float leftPos = GameResourceManager.Padding;
+        float topPos = menuHeight - GameResourceManager.Padding - GameResourceManager.ButtonHeight;
+        if (GUI.Button(new Rect(leftPos, topPos, GameResourceManager.ButtonWidth, GameResourceManager.ButtonHeight), "Load Game"))
         {
             PlayClick();
             StartLoad();
         }
-        leftPos += ResourceManager.ButtonWidth + ResourceManager.Padding;
-        if (GUI.Button(new Rect(leftPos, topPos, ResourceManager.ButtonWidth, ResourceManager.ButtonHeight), "Cancel"))
+        leftPos += GameResourceManager.ButtonWidth + GameResourceManager.Padding;
+        if (GUI.Button(new Rect(leftPos, topPos, GameResourceManager.ButtonWidth, GameResourceManager.ButtonHeight), "Cancel"))
         {
             PlayClick();
             CancelLoad();
@@ -73,10 +73,10 @@ public class LoadMenu : MonoBehaviour
         GUI.EndGroup();
 
         //selection list, needs to be called outside of the group for the menu
-        float selectionLeft = groupRect.x + ResourceManager.Padding;
-        float selectionTop = groupRect.y + ResourceManager.Padding;
-        float selectionWidth = groupRect.width - 2 * ResourceManager.Padding;
-        float selectionHeight = groupRect.height - GetMenuItemsHeight() - ResourceManager.Padding;
+        float selectionLeft = groupRect.x + GameResourceManager.Padding;
+        float selectionTop = groupRect.y + GameResourceManager.Padding;
+        float selectionWidth = groupRect.width - 2 * GameResourceManager.Padding;
+        float selectionHeight = groupRect.height - GetMenuItemsHeight() - GameResourceManager.Padding;
         SelectionList.Draw(selectionLeft, selectionTop, selectionWidth, selectionHeight, selectionSkin);
     }
     #endregion
@@ -89,7 +89,7 @@ public class LoadMenu : MonoBehaviour
 
     private float GetMenuItemsHeight()
     {
-        return ResourceManager.ButtonHeight + 2 * ResourceManager.Padding;
+        return GameResourceManager.ButtonHeight + 2 * GameResourceManager.Padding;
     }
 
     public void Activate()
@@ -102,7 +102,7 @@ public class LoadMenu : MonoBehaviour
         string newLevel = SelectionList.GetCurrentEntry();
         if (newLevel != "")
         {
-            ResourceManager.LevelName = newLevel;
+            GameResourceManager.LevelName = newLevel;
             // make use of a pair of empty scenes to load details into. 
             // We need two of these for the scenario where we load a game into one and then want to load a game again
             if (SceneManager.GetActiveScene().name != "BlankMap1")

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using RTSLockstep;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AgentCommander : BehaviourHelper
@@ -8,28 +7,24 @@ public class AgentCommander : BehaviourHelper
     #region Properties
     public string username;
     public bool human;
-    private HUD _cachedHud;
+    public HUD CachedHud { get; private set; }
     public BuildManager CachedBuilderManager { get; private set; }
-    private AgentController cachedController;
-    public int startGold, startGoldLimit, startArmy, startArmyLimit, startOre, startOreLimit, startCrystal, startCrystalLimit,
-        startWood, startWoodLimit, startStone, startStoneLimit, startFood, startFoodLimit;
-    public Color teamColor;
+    public ResourceManager CachedResourceManager { get; private set; }
+    private AgentController _cachedController;
 
-    private Dictionary<ResourceType, long> resources;
-    private Dictionary<ResourceType, long> resourceLimits;
+    public Color teamColor;
     private bool Setted = false;
     #endregion
 
     #region MonoBehavior
     protected void Setup()
     {
-        resources = InitResourceList();
-        resourceLimits = InitResourceList();
+        CachedResourceManager = GetComponentInParent<ResourceManager>();
+        CachedHud = GetComponentInParent<HUD>();
+        CachedBuilderManager = GetComponentInParent<BuildManager>();
 
-        _cachedHud = GetComponentInChildren<HUD>();
-        CachedBuilderManager = GetComponentInChildren<BuildManager>();
-
-        _cachedHud.Setup();
+        CachedResourceManager.Setup();
+        CachedHud.Setup();
         CachedBuilderManager.Setup();
 
         Setted = true;
@@ -40,9 +35,7 @@ public class AgentCommander : BehaviourHelper
     {
         if (!Setted)
             Setup();
-
-        AddStartResourceLimits();
-        AddStartResources();
+        CachedResourceManager.Initialize();
     }
 
     // Update is called once per frame
@@ -50,35 +43,25 @@ public class AgentCommander : BehaviourHelper
     {
         if (human)
         {
-            _cachedHud.Visualize();
-            _cachedHud.SetResourceValues(resources, resourceLimits);
+            CachedResourceManager.Visualize();
+            CachedHud.Visualize();
+            CachedBuilderManager.Visualize();
         }
-        CachedBuilderManager.Visualize();
     }
 
     protected override void doGUI()
     {
-        _cachedHud.doGUI();
+        CachedHud.doGUI();
     }
     #endregion
 
     #region Public
-    public void AddResource(ResourceType type, long amount)
-    {
-        resources[type] += amount;
-    }
-
-    public void IncrementResourceLimit(ResourceType type, int amount)
-    {
-        resourceLimits[type] += amount;
-    }
-
     public virtual void SaveDetails(JsonWriter writer)
     {
         SaveManager.WriteString(writer, "Username", username);
         SaveManager.WriteBoolean(writer, "Human", human);
         SaveManager.WriteColor(writer, "TeamColor", teamColor);
-        SaveManager.SavePlayerResources(writer, resources, resourceLimits);
+        SaveManager.SavePlayerResources(writer, CachedResourceManager.GetResources(), CachedResourceManager.GetResourceLimits());
         SaveManager.SavePlayerRTSAgents(writer, GetComponent<RTSAgents>().GetComponentsInChildren<RTSAgent>());
     }
 
@@ -134,7 +117,7 @@ public class AgentCommander : BehaviourHelper
                         teamColor = LoadManager.LoadColor(reader);
                         break;
                     case "Resources":
-                        LoadResources(reader);
+                        CachedResourceManager.LoadResources(reader);
                         break;
                     case "Units":
                         LoadRTSAgents(reader);
@@ -160,194 +143,18 @@ public class AgentCommander : BehaviourHelper
         return true;
     }
 
-    public long GetResourceAmount(ResourceType type)
-    {
-        return resources[type];
-    }
-
-    public long GetResourceLimit(ResourceType type)
-    {
-        return resourceLimits[type];
-    }
-
-    public void RemoveResource(ResourceType type, int amount)
-    {
-        resources[type] -= amount;
-    }
-
-    public void DecrementResourceLimit(ResourceType type, int amount)
-    {
-        resourceLimits[type] -= amount;
-    }
-
-    public bool CheckResources(RTSAgent agent)
-    {
-        bool validResources = true;
-        foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
-        {
-            if (entry.Value > 0)
-            {
-                switch (entry.Key.ToString())
-                {
-                    case "Provision":
-                        if ((entry.Value + GetResourceAmount(entry.Key)) >= GetResourceLimit(entry.Key))
-                        {
-                            validResources = false;
-                            Debug.Log("not enough supplies!");
-                        }
-                        break;
-                    default:
-                        if (entry.Value > GetResourceAmount(entry.Key))
-                        {
-                            validResources = false;
-                            Debug.Log("not enough resources!");
-                        }
-                        break;
-                };
-            };
-        }
-        return validResources;
-    }
-
-    public void RemoveResources(RTSAgent agent)
-    {
-        foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
-        {
-            if (entry.Value > 0)
-            {
-                switch (entry.Key.ToString())
-                {
-                    case "Provision":
-                        AddResource(entry.Key, entry.Value);
-                        break;
-                    default:
-                        RemoveResource(entry.Key, entry.Value);
-                        break;
-                };
-            };
-        }
-    }
-
     public void SetController(AgentController controller)
     {
-        cachedController = controller;
+        _cachedController = controller;
     }
 
     public AgentController GetController()
     {
-        return cachedController;
+        return _cachedController;
     }
     #endregion
 
     #region Private
-    private Dictionary<ResourceType, long> InitResourceList()
-    {
-        Dictionary<ResourceType, long> list = new Dictionary<ResourceType, long>();
-        list.Add(ResourceType.Gold, 0);
-        list.Add(ResourceType.Ore, 0);
-        list.Add(ResourceType.Stone, 0);
-        list.Add(ResourceType.Wood, 0);
-        list.Add(ResourceType.Crystal, 0);
-        list.Add(ResourceType.Food, 0);
-        list.Add(ResourceType.Provision, 0);
-        return list;
-    }
-
-    private void AddStartResourceLimits()
-    {
-        IncrementResourceLimit(ResourceType.Gold, startGoldLimit);
-        IncrementResourceLimit(ResourceType.Ore, startOreLimit);
-        IncrementResourceLimit(ResourceType.Stone, startStoneLimit);
-        IncrementResourceLimit(ResourceType.Wood, startWoodLimit);
-        IncrementResourceLimit(ResourceType.Crystal, startCrystalLimit);
-        IncrementResourceLimit(ResourceType.Food, startFoodLimit);
-        IncrementResourceLimit(ResourceType.Provision, startArmyLimit);
-    }
-
-    private void AddStartResources()
-    {
-        AddResource(ResourceType.Gold, startGold);
-        AddResource(ResourceType.Ore, startOre);
-        AddResource(ResourceType.Stone, startStone);
-        AddResource(ResourceType.Wood, startWood);
-        AddResource(ResourceType.Crystal, startCrystal);
-        AddResource(ResourceType.Food, startFood);
-        AddResource(ResourceType.Provision, startArmy);
-    }
-
-    private void LoadResources(JsonTextReader reader)
-    {
-        if (reader == null)
-        {
-            return;
-        }
-        string currValue = "";
-        while (reader.Read())
-        {
-            if (reader.Value != null)
-            {
-                if (reader.TokenType == JsonToken.PropertyName)
-                {
-                    currValue = (string)reader.Value;
-                }
-                else
-                {
-                    switch (currValue)
-                    {
-                        case "Gold":
-                            startGold = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Gold_Limit":
-                            startGoldLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Army":
-                            startArmy = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Army_Limit":
-                            startArmyLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Ore":
-                            startOre = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Ore_Limit":
-                            startOreLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Crystal":
-                            startCrystal = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Crystal_Limit":
-                            startCrystalLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Wood":
-                            startWood = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Wood_Limit":
-                            startWoodLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Stone":
-                            startStone = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Stone_Limit":
-                            startStoneLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Food":
-                            startFood = (int)(System.Int64)reader.Value;
-                            break;
-                        case "Food_Limit":
-                            startFoodLimit = (int)(System.Int64)reader.Value;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            else if (reader.TokenType == JsonToken.EndArray)
-            {
-                return;
-            }
-        }
-    }
-
     private void LoadRTSAgents(JsonTextReader reader)
     {
         if (reader == null)
@@ -368,7 +175,7 @@ public class AgentCommander : BehaviourHelper
                 {
                     type = (string)reader.Value;
                     // need to create unit via commander controller...
-                    GameObject newObject = Instantiate(ResourceManager.GetAgentTemplate(type).gameObject);
+                    GameObject newObject = Instantiate(GameResourceManager.GetAgentTemplate(type).gameObject);
                     RTSAgent agent = newObject.GetComponent<RTSAgent>();
                     agent.name = agent.name.Replace("(Clone)", "").Trim();
                     agent.LoadDetails(reader);

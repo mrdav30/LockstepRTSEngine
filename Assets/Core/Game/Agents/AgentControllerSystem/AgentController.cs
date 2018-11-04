@@ -324,7 +324,7 @@ namespace RTSLockstep
                 Debug.LogError("A game manager has not been initialized!");
 
             //load from ls db
-            GameObject commanderObject = GameObject.Instantiate(ResourceManager.GetCommanderObject(), UnityEngine.Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<AgentCommanders>().transform);
+            GameObject commanderObject = GameObject.Instantiate(GameResourceManager.GetCommanderObject(), UnityEngine.Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<AgentCommanders>().transform);
 
             commanderObject.name = this.ControllerName;
 
@@ -422,7 +422,7 @@ namespace RTSLockstep
 
         public static void RegisterRawAgent(RTSAgent agent)
         {
-            var agentCodeID = ResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
+            var agentCodeID = GameResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
             FastList<bool> typeActive;
             if (!AgentController.TypeAgentsActive.TryGetValue(agentCodeID, out typeActive))
             {
@@ -450,7 +450,7 @@ namespace RTSLockstep
         /// <param name="isBare">If set to <c>true</c> is bare.</param>
         public static RTSAgent CreateRawAgent(string agentCode)
         {
-            if (!ResourceManager.IsValidAgentCode(agentCode))
+            if (!GameResourceManager.IsValidAgentCode(agentCode))
             {
                 throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
@@ -460,15 +460,15 @@ namespace RTSLockstep
             if (cache.IsNotNull() && cache.Count > 0)
             {
                 curAgent = cache.Pop();
-                ushort agentCodeID = ResourceManager.GetAgentCodeIndex(agentCode);
+                ushort agentCodeID = GameResourceManager.GetAgentCodeIndex(agentCode);
                 Debug.Log(curAgent.TypeIndex);
                 TypeAgentsActive[agentCodeID][curAgent.TypeIndex] = true;
             }
             else
             {
-                IAgentData interfacer = ResourceManager.AgentCodeInterfacerMap[agentCode];
+                IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[agentCode];
 
-                curAgent = GameObject.Instantiate(ResourceManager.GetAgentTemplate(agentCode).gameObject).GetComponent<RTSAgent>();
+                curAgent = GameObject.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject).GetComponent<RTSAgent>();
                 curAgent.Setup(interfacer);
 
                 RegisterRawAgent(curAgent);
@@ -590,7 +590,7 @@ namespace RTSLockstep
             {
                 // if (CodeIndexMap.TryGetValue(agent.MyAgentCode, out agentCodeID))
                 // {
-                agentCodeID = ResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
+                agentCodeID = GameResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
                 if (agentCodeID.IsNotNull())
                 {
                     TypeAgentsActive[agentCodeID][agent.TypeIndex] = false;

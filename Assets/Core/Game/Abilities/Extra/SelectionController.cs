@@ -42,7 +42,7 @@ namespace RTSLockstep
 
         protected override void doGUI()
         {
-            if (Agent && !ResourceManager.MenuOpen)
+            if (Agent && !GameResourceManager.MenuOpen)
             {
                 if (Agent.IsSelected && Agent.IsVisible)
                 {
@@ -116,7 +116,7 @@ namespace RTSLockstep
 
         private void DrawSelection()
         {
-            GUI.skin = ResourceManager.SelectBoxSkin;
+            GUI.skin = GameResourceManager.SelectBoxSkin;
             Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
             // Draw the selection box around the currently selected object, within the bounds of the playing area
             GUI.BeginGroup(Agent.GetPlayerArea());
@@ -140,7 +140,7 @@ namespace RTSLockstep
                     float leftPos = selectBox.x + selectBox.width - 7;
                     float topPos = selectBox.y + 2 + (maxHeight - height);
                     float width = 5;
-                    Texture2D resourceBar = ResourceManager.GetResourceHealthBar(cachedHarvest.HarvestType);
+                    Texture2D resourceBar = GameResourceManager.GetResourceHealthBar(cachedHarvest.HarvestType);
                     if (resourceBar)
                     {
                         GUI.DrawTexture(new Rect(leftPos, topPos, width, height), resourceBar);
@@ -156,21 +156,21 @@ namespace RTSLockstep
                 healthPercentage = (float) cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
                 if (healthPercentage > highSplit)
                 {
-                    healthStyle.normal.background = ResourceManager.HealthyTexture;
+                    healthStyle.normal.background = GameResourceManager.HealthyTexture;
                 }
                 else if (healthPercentage > lowSplit)
                 {
-                    healthStyle.normal.background = ResourceManager.DamagedTexture;
+                    healthStyle.normal.background = GameResourceManager.DamagedTexture;
                 }
                 else
                 {
-                    healthStyle.normal.background = ResourceManager.CriticalTexture;
+                    healthStyle.normal.background = GameResourceManager.CriticalTexture;
                 }
             }
             else if (Agent.MyAgentType == AgentType.Resource)
             {
                 healthPercentage = Agent.GetAbility<ResourceDeposit>().AmountLeft / (float)Agent.GetAbility<ResourceDeposit>().Capacity;
-                healthStyle.normal.background = ResourceManager.GetResourceHealthBar(Agent.GetAbility<ResourceDeposit>().ResourceType);
+                healthStyle.normal.background = GameResourceManager.GetResourceHealthBar(Agent.GetAbility<ResourceDeposit>().ResourceType);
             }
         }
 
@@ -183,7 +183,7 @@ namespace RTSLockstep
 
         private void DrawBuildProgress()
         {
-            GUI.skin = ResourceManager.SelectBoxSkin;
+            GUI.skin = GameResourceManager.SelectBoxSkin;
             Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
             GUI.BeginGroup(Agent.GetPlayerArea());

@@ -48,32 +48,32 @@ public class Menu : MonoBehaviour
         GUI.skin = mySkin;
         float menuHeight = GetMenuHeight();
 
-        float groupLeft = Screen.width / 2 - ResourceManager.MenuWidth / 2;
+        float groupLeft = Screen.width / 2 - GameResourceManager.MenuWidth / 2;
         float groupTop = Screen.height / 2 - menuHeight / 2;
-        GUI.BeginGroup(new Rect(groupLeft, groupTop, ResourceManager.MenuWidth, menuHeight));
+        GUI.BeginGroup(new Rect(groupLeft, groupTop, GameResourceManager.MenuWidth, menuHeight));
 
         //background box
-        GUI.Box(new Rect(0, 0, ResourceManager.MenuWidth, menuHeight), "");
+        GUI.Box(new Rect(0, 0, GameResourceManager.MenuWidth, menuHeight), "");
         //header image
-        GUI.DrawTexture(new Rect(ResourceManager.Padding, ResourceManager.Padding, ResourceManager.HeaderWidth, ResourceManager.HeaderHeight), header);
+        GUI.DrawTexture(new Rect(GameResourceManager.Padding, GameResourceManager.Padding, GameResourceManager.HeaderWidth, GameResourceManager.HeaderHeight), header);
 
         //welcome message
-        float leftPos = ResourceManager.Padding;
-        float topPos = 2 * ResourceManager.Padding + header.height;
-        GUI.Label(new Rect(leftPos, topPos, ResourceManager.MenuWidth - 2 * ResourceManager.Padding, ResourceManager.TextHeight), "Welcome " + RTSLockstep.PlayerManager.GetPlayerName());
+        float leftPos = GameResourceManager.Padding;
+        float topPos = 2 * GameResourceManager.Padding + header.height;
+        GUI.Label(new Rect(leftPos, topPos, GameResourceManager.MenuWidth - 2 * GameResourceManager.Padding, GameResourceManager.TextHeight), "Welcome " + RTSLockstep.PlayerManager.GetPlayerName());
 
         //menu buttons
         if (buttons != null)
         {
-            leftPos = ResourceManager.MenuWidth / 2 - ResourceManager.ButtonWidth / 2;
-            topPos += ResourceManager.TextHeight + ResourceManager.Padding;
+            leftPos = GameResourceManager.MenuWidth / 2 - GameResourceManager.ButtonWidth / 2;
+            topPos += GameResourceManager.TextHeight + GameResourceManager.Padding;
             for (int i = 0; i < buttons.Length; i++)
             {
                 if (i > 0)
                 {
-                    topPos += ResourceManager.ButtonHeight + ResourceManager.Padding;
+                    topPos += GameResourceManager.ButtonHeight + GameResourceManager.Padding;
                 }
-                if (GUI.Button(new Rect(leftPos, topPos, ResourceManager.ButtonWidth, ResourceManager.ButtonHeight), buttons[i]))
+                if (GUI.Button(new Rect(leftPos, topPos, GameResourceManager.ButtonWidth, GameResourceManager.ButtonHeight), buttons[i]))
                 {
                     HandleButton(buttons[i]);
                 }
@@ -100,14 +100,14 @@ public class Menu : MonoBehaviour
     protected virtual float GetMenuHeight()
     {
         float buttonHeight = 0;
-        float paddingHeight = 2 * ResourceManager.Padding;
-        float messageHeight = ResourceManager.TextHeight + ResourceManager.Padding;
+        float paddingHeight = 2 * GameResourceManager.Padding;
+        float messageHeight = GameResourceManager.TextHeight + GameResourceManager.Padding;
         if (buttons != null)
         {
-            buttonHeight = buttons.Length * ResourceManager.ButtonHeight;
-            paddingHeight += buttons.Length * ResourceManager.Padding;
+            buttonHeight = buttons.Length * GameResourceManager.ButtonHeight;
+            paddingHeight += buttons.Length * GameResourceManager.Padding;
         }
-        return ResourceManager.HeaderHeight + buttonHeight + paddingHeight + messageHeight;
+        return GameResourceManager.HeaderHeight + buttonHeight + paddingHeight + messageHeight;
     }
 
     protected void ExitGame()
@@ -118,7 +118,7 @@ public class Menu : MonoBehaviour
     protected void ReturnToMainMenu()
     {
 
-        ResourceManager.LevelName = "";
+        GameResourceManager.LevelName = "";
         SceneManager.LoadScene("MainMenu");
     }
 

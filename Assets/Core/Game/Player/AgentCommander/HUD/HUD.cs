@@ -51,7 +51,7 @@ public class HUD : MonoBehaviour
     // Use this for initialization
     public void Setup()
     {
-        cachedCommander = transform.GetComponentInParent<AgentCommander>();
+        cachedCommander = GetComponentInParent<AgentCommander>();
         if (cachedCommander && cachedCommander.human)
         {
             //    agentController = PlayerManager.GetAgentController(cachedCommander.playerIndex);
@@ -127,8 +127,8 @@ public class HUD : MonoBehaviour
                     default: break;
                 }
             }
-            ResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
-            ResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
+            GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
+            GameResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
             SetCursorState(CursorState.Select);
 
@@ -151,7 +151,7 @@ public class HUD : MonoBehaviour
         if (cachedCommander && cachedCommander.human && cachedCommander == PlayerManager.MainController.Commander)
         {
             DrawPlayerDetails();
-            if (!ResourceManager.MenuOpen)
+            if (!GameResourceManager.MenuOpen)
             {
                 if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
                 {
@@ -337,7 +337,7 @@ public class HUD : MonoBehaviour
         {
             float topPos = i * BUILD_IMAGE_HEIGHT - (i + 1) * BUILD_IMAGE_PADDING;
             Rect buildPos = new Rect(BUILD_IMAGE_PADDING, topPos, BUILD_IMAGE_WIDTH, BUILD_IMAGE_HEIGHT);
-            GUI.DrawTexture(buildPos, ResourceManager.GetBuildImage(buildQueue[i]));
+            GUI.DrawTexture(buildPos, GameResourceManager.GetBuildImage(buildQueue[i]));
             GUI.DrawTexture(buildPos, buildFrame);
             topPos += BUILD_IMAGE_PADDING;
             float width = BUILD_IMAGE_WIDTH - 2 * BUILD_IMAGE_PADDING;
@@ -535,7 +535,7 @@ public class HUD : MonoBehaviour
             int column = i % 2;
             int row = i / 2;
             Rect pos = GetButtonPos(row, column);
-            Texture2D action = ResourceManager.GetBuildImage(actions[i]);
+            Texture2D action = GameResourceManager.GetBuildImage(actions[i]);
             if (action)
             {
                 //create the button and handle the click of that button
@@ -546,11 +546,14 @@ public class HUD : MonoBehaviour
                     {
                         PlayClick();
 
-                        if (agent.MyAgentType == AgentType.Unit && agent.GetAbility<Construct>())
+                        if (agent.MyAgentType == AgentType.Unit 
+                            && agent.GetAbility<Construct>())
                         {
                             cachedCommander.CachedBuilderManager.CreateBuilding(agent, actions[i]);
                         }
-                        else if (agent.MyAgentType == AgentType.Building && agent.GetAbility<Spawner>())
+                        else if (agent.MyAgentType == AgentType.Building 
+                            && !agent.GetAbility<Structure>().UnderConstruction()
+                            && agent.GetAbility<Spawner>())
                         {
                             // send spawn command
                             Command spawnCom = new Command(AbilityDataItem.FindInterfacer("Spawner").ListenInputID);
@@ -591,15 +594,15 @@ public class HUD : MonoBehaviour
     {
         GUI.skin = playerDetailsSkin;
         GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
-        float height = ResourceManager.TextHeight;
-        float leftPos = ResourceManager.Padding;
-        float topPos = Screen.height - height - ResourceManager.Padding;
+        float height = GameResourceManager.TextHeight;
+        float leftPos = GameResourceManager.Padding;
+        float topPos = Screen.height - height - GameResourceManager.Padding;
         Texture2D avatar = PlayerManager.GetPlayerAvatar();
         if (avatar)
         {
             //we want the texture to be drawn square at all times
             GUI.DrawTexture(new Rect(leftPos, topPos, height, height), avatar);
-            leftPos += height + ResourceManager.Padding;
+            leftPos += height + GameResourceManager.Padding;
         }
         float minWidth = 0, maxWidth = 0;
         string playerName = PlayerManager.GetPlayerName();

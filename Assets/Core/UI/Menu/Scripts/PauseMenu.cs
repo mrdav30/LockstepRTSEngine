@@ -63,7 +63,7 @@ public class PauseMenu : Menu
             commander.GetComponent<UserInputHelper>().enabled = true;
         }
         Cursor.visible = false;
-        ResourceManager.MenuOpen = false;
+        GameResourceManager.MenuOpen = false;
     }
 
     private void SaveGame()

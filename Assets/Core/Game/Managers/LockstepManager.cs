@@ -91,7 +91,7 @@ namespace RTSLockstep
 			InputCodeManager.Setup ();
 			AbilityDataItem.Setup ();
 
-            ResourceManager.Setup();
+            GameResourceManager.Setup();
 			//AgentController.Setup ();
 
 			ProjectileManager.Setup ();

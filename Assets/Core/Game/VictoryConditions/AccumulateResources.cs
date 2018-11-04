@@ -13,6 +13,6 @@ public class AccumulateResources : VictoryCondition
 
     public override bool CommanderMeetsConditions(AgentCommander commander)
     {
-        return commander && !commander.IsDead() && commander.GetResourceAmount(type) >= amount;
+        return commander && !commander.IsDead() && commander.CachedResourceManager.GetResourceAmount(type) >= amount;
     }
 } 

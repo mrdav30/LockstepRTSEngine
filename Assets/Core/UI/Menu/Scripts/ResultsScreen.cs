@@ -36,9 +36,9 @@ public class ResultsScreen : MonoBehaviour
         GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
 
         //display 
-        float padding = ResourceManager.Padding;
-        float itemHeight = ResourceManager.ButtonHeight;
-        float buttonWidth = ResourceManager.ButtonWidth;
+        float padding = GameResourceManager.Padding;
+        float itemHeight = GameResourceManager.ButtonHeight;
+        float buttonWidth = GameResourceManager.ButtonWidth;
         float leftPos = padding;
         float topPos = padding;
         GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
@@ -55,13 +55,13 @@ public class ResultsScreen : MonoBehaviour
             PlayClick();
             //makes sure that the loaded level runs at normal speed
             Time.timeScale = 1.0f;
-            ResourceManager.MenuOpen = false;
+            GameResourceManager.MenuOpen = false;
             SceneManager.LoadScene("Map");
         }
         leftPos += padding + buttonWidth;
         if (GUI.Button(new Rect(leftPos, topPos, buttonWidth, itemHeight), "Main Menu"))
         {
-            ResourceManager.LevelName = "";
+            GameResourceManager.LevelName = "";
             SceneManager.LoadScene("MainMenu");
             Cursor.visible = true;
         }

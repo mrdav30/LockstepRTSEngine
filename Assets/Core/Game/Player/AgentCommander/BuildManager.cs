@@ -8,7 +8,7 @@ public class BuildManager : MonoBehaviour
     private RTSAgent tempBuilding;
     private RTSAgent tempCreator;
     private bool findingPlacement = false;
-    private AgentCommander cachedCommander;
+    private AgentCommander _cachedCommander;
 
     public Material notAllowedMaterial, allowedMaterial;
     #endregion
@@ -16,7 +16,7 @@ public class BuildManager : MonoBehaviour
     // Use this for initialization
     public void Setup()
     {
-        cachedCommander = transform.GetComponentInParent<AgentCommander>();
+        _cachedCommander = GetComponentInParent<AgentCommander>();
     }
 
     // Update is called once per frame
@@ -38,7 +38,7 @@ public class BuildManager : MonoBehaviour
     public void CreateBuilding(RTSAgent agent, string buildingName)
     {
         Vector2d buildPoint = new Vector2d(agent.transform.position.x, agent.transform.position.z + 10);
-        if (cachedCommander)
+        if (_cachedCommander)
         {
             //cleanup later...
             CreateBuilding(buildingName, buildPoint, agent, agent.GetPlayerArea());
@@ -47,11 +47,11 @@ public class BuildManager : MonoBehaviour
 
     public void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent creator, Rect playingArea)
     {
-        GameObject newBuilding = Instantiate(ResourceManager.GetAgentTemplate(buildingName).gameObject);
+        GameObject newBuilding = Instantiate(GameResourceManager.GetAgentTemplate(buildingName).gameObject);
 
         tempBuilding = newBuilding.GetComponent<RTSAgent>();
 
-        if (!cachedCommander.CheckResources(tempBuilding))
+        if (!_cachedCommander.CachedResourceManager.CheckResources(tempBuilding))
         {
             Destroy(newBuilding);
           //  Debug.Log("not enough resources");
@@ -120,19 +120,19 @@ public class BuildManager : MonoBehaviour
     public void StartConstruction()
     {
         // check that the Player has the resources available before allowing them to create a new Unit / Building
-        if (cachedCommander.CheckResources(tempBuilding))
+        if (_cachedCommander.CachedResourceManager.CheckResources(tempBuilding))
         {
-            cachedCommander.RemoveResources(tempBuilding);
+            _cachedCommander.CachedResourceManager.RemoveResources(tempBuilding);
             findingPlacement = false;
             Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-            RTSAgent newBuilding = cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, new Vector2d(0, tempBuilding.transform.rotation.y)) as RTSAgent;
+            RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, new Vector2d(0, tempBuilding.transform.rotation.y)) as RTSAgent;
             Destroy(tempBuilding.gameObject);
 
             newBuilding.SetState(AnimState.Building);
             newBuilding.RestoreMaterials();
             newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
             newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-            newBuilding.SetCommander(cachedCommander);
+            newBuilding.SetCommander(_cachedCommander);
 
             // send build command
             Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);

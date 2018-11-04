@@ -37,9 +37,9 @@ public class AudioElement
             //do so to keep the inspector cleaner - this saves making a sounds object
          //   GameObjectList list = MonoBehaviour.FindObjectOfType(typeof(GameObjectList)) as GameObjectList;
 
-            if (ResourceManager.OrganizerObject)
+            if (GameResourceManager.OrganizerObject)
             {
-                element.transform.parent = ResourceManager.OrganizerObject;
+                element.transform.parent = GameResourceManager.OrganizerObject;
             }
         }
         Add(sounds, volumes);

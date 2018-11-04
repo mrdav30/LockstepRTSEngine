@@ -16,7 +16,7 @@ public class UserInputHelper : BehaviourHelper
     [SerializeField]
     private GUIStyle _boxStyle;
     [SerializeField]
-    private UserInputKeys userInputKeys = new UserInputKeys();
+    private UserInputKeys userInputKeys;
 #pragma warning restore 0649
     public static RTSGUIManager GUIManager;
     /// <summary>
@@ -229,29 +229,29 @@ public class UserInputHelper : BehaviourHelper
         bool mouseScroll = false;
 
         //horizontal camera movement
-        if (xpos >= 0 && xpos < ResourceManager.ScrollWidth)
+        if (xpos >= 0 && xpos < GameResourceManager.ScrollWidth)
         {
-            movement.x -= ResourceManager.ScrollSpeed;
+            movement.x -= GameResourceManager.ScrollSpeed;
             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanLeft);
             mouseScroll = true;
         }
-        else if (xpos <= Screen.width && xpos > Screen.width - ResourceManager.ScrollWidth)
+        else if (xpos <= Screen.width && xpos > Screen.width - GameResourceManager.ScrollWidth)
         {
-            movement.x += ResourceManager.ScrollSpeed;
+            movement.x += GameResourceManager.ScrollSpeed;
             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanRight);
             mouseScroll = true;
         }
 
         //vertical camera movement
-        if (ypos >= 0 && ypos < ResourceManager.ScrollWidth)
+        if (ypos >= 0 && ypos < GameResourceManager.ScrollWidth)
         {
-            movement.z -= ResourceManager.ScrollSpeed;
+            movement.z -= GameResourceManager.ScrollSpeed;
             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanDown);
             mouseScroll = true;
         }
-        else if (ypos <= Screen.height && ypos > Screen.height - ResourceManager.ScrollWidth)
+        else if (ypos <= Screen.height && ypos > Screen.height - GameResourceManager.ScrollWidth)
         {
-            movement.z += ResourceManager.ScrollSpeed;
+            movement.z += GameResourceManager.ScrollSpeed;
             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanUp);
             mouseScroll = true;
         }
@@ -262,7 +262,7 @@ public class UserInputHelper : BehaviourHelper
         movement.y = 0;
 
         // away from ground movement
-        movement.y -= ResourceManager.ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
+        movement.y -= GameResourceManager.ScrollSpeed * Input.GetAxis("Mouse ScrollWheel");
 
         // calculate desiered camera position based on received input
         Vector3 origin = GUIManager.MainCam.transform.position;
@@ -272,19 +272,19 @@ public class UserInputHelper : BehaviourHelper
         destination.z += movement.z;
 
         // limit away from ground movement to be between a minimum and maximum distance
-        if (destination.y > ResourceManager.MaxCameraHeight)
+        if (destination.y > GameResourceManager.MaxCameraHeight)
         {
-            destination.y = ResourceManager.MaxCameraHeight;
+            destination.y = GameResourceManager.MaxCameraHeight;
         }
-        else if (destination.y < ResourceManager.MinCameraHeight)
+        else if (destination.y < GameResourceManager.MinCameraHeight)
         {
-            destination.y = ResourceManager.MinCameraHeight;
+            destination.y = GameResourceManager.MinCameraHeight;
         }
 
         // if a change in position is destected, perform necessary update
         if (destination != origin)
         {
-            GUIManager.MainCam.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.ScrollSpeed);
+            GUIManager.MainCam.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GameResourceManager.ScrollSpeed);
         }
 
         //!Selector.MainSelectedAgent && 
@@ -306,14 +306,14 @@ public class UserInputHelper : BehaviourHelper
         if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1)
             || Input.GetMouseButton(1) && Input.GetKeyDown(KeyCode.LeftAlt))
         {
-            destination.x -= Input.GetAxis("Mouse Y") * ResourceManager.RotateAmount;
-            destination.y += Input.GetAxis("Mouse X") * ResourceManager.RotateAmount;
+            destination.x -= Input.GetAxis("Mouse Y") * GameResourceManager.RotateAmount;
+            destination.y += Input.GetAxis("Mouse X") * GameResourceManager.RotateAmount;
         }
 
         // if a change in position is detected, perform necessary update
         if (destination != origin)
         {
-            GUIManager.MainCam.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.RotateSpeed);
+            GUIManager.MainCam.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * GameResourceManager.RotateSpeed);
         }
     }
 
@@ -465,7 +465,7 @@ public class UserInputHelper : BehaviourHelper
         GetComponentInChildren<PauseMenu>().enabled = true;
         GetComponent<UserInputHelper>().enabled = false;
         Cursor.visible = true;
-        ResourceManager.MenuOpen = true;
+        GameResourceManager.MenuOpen = true;
     }
 
     //LSF

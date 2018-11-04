@@ -64,7 +64,7 @@ namespace RTSLockstep
 
 			foreach (var agentInfo in EnvironmentAgents) {
 				var agent = agentInfo.Agent;
-				agentInfo.Agent.Setup (ResourceManager.GetAgentInterfacer (agentInfo.AgentCode));
+				agentInfo.Agent.Setup (GameResourceManager.GetAgentInterfacer (agentInfo.AgentCode));
 				environmentController.InitializeAgent (agent,agentInfo.Position.ToVector2d(), agentInfo.Rotation);
 				agentInfo.Agent.Body.HeightPos = agentInfo.Position.z;
 				agentInfo.Agent.TypeIndex = AgentController.UNREGISTERED_TYPE_INDEX;

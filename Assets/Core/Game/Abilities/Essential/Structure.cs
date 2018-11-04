@@ -42,7 +42,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetCommander().IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace RTSLockstep
         {
             if (provisioner)
             {
-                Agent.GetCommander().DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+                Agent.GetCommander().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
         }
 

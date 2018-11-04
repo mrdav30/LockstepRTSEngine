@@ -108,7 +108,7 @@ namespace RTSLockstep
                 RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
                 if (Agent.IsSelected)
                 {
-                    if (flag && spawnPoint != ResourceManager.InvalidPosition.ToVector3() && rallyPoint != ResourceManager.InvalidPosition.ToVector3())
+                    if (flag && spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3())
                     {
                         if (_flagState == FlagState.FlagSet)
                         {
@@ -140,14 +140,14 @@ namespace RTSLockstep
 
         public void CreateUnit(string unitName)
         {
-            GameObject unit = ResourceManager.GetAgentTemplate(unitName).gameObject;
+            GameObject unit = GameResourceManager.GetAgentTemplate(unitName).gameObject;
             RTSAgent unitObject = unit.GetComponent<RTSAgent>();
             // check that the Player has the resources available before allowing them to create a new Unit / Building
             if (Agent.GetCommander() && unitObject)
             {
-                if (Agent.GetCommander().CheckResources(unitObject))
+                if (Agent.GetCommander().CachedResourceManager.CheckResources(unitObject))
                 {
-                    Agent.GetCommander().RemoveResources(unitObject);
+                    Agent.GetCommander().CachedResourceManager.RemoveResources(unitObject);
                     spawnQueue.Enqueue(unitName);
                 }
                 else
@@ -255,7 +255,7 @@ namespace RTSLockstep
             Vector2d pos;
             if (com.TryGetData<Vector2d>(out pos))
             {
-                if (pos.ToVector3d() != ResourceManager.InvalidPosition)
+                if (pos.ToVector3d() != GameResourceManager.InvalidPosition)
                 {
                     SetRallyPoint(pos.ToVector3());
                 }
@@ -269,7 +269,7 @@ namespace RTSLockstep
 
         public bool hasSpawnPoint()
         {
-            return spawnPoint != ResourceManager.InvalidPosition.ToVector3() && rallyPoint != ResourceManager.InvalidPosition.ToVector3();
+            return spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3();
         }
 
         public FlagState GetFlagState()

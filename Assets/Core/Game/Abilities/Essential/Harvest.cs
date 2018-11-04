@@ -489,7 +489,7 @@ namespace RTSLockstep
             currentLoadAmount -= deposit;
 
             ResourceType depositType = HarvestType;
-            Agent.Controller.Commander.AddResource(depositType, deposit);
+            Agent.Controller.Commander.CachedResourceManager.AddResource(depositType, deposit);
 
             if (currentLoadAmount <= 0)
             {

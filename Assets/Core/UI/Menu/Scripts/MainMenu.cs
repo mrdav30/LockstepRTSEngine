@@ -71,7 +71,7 @@ public class MainMenu : Menu
 
     private void NewGame()
     {
-        ResourceManager.MenuOpen = false;
+        GameResourceManager.MenuOpen = false;
         SceneManager.LoadScene("SampleMap");
         //makes sure that the loaded level runs at normal speed
         Time.timeScale = 1.0f;
