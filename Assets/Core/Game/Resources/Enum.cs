@@ -73,4 +73,16 @@
         SpecialAttack,
         Extra
     }
+
+    public enum UserInputKeyMappings
+    {
+        RotateLeftShortCut,
+        RotateRightShortCut,
+        MainMenuShortCut,
+        SpawnMenuShortCut,
+        ConstructMenuShortCut,
+        RepairShortCut,
+        RallyShortCut,
+        AttackShortCut
+    }
 }

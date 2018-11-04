@@ -1458,7 +1458,7 @@ MonoBehaviour:
   _cooldown: 0
   _projectileCode: Melee
   _range: 65536
-  _sight: 524288
+  _sight: 655360
   _damage: 131072
   _attackInterval: 65536
   _targetAllegiance: 4
@@ -1498,11 +1498,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldown: 0
   ResourceStoreName: HumanTownHall
-  CollectionAmount: 15
+  CollectionAmount: 10
   DepositAmount: 25
   Capacity: 75
   _harvestInterval: 65536
-  _windup: 196608
+  _windup: 131072
   _increasePriority: 1
   HarvestingAnimState: 0
   MovingAnimState: 0
