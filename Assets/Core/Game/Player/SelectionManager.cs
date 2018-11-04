@@ -1,5 +1,6 @@
 ﻿using FastCollections;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -214,7 +215,7 @@ namespace RTSLockstep
                     }
                     else if (Input.GetMouseButtonDown(1))
                     {
-                        if (OnSingleLeftTap != null) { OnSingleRightTap(); }
+                        if (OnSingleRightTap != null) { OnSingleRightTap(); }
                     }
 
                     if (tap == true && Time.time > tapTimer + tapThreshold)

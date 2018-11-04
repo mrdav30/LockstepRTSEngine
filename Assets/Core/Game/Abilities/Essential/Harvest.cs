@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -500,6 +499,10 @@ namespace RTSLockstep
                     IsHarvesting = true;
                     IsHarvestMoving = true;
                 }
+                else
+                {
+                    cachedAI.DecideWhatToDo();
+                }
             }
 
         }
@@ -697,6 +700,11 @@ namespace RTSLockstep
             RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, transform.position) as RTSAgent;
 
             return nearestObject;
+        }
+
+        public void SetResourceTarget(RTSAgent value)
+        {
+            resourceTarget = value;
         }
 
         public long GetCurrentLoad()

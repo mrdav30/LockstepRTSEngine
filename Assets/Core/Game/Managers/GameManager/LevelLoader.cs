@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using System;
+using UnityEngine;
 
 namespace RTSLockstep
 {
-    [System.Serializable]
+    [Serializable]
     public struct SpawnInfo
     {
         [DataCode("Agents")]
@@ -62,10 +62,8 @@ namespace RTSLockstep
 
         public void LaunchSpawns()
         {
-            for (int i = 0; i < Spawns.Length; i++)
+            foreach(SpawnInfo info in Spawns)
             {
-                SpawnInfo info = Spawns[i];
-
                 var controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
 
                 for (int j = 0; j < info.Count; j++)
@@ -80,9 +78,9 @@ namespace RTSLockstep
             {
                 //Find average of spawn positions
                 Vector2d battlePos = Vector2d.zero;
-                for (int i = 0; i < Spawns.Length; i++)
+                foreach(SpawnInfo info in Spawns)
                 {
-                    battlePos += Spawns[i].Position;
+                    battlePos += info.Position;
                 }
                 battlePos /= Spawns.Length;
                 Command com = new Command(Data.AbilityDataItem.FindInterfacer<Attack>().ListenInputID);

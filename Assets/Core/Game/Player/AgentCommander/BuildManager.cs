@@ -78,6 +78,24 @@ public class BuildManager : MonoBehaviour
         return findingPlacement;
     }
 
+    public void HandleRotationTap(UserInputKeyMappings direction)
+    {
+        if(findingPlacement && tempBuilding)
+        {
+            switch (direction)
+            {
+                case UserInputKeyMappings.RotateLeftShortCut:
+                    tempBuilding.transform.Rotate(0, 90, 0);
+                    break;
+                case UserInputKeyMappings.RotateRightShortCut:
+                    tempBuilding.transform.Rotate(0, -90, 0);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     public void FindBuildingLocation()
     {
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
@@ -107,7 +125,7 @@ public class BuildManager : MonoBehaviour
             cachedCommander.RemoveResources(tempBuilding);
             findingPlacement = false;
             Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-            RTSAgent newBuilding = cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, Vector2d.right) as RTSAgent;
+            RTSAgent newBuilding = cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, new Vector2d(0, tempBuilding.transform.rotation.y)) as RTSAgent;
             Destroy(tempBuilding.gameObject);
 
             newBuilding.SetState(AnimState.Building);

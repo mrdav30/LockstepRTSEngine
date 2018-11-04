@@ -441,7 +441,6 @@ namespace RTSLockstep
 			YMin = 0;
 			YMax = 0;
 
-
 			PastGridXMin = int.MaxValue;
 			PastGridXMax = int.MaxValue;
 			PastGridYMin = int.MaxValue;
@@ -464,7 +463,10 @@ namespace RTSLockstep
 			}
 			if (RotationalTransform != null) {
 				CanSetVisualRotation = true;
-				visualRot = GetVisualRot ();
+                if(Forward != Vector2d.zero)
+                {
+                    visualRot = GetVisualRot();
+                }
 				//				_rotationOffset = transform.GetComponent<InvasionDay.GeoHandler>()._eulerOffset;
 				lastVisualRot = visualRot;
 			} else {
@@ -667,7 +669,10 @@ namespace RTSLockstep
 		{
 			if (this.CanSetVisualRotation) {
 				lastVisualRot = RotationalTransform.rotation;
-				visualRot = GetVisualRot ();
+                if(Forward != Vector2d.zero)
+                {
+                    visualRot = GetVisualRot();
+                }
 			}
 		}
 

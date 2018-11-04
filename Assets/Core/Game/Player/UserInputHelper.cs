@@ -1,7 +1,13 @@
-﻿using RTSLockstep;
+﻿using RotaryHeart.Lib.SerializableDictionary;
+using RTSLockstep;
 using RTSLockstep.Data;
 using RTSLockstep.UI;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+[Serializable]
+public class UserInputKeys : SerializableDictionaryBase<UserInputKeyMappings, KeyCode> { };
 
 public class UserInputHelper : BehaviourHelper
 {
@@ -9,6 +15,8 @@ public class UserInputHelper : BehaviourHelper
 #pragma warning disable 0649
     [SerializeField]
     private GUIStyle _boxStyle;
+    [SerializeField]
+    private UserInputKeys userInputKeys = new UserInputKeys();
 #pragma warning restore 0649
     public static RTSGUIManager GUIManager;
     /// <summary>
@@ -126,12 +134,33 @@ public class UserInputHelper : BehaviourHelper
             MoveCamera();
             RotateCamera();
             MouseHover();
+
+            foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
+            {
+                if (Input.GetKeyDown(inputKey.Value))
+                {
+                    switch (inputKey.Key)
+                    {
+                        case UserInputKeyMappings.RotateLeftShortCut:
+                            PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
+                            break;
+                        case UserInputKeyMappings.RotateRightShortCut:
+                            PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
     }
 
     protected override void doGUI()
     {
-        if (_boxStyle == null) return;
+        if (_boxStyle == null)
+        {
+            return;
+        }
         this.DrawBox(_boxStyle);
     }
     #endregion
@@ -285,7 +314,7 @@ public class UserInputHelper : BehaviourHelper
     private void HandleSingleRightClick()
     {
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
-            && !Input.GetKey(KeyCode.LeftAlt) && Selector.MainSelectedAgent)
+            && Selector.MainSelectedAgent)
         {
             if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
             {
@@ -296,7 +325,8 @@ public class UserInputHelper : BehaviourHelper
                 if (Selector.MainSelectedAgent
                     && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>())
+                    if (Selector.MainSelectedAgent.GetAbility<Spawner>()
+                        && !Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
                     {
                         if (Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
                         {
@@ -314,27 +344,36 @@ public class UserInputHelper : BehaviourHelper
                     if (RTSInterfacing.MousedAgent.IsNotNull())
                     {
                         // if moused agent is a resource, send selected agent to harvest
-                        if (Selector.MainSelectedAgent.GetAbility<Harvest>() && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
+                        if (Selector.MainSelectedAgent.GetAbility<Harvest>()
+                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
                         {
                             //call harvest command
                             ProcessInterfacer((QuickHarvest));
                         }
-                        // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
-                        else if (Selector.MainSelectedAgent.GetAbility<Harvest>() && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0
-                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
-                            && !RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction()
+                        // moused agent is a building and owned by current player
+                        else if (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
                             && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                         {
-                            //call harvest command 
-                            ProcessInterfacer((QuickHarvest));
-                        }
-                        else if (Selector.MainSelectedAgent.GetAbility<Construct>() && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
-                                && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
-                        {
-                            //call build command
-                            ProcessInterfacer((QuickBuild));
+                            // moused agent isn't under construction
+                            if (!RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction())
+                            {
+                                // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
+                                if (Selector.MainSelectedAgent.GetAbility<Harvest>()
+                                    && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
+                                {
+                                    //call harvest command 
+                                    ProcessInterfacer((QuickHarvest));
+                                }
+                            }
+                            // moused agent is still under construction
+                            else if (Selector.MainSelectedAgent.GetAbility<Construct>())
+                            {
+                                //call build command
+                                ProcessInterfacer((QuickBuild));
+                            }
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Attack>()
+                            && !RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController)
                             && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
                         {
                             //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
@@ -349,6 +388,14 @@ public class UserInputHelper : BehaviourHelper
                     }
                 }
             }
+        }
+    }
+
+    private void HandleRotationTap()
+    {
+        if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
+        {
+            
         }
     }
 
