@@ -47,6 +47,14 @@ public class UserInputHelper : BehaviourHelper
     public static AbilityDataItem QuickBuild;
     public static AbilityDataItem QuickRally;
 
+    public static event Action OnSingleLeftTapDown;
+    public static event Action OnSingleRightTapDown;
+    public static event Action OnDoubleLeftTapDown;
+    //Defines the maximum time between two taps to make it double tap
+    private static float tapThreshold = 0.25f;
+    private static float tapTimer = 0.0f;
+    private static bool tap = false;
+
     private static bool _isGathering;
     public static bool IsGathering
     {
@@ -81,8 +89,6 @@ public class UserInputHelper : BehaviourHelper
         if (!Setted)
             Setup();
         SelectionManager.Initialize();
-        SelectionManager.OnSingleLeftTap += HandleSingleLeftClick;
-        SelectionManager.OnSingleRightTap += HandleSingleRightClick;
         RTSInterfacing.Initialize();
         IsGathering = false;
         CurrentInterfacer = null;
@@ -134,6 +140,40 @@ public class UserInputHelper : BehaviourHelper
             MoveCamera();
             RotateCamera();
             MouseHover();
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (Time.time < tapTimer + tapThreshold)
+                {
+                    if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
+                    tap = false;
+                    return;
+                }
+                else
+                {
+                    if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
+                }
+                tap = true;
+                tapTimer = Time.time;
+            }
+            else if (Input.GetMouseButtonDown(1))
+            {
+                HandleSingleRightClick();
+                if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
+            }
+
+            if (tap == true && Time.time > tapTimer + tapThreshold)
+            {
+                tap = false;
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (!SelectionManager._selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                    {
+                        SelectionManager.ClearSelection();
+                    }
+                }
+                HandleSingleLeftClick();
+            }
 
             foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
             {

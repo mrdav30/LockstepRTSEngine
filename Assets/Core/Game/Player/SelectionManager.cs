@@ -1,6 +1,5 @@
 ﻿using FastCollections;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -42,19 +41,14 @@ namespace RTSLockstep
         private static Vector2 Edge;
         private static Vector2 dif;
 
-        private static bool _selectionLocked = true;
-
-        public static event Action OnSingleLeftTap;
-        public static event Action OnSingleRightTap;
-        public static event Action OnDoubleLeftTap;
-        [Tooltip("Defines the maximum time between two taps to make it double tap")]
-        private static float tapThreshold = 0.25f;
-        private static float tapTimer = 0.0f;
-        private static bool tap = false;
+        public static bool _selectionLocked { get; private set; }
 
         public static void Initialize()
         {
             ClearSelection();
+            UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClickDown;
+            UserInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
+            _selectionLocked = true;
         }
 
         public static void Update()
@@ -193,56 +187,17 @@ namespace RTSLockstep
                     Boxing = false;
                 }
             }
-            else
-            {
-                if (IsGathering == false)
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        if (Time.time < tapTimer + tapThreshold)
-                        {
-                            HandleDoubleLeftClick();
-                            if (OnDoubleLeftTap != null) { OnDoubleLeftTap(); }
-                            tap = false;
-                            return;
-                        }
-                        else
-                        {
-                            HandleSingleLeftClick();
-                        }
-                        tap = true;
-                        tapTimer = Time.time;
-                    }
-                    else if (Input.GetMouseButtonDown(1))
-                    {
-                        if (OnSingleRightTap != null) { OnSingleRightTap(); }
-                    }
-
-                    if (tap == true && Time.time > tapTimer + tapThreshold)
-                    {
-                        tap = false;
-                        if (Input.GetMouseButtonUp(0))
-                        {
-                            if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
-                            {
-                                ClearSelection();
-                            }
-                        }
-                        if (OnSingleLeftTap != null) { OnSingleLeftTap(); }
-                    }
-                }
-            }
         }
 
         // do single click things
-        public static void HandleSingleLeftClick()
+        public static void HandleSingleLeftClickDown()
         {
             CheckBoxDistance = true;
             StartBoxing(MousePosition);
         }
 
         // do double click things
-        public static void HandleDoubleLeftClick()
+        public static void HandleDoubleLeftClickDown()
         {
             Boxing = false;
             if (MousedAgent)
