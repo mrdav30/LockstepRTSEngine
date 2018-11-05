@@ -8,6 +8,7 @@
         Infantry,
         Ranged,
         Convoy,
+        Wall,
         AttackStructure
     }
 }

@@ -168,7 +168,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 9.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
       propertyPath: m_LocalPosition.z
@@ -778,6 +778,26 @@ Prefab:
       propertyPath: m_Name
       value: JungleGreenPine_XL (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1062187151898614, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1619905845099784, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1309315727913746, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1362254081914404, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
   m_IsPrefabAsset: 0
@@ -1022,7 +1042,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 10.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
       propertyPath: m_LocalPosition.z

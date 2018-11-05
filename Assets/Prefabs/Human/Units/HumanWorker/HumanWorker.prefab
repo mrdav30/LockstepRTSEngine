@@ -1526,6 +1526,7 @@ MonoBehaviour:
   - HumanTownHall
   - HumanWatchTower
   - HumanHouse
+  - HumanWoodWall
   _windup: 196608
   _increasePriority: 1
 --- !u!114 &114552794059523324

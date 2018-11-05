@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33634477668742906}
   - component: {fileID: 23396297333701158}
   - component: {fileID: 114191055513263246}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: JunglePineFull
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 33488433134689758}
   - component: {fileID: 23819323675704900}
   - component: {fileID: 114475441816166968}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: JunglePineQuarter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   - component: {fileID: 114195157077634942}
   - component: {fileID: 114625197629463774}
   - component: {fileID: 114843080760339064}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: JungleGreenPine_XL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 4589787169499008}
   - component: {fileID: 33327511923407966}
   - component: {fileID: 23870613100074780}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: JunglePineEmpty
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 33992478041717602}
   - component: {fileID: 23116293232511918}
   - component: {fileID: 114038093893183892}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: JunglePineHalf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
