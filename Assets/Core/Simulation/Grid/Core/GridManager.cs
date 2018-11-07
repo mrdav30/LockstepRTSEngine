@@ -5,8 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Collections.Generic;
+using FastCollections;
 
 namespace RTSLockstep
 {

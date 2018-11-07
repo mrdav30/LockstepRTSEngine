@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using RTSLockstep;
-using RTSLockstep.Utility;
-using RTSLockstep.Abilities;
+﻿using RTSLockstep;
 using System.Collections.Generic; 
+
 public static class GridBuilder
 {
 	public static IBuildable Target { get; private set; }

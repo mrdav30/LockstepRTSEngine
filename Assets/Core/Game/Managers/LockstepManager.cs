@@ -88,6 +88,7 @@ namespace RTSLockstep
 			Command.Setup ();
 
 			GridManager.Setup ();
+
 			InputCodeManager.Setup ();
 			AbilityDataItem.Setup ();
 
@@ -165,8 +166,7 @@ namespace RTSLockstep
 
 			GridManager.Initialize ();
 
-
-			CoroutineManager.Initialize ();
+            CoroutineManager.Initialize ();
 			FrameManager.Initialize ();
 
 			CommandManager.Initialize ();
@@ -174,9 +174,12 @@ namespace RTSLockstep
 
 			PhysicsManager.Initialize ();
 			PlayerManager.Initialize ();
+
+            GridBuilder.Initialize();
+
             //Initialized in UserInputHelper
-		//	SelectionManager.Initialize ();
-			InfluenceManager.Initialize ();
+            //	SelectionManager.Initialize ();
+            InfluenceManager.Initialize ();
 			ProjectileManager.Initialize ();
 
 			DefaultMessageRaiser.LateInitialize ();
@@ -228,7 +231,7 @@ namespace RTSLockstep
 		private static void GameStart ()
 		{
 			BehaviourHelperManager.GameStart ();
-			GameStarted = true;
+            GameStarted = true;
 		}
 
 		private static void LateSimulate ()

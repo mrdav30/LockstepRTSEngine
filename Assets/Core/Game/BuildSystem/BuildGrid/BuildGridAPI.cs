@@ -1,18 +1,15 @@
-﻿
-using UnityEngine;
-using System.Collections; using FastCollections;
-using RTSLockstep;
-using RTSLockstep.Utility;
-using RTSLockstep.Abilities;
+﻿using RTSLockstep;
 namespace RTSLockstep.Utility {}
 namespace RTSLockstep.Abilities{}
 namespace RTSLockstep.Agents {}
+
 public static class BuildGridAPI {
     const int defaultGridLength = 256;
     const int defaultBuildSpacing = 3;
     const int defaultGridOffset = -128;
     public static BuildGridManager MainBuildGrid {get; private set;}
     public static int GridOffset {get; private set;}
+
     public static void Initialize (
         int gridLength = defaultGridLength,
         int buildSpacing = defaultBuildSpacing,
@@ -20,6 +17,7 @@ public static class BuildGridAPI {
         MainBuildGrid = new BuildGridManager(gridLength, buildSpacing);
         GridOffset = gridOffset;
     }
+
     internal static bool Construct (Coordinate buildPos, IBuildable building) {
         return MainBuildGrid.Construct (building);
     }
