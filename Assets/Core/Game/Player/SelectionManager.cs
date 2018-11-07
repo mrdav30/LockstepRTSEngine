@@ -46,7 +46,8 @@ namespace RTSLockstep
         public static void Initialize()
         {
             ClearSelection();
-            UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClickDown;
+            UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
+            UserInputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
             UserInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
             _selectionLocked = true;
         }
@@ -117,6 +118,7 @@ namespace RTSLockstep
                                     curAgent = agentController.LocalAgents[j];
                                     if (curAgent.CanSelect)
                                     {
+                                        //always add mousedagent
                                         if (curAgent.RefEquals(MousedAgent))
                                         {
                                             bufferSelectedAgents.Add(curAgent);
@@ -189,8 +191,14 @@ namespace RTSLockstep
             }
         }
 
-        // do single click things
-        public static void HandleSingleLeftClickDown()
+        // do left click things
+        public static void HandleSingleLeftClick()
+        {
+            QuickSelect();
+        }
+
+        // do left click hold things
+        public static void HandleLeftClickHoldDown()
         {
             CheckBoxDistance = true;
             StartBoxing(MousePosition);
@@ -258,7 +266,7 @@ namespace RTSLockstep
 
         public static void QuickSelect()
         {
-            if (!_selectionLocked)
+            if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                 ClearSelection();
             SelectAgent(MousedAgent);
         }

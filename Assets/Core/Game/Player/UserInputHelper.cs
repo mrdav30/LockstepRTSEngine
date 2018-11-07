@@ -48,10 +48,11 @@ public class UserInputHelper : BehaviourHelper
     public static AbilityDataItem QuickRally;
 
     public static event Action OnSingleLeftTapDown;
+    public static event Action OnLeftTapHoldDown;
     public static event Action OnSingleRightTapDown;
     public static event Action OnDoubleLeftTapDown;
     //Defines the maximum time between two taps to make it double tap
-    private static float tapThreshold = 0.25f;
+    private static float tapThreshold = 0.30f;
     private static float tapTimer = 0.0f;
     private static bool tap = false;
 
@@ -126,6 +127,7 @@ public class UserInputHelper : BehaviourHelper
             //Trigger the ability
             if (Input.GetMouseButtonDown(0) || CurrentInterfacer.InformationGather == InformationGatherType.None)
             {
+                Debug.Log("1");
                 ProcessInterfacer(CurrentInterfacer);
             }
         }
@@ -143,38 +145,50 @@ public class UserInputHelper : BehaviourHelper
 
             if (Input.GetMouseButtonDown(0))
             {
+                // left double click action
                 if (Time.time < tapTimer + tapThreshold)
                 {
+                    Debug.Log("double tap");
                     if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
                     tap = false;
                     return;
                 }
-                else
-                {
-                    if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
-                }
+
                 tap = true;
                 tapTimer = Time.time;
             }
+            // right click action
             else if (Input.GetMouseButtonDown(1))
             {
+                Debug.Log("right tap");
                 HandleSingleRightClick();
                 if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
             }
 
+
             if (tap == true && Time.time > tapTimer + tapThreshold)
             {
                 tap = false;
-                if (Input.GetMouseButtonUp(0))
+
+                // left click hold action
+                if (Input.GetMouseButton(0))
                 {
-                    if (!SelectionManager._selectionLocked && !Input.GetKey(KeyCode.LeftShift))
-                    {
-                        SelectionManager.ClearSelection();
-                    }
+                    Debug.Log("holding");
+                    if (OnLeftTapHoldDown != null) { OnLeftTapHoldDown(); }
                 }
-                HandleSingleLeftClick();
+                else
+                {
+                    // left click action
+                    Debug.Log("left tap");
+                    HandleSingleLeftClick();
+                    if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
+                }
+
+
+
             }
 
+            // other defined keys
             foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
             {
                 if (Input.GetKeyDown(inputKey.Value))
@@ -325,6 +339,7 @@ public class UserInputHelper : BehaviourHelper
             {
                 if (PlayerManager.MainController.GetCommanderBuilderManager().CanPlaceBuilding())
                 {
+                    Debug.Log("Start construct");
                     PlayerManager.MainController.GetCommanderBuilderManager().StartConstruction();
                 }
             }
@@ -435,7 +450,7 @@ public class UserInputHelper : BehaviourHelper
     {
         if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
         {
-            
+
         }
     }
 
