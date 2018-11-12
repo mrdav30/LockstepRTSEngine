@@ -2431,16 +2431,16 @@ MonoBehaviour:
     ImmovableCollisionDirection:
       x: 0
       y: 0
-    _shape: 1
+    _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 32768
-    _halfHeight: 32768
+    _halfWidth: 262144
+    _halfHeight: 327680
     _radius: 425984
     _immovable: 1
     _basePriority: 0
     _vertices: []
-    _height: 65536
+    _height: 524288
     _positionalTransform: {fileID: 4452996533959122}
     _rotationalTransform: {fileID: 4452996533959122}
 --- !u!114 &114958349450188848

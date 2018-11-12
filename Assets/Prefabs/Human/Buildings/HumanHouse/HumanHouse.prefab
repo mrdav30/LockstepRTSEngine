@@ -651,15 +651,15 @@ MonoBehaviour:
     ImmovableCollisionDirection:
       x: 0
       y: 0
-    _shape: 1
+    _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 32768
-    _halfHeight: 32768
+    _halfWidth: 196608
+    _halfHeight: 196608
     _radius: 262144
     _immovable: 1
     _basePriority: 0
     _vertices: []
-    _height: 442368
+    _height: 458752
     _positionalTransform: {fileID: 4453475863889296}
     _rotationalTransform: {fileID: 4453475863889296}

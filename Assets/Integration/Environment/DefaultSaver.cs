@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using RTSLockstep;
+using FastCollections;
 using System.Collections.Generic;
 using RTSLockstep.Data;
-using RTSLockstep;
 
 namespace RTSLockstep
 {

@@ -5,11 +5,13 @@ public static class GridBuilder
 {
 	public static IBuildable Target { get; private set; }
 	public static bool IsMovingBuilding { get; private set; }
+
 	#region Setup
 	private static void SetTarget(IBuildable buildable)
 	{
 		Target = buildable;
 	}
+
 	public static void Initialize()
 	{
 		BuildGridAPI.Initialize();
@@ -36,10 +38,12 @@ public static class GridBuilder
 		UpdatePlace(newPos);
 		return EndPlace();
 	}
+
 	private static void StartPlace()
 	{
 		Target.IsMoving = true;
 	}
+
 	private static bool UpdatePlace(Vector2d newPos)
 	{
 		Coordinate coor = BuildGridAPI.ToGridPos(newPos);
@@ -48,6 +52,7 @@ public static class GridBuilder
 		Target.IsValidOnGrid = (canPlace);
 		return canPlace;
 	}
+
 	private static bool EndPlace()
 	{
 		Coordinate coor = Target.GridPosition;
@@ -75,6 +80,7 @@ public static class GridBuilder
 		}
 		IsMovingBuilding = true;
 	}
+
 	/// <summary>
 	/// Moves the target buildable and returns whether or not its new position is a valid place to build.
 	/// </summary>
@@ -84,6 +90,7 @@ public static class GridBuilder
 		if (IsMovingBuilding == false) throw new System.Exception("Building move must be started before being updated");
 		return UpdatePlace(newPos);
 	}
+
 	/// <summary>
 	/// Returns whether or not the buildable could be built on where its movement ends.
 	/// If not, the buildable is returned to its previous position.

@@ -4,11 +4,10 @@ using System.Collections; using FastCollections;
 namespace RTSLockstep
 {
     [DisallowMultipleComponent]
-
     public class DynamicBlocker : Ability
     {
         static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
-
+        FastList<GridNode> LastCoordinates = new FastList<GridNode>();
         LSBody CachedBody;
 
         protected override void OnInitialize()
@@ -24,6 +23,7 @@ namespace RTSLockstep
             }
             LastCoordinates.FastClear();
         }
+
         void UpdateCoordinates () {
             const long gridSpacing = FixedMath.One;
             bufferCoordinates.FastClear();
@@ -40,8 +40,6 @@ namespace RTSLockstep
             }
         }
 
-
-        FastList<GridNode> LastCoordinates = new FastList<GridNode>();
         protected override void OnLateSimulate()
         {
             if (this.CachedBody.PositionChangedBuffer)
@@ -52,6 +50,7 @@ namespace RTSLockstep
 
             }
         }
+
         protected override void OnDeactivate()
         {
             RemoveLastCoordinates ();

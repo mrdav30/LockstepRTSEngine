@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4595820721879352}
   - component: {fileID: 33634477668742906}
   - component: {fileID: 23396297333701158}
-  - component: {fileID: 114191055513263246}
   m_Layer: 10
   m_Name: JunglePineFull
   m_TagString: Untagged
@@ -39,7 +38,6 @@ GameObject:
   - component: {fileID: 4059158533861048}
   - component: {fileID: 33488433134689758}
   - component: {fileID: 23819323675704900}
-  - component: {fileID: 114475441816166968}
   m_Layer: 10
   m_Name: JunglePineQuarter
   m_TagString: Untagged
@@ -60,6 +58,7 @@ GameObject:
   - component: {fileID: 114195157077634942}
   - component: {fileID: 114625197629463774}
   - component: {fileID: 114843080760339064}
+  - component: {fileID: 114736113807928282}
   m_Layer: 10
   m_Name: JungleGreenPine_XL
   m_TagString: Untagged
@@ -94,7 +93,6 @@ GameObject:
   - component: {fileID: 4836044096877636}
   - component: {fileID: 33992478041717602}
   - component: {fileID: 23116293232511918}
-  - component: {fileID: 114038093893183892}
   m_Layer: 10
   m_Name: JunglePineHalf
   m_TagString: Untagged
@@ -339,28 +337,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1619905845099784}
   m_Mesh: {fileID: 4300042, guid: f7f2c7c6af225a54483526e45bd18fe2, type: 3}
---- !u!114 &114038093893183892
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1619905845099784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114191055513263246
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1062187151898614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114195157077634942
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -412,24 +388,13 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfHeight: 32768
-    _radius: 183304
+    _radius: 131072
     _immovable: 1
     _basePriority: 0
     _vertices: []
-    _height: 911040
+    _height: 917504
     _positionalTransform: {fileID: 4711257885876698}
     _rotationalTransform: {fileID: 4711257885876698}
---- !u!114 &114475441816166968
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1309315727913746}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114625197629463774
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -443,6 +408,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
+--- !u!114 &114736113807928282
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1355823693922466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114843080760339064
 MonoBehaviour:
   m_ObjectHideFlags: 1

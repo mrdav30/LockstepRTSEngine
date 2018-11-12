@@ -51,6 +51,7 @@ public class BuildManager : MonoBehaviour
 
         tempBuilding = newBuilding.GetComponent<RTSAgent>();
 
+        //check resources before instantiating the object
         if (!_cachedCommander.CachedResourceManager.CheckResources(tempBuilding))
         {
             Destroy(newBuilding);
