@@ -6,6 +6,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles user input outside of HUD
+/// </summary>
+
 [Serializable]
 public class UserInputKeys : SerializableDictionaryBase<UserInputKeyMappings, KeyCode> { };
 
@@ -52,7 +56,7 @@ public class UserInputHelper : BehaviourHelper
     public static event Action OnSingleRightTapDown;
     public static event Action OnDoubleLeftTapDown;
     //Defines the maximum time between two taps to make it double tap
-    private static float tapThreshold = 0.30f;
+    private static float tapThreshold = 0.25f;
     private static float tapTimer = 0.0f;
     private static bool tap = false;
 
@@ -127,7 +131,6 @@ public class UserInputHelper : BehaviourHelper
             //Trigger the ability
             if (Input.GetMouseButtonDown(0) || CurrentInterfacer.InformationGather == InformationGatherType.None)
             {
-                Debug.Log("1");
                 ProcessInterfacer(CurrentInterfacer);
             }
         }
@@ -140,69 +143,68 @@ public class UserInputHelper : BehaviourHelper
             }
 
             MoveCamera();
-            RotateCamera();
-            MouseHover();
 
-            if (Input.GetMouseButtonDown(0))
+            // prevent user input if mouse is over hud
+            bool mouseOverHud = PlayerManager.MainController.GetCommanderHUD()._mouseOverHud;
+            if (!mouseOverHud)
             {
-                // left double click action
-                if (Time.time < tapTimer + tapThreshold)
+                RotateCamera();
+                MouseHover();
+
+                if (Input.GetMouseButtonDown(0))
                 {
-                    Debug.Log("double tap");
-                    if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
-                    tap = false;
-                    return;
-                }
-
-                tap = true;
-                tapTimer = Time.time;
-            }
-            // right click action
-            else if (Input.GetMouseButtonDown(1))
-            {
-                Debug.Log("right tap");
-                HandleSingleRightClick();
-                if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
-            }
-
-
-            if (tap == true && Time.time > tapTimer + tapThreshold)
-            {
-                tap = false;
-
-                // left click hold action
-                if (Input.GetMouseButton(0))
-                {
-                    Debug.Log("holding");
-                    if (OnLeftTapHoldDown != null) { OnLeftTapHoldDown(); }
-                }
-                else
-                {
-                    // left click action
-                    Debug.Log("left tap");
-                    HandleSingleLeftClick();
-                    if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
-                }
-
-
-
-            }
-
-            // other defined keys
-            foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
-            {
-                if (Input.GetKeyDown(inputKey.Value))
-                {
-                    switch (inputKey.Key)
+                    // left double click action
+                    if (Time.time < tapTimer + tapThreshold)
                     {
-                        case UserInputKeyMappings.RotateLeftShortCut:
-                            PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
-                            break;
-                        case UserInputKeyMappings.RotateRightShortCut:
-                            PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
-                            break;
-                        default:
-                            break;
+                        if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
+                        tap = false;
+                        return;
+                    }
+
+                    tap = true;
+                    tapTimer = Time.time;
+                }
+                // right click action
+                else if (Input.GetMouseButtonDown(1))
+                {
+                    HandleSingleRightClick();
+                    if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
+                }
+
+
+                if (tap == true && Time.time > tapTimer + tapThreshold)
+                {
+                    tap = false;
+
+                    // left click hold action
+                    if (Input.GetMouseButton(0))
+                    {
+                        if (OnLeftTapHoldDown != null) { OnLeftTapHoldDown(); }
+                    }
+                    else
+                    {
+                        // left click action
+                        HandleSingleLeftClick();
+                        if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
+                    }
+                }
+
+                // other defined keys
+                foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
+                {
+                    if (Input.GetKeyDown(inputKey.Value))
+                    {
+                        switch (inputKey.Key)
+                        {
+                            case UserInputKeyMappings.RotateLeftShortCut:
+                                PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
+                                break;
+                            case UserInputKeyMappings.RotateRightShortCut:
+                                PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -339,7 +341,6 @@ public class UserInputHelper : BehaviourHelper
             {
                 if (PlayerManager.MainController.GetCommanderBuilderManager().CanPlaceBuilding())
                 {
-                    Debug.Log("Start construct");
                     PlayerManager.MainController.GetCommanderBuilderManager().StartConstruction();
                 }
             }
