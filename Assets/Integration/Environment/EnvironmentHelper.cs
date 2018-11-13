@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace RTSLockstep
 {
     public class EnvironmentHelper : BehaviourHelper
     {
-
         public override ushort ListenInput
         {
             get
@@ -14,11 +12,15 @@ namespace RTSLockstep
             }
         }
 
+        [SerializeField]
+        private EnvironmentSaver[] _savers;
+        public EnvironmentSaver[] Savers { get { return _savers; } }
 
         #if UNITY_EDITOR
         [SerializeField]
         private GameObject _saverObject;
         GameObject SaverObject {get {return _saverObject;}}
+
         public void ScanAndSave () {
             if (SaverObject == null) {
                 Debug.Log ("Please assign 'Saver Object'");
@@ -53,11 +55,6 @@ namespace RTSLockstep
         }
         #endif
 
-        [SerializeField]
-        private EnvironmentSaver[] _savers;
-        public EnvironmentSaver[] Savers { get {return _savers;}}
-
-
         protected override void OnEarlyInitialize()
         {
             foreach (EnvironmentSaver saver in Savers) {
@@ -67,6 +64,7 @@ namespace RTSLockstep
                 saver.EarlyApply ();
             }
         }
+
         protected override void OnInitialize()
         {
             foreach (EnvironmentSaver saver in Savers)
@@ -74,6 +72,7 @@ namespace RTSLockstep
                 saver.Apply();
             }
         }
+
         protected override void OnLateInitialize()
         {
             foreach (EnvironmentSaver saver in Savers) {

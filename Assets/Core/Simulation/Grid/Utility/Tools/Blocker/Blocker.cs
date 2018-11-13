@@ -3,7 +3,7 @@ using FastCollections;
 using RTSLockstep;
 
 //Blocker for static environment pieces in a scene.
-[RequireComponent (typeof (RTSLockstep.UnityLSBody))]
+[RequireComponent (typeof (UnityLSBody))]
 public class Blocker : EnvironmentObject
 {
     static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();

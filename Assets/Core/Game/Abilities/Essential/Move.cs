@@ -1,6 +1,6 @@
 ﻿using FastCollections;
-using RTSLockstep.Pathfinding;
 using Newtonsoft.Json;
+using RTSLockstep.Pathfinding;
 using System;
 using UnityEngine;
 
@@ -548,7 +548,6 @@ namespace RTSLockstep
 
         }
 
-
         public void StopMove()
         {
             if (IsMoving)
@@ -628,6 +627,7 @@ namespace RTSLockstep
         readonly bool paused;
         private void HandleCollision(LSBody other)
         {
+            Debug.Log("move collision");
             if (!CanMove)
             {
                 return;

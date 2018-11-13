@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4593892130582086}
   - component: {fileID: 33649542411584692}
   - component: {fileID: 23479263822974006}
-  - component: {fileID: 114167542564920624}
   m_Layer: 10
   m_Name: CrystalDepositHalf
   m_TagString: Untagged
@@ -39,7 +38,6 @@ GameObject:
   - component: {fileID: 4097259931062804}
   - component: {fileID: 33836929873279676}
   - component: {fileID: 23995719191206712}
-  - component: {fileID: 114116322931810176}
   m_Layer: 10
   m_Name: CrystalDepositFull
   m_TagString: Untagged
@@ -57,7 +55,6 @@ GameObject:
   - component: {fileID: 4402881641824420}
   - component: {fileID: 33001612917853488}
   - component: {fileID: 23644964336510654}
-  - component: {fileID: 114437039594158344}
   m_Layer: 10
   m_Name: CrystalDepositEmpty
   m_TagString: Untagged
@@ -75,7 +72,6 @@ GameObject:
   - component: {fileID: 4724210534299598}
   - component: {fileID: 33160543215222812}
   - component: {fileID: 23162479491758964}
-  - component: {fileID: 114886310819822218}
   m_Layer: 10
   m_Name: CrystalDepositQuarter
   m_TagString: Untagged
@@ -96,6 +92,7 @@ GameObject:
   - component: {fileID: 114066457341764114}
   - component: {fileID: 114864015683344652}
   - component: {fileID: 114155340167218942}
+  - component: {fileID: 114991101511973450}
   m_Layer: 10
   m_Name: CrystalDeposit
   m_TagString: Untagged
@@ -357,17 +354,6 @@ MonoBehaviour:
   resourceHalf: {fileID: 1516068087413970}
   resourceQuarter: {fileID: 1797994945844112}
   resourceEmpty: {fileID: 1714147303784954}
---- !u!114 &114116322931810176
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1547750639459310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114155340167218942
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -377,17 +363,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114167542564920624
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1516068087413970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114251684514526896
@@ -431,17 +406,6 @@ MonoBehaviour:
     _height: 147456
     _positionalTransform: {fileID: 4255305627525500}
     _rotationalTransform: {fileID: 4255305627525500}
---- !u!114 &114437039594158344
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1714147303784954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114573686508072632
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -503,12 +467,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &114886310819822218
+--- !u!114 &114991101511973450
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1797994945844112}
+  m_GameObject: {fileID: 1911411376021232}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}

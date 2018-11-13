@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using FastCollections;
+using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -13,18 +13,21 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             CachedBody = Agent.Body;
-            UpdateCoordinates ();
+            UpdateCoordinates();
         }
 
-        void RemoveLastCoordinates () {
-            for (int i = 0; i < LastCoordinates.Count; i++) {
+        void RemoveLastCoordinates()
+        {
+            for (int i = 0; i < LastCoordinates.Count; i++)
+            {
                 GridNode node = LastCoordinates[i];
                 node.RemoveObstacle();
             }
             LastCoordinates.FastClear();
         }
 
-        void UpdateCoordinates () {
+        void UpdateCoordinates()
+        {
             const long gridSpacing = FixedMath.One;
             bufferCoordinates.FastClear();
             CachedBody.GetCoveredSnappedPositions(gridSpacing, bufferCoordinates);
@@ -44,16 +47,14 @@ namespace RTSLockstep
         {
             if (this.CachedBody.PositionChangedBuffer)
             {
-                RemoveLastCoordinates ();
-                UpdateCoordinates ();
-
-
+                RemoveLastCoordinates();
+                UpdateCoordinates();
             }
         }
 
         protected override void OnDeactivate()
         {
-            RemoveLastCoordinates ();
+            RemoveLastCoordinates();
         }
     }
 }

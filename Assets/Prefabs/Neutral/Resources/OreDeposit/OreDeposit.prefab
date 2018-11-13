@@ -38,7 +38,6 @@ GameObject:
   - component: {fileID: 4263313608249650}
   - component: {fileID: 33305069180760796}
   - component: {fileID: 23489205560948310}
-  - component: {fileID: 114767073651889486}
   m_Layer: 10
   m_Name: OreDepositQuarter
   m_TagString: Untagged
@@ -59,6 +58,7 @@ GameObject:
   - component: {fileID: 114286345437424172}
   - component: {fileID: 114200294416555854}
   - component: {fileID: 114778364861051744}
+  - component: {fileID: 114622457490267322}
   m_Layer: 10
   m_Name: OreDeposit
   m_TagString: Untagged
@@ -76,7 +76,6 @@ GameObject:
   - component: {fileID: 4782759034547088}
   - component: {fileID: 33918755342495732}
   - component: {fileID: 23663645550966162}
-  - component: {fileID: 114834533366323832}
   m_Layer: 10
   m_Name: OreDepositFull
   m_TagString: Untagged
@@ -94,7 +93,6 @@ GameObject:
   - component: {fileID: 4716875289060344}
   - component: {fileID: 33869703690645624}
   - component: {fileID: 23004805238973434}
-  - component: {fileID: 114110163729482694}
   m_Layer: 10
   m_Name: OreDepositHalf
   m_TagString: Untagged
@@ -339,17 +337,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1462845801722356}
   m_Mesh: {fileID: 4300000, guid: 3e99f38ce10946f44aa55df27897b5c6, type: 3}
---- !u!114 &114110163729482694
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1933807352630338}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114200294416555854
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -428,6 +415,17 @@ MonoBehaviour:
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 00000000000000000000000000000000000000000000000000000000
+--- !u!114 &114622457490267322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1312883334417478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114680489691796294
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -469,17 +467,6 @@ MonoBehaviour:
     _height: 212992
     _positionalTransform: {fileID: 4669544497093498}
     _rotationalTransform: {fileID: 4669544497093498}
---- !u!114 &114767073651889486
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1108481569231288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114778364861051744
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -489,16 +476,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114834533366323832
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1462845801722356}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

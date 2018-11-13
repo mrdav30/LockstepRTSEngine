@@ -16,9 +16,9 @@ using UnityEditor;
 
 namespace RTSLockstep.Legacy
 {
-	[System.Obsolete ("This class is only used for automatically swapping legacy LSBodies.")]
-	public partial class LSBody : MonoBehaviour
-	{
+    [System.Obsolete("This class is only used for automatically swapping legacy LSBodies.")]
+    public partial class LSBody : MonoBehaviour
+    {
 
         private void Awake()
         {
@@ -32,12 +32,12 @@ namespace RTSLockstep.Legacy
 
         [SerializeField] //For inspector debugging
         internal Vector2d _position;
-		[SerializeField]
-		internal Vector2d _rotation = Vector2d.up;
-		[SerializeField, FixedNumber]
-		internal long _heightPos;
-		[SerializeField]
-		public Vector2d _velocity;
+        [SerializeField]
+        internal Vector2d _rotation = Vector2d.up;
+        [SerializeField, FixedNumber]
+        internal long _heightPos;
+        [SerializeField]
+        public Vector2d _velocity;
 
         #endregion
 
@@ -46,89 +46,106 @@ namespace RTSLockstep.Legacy
 
         private bool _forwardNeedsSet = false;
 
-		private bool ForwardNeedsSet {
-			get { return _forwardNeedsSet; }
-			set { _forwardNeedsSet = value; }
-		}
+        private bool ForwardNeedsSet
+        {
+            get { return _forwardNeedsSet; }
+            set { _forwardNeedsSet = value; }
+        }
 
-		private Vector2d _forward;
+        private Vector2d _forward;
 
-		public Vector2d Forward {
-			get {
-				return Rotation.ToDirection ();
-			}
-			set {
-				Rotation = value.ToRotation ();
-			}
-		}
+        public Vector2d Forward
+        {
+            get
+            {
+                return Rotation.ToDirection();
+            }
+            set
+            {
+                Rotation = value.ToRotation();
+            }
+        }
 
-		[Lockstep]
-		public bool PositionChanged { get; set; }
+        [Lockstep]
+        public bool PositionChanged { get; set; }
 
-		[Lockstep]
-		public Vector2d Position {
-			get {
-				return _position;
-			}
-			set {
-				_position = value;
-				this.PositionChanged = true;
-			}
-		}
+        [Lockstep]
+        public Vector2d Position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                _position = value;
+                this.PositionChanged = true;
+            }
+        }
 
-		private bool _rotationChanged;
+        private bool _rotationChanged;
 
-		[Lockstep]
-		public bool RotationChanged {
-			get {
-				return _rotationChanged;
-			}
-			set {
-				if (value)
-					ForwardNeedsSet = true;
-				_rotationChanged = value;
-			}
-		}
+        [Lockstep]
+        public bool RotationChanged
+        {
+            get
+            {
+                return _rotationChanged;
+            }
+            set
+            {
+                if (value)
+                    ForwardNeedsSet = true;
+                _rotationChanged = value;
+            }
+        }
 
 
-		[Lockstep]
-		public Vector2d Rotation {
-			get {
-				return _rotation;
-			}
-			set {
-				_rotation = value;
-				this.RotationChanged = true;
-			}
-		}
+        [Lockstep]
+        public Vector2d Rotation
+        {
+            get
+            {
+                return _rotation;
+            }
+            set
+            {
+                _rotation = value;
+                this.RotationChanged = true;
+            }
+        }
 
-		[Lockstep]
-		public bool HeightPosChanged { get; set; }
+        [Lockstep]
+        public bool HeightPosChanged { get; set; }
 
-		[Lockstep]
-		public long HeightPos {
-			get { return _heightPos; }
-			set {
-				_heightPos = value;
-				this.HeightPosChanged = true;
-			}
-		}
+        [Lockstep]
+        public long HeightPos
+        {
+            get { return _heightPos; }
+            set
+            {
+                _heightPos = value;
+                this.HeightPosChanged = true;
+            }
+        }
 
-		[Lockstep]
-		public bool VelocityChanged { get; set; }
+        [Lockstep]
+        public bool VelocityChanged { get; set; }
 
-		[Lockstep]
-		public Vector2d Velocity {
-			get { return _velocity; }
-			set {
-				_velocity = value;
-				VelocityChanged = true;
-			}
-		}
+        [Lockstep]
+        public Vector2d Velocity
+        {
+            get { return _velocity; }
+            set
+            {
+                _velocity = value;
+                VelocityChanged = true;
+            }
+        }
 
-		public Vector2d LastPosition { get; private set; }
+        public Vector2d LastPosition { get; private set; }
 
-		internal uint RaycastVersion { get; set; }
+        internal uint RaycastVersion { get; set; }
 
         #endregion
 
@@ -136,376 +153,389 @@ namespace RTSLockstep.Legacy
         #region Other variables
         internal Vector3 _visualPosition;
 
-		public Vector3 VisualPosition { get { return _visualPosition; } }
+        public Vector3 VisualPosition { get { return _visualPosition; } }
 
-		public RTSAgent Agent { get; private set; }
+        public RTSAgent Agent { get; private set; }
 
-		public long FastRadius { get; private set; }
+        public long FastRadius { get; private set; }
 
-		public bool PositionChangedBuffer { get; private set; }
-		//D
-		public bool SetPositionBuffer { get; private set; }
-		//ND
+        public bool PositionChangedBuffer { get; private set; }
+        //D
+        public bool SetPositionBuffer { get; private set; }
+        //ND
 
-		
-		public bool RotationChangedBuffer { get; private set; }
-		//D
-		private bool SetRotationBuffer { get; set; }
-		//ND
 
-		bool SetVisualPosition { get; set; }
+        public bool RotationChangedBuffer { get; private set; }
+        //D
+        private bool SetRotationBuffer { get; set; }
+        //ND
 
-		bool SetVisualRotation { get; set; }
+        bool SetVisualPosition { get; set; }
 
-		private bool Setted { get; set; }
+        bool SetVisualRotation { get; set; }
 
-		
-		public long VelocityFastMagnitude { get; private set; }
+        private bool Setted { get; set; }
+
+
+        public long VelocityFastMagnitude { get; private set; }
 
         #endregion
-        
+
         #region Extra Processes
-        private void AddChild (LSBody child)
-		{
-			if (Children == null)
-				Children = new FastBucket<LSBody> ();
-			Children.Add (child);
-		}
+        private void AddChild(LSBody child)
+        {
+            if (Children == null)
+                Children = new FastBucket<LSBody>();
+            Children.Add(child);
+        }
 
-		private void RemoveChild (LSBody child)
-		{
-			Children.Remove (child);
-		}
+        private void RemoveChild(LSBody child)
+        {
+            Children.Remove(child);
+        }
 
-		private FastBucket<LSBody> Children;
-		public Vector2d[] RealPoints;
-		public Vector2d[] Edges;
-		public Vector2d[] EdgeNorms;
+        private FastBucket<LSBody> Children;
+        public Vector2d[] RealPoints;
+        public Vector2d[] Edges;
+        public Vector2d[] EdgeNorms;
 
-		public bool ChangedPartition { get; set; }
-        
-		public long XMin { get; private set; }
+        public bool ChangedPartition { get; set; }
 
-		public long XMax { get; private set; }
+        public long XMin { get; private set; }
 
-		public long YMin { get; private set; }
+        public long XMax { get; private set; }
 
-		public long YMax { get; private set; }
+        public long YMin { get; private set; }
 
-		public int PastGridXMin;
-		public int PastGridXMax;
-		public int PastGridYMin;
-		public int PastGridYMax;
+        public long YMax { get; private set; }
 
-		public long HeightMin { get; private set; }
+        public int PastGridXMin;
+        public int PastGridXMax;
+        public int PastGridYMin;
+        public int PastGridYMax;
 
-		public long HeightMax { get; private set; }
+        public long HeightMin { get; private set; }
 
-		public delegate void CollisionFunction (LSBody other);
+        public long HeightMax { get; private set; }
 
-		private Dictionary<int,CollisionPair> _collisionPairs;
-		private HashSet<int> _collisionPairHolders;
+        public delegate void CollisionFunction(LSBody other);
 
-		internal Dictionary<int,CollisionPair> CollisionPairs {
-			get {
-				return _collisionPairs.IsNotNull () ? _collisionPairs : (_collisionPairs = new Dictionary<int, CollisionPair> ());
-			}
-		}
+        private Dictionary<int, CollisionPair> _collisionPairs;
+        private HashSet<int> _collisionPairHolders;
 
-		internal HashSet<int> CollisionPairHolders {
-			get {
-				return _collisionPairHolders ?? (_collisionPairHolders = new HashSet<int> ());
-			}
-		}
+        internal Dictionary<int, CollisionPair> CollisionPairs
+        {
+            get
+            {
+                return _collisionPairs.IsNotNull() ? _collisionPairs : (_collisionPairs = new Dictionary<int, CollisionPair>());
+            }
+        }
 
-		internal void NotifyContact (LSBody other, bool isColliding, bool isChanged)
-		{
-			if (isColliding) {
-				if (isChanged) {
-					if (onContactEnter.IsNotNull ())
-						onContactEnter (other);
-				}
-				if (onContact != null)
-					onContact (other);
-				
-			} else {
-				if (isChanged) {
-					if (onContactExit != null)
-						onContactExit (other);
-				}
-			}
-		}
+        internal HashSet<int> CollisionPairHolders
+        {
+            get
+            {
+                return _collisionPairHolders ?? (_collisionPairHolders = new HashSet<int>());
+            }
+        }
 
-		public event CollisionFunction onContact;
-		public event CollisionFunction onContactEnter;
-		public event CollisionFunction onContactExit;
+        internal void NotifyContact(LSBody other, bool isColliding, bool isChanged)
+        {
+            if (isColliding)
+            {
+                if (isChanged)
+                {
+                    if (onContactEnter.IsNotNull())
+                        onContactEnter(other);
+                }
+                if (onContact != null)
+                    onContact(other);
+            }
+            else
+            {
+                if (isChanged)
+                {
+                    if (onContactExit != null)
+                        onContactExit(other);
+                }
+            }
+        }
 
-		public int ID { get; private set; }
+        public event CollisionFunction onContact;
+        public event CollisionFunction onContactEnter;
+        public event CollisionFunction onContactExit;
 
-		private int _dynamicID = -1;
+        public int ID { get; private set; }
 
-		internal int DynamicID { get { return _dynamicID; } set { _dynamicID = value; } }
+        private int _dynamicID = -1;
 
-		public int Priority { get; set; }
+        internal int DynamicID { get { return _dynamicID; } set { _dynamicID = value; } }
 
-		#region Serialized
+        public int Priority { get; set; }
 
-		[SerializeField, FormerlySerializedAs ("Shape")]
-		protected ColliderType _shape = ColliderType.None;
+        #region Serialized
 
-		public ColliderType Shape { get { return _shape; } }
+        [SerializeField, FormerlySerializedAs("Shape")]
+        protected ColliderType _shape = ColliderType.None;
 
-		[SerializeField, FormerlySerializedAs ("IsTrigger")]
-		private bool _isTrigger;
+        public ColliderType Shape { get { return _shape; } }
 
-		public bool IsTrigger { get { return _isTrigger; } }
+        [SerializeField, FormerlySerializedAs("IsTrigger")]
+        private bool _isTrigger;
 
-		[SerializeField, FormerlySerializedAs ("Layer")]
-		private int _layer;
+        public bool IsTrigger { get { return _isTrigger; } }
 
-		public int Layer { get { return _layer; } }
+        [SerializeField, FormerlySerializedAs("Layer")]
+        private int _layer;
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfWidth")]
-		private long _halfWidth = FixedMath.Half;
+        public int Layer { get { return _layer; } }
 
-		public long HalfWidth { get { return _halfWidth; } }
+        [SerializeField, FixedNumber, FormerlySerializedAs("HalfWidth")]
+        private long _halfWidth = FixedMath.Half;
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfHeight")]
-		public long _halfHeight = FixedMath.Half;
+        public long HalfWidth { get { return _halfWidth; } }
 
-		public long HalfHeight { get { return _halfHeight; } }
+        [SerializeField, FixedNumber, FormerlySerializedAs("HalfHeight")]
+        public long _halfHeight = FixedMath.Half;
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
-		protected long _radius = FixedMath.Half;
+        public long HalfHeight { get { return _halfHeight; } }
 
-		public long Radius { get { return _radius; } }
+        [SerializeField, FixedNumber, FormerlySerializedAs("Radius")]
+        protected long _radius = FixedMath.Half;
 
-		[SerializeField]
-		protected bool _immovable;
+        public long Radius { get { return _radius; } }
 
-		public bool Immovable { get; private set; }
+        [SerializeField]
+        protected bool _immovable;
 
-		[SerializeField, FormerlySerializedAs ("_priority")]
-		private int _basePriority;
+        public bool Immovable { get; private set; }
 
-		public int BasePriority { get { return _basePriority; } }
+        [SerializeField, FormerlySerializedAs("_priority")]
+        private int _basePriority;
 
-		[SerializeField, FormerlySerializedAs ("Vertices")]
-		private Vector2d[] _vertices;
+        public int BasePriority { get { return _basePriority; } }
 
-		public Vector2d[] Vertices { get { return _vertices; } }
+        [SerializeField, FormerlySerializedAs("Vertices")]
+        private Vector2d[] _vertices;
 
-		[SerializeField, FixedNumber]
-		private long _height = FixedMath.One;
+        public Vector2d[] Vertices { get { return _vertices; } }
 
-		[Lockstep (true)]
-		public long Height { get {return _height;}}
+        [SerializeField, FixedNumber]
+        private long _height = FixedMath.One;
 
-		[SerializeField]
-		private Transform _positionalTransform;
+        [Lockstep(true)]
+        public long Height { get { return _height; } }
 
-		public Transform PositionalTransform { get ; set; }
+        [SerializeField]
+        private Transform _positionalTransform;
 
-		private bool _canSetVisualPosition;
+        public Transform PositionalTransform { get; set; }
 
-		public bool CanSetVisualPosition {
-			get {
-				return _canSetVisualPosition;
-			}
-			set {
-				_canSetVisualPosition = value && PositionalTransform != null;
-			}
-		}
+        private bool _canSetVisualPosition;
 
-		[SerializeField]
-		private Transform _rotationalTransform;
+        public bool CanSetVisualPosition
+        {
+            get
+            {
+                return _canSetVisualPosition;
+            }
+            set
+            {
+                _canSetVisualPosition = value && PositionalTransform != null;
+            }
+        }
 
-		public Vector3 _rotationOffset;
+        [SerializeField]
+        private Transform _rotationalTransform;
 
-		public Transform RotationalTransform { get; set; }
+        public Vector3 _rotationOffset;
 
-		private bool _canSetVisualRotation;
+        public Transform RotationalTransform { get; set; }
 
-		public bool CanSetVisualRotation {
-			get {
-				return _canSetVisualRotation && RotationalTransform != null;
-			}
-			set {
-				_canSetVisualRotation = value;
-			}
-		}
+        private bool _canSetVisualRotation;
 
-		public Vector3d Position3d {
-			get {
-				return this.Position.ToVector3d (this.HeightPos);
-			}
-		}
+        public bool CanSetVisualRotation
+        {
+            get
+            {
+                return _canSetVisualRotation && RotationalTransform != null;
+            }
+            set
+            {
+                _canSetVisualRotation = value;
+            }
+        }
 
-		#endregion
+        public Vector3d Position3d
+        {
+            get
+            {
+                return this.Position.ToVector3d(this.HeightPos);
+            }
+        }
 
-		private Vector2d[] RotatedPoints;
+        #endregion
 
-		public void Setup (RTSAgent agent)
-		{
+        private Vector2d[] RotatedPoints;
 
-		}
+        public void Setup(RTSAgent agent)
+        {
 
-		private bool OutMoreThanSet { get; set; }
+        }
 
-		public bool OutMoreThan { get; private set; }
+        private bool OutMoreThanSet { get; set; }
 
-		public void GeneratePoints ()
-		{
+        public bool OutMoreThan { get; private set; }
 
-		}
+        public void GeneratePoints()
+        {
 
-		public void GenerateBounds ()
-		{
-			
-		}
+        }
 
-		public void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
-		{
-			
-		}
+        public void GenerateBounds()
+        {
 
-		void CheckVariables ()
-		{
+        }
 
-		}
+        public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
+        {
 
-		public void BuildPoints ()
-		{
-			
-		}
+        }
 
-		public void BuildBounds ()
-		{
+        void CheckVariables()
+        {
 
-		}
+        }
 
+        public void BuildPoints()
+        {
 
-		public void Simulate ()
-		{}
+        }
 
-		
-		public void BuildChangedValues ()
-		{
-			
-		}
+        public void BuildBounds()
+        {
 
-		public void SetVisuals ()
-		{
+        }
 
-		}
 
-		private void DoSetVisualPosition (Vector3 pos)
-		{
-	
-		}
+        public void Simulate()
+        { }
 
-		private void DoSetVisualRotation (Vector2d rot)
-		{
 
-		}
+        public void BuildChangedValues()
+        {
 
-		public void SetExtrapolatedVisuals ()
-		{
-            
-		}
+        }
 
-		Vector3 lastVisualPos;
-		Quaternion lastVisualRot;
-		//Quaternion visualRot = Quaternion.identity;
+        public void SetVisuals()
+        {
 
-		public void Visualize ()
-		{
-		}
+        }
 
-		public void LerpOverReset ()
-		{
-            
-		}
+        private void DoSetVisualPosition(Vector3 pos)
+        {
 
-	
-		
-	
+        }
 
+        private void DoSetVisualRotation(Vector2d rot)
+        {
 
-		void Reset ()
-		{
-			
-		}
+        }
 
-		void OnDrawGizmos ()
-		{
-		}
+        public void SetExtrapolatedVisuals()
+        {
 
-#endregion
+        }
 
-        #if UNITY_EDITOR
-        public void Replace () {
+        Vector3 lastVisualPos;
+        Quaternion lastVisualRot;
+        //Quaternion visualRot = Quaternion.identity;
+
+        public void Visualize()
+        {
+        }
+
+        public void LerpOverReset()
+        {
+
+        }
+
+        void Reset()
+        {
+
+        }
+
+        void OnDrawGizmos()
+        {
+        }
+
+        #endregion
+
+#if UNITY_EDITOR
+        public void Replace()
+        {
             Debug.Log("1");
-			if (this.gameObject.GetComponent<UnityLSBody>() != null) {
-				return;
-			}
-			var uBody = this.gameObject.AddComponent<UnityLSBody>();
-			//var body = uBody.InternalBody;
-			UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(uBody);
-			SerializedProperty Shape;
-			//Enum
-			SerializedProperty IsTrigger;
-			//bool
-			SerializedProperty Layer;
-			//int
-			SerializedProperty BasePriority;
-			//int
-			SerializedProperty HalfWidth;
-			//long
-			SerializedProperty HalfHeight;
-			//long
-			SerializedProperty Radius;
-			//long
-			SerializedProperty Immovable;
-			//bool
-			//SerializedProperty Vertices;
-			//Vector2d[]
-			SerializedProperty Height;
-			//long
-			SerializedProperty PositionalTransform;
-			//transform
-			SerializedProperty RotationalTransform;
-			#region fold
-			Shape = so.FindProperty("_internalBody").FindPropertyRelative("_shape");
-			IsTrigger = so.FindProperty("_internalBody").FindPropertyRelative("_isTrigger");
-			Layer = so.FindProperty("_internalBody").FindPropertyRelative("_layer");
-			BasePriority = so.FindProperty("_internalBody").FindPropertyRelative("_basePriority");
-			HalfWidth = so.FindProperty("_internalBody").FindPropertyRelative("_halfWidth");
-			HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
-			Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
-			Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
-			//Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
-			Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
-			PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
-			RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");
-			#endregion
+            if (this.gameObject.GetComponent<UnityLSBody>() != null)
+            {
+                return;
+            }
+            var uBody = this.gameObject.AddComponent<UnityLSBody>();
+            //var body = uBody.InternalBody;
+            UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(uBody);
+            SerializedProperty Shape;
+            //Enum
+            SerializedProperty IsTrigger;
+            //bool
+            SerializedProperty Layer;
+            //int
+            SerializedProperty BasePriority;
+            //int
+            SerializedProperty HalfWidth;
+            //long
+            SerializedProperty HalfHeight;
+            //long
+            SerializedProperty Radius;
+            //long
+            SerializedProperty Immovable;
+            //bool
+            //SerializedProperty Vertices;
+            //Vector2d[]
+            SerializedProperty Height;
+            //long
+            SerializedProperty PositionalTransform;
+            //transform
+            SerializedProperty RotationalTransform;
+            #region fold
+            Shape = so.FindProperty("_internalBody").FindPropertyRelative("_shape");
+            IsTrigger = so.FindProperty("_internalBody").FindPropertyRelative("_isTrigger");
+            Layer = so.FindProperty("_internalBody").FindPropertyRelative("_layer");
+            BasePriority = so.FindProperty("_internalBody").FindPropertyRelative("_basePriority");
+            HalfWidth = so.FindProperty("_internalBody").FindPropertyRelative("_halfWidth");
+            HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
+            Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
+            Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
+            //Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
+            Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
+            PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
+            RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");
+            #endregion
 
-			Shape.enumValueIndex = (int)this.Shape;
-			IsTrigger.boolValue = (bool)this.IsTrigger;
-			Layer.intValue = (int)this.Layer;
-			BasePriority.intValue = (int)this.BasePriority;
-			HalfWidth.longValue = (long)this.HalfWidth;
-			HalfHeight.longValue = (long)this.HalfHeight;
-			Radius.longValue = (long)this.Radius;
-			Immovable.boolValue = (bool)this.Immovable;
-			//Vertices hard to carry over
-			Height.longValue = (long)this.Height;
-			PositionalTransform.objectReferenceValue = this.PositionalTransform;
-			RotationalTransform.objectReferenceValue = this.RotationalTransform;
-			so.ApplyModifiedProperties();
-			EditorUtility.SetDirty(uBody);
-		}
-        #endif
+            Shape.enumValueIndex = (int)this.Shape;
+            IsTrigger.boolValue = this.IsTrigger;
+            Layer.intValue = this.Layer;
+            BasePriority.intValue = this.BasePriority;
+            HalfWidth.longValue = this.HalfWidth;
+            HalfHeight.longValue = this.HalfHeight;
+            Radius.longValue = this.Radius;
+            Immovable.boolValue = this.Immovable;
+            //Vertices hard to carry over
+            Height.longValue = this.Height;
+            PositionalTransform.objectReferenceValue = this.PositionalTransform;
+            RotationalTransform.objectReferenceValue = this.RotationalTransform;
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(uBody);
+        }
+#endif
 
     }
 

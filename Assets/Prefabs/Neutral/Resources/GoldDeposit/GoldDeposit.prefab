@@ -39,7 +39,6 @@ GameObject:
   - component: {fileID: 4336484176024120}
   - component: {fileID: 33477392149781874}
   - component: {fileID: 23715249473503682}
-  - component: {fileID: 114168989156268678}
   m_Layer: 10
   m_Name: GoldDepositFull
   m_TagString: Untagged
@@ -60,6 +59,7 @@ GameObject:
   - component: {fileID: 114157392711237616}
   - component: {fileID: 114322657313946636}
   - component: {fileID: 114535224092038690}
+  - component: {fileID: 114905450173827076}
   m_Layer: 10
   m_Name: GoldDeposit
   m_TagString: Untagged
@@ -77,7 +77,6 @@ GameObject:
   - component: {fileID: 4740953773567928}
   - component: {fileID: 33682303349957914}
   - component: {fileID: 23090892918694250}
-  - component: {fileID: 114615773726740738}
   m_Layer: 10
   m_Name: GoldDepositHalf
   m_TagString: Untagged
@@ -95,7 +94,6 @@ GameObject:
   - component: {fileID: 4870983081693242}
   - component: {fileID: 33716290962151236}
   - component: {fileID: 23444608826995764}
-  - component: {fileID: 114189800073831716}
   m_Layer: 10
   m_Name: GoldDepositQuarter
   m_TagString: Untagged
@@ -371,28 +369,6 @@ MonoBehaviour:
   resourceHalf: {fileID: 1742604459818202}
   resourceQuarter: {fileID: 1800253881378786}
   resourceEmpty: {fileID: 1152765750499072}
---- !u!114 &114168989156268678
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1661602373909176}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114189800073831716
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1800253881378786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114322657313946636
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -465,17 +441,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114615773726740738
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1742604459818202}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114625934437660894
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -517,3 +482,14 @@ MonoBehaviour:
     _height: 245760
     _positionalTransform: {fileID: 4541798942617490}
     _rotationalTransform: {fileID: 4541798942617490}
+--- !u!114 &114905450173827076
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1689033263610340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

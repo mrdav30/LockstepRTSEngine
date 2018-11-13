@@ -11,6 +11,7 @@ namespace RTSLockstep.UI
                 return Camera.main.transform.hasChanged;
             }
         }
+
         public override float CameraScale
         {
             get
@@ -18,6 +19,7 @@ namespace RTSLockstep.UI
                 return Camera.main.transform.position.y;
             }
         }
+
         public override bool CanHUD
         {
             get
@@ -25,6 +27,7 @@ namespace RTSLockstep.UI
                 return true;
             }
         }
+
         public override bool CanInteract
         {
             get
@@ -32,10 +35,12 @@ namespace RTSLockstep.UI
                 return true;
             }
         }
+
         public override void InformationDown()
         {
 
         }
+
         public override Camera MainCam
         {
             get
@@ -43,6 +48,7 @@ namespace RTSLockstep.UI
                 return Camera.main;
             }
         }
+
         public override bool ShowHealthWhenFull
         {
             get

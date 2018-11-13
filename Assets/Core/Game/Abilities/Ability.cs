@@ -4,8 +4,8 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-using RTSLockstep.Data;
 using Newtonsoft.Json;
+using RTSLockstep.Data;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -102,6 +102,7 @@ namespace RTSLockstep
         {
             this.OnLateSetup();
         }
+
         /// <summary>
         /// Override for communicating with other abilities in the setup phase
         /// </summary>

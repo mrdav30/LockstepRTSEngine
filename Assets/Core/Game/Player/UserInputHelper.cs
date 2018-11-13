@@ -303,7 +303,6 @@ public class UserInputHelper : BehaviourHelper
             GUIManager.MainCam.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GameResourceManager.ScrollSpeed);
         }
 
-        //!Selector.MainSelectedAgent && 
         if (!SelectionManager.MousedAgent
             && !mouseScroll
             && !PlayerManager.MainController.GetCommanderHUD().GetCursorLockState()

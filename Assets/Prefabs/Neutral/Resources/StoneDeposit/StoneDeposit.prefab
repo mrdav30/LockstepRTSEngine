@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 4805182018244110}
   - component: {fileID: 33836144744892952}
   - component: {fileID: 23183877780674788}
-  - component: {fileID: 114387464045246636}
   m_Layer: 10
   m_Name: StoneDepositFull
   m_TagString: Untagged
@@ -39,7 +38,6 @@ GameObject:
   - component: {fileID: 4276111380982120}
   - component: {fileID: 33573229056990690}
   - component: {fileID: 23631851421485634}
-  - component: {fileID: 114759308501694172}
   m_Layer: 10
   m_Name: StoneDepositQuarter
   m_TagString: Untagged
@@ -57,7 +55,6 @@ GameObject:
   - component: {fileID: 4878904650076876}
   - component: {fileID: 33185117268207230}
   - component: {fileID: 23474315846594004}
-  - component: {fileID: 114964163660159078}
   m_Layer: 10
   m_Name: StoneDepositHalf
   m_TagString: Untagged
@@ -78,6 +75,7 @@ GameObject:
   - component: {fileID: 114075044497011668}
   - component: {fileID: 114299335478744638}
   - component: {fileID: 114781160210196684}
+  - component: {fileID: 114762682932731976}
   m_Layer: 10
   m_Name: StoneDeposit
   m_TagString: Untagged
@@ -369,17 +367,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &114387464045246636
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1052491548656512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114584507045198590
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -469,12 +456,12 @@ MonoBehaviour:
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 00000000000000000000000000000000000000000000000000000000
---- !u!114 &114759308501694172
+--- !u!114 &114762682932731976
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1244894659910424}
+  m_GameObject: {fileID: 1687852583994148}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
@@ -489,16 +476,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114964163660159078
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1350680308405444}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

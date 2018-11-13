@@ -7,6 +7,7 @@ namespace RTSLockstep
     public class ResourceDeposit : Ability
     {
         public long AmountLeft { get; private set; }
+        private DynamicBlocker cachedBlocker;
 
         #region Serialized Values (Further description in properties)
         public long Capacity;
@@ -14,6 +15,11 @@ namespace RTSLockstep
         [SerializeField]
         private GameObject resourceFull, resourceHalf, resourceQuarter, resourceEmpty;
         #endregion
+
+        protected override void OnSetup()
+        {
+            cachedBlocker = Agent.GetAbility<DynamicBlocker>();
+        }
 
         protected override void OnInitialize()
         {
@@ -43,6 +49,10 @@ namespace RTSLockstep
                 resourceQuarter.GetComponent<Renderer>().enabled = false;
                 if (resourceEmpty.GetComponent<Renderer>().enabled == false)
                     resourceEmpty.GetComponent<Renderer>().enabled = true;
+                if (cachedBlocker)
+                {
+                    cachedBlocker.Deactivate();
+                }
             }
             Agent.Body.CalculateBounds();
         }
