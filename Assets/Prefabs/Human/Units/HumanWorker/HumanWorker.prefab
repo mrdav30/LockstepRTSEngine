@@ -534,6 +534,7 @@ GameObject:
   - component: {fileID: 114552794059523324}
   - component: {fileID: 95137511769296372}
   - component: {fileID: 114043561203084636}
+  - component: {fileID: 114561287811282174}
   m_Layer: 0
   m_Name: HumanWorker
   m_TagString: Untagged
@@ -1575,6 +1576,17 @@ MonoBehaviour:
   emptyHarvestVolume: 0.5
   harvestVolume: 0.5
   startHarvestVolume: 1
+--- !u!114 &114561287811282174
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1845799108638348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114573005599800606
 MonoBehaviour:
   m_ObjectHideFlags: 1

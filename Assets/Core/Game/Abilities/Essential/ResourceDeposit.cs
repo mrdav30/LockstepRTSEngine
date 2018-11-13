@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -16,11 +15,6 @@ namespace RTSLockstep
         private GameObject resourceFull, resourceHalf, resourceQuarter, resourceEmpty;
         #endregion
 
-        protected override void OnSetup()
-        {
-            cachedBlocker = Agent.GetAbility<DynamicBlocker>();
-        }
-
         protected override void OnInitialize()
         {
             AmountLeft = Capacity;
@@ -28,7 +22,7 @@ namespace RTSLockstep
 
         protected override void OnVisualize()
         {
-            float percentLeft = (float)AmountLeft / (float)Capacity;
+            float percentLeft = AmountLeft / (float)Capacity;
             if (percentLeft <= .5f && percentLeft > .25f)
             {
                 percentLeft = .5f;
@@ -49,10 +43,8 @@ namespace RTSLockstep
                 resourceQuarter.GetComponent<Renderer>().enabled = false;
                 if (resourceEmpty.GetComponent<Renderer>().enabled == false)
                     resourceEmpty.GetComponent<Renderer>().enabled = true;
-                if (cachedBlocker)
-                {
-                    cachedBlocker.Deactivate();
-                }
+                Agent.Die();
+                return;
             }
             Agent.Body.CalculateBounds();
         }

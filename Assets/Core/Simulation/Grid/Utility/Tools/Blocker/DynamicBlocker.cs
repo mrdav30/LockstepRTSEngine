@@ -10,10 +10,15 @@ namespace RTSLockstep
         FastList<GridNode> LastCoordinates = new FastList<GridNode>();
         LSBody CachedBody;
 
-        protected override void OnInitialize()
+        protected override void OnSetup()
         {
             CachedBody = Agent.Body;
             UpdateCoordinates();
+        }
+
+        protected override void OnInitialize()
+        {
+
         }
 
         void RemoveLastCoordinates()
