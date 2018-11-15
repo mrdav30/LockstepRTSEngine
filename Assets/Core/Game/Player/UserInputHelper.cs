@@ -55,6 +55,11 @@ public class UserInputHelper : BehaviourHelper
     public static event Action OnLeftTapHoldDown;
     public static event Action OnSingleRightTapDown;
     public static event Action OnDoubleLeftTapDown;
+
+    //camera rotate speed
+    public float SpeedH = 5f;
+    public float SpeedV = 5f;
+
     //Defines the maximum time between two taps to make it double tap
     private static float tapThreshold = 0.25f;
     private static float tapTimer = 0.0f;
@@ -73,6 +78,12 @@ public class UserInputHelper : BehaviourHelper
 
     private static bool Setted = false;
     private static Command curCom;
+
+    // limits for angle in tilt x axis
+    private float yaw = 0f;
+    private float pitch = 0f;
+    private float minPitch = -30f;
+    private float maxPitch = 60f;
     #endregion
 
     #region BehaviorHelper
@@ -323,13 +334,18 @@ public class UserInputHelper : BehaviourHelper
         {
             destination.x -= Input.GetAxis("Mouse Y") * GameResourceManager.RotateAmount;
             destination.y += Input.GetAxis("Mouse X") * GameResourceManager.RotateAmount;
+
+            yaw += Input.GetAxis("Mouse X") * SpeedH;
+            pitch -= Input.GetAxis("Mouse Y") * SpeedV;
+            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         }
 
         // if a change in position is detected, perform necessary update
         if (destination != origin)
         {
-            GUIManager.MainCam.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * GameResourceManager.RotateSpeed);
+            GUIManager.MainCam.transform.eulerAngles = new Vector3(pitch, yaw, 0f);
         }
+
     }
 
     private void HandleSingleLeftClick()
