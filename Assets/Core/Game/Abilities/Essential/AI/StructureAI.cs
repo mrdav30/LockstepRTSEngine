@@ -19,11 +19,6 @@ namespace RTSLockstep
             cachedSpawner = Agent.GetAbility<Spawner>();
         }
 
-        protected override void OnVisualize()
-        {
-
-        }
-
         public override void CanAttack()
         {
             if (cachedAttack)

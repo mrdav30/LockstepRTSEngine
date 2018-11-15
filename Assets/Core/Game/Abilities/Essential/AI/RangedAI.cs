@@ -9,15 +9,6 @@ namespace RTSLockstep
         #region Serialized Values (Further description in properties)
         #endregion
 
-        protected override void OnInitialize()
-        {
-        }
-
-        protected override void OnVisualize()
-        {
-          
-        }
-
         public override void CanAttack()
         {
             canAttack = true;

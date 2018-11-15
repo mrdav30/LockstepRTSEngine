@@ -8,7 +8,7 @@ namespace RTSLockstep
 {
     public static class WorkManager
     {
-        //not needed
+        //no longer needed?
         public static Rect CalculateSelectionBox(Bounds selectionBounds, Rect playingArea)
         {
             //shorthand for the coordinates of the centre of the selection bounds
@@ -86,27 +86,29 @@ namespace RTSLockstep
             }
         }
 
-        public static List<RTSAgent> FindNearbyObjects(Vector3 position, float range)
-        {
-            Collider[] hitColliders = Physics.OverlapSphere(position, range);
-            HashSet<int> nearbyObjectIds = new HashSet<int>();
-            List<RTSAgent> nearbyObjects = new List<RTSAgent>();
-            for (int i = 0; i < hitColliders.Length; i++)
-            {
-                Transform parent = hitColliders[i].transform.parent;
-                if (parent)
-                {
-                    RTSAgent parentObject = parent.GetComponent<RTSAgent>();
-                    if (parentObject && !nearbyObjectIds.Contains(parentObject.GlobalID))
-                    {
-                        nearbyObjectIds.Add(parentObject.GlobalID);
-                        nearbyObjects.Add(parentObject);
-                    }
-                }
-            }
-            return nearbyObjects;
-        }
+        // no longer needed?
+        //public static List<RTSAgent> FindNearbyObjects(Vector3 position, float range)
+        //{
+        //    Collider[] hitColliders = Physics.OverlapSphere(position, range);
+        //    HashSet<int> nearbyObjectIds = new HashSet<int>();
+        //    List<RTSAgent> nearbyObjects = new List<RTSAgent>();
+        //    for (int i = 0; i < hitColliders.Length; i++)
+        //    {
+        //        Transform parent = hitColliders[i].transform.parent;
+        //        if (parent)
+        //        {
+        //            RTSAgent parentObject = parent.GetComponent<RTSAgent>();
+        //            if (parentObject && !nearbyObjectIds.Contains(parentObject.GlobalID))
+        //            {
+        //                nearbyObjectIds.Add(parentObject.GlobalID);
+        //                nearbyObjects.Add(parentObject);
+        //            }
+        //        }
+        //    }
+        //    return nearbyObjects;
+        //}
 
+        //currently used by harvest ability, switch to influence?
         public static RTSAgent FindNearestWorldObjectInListToPosition(List<RTSAgent> objects, Vector3 position)
         {
             if (objects == null || objects.Count == 0)

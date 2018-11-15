@@ -34,6 +34,7 @@ namespace RTSLockstep
 		//}
 
         #region Scanning
+        // find single unit
         public static RTSAgent Scan(Vector2d position, long radius, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional)
         {
             ScanAll(position, radius, agentConditional, bucketConditional, bufferAgents);
@@ -144,7 +145,6 @@ namespace RTSLockstep
             }
             return closestAgent;
         }
-
         #endregion
     }
 }

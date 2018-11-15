@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +8,7 @@ namespace RTSLockstep
     public class DeterminismAI : Ability
     {
         protected bool canAttack;
+        protected LSBody cachedBody;
         protected Health cachedHealth;
         protected Attack cachedAttack;
         protected Move cachedMove;
@@ -18,12 +19,14 @@ namespace RTSLockstep
         private float timeSinceLastDecision = 0.0f, timeBetweenDecisions = 0.1f;
         //convert to fast list...
         protected List<RTSAgent> nearbyObjects;
+        protected RTSAgent nearbyAgent;
 
         #region Serialized Values (Further description in properties)
         #endregion
 
         protected override void OnInitialize()
         {
+            cachedBody = Agent.Body;
             cachedHealth = Agent.GetAbility<Health>();
             cachedAttack = Agent.GetAbility<Attack>();
             cachedMove = Agent.GetAbility<Move>();
@@ -38,19 +41,33 @@ namespace RTSLockstep
             }
         }
 
+        /*
+         * A child class should only determine other conditions under which a decision should
+         * not be made. This could be 'harvesting' for a harvester, for example. Alternatively,
+         * an object that never has to make decisions could just return false...or not have this ability
+        */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedAttack && !cachedAttack.IsCasting && cachedMove && !cachedMove.IsMoving)
+            if (cachedAttack && cachedAttack.IsCasting)
             {
-                //we are not doing anything at the moment
-                if (timeSinceLastDecision > timeBetweenDecisions)
-                {
-                    timeSinceLastDecision = 0.0f;
-                    return true;
-                }
-                timeSinceLastDecision += Time.deltaTime;
+                return false;
             }
-            return false;
+            else if (cachedMove && cachedMove.IsMoving)
+            {
+                return false;
+            }
+
+            //we are not doing anything at the moment
+            if (timeSinceLastDecision > timeBetweenDecisions)
+            {
+                timeSinceLastDecision = 0.0f;
+                return true;
+            }
+            else
+            {
+                timeSinceLastDecision += Time.deltaTime;
+                return false;
+            }
         }
 
         public virtual void CanAttack()
@@ -58,22 +75,12 @@ namespace RTSLockstep
             //default behaviour needs to be overidden by children
         }
 
-        /*
-         * A child class should only determine other conditions under which a decision should
-         * not be made. This could be 'harvesting' for a harvester, for example. Alternatively,
-         * an object that never has to make decisions could just return false.
-        */
-
-        protected void GetNearbyObject()
-        {
-            Vector3 currentPosition = transform.position;
-            nearbyObjects = WorkManager.FindNearbyObjects(currentPosition, cachedAttack.Sight);
-        }
-
         public virtual void DecideWhatToDo()
         {
-            //determine what should be done by the world object at the current point in time
-            GetNearbyObject();
+            //determine what should be done by the agent at the current point in time
+            //need sight from attack ability to be able to scan...
+            if(cachedAttack)
+               nearbyAgent = DoScan();
 
             //if (CanAttack())
             //{
@@ -96,6 +103,32 @@ namespace RTSLockstep
             //        BeginAttack(closestObject);
             //    }
             //}
+        }
+
+        protected virtual Func<RTSAgent, bool> AgentConditional
+        {
+            get
+            {
+                Func<RTSAgent, bool> agentConditional = null;
+                return agentConditional;
+            }
+        }
+
+        protected virtual RTSAgent DoScan()
+        {
+            Func<RTSAgent, bool> agentConditional = AgentConditional;
+
+            RTSAgent agent = InfluenceManager.Scan(
+                                this.cachedBody.Position,
+                                this.cachedAttack.Sight,
+                                agentConditional,
+                                (bite) =>
+                                {
+                                    return ((this.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
+                                }
+                            );
+
+            return agent;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)

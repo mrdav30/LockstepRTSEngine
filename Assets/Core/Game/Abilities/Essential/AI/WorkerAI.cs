@@ -1,8 +1,7 @@
-﻿using RTSLockstep.Data;
+﻿using System;
+using RTSLockstep.Data;
 using Newtonsoft.Json;
-using RTSLockstep;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -19,11 +18,6 @@ namespace RTSLockstep
             base.OnInitialize();
             cachedBuild = Agent.GetAbility<Construct>();
             cachedHarvest = Agent.GetAbility<Harvest>();
-        }
-
-        protected override void OnVisualize()
-        {
-          
         }
 
         public override void CanAttack()
@@ -51,68 +45,95 @@ namespace RTSLockstep
         public override void DecideWhatToDo()
         {
             base.DecideWhatToDo();
-            if (Agent.Tag == AgentTag.Harvester && cachedHarvest.IsFocused)
+            if (Agent.Tag == AgentTag.Harvester && !cachedHarvest.IsFocused)
             {
                 //convert to fast list...
-                List<RTSAgent> resources = new List<RTSAgent>();
-                foreach (RTSAgent nearbyObject in nearbyObjects)
+                //List<RTSAgent> resources = new List<RTSAgent>();
+                //foreach (RTSAgent nearbyObject in nearbyObjects)
+                //{
+                //    ResourceDeposit resource = nearbyObject.GetAbility<ResourceDeposit>();
+                //    if (resource && !resource.IsEmpty())
+                //    {
+                //        resources.Add(nearbyObject);
+                //    }
+                //}
+             //   RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(resources, transform.position);
+                if (nearbyAgent)
                 {
-                    ResourceDeposit resource = nearbyObject.GetAbility<ResourceDeposit>();
-                    if (resource && !resource.IsEmpty())
-                    {
-                        resources.Add(nearbyObject);
-                    }
-                }
-                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(resources, transform.position);
-                if (nearestObject)
-                {
-                    ResourceDeposit closestResource = nearestObject.GetAbility<ResourceDeposit>();
+                    ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
                     // only harvest resources the worker is assigned to
-                    if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType)
+                    if (closestResource 
+                        && closestResource.ResourceType == cachedHarvest.HarvestType)
                     {
                         // send harvest command
                         Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
-                        harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearestObject.GlobalID));
-                        UserInputHelper.SendCommand(harvestCom);
+                        harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                        Agent.Execute(harvestCom);
                     }
                 }
-                //else
-                //{
-                //    cachedHarvest.SetResourceTarget(null);
-                //}
+                else
+                {
+                    cachedHarvest.SetResourceTarget(null);
+                }
             }
-            if (Agent.Tag == AgentTag.Builder && cachedBuild.IsFocused)
+            if (Agent.Tag == AgentTag.Builder && !cachedBuild.IsFocused)
             {
                 //convert to fast array
-                List<RTSAgent> buildings = new List<RTSAgent>();
-                foreach (RTSAgent nearbyObject in nearbyObjects)
+                //List<RTSAgent> buildings = new List<RTSAgent>();
+                //foreach (RTSAgent nearbyObject in nearbyObjects)
+                //{
+                //    if (nearbyObject.GetCommander() != Agent.Controller.Commander)
+                //    {
+                //        continue;
+                //    }
+                //    RTSAgent nearbyBuilding = nearbyObject.GetComponent<RTSAgent>();
+                //    if (nearbyBuilding && nearbyBuilding.GetAbility<Structure>().UnderConstruction())
+                //    {
+                //        buildings.Add(nearbyObject);
+                //    }
+                //}
+             //   RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(buildings, transform.position);
+                if (nearbyAgent)
                 {
-                    if (nearbyObject.GetCommander() != Agent.Controller.Commander)
-                    {
-                        continue;
-                    }
-                    RTSAgent nearbyBuilding = nearbyObject.GetComponent<RTSAgent>();
-                    if (nearbyBuilding && nearbyBuilding.GetAbility<Structure>().UnderConstruction())
-                    {
-                        buildings.Add(nearbyObject);
-                    }
-                }
-                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(buildings, transform.position);
-                if (nearestObject)
-                {
-                    RTSAgent closestBuilding = nearestObject.GetComponent<RTSAgent>();
+                    Structure closestBuilding = nearbyAgent.GetComponent<Structure>();
                     if (closestBuilding)
                     {
                         // send build command
                         Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, closestBuilding.GlobalID));
-                        UserInputHelper.SendCommand(buildCom);
+                        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                        Agent.Execute(buildCom);
                     }
                 }
                 else
                 {
                     cachedBuild.SetCurrentProject(null);
                 }
+            }
+        }
+
+        protected override Func<RTSAgent, bool> AgentConditional
+        {
+            get
+            {
+                Func<RTSAgent, bool> agentConditional = null;
+
+                if (Agent.Tag == AgentTag.Harvester)
+                {
+                    agentConditional = (other) =>
+                    {
+                        ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
+                        return resourceDeposit != null && !resourceDeposit.IsEmpty() && other.IsActive;
+                    };
+                }
+                else if (Agent.Tag == AgentTag.Builder)
+                {
+                    agentConditional = (other) =>
+                    {
+                        Structure structure = other.GetAbility<Structure>();
+                        return structure != null && structure.UnderConstruction() && other.IsActive;
+                    };
+                }
+                return agentConditional;
             }
         }
 

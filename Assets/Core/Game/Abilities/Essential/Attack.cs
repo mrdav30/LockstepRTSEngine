@@ -46,7 +46,7 @@ namespace RTSLockstep
         public long AttackAngle { get { return _attackAngle; } }
         //The angle in front of the unit that the target must be located in
 
-        protected virtual AllegianceType TargetAllegiance
+        public AllegianceType TargetAllegiance
         { //Allegiance to the target
             get { return this._targetAllegiance; }
         }
@@ -730,6 +730,20 @@ namespace RTSLockstep
             }
         }
 
+        public bool ScanWithinRangeAndEngage()
+        {
+            RTSAgent agent = this.DoScan();
+            if (agent == null)
+            {
+                return false;
+            }
+            else
+            {
+                Engage(agent);
+                return true;
+            }
+        }
+
         protected virtual bool AgentValid(RTSAgent agent)
         {
             return true;
@@ -798,21 +812,6 @@ namespace RTSLockstep
 
             return agent;
         }
-
-        public bool ScanWithinRangeAndEngage()
-        {
-            RTSAgent agent = this.DoScan();
-            if (agent == null)
-            {
-                return false;
-            }
-            else
-            {
-                Engage(agent);
-                return true;
-            }
-        }
-
 #if UNITY_EDITOR
         void OnDrawGizmos()
         {

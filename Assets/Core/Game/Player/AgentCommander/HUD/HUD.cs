@@ -148,7 +148,10 @@ public class HUD : MonoBehaviour
     // Update is called once per frame
     public void doGUI()
     {
-        if (cachedCommander && cachedCommander.human && cachedCommander == PlayerManager.MainController.Commander)
+        if (cachedCommander 
+            && cachedCommander.human 
+            && PlayerManager.MainController.IsNotNull()
+            && cachedCommander == PlayerManager.MainController.Commander)
         {
             DrawPlayerDetails();
             if (!GameResourceManager.MenuOpen)
