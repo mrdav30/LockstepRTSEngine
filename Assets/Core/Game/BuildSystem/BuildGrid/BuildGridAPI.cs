@@ -5,9 +5,9 @@ namespace RTSLockstep.Agents { }
 
 public static class BuildGridAPI
 {
-    const int defaultGridLength = 256;
-    const int defaultBuildSpacing = 3;
-    const int defaultGridOffset = -128;
+    const int defaultGridLength = 500;
+    const int defaultBuildSpacing = 1;
+    const int defaultGridOffset = -100;
     public static BuildGridManager MainBuildGrid { get; private set; }
     public static int GridOffset { get; private set; }
 
@@ -20,11 +20,11 @@ public static class BuildGridAPI
         GridOffset = gridOffset;
     }
 
-    internal static bool Construct(Coordinate buildPos, IBuildable building)
+    internal static bool Construct(IBuildable building)
     {
         return MainBuildGrid.Construct(building);
     }
-    internal static void Unbuild(Coordinate position, IBuildable building)
+    internal static void Unbuild(IBuildable building)
     {
         MainBuildGrid.Unbuild(building);
     }

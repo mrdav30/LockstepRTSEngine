@@ -60,8 +60,7 @@ public static class GridBuilder
 
     private static bool EndPlace()
     {
-        Coordinate coor = Target.GridPosition;
-        bool canBuild = (BuildGridAPI.Construct(coor, Target));
+        bool canBuild = (BuildGridAPI.Construct(Target));
         Target.IsValidOnGrid = (canBuild);
         Target.IsMoving = false;
         return canBuild;
@@ -77,7 +76,7 @@ public static class GridBuilder
         TargetOriginalPosition = Target.GridPosition;
         if (TargetOriginalValid)
         {
-            BuildGridAPI.Unbuild(TargetOriginalPosition, Target);
+            BuildGridAPI.Unbuild(Target);
         }
         IsMovingBuilding = true;
     }
@@ -108,7 +107,7 @@ public static class GridBuilder
         if (TargetOriginalValid)
         {
             Target.GridPosition = TargetOriginalPosition;
-            BuildGridAPI.Construct(TargetOriginalPosition, Target);
+            BuildGridAPI.Construct(Target);
             Target.IsValidOnGrid = true;
             return PlacementResult.Returned;
         }
@@ -123,7 +122,7 @@ public static class GridBuilder
     #region Unbuilding
     public static void Unbuild(IBuildable buildable)
     {
-        BuildGridAPI.Unbuild(buildable.GridPosition, buildable);
+        BuildGridAPI.Unbuild(buildable);
     }
     #endregion
 

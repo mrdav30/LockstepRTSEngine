@@ -7,6 +7,7 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempStructure;
+    private static Vector3 lastLocation;
     private static RTSAgent tempCreator;
     private static bool findingPlacement = false;
     private static AgentCommander _cachedCommander;
@@ -58,7 +59,6 @@ public static class ConstructionHandler
             && buildingTemplate.GetComponent<Structure>())
         {
             // check that the Player has the resources available before allowing them to create a new structure
-            //put resources in LS db
             if (!_cachedCommander.CachedResourceManager.CheckResources(buildingTemplate))
             {
                 Debug.Log("Not enough resources!");
@@ -114,8 +114,9 @@ public static class ConstructionHandler
     public static void FindBuildingLocation()
     {
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        if (RTSInterfacing.HitPointIsGround(Input.mousePosition))
+        if (RTSInterfacing.HitPointIsGround(Input.mousePosition) && lastLocation != newLocation)
         {
+            lastLocation = newLocation;
             if (!GridBuilder.IsMovingBuilding)
             {
                 GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
@@ -148,7 +149,7 @@ public static class ConstructionHandler
         GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
         Object.Destroy(tempStructure.gameObject);
 
-        if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), buildPoint))
+        if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
         {
             _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
             RestoreMaterials(newBuilding.gameObject);

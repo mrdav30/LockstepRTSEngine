@@ -61,8 +61,6 @@ public class BuildGridManager
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
                 Coordinate coor = bufferBuildCoordinates[i];
-                //  BuildGridNode buildNode = Grid[coor.x, coor.y];
-                // buildNode.RegisteredBuilding = buildable;
                 Grid[coor.x, coor.y].RegisteredBuilding = buildable;
             }
             return true;
@@ -160,7 +158,9 @@ public class BuildGridManager
     private bool TryGetBuildCoordinates(Coordinate position, int size, FastList<Coordinate> output)
     {
         int half = size / 2;
-        int lowX = half, highX = half, lowY = half, highY = half;
+        int lowX = half, lowY = half;
+        int highX = half + 1, highY = half + 1;
+
         if (size % 2 == 0)
         {
             highX -= 1;
@@ -194,7 +194,7 @@ public class BuildGridManager
     public void GetSpacedNeighborCoordinates(Coordinate position, int size, FastList<Coordinate> output)
     {
         int half = size / 2;
-        int lowX = half, highX = half, lowY = half, highY = half;
+        int lowX = half, highX = half + 1, lowY = half, highY = half + 1;
         if (size % 2 == 0)
         {
             highX -= 1;

@@ -14,7 +14,7 @@
 
         public GridSettings()
         {
-            Init(256, 256, FixedMath.Create(-128), FixedMath.Create(-128), true);
+            Init(500, 500, FixedMath.Create(-100), FixedMath.Create(-100), true);
         }
 
         public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
