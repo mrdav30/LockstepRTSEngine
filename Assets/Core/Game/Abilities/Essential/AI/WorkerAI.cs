@@ -47,17 +47,6 @@ namespace RTSLockstep
             base.DecideWhatToDo();
             if (Agent.Tag == AgentTag.Harvester && !cachedHarvest.IsFocused)
             {
-                //convert to fast list...
-                //List<RTSAgent> resources = new List<RTSAgent>();
-                //foreach (RTSAgent nearbyObject in nearbyObjects)
-                //{
-                //    ResourceDeposit resource = nearbyObject.GetAbility<ResourceDeposit>();
-                //    if (resource && !resource.IsEmpty())
-                //    {
-                //        resources.Add(nearbyObject);
-                //    }
-                //}
-             //   RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(resources, transform.position);
                 if (nearbyAgent)
                 {
                     ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
@@ -78,21 +67,6 @@ namespace RTSLockstep
             }
             if (Agent.Tag == AgentTag.Builder && !cachedBuild.IsFocused)
             {
-                //convert to fast array
-                //List<RTSAgent> buildings = new List<RTSAgent>();
-                //foreach (RTSAgent nearbyObject in nearbyObjects)
-                //{
-                //    if (nearbyObject.GetCommander() != Agent.Controller.Commander)
-                //    {
-                //        continue;
-                //    }
-                //    RTSAgent nearbyBuilding = nearbyObject.GetComponent<RTSAgent>();
-                //    if (nearbyBuilding && nearbyBuilding.GetAbility<Structure>().UnderConstruction())
-                //    {
-                //        buildings.Add(nearbyObject);
-                //    }
-                //}
-             //   RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(buildings, transform.position);
                 if (nearbyAgent)
                 {
                     Structure closestBuilding = nearbyAgent.GetComponent<Structure>();

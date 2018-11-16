@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RTSLockstep;
+using System;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -34,13 +35,40 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (!cachedAttack)
-            {
+            if (Agent.GetAbility<Structure>().UnderConstruction())
+            {              
                 return false;
             }
             else
             {
                 return base.ShouldMakeDecision();
+            }
+        }
+
+        //TODO: Consolidate the checks in LSInfluencer
+        protected override Func<RTSAgent, bool> AgentConditional
+        {
+            get
+            {
+                Func<RTSAgent, bool> agentConditional = null;
+
+                if (cachedAttack.Damage >= 0)
+                {
+                    agentConditional = (other) =>
+                    {
+                        Health health = other.GetAbility<Health>();
+                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && cachedAttack.CachedAgentValid(other);
+                    };
+                }
+                else
+                {
+                    agentConditional = (other) =>
+                    {
+                        Health health = other.GetAbility<Health>();
+                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && cachedAttack.CachedAgentValid(other);
+                    };
+                }
+                return agentConditional;
             }
         }
 

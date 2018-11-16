@@ -106,13 +106,14 @@ public class UserInputHelper : BehaviourHelper
             Setup();
         SelectionManager.Initialize();
         RTSInterfacing.Initialize();
+        ConstructionHandler.Initialize();
         IsGathering = false;
         CurrentInterfacer = null;
     }
 
     protected override void OnVisualize()
     {
-        if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
+        if (ConstructionHandler.IsFindingBuildingLocation())
         {
             SelectionManager.CanBox = false;
         }
@@ -124,6 +125,8 @@ public class UserInputHelper : BehaviourHelper
         SelectionManager.Update();
         //Update RTSInterfacing, a useful tool that automatically generates useful data for user-interfacing
         RTSInterfacing.Visualize();
+        //Update Construction handler which handles placing buildings on a grid
+        ConstructionHandler.Visualize();
 
         if (IsGathering)
         {
@@ -208,10 +211,10 @@ public class UserInputHelper : BehaviourHelper
                         switch (inputKey.Key)
                         {
                             case UserInputKeyMappings.RotateLeftShortCut:
-                                PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
+                                ConstructionHandler.HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
                                 break;
                             case UserInputKeyMappings.RotateRightShortCut:
-                                PlayerManager.MainController.GetCommanderBuilderManager().HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
+                                ConstructionHandler.HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
                                 break;
                             default:
                                 break;
@@ -352,11 +355,11 @@ public class UserInputHelper : BehaviourHelper
     {
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
         {
-            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
+            if (ConstructionHandler.IsFindingBuildingLocation())
             {
-                if (PlayerManager.MainController.GetCommanderBuilderManager().CanPlaceBuilding())
+                if (ConstructionHandler.CanPlaceStructure())
                 {
-                    PlayerManager.MainController.GetCommanderBuilderManager().StartConstruction();
+                    ConstructionHandler.StartConstruction();
                 }
             }
             else
@@ -387,9 +390,9 @@ public class UserInputHelper : BehaviourHelper
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
             && Selector.MainSelectedAgent)
         {
-            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
+            if (ConstructionHandler.IsFindingBuildingLocation())
             {
-                PlayerManager.MainController.GetCommanderBuilderManager().CancelBuildingPlacement();
+                ConstructionHandler.CancelBuildingPlacement();
             }
             else
             {
@@ -462,31 +465,17 @@ public class UserInputHelper : BehaviourHelper
         }
     }
 
-    private void HandleRotationTap()
-    {
-        if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
-        {
-
-        }
-    }
-
     private void MouseHover()
     {
-        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
-        {
-            if (PlayerManager.MainController.GetCommanderBuilderManager().IsFindingBuildingLocation())
-            {
-                PlayerManager.MainController.GetCommanderBuilderManager().FindBuildingLocation();
-            }
-            else if (Selector.MainSelectedAgent
+        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
+            && Selector.MainSelectedAgent
                 && Selector.MainSelectedAgent.IsActive
                 && Selector.MainSelectedAgent.GetAbility<Move>()
                 && Selector.MainSelectedAgent.GetAbility<Move>().CanMove
                 && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController)
                 && !SelectionManager.MousedAgent)
-            {
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Move);
-            }
+        {
+            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Move);
         }
     }
 

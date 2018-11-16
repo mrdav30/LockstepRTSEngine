@@ -14,7 +14,6 @@ namespace RTSLockstep
 			{
 				helper.EarlyInitialize();
 			}
-
 		}
 
 		public static void LateInitialize()

@@ -175,7 +175,7 @@ namespace RTSLockstep
 			PhysicsManager.Initialize ();
 			PlayerManager.Initialize ();
 
-            GridBuilder.Initialize();
+         //   GridBuilder.Initialize();
 
             //Initialized in UserInputHelper
             //	SelectionManager.Initialize ();

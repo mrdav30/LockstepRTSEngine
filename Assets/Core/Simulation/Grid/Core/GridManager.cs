@@ -121,14 +121,12 @@ namespace RTSLockstep
 			//Debug.Log ("Grid generated using " + usedMem + " Bytes!");
 		}
 		
-
         public static int GenerateDeltaCount(int size)
         {
             long fixSize = FixedMath.Create(size);
             int ret = FixedMath.Mul(FixedMath.Mul(fixSize, fixSize), FixedMath.Pi).CeilToInt();
             return ret;
         }
-
 
         public static void Setup () {
             //Nothing here to see
@@ -194,7 +192,6 @@ namespace RTSLockstep
 		{
 			return index >= 0 && index < GridSize;
 		}
-
 
         public static Vector2d GetOffsettedPos (Vector2d worldPos)
         {

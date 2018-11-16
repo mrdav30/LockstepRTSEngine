@@ -1,141 +1,147 @@
 ﻿using RTSLockstep;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using UnityEngine;
 
 public static class GridBuilder
 {
-	public static IBuildable Target { get; private set; }
-	public static bool IsMovingBuilding { get; private set; }
+    public static IBuildable Target { get; private set; }
+    public static bool IsMovingBuilding { get; private set; }
 
-	#region Setup
-	private static void SetTarget(IBuildable buildable)
-	{
-		Target = buildable;
-	}
+    private static bool TargetOriginalValid { get; set; }
+    private static Coordinate TargetOriginalPosition { get; set; }
+    public static Coordinate GetTargetOriginalPosition { get { return TargetOriginalPosition; } }
 
-	public static void Initialize()
-	{
-		BuildGridAPI.Initialize();
-		Reset();
-	}
+    #region Setup
+    private static void SetTarget(IBuildable buildable)
+    {
+        Target = buildable;
+    }
 
-	public static void Reset()
-	{
-		ClearTarget();
-		IsMovingBuilding = false;
-	}
+    public static void Initialize()
+    {
+        BuildGridAPI.Initialize();
+        Reset();
+    }
 
-	public static void ClearTarget()
-	{
-		Target = null;
-	}
-	#endregion
+    public static void Reset()
+    {
+        Debug.Log("Build grid reset");
+        ClearTarget();
+        IsMovingBuilding = false;
+    }
 
-	#region Placing
-	public static bool Place(IBuildable buildable, Vector2d newPos)
-	{
-		SetTarget(buildable);
-		StartPlace();
-		UpdatePlace(newPos);
-		return EndPlace();
-	}
+    public static void ClearTarget()
+    {
+        Target = null;
+    }
+    #endregion
 
-	private static void StartPlace()
-	{
-		Target.IsMoving = true;
-	}
+    #region Placing
+    public static bool Place(IBuildable buildable, Vector2d newPos)
+    {
+        SetTarget(buildable);
+        StartPlace();
+        UpdatePlace(newPos);
+        return EndPlace();
+    }
 
-	private static bool UpdatePlace(Vector2d newPos)
-	{
-		Coordinate coor = BuildGridAPI.ToGridPos(newPos);
-		Target.GridPosition = coor;
-		bool canPlace = BuildGridAPI.CanBuild(coor, Target);
-		Target.IsValidOnGrid = (canPlace);
-		return canPlace;
-	}
+    private static void StartPlace()
+    {
+        Target.IsMoving = true;
+    }
 
-	private static bool EndPlace()
-	{
-		Coordinate coor = Target.GridPosition;
-		bool canBuild = (BuildGridAPI.Construct(coor, Target));
-		Target.IsValidOnGrid = (canBuild);
-		Target.IsMoving = false;
-		return canBuild;
-	}
-	#endregion
+    private static bool UpdatePlace(Vector2d newPos)
+    {
+        Coordinate coor = BuildGridAPI.ToGridPos(newPos);
+        Target.GridPosition = coor;
+        bool canPlace = BuildGridAPI.CanBuild(coor, Target);
+        Target.IsValidOnGrid = (canPlace);
+        return canPlace;
+    }
 
-	#region Moving
-	private static bool TargetOriginalValid { get; set; }
-	private static Coordinate TargetOriginalPosition { get; set; }
-	public static Coordinate GetTargetOriginalPosition { get { return TargetOriginalPosition; } }
+    private static bool EndPlace()
+    {
+        Coordinate coor = Target.GridPosition;
+        bool canBuild = (BuildGridAPI.Construct(coor, Target));
+        Target.IsValidOnGrid = (canBuild);
+        Target.IsMoving = false;
+        return canBuild;
+    }
+    #endregion
 
-	public static void StartMove(IBuildable buildable)
-	{
-		SetTarget(buildable);
-		StartPlace();
-		TargetOriginalValid = Target.IsValidOnGrid;
-		TargetOriginalPosition = Target.GridPosition;
-		if (TargetOriginalValid)
-		{
-			BuildGridAPI.Unbuild(TargetOriginalPosition, Target);
-		}
-		IsMovingBuilding = true;
-	}
+    #region Moving
+    public static void StartMove(IBuildable buildable)
+    {
+        SetTarget(buildable);
+        StartPlace();
+        TargetOriginalValid = Target.IsValidOnGrid;
+        TargetOriginalPosition = Target.GridPosition;
+        if (TargetOriginalValid)
+        {
+            BuildGridAPI.Unbuild(TargetOriginalPosition, Target);
+        }
+        IsMovingBuilding = true;
+    }
 
-	/// <summary>
-	/// Moves the target buildable and returns whether or not its new position is a valid place to build.
-	/// </summary>
-	/// <param name="newPos">New position.</param>
-	public static bool UpdateMove(Vector2d newPos)
-	{
-		if (IsMovingBuilding == false) throw new System.Exception("Building move must be started before being updated");
-		return UpdatePlace(newPos);
-	}
+    /// <summary>
+    /// Moves the target buildable and returns whether or not its new position is a valid place to build.
+    /// </summary>
+    /// <param name="newPos">New position.</param>
+    public static bool UpdateMove(Vector2d newPos)
+    {
+        if (IsMovingBuilding == false) throw new System.Exception("Building move must be started before being updated");
+        return UpdatePlace(newPos);
+    }
 
-	/// <summary>
-	/// Returns whether or not the buildable could be built on where its movement ends.
-	/// If not, the buildable is returned to its previous position.
-	/// </summary>
-	/// <returns><c>true</c>, if move was ended, <c>false</c> otherwise.</returns>
-	public static PlacementResult EndMove()
-	{
-		IsMovingBuilding = false;
-		if (EndPlace())
-		{
-			return PlacementResult.Placed;
-		}
-		if (TargetOriginalValid)
-		{
-			Target.GridPosition = TargetOriginalPosition;
-			BuildGridAPI.Construct(TargetOriginalPosition, Target);
-			Target.IsValidOnGrid = true;
-			return PlacementResult.Returned;
-		}
-		else {
-			return PlacementResult.Limbo;
-		}
-		//return PlacementResult.Returned;
-	}
-	#endregion
+    /// <summary>
+    /// Returns whether or not the buildable could be built on where its movement ends.
+    /// If not, the buildable is returned to its previous position.
+    /// </summary>
+    /// <returns><c>true</c>, if move was ended, <c>false</c> otherwise.</returns>
+    public static PlacementResult EndMove()
+    {
+        IsMovingBuilding = false;
+        if (EndPlace())
+        {
+            return PlacementResult.Placed;
+        }
 
-	#region Unbuilding
-	public static void Unbuild(IBuildable buildable)
-	{
-		BuildGridAPI.Unbuild(buildable.GridPosition, buildable);
-	}
-	#endregion
+        if (TargetOriginalValid)
+        {
+            Target.GridPosition = TargetOriginalPosition;
+            BuildGridAPI.Construct(TargetOriginalPosition, Target);
+            Target.IsValidOnGrid = true;
+            return PlacementResult.Returned;
+        }
+        else
+        {
+            return PlacementResult.Limbo;
+        }
+        //return PlacementResult.Returned;
+    }
+    #endregion
+
+    #region Unbuilding
+    public static void Unbuild(IBuildable buildable)
+    {
+        Debug.Log("unbuild");
+        BuildGridAPI.Unbuild(buildable.GridPosition, buildable);
+    }
+    #endregion
 
 
-	public static IEnumerable<IBuildable> GetOccupyingBuildings(IBuildable buildable)
-	{
-		foreach (var obj in BuildGridAPI.MainBuildGrid.GetOccupyingBuildables(buildable))
-		{
-			yield return obj;
-		}
-	}
-	public enum PlacementResult
-	{
-		Placed,
-		Returned,
-		Limbo
-	}
+    public static IEnumerable<IBuildable> GetOccupyingBuildings(IBuildable buildable)
+    {
+        foreach (var obj in BuildGridAPI.MainBuildGrid.GetOccupyingBuildables(buildable))
+        {
+            yield return obj;
+        }
+    }
+}
+
+public enum PlacementResult
+{
+    Placed,
+    Returned,
+    Limbo
 }

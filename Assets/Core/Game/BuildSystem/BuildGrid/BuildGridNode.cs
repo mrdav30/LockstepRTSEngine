@@ -10,7 +10,7 @@
 		public BuildGridManager ParentGrid { get; private set; }
 		public Coordinate Position { get; private set; }
 		public bool Occupied { get { return RegisteredBuilding != null; } }
-		public RTSLockstep.IBuildable RegisteredBuilding { get; set;}
+		public IBuildable RegisteredBuilding { get; set;}
 		public bool IsNeighbor
 		{
 			get

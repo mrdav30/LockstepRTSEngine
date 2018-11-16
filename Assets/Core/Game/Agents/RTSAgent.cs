@@ -189,7 +189,6 @@ namespace RTSLockstep
 
         public bool _provisioned { get; private set; }
         private Rect _playingArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
-        private List<Material> oldMaterials = new List<Material>();
         private bool loadedSavedValues = false;
         private AgentCommander _cachedCommander;
         #endregion
@@ -526,35 +525,6 @@ namespace RTSLockstep
             foreach (TeamColor teamColor in teamColors)
             {
                 teamColor.GetComponent<Renderer>().material.color = _cachedCommander.teamColor;
-            }
-        }
-
-        public void SetTransparentMaterial(Material material, bool storeExistingMaterial)
-        {
-            if (storeExistingMaterial)
-            {
-                oldMaterials.Clear();
-            }
-            Renderer[] renderers = GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers)
-            {
-                if (storeExistingMaterial)
-                {
-                    oldMaterials.Add(renderer.material);
-                }
-                renderer.material = material;
-            }
-        }
-
-        public void RestoreMaterials()
-        {
-            Renderer[] renderers = GetComponentsInChildren<Renderer>();
-            if (oldMaterials.Count == renderers.Length)
-            {
-                for (int i = 0; i < renderers.Length; i++)
-                {
-                    renderers[i].material = oldMaterials[i];
-                }
             }
         }
 

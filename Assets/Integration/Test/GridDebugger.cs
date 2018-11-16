@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace RTSLockstep
 {
@@ -29,34 +28,40 @@ namespace RTSLockstep
                         DrawPathfinding();
                         break;
                     case GridType.Building:
-                        DrawBuilding ();
+                        DrawBuilding();
                         break;
                 }
             }
         }
 
         private Vector3 nodeScale;
-        void DrawBuilding () {
+        void DrawBuilding()
+        {
             int length = BuildGridAPI.MainBuildGrid.GridLength;
-            for (int i = 0; i < length; i++) {
-                for (int j = 0; j < length; j++) {
-                    BuildGridNode node = BuildGridAPI.MainBuildGrid.Grid[i,j];
-                    if (node.Occupied) {
+            for (int i = 0; i < length; i++)
+            {
+                for (int j = 0; j < length; j++)
+                {
+                    BuildGridNode node = BuildGridAPI.MainBuildGrid.Grid[i, j];
+                    if (node.Occupied)
+                    {
                         Gizmos.color = Color.red;
                     }
-                    else {
+                    else
+                    {
                         Gizmos.color = Color.green;
                     }
-                    Gizmos.DrawCube(BuildGridAPI.ToWorldPos(new Coordinate(i,j)).ToVector3(), nodeScale);
+                    Gizmos.DrawCube(BuildGridAPI.ToWorldPos(new Coordinate(i, j)).ToVector3(), nodeScale);
                 }
             }
         }
+
         void DrawPathfinding()
         {
             for (int i = 0; i < GridManager.GridSize; i++)
             {
                 //Gets every pathfinding node and shows the draws a cube for the node
-                GridNode node = GridManager.Grid [i];
+                GridNode node = GridManager.Grid[i];
                 //Color depends on whether or not the node is walkable
                 //Red = Unwalkable, Green = Walkable
                 if (node.Unwalkable)
@@ -65,12 +70,13 @@ namespace RTSLockstep
                     Gizmos.color = Color.green; //I'm part colorblind... grey doesn't work very well with red
                 Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
 
-				if (node.ClearanceSource != GridNode.DEFAULT_SOURCE) {
-					#if UNITY_EDITOR
-					UnityEditor.Handles.color = Color.red;
-					UnityEditor.Handles.Label (node.WorldPos.ToVector3 (LeHeight), "d" + node.ClearanceDegree.ToString ());
-					#endif
-				}
+                if (node.ClearanceSource != GridNode.DEFAULT_SOURCE)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.Handles.color = Color.red;
+                    UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());
+#endif
+                }
             }
         }
 

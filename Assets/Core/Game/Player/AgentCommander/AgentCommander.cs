@@ -8,7 +8,6 @@ public class AgentCommander : BehaviourHelper
     public string username;
     public bool human;
     public HUD CachedHud { get; private set; }
-    public BuildManager CachedBuilderManager { get; private set; }
     public ResourceManager CachedResourceManager { get; private set; }
     private AgentController _cachedController;
 
@@ -21,11 +20,9 @@ public class AgentCommander : BehaviourHelper
     {
         CachedResourceManager = GetComponentInParent<ResourceManager>();
         CachedHud = GetComponentInParent<HUD>();
-        CachedBuilderManager = GetComponentInParent<BuildManager>();
 
         CachedResourceManager.Setup();
         CachedHud.Setup();
-        CachedBuilderManager.Setup();
 
         Setted = true;
     }
@@ -36,6 +33,7 @@ public class AgentCommander : BehaviourHelper
         if (!Setted)
             Setup();
         CachedResourceManager.Initialize();
+     //   CachedBuilderManager.Initialize();
     }
 
     // Update is called once per frame
@@ -45,7 +43,7 @@ public class AgentCommander : BehaviourHelper
         {
             CachedResourceManager.Visualize();
             CachedHud.Visualize();
-            CachedBuilderManager.Visualize();
+          //  CachedBuilderManager.Visualize();
         }
     }
 
@@ -155,6 +153,7 @@ public class AgentCommander : BehaviourHelper
     #endregion
 
     #region Private
+    //this should be in the controller...
     private void LoadRTSAgents(JsonTextReader reader)
     {
         if (reader == null)
@@ -182,11 +181,6 @@ public class AgentCommander : BehaviourHelper
                     agent.transform.parent = agents.transform;
                     agent.SetCommander(this);
                     agent.SetTeamColor();
-
-                    if (agent.GetAbility<Structure>().UnderConstruction())
-                    {
-                        agent.SetTransparentMaterial(CachedBuilderManager.allowedMaterial, true);
-                    }
                 }
             }
             else if (reader.TokenType == JsonToken.EndArray)

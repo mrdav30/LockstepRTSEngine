@@ -21,6 +21,7 @@ public class HUD : MonoBehaviour
     public Texture2D rallyPointCursor;
     public Texture2D healthy, damaged, critical;
     public Texture2D[] resourceHealthBars;
+    public Material notAllowedMaterial, allowedMaterial;
     public GUISkin playerDetailsSkin;
     public AudioClip clickSound;
     public float clickVolume = 1.0f;
@@ -460,7 +461,7 @@ public class HUD : MonoBehaviour
             SetCursorState(CursorState.Pointer);
         }
 
-        if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+        if (!ConstructionHandler.IsFindingBuildingLocation())
         {
             GUI.skin = mouseCursorSkin;
             GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
@@ -552,7 +553,7 @@ public class HUD : MonoBehaviour
                         if (agent.MyAgentType == AgentType.Unit 
                             && agent.GetAbility<Construct>())
                         {
-                            cachedCommander.CachedBuilderManager.CreateBuilding(agent, actions[i]);
+                            ConstructionHandler.CreateBuilding(agent, actions[i]);
                         }
                         else if (agent.MyAgentType == AgentType.Building 
                             && !agent.GetAbility<Structure>().UnderConstruction()

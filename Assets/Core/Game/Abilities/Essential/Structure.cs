@@ -3,10 +3,26 @@ using UnityEngine;
 
 namespace RTSLockstep
 {
-    public class Structure : Ability
+    public class Structure : Ability, IBuildable
     {
         public bool provisioner;
         public int provisionAmount;
+        public GameObject tempStructure;
+        [SerializeField]
+        private int _buildSize;
+
+        /// <summary>
+        /// Describes the width and height of the buildable. This value does not change on the buildable.
+        /// </summary>
+        /// <value>The size of the build.</value>
+        public int BuildSize { get { return _buildSize; } }
+
+        public Coordinate GridPosition { get; set; }
+        /// <summary>
+        /// Function that relays to the buildable whether or not it's on a valid building spot.
+        /// </summary>
+        public bool IsValidOnGrid { get; set; }
+        public bool IsMoving { get; set; }
 
         private bool _needsBuilding;
         private bool _needsRepair;
@@ -19,6 +35,8 @@ namespace RTSLockstep
         {
             cachedHealth = Agent.GetAbility<Health>();
             cachedSpawner = Agent.GetAbility<Spawner>();
+
+            upgradeLevel = 1;
         }
 
         protected override void OnInitialize()
@@ -26,8 +44,6 @@ namespace RTSLockstep
             _needsBuilding = false;
             _needsRepair = false;
             _provisioned = false;
-
-            upgradeLevel = 1;
         }
 
         protected override void OnSimulate()
@@ -86,6 +102,12 @@ namespace RTSLockstep
             return this.upgradeLevel;
         }
 
+        public void SetGridPosition(Vector2d pos)
+        {
+            Coordinate coord = new Coordinate(pos.x.ToInt(), pos.y.ToInt());
+            GridPosition = coord;
+        }
+
         protected override void OnDeactivate()
         {
             if (provisioner)
@@ -120,6 +142,11 @@ namespace RTSLockstep
                     Agent.SetPlayingArea(LoadManager.LoadRect(reader));
                     break;
                 default: break;
+            }
+
+            if (_needsBuilding)
+            {
+                ConstructionHandler.SetTransparentMaterial(Agent.gameObject, Agent.GetCommander().CachedHud.allowedMaterial, true);
             }
         }
     }

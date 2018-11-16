@@ -291,10 +291,10 @@ namespace RTSLockstep
             return _commander.transform.GetComponentInChildren<HUD>();
         }
 
-        public BuildManager GetCommanderBuilderManager()
-        {
-            return _commander.transform.GetComponentInChildren<BuildManager>();
-        }
+        //public ConstructionHandler GetCommanderBuilderManager()
+        //{
+        //    return _commander.transform.GetComponentInChildren<ConstructionHandler>();
+        //}
 
         public static AgentController GetInstanceManager(int index)
         {
