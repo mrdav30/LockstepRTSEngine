@@ -602,7 +602,7 @@ MonoBehaviour:
   provisionAmount: 0
   tempStructure: {fileID: 1496648592488480, guid: 6da9b120afaf44f46bf1caabe2983881,
     type: 2}
-  _buildSize: 5
+  _buildSize: 4
 --- !u!114 &114279839518768826
 MonoBehaviour:
   m_ObjectHideFlags: 1

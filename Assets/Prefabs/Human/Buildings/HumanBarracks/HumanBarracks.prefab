@@ -2380,6 +2380,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provisioner: 0
   provisionAmount: 0
+  tempStructure: {fileID: 1527426487528806, guid: 9f428967f6ce17a4e86373516dc6ee35,
+    type: 2}
+  _buildSize: 5
 --- !u!114 &114759572138077454
 MonoBehaviour:
   m_ObjectHideFlags: 1

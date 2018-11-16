@@ -6,11 +6,11 @@ using UnityEngine;
 public static class ConstructionHandler
 {
     #region Properties
-    private static GameObject tempBuilding;
+    private static GameObject tempStructure;
     private static RTSAgent tempCreator;
     private static bool findingPlacement = false;
     private static AgentCommander _cachedCommander;
-    private static bool _canPlace;
+    private static bool _validPlacement;
     private static List<Material> oldMaterials = new List<Material>();
     #endregion
 
@@ -25,14 +25,17 @@ public static class ConstructionHandler
     {
         if (findingPlacement)
         {
-            FindBuildingLocation();
-            if (_canPlace)
+            if (!_cachedCommander.CachedHud._mouseOverHud)
             {
-                SetTransparentMaterial(tempBuilding, _cachedCommander.CachedHud.allowedMaterial, false);
-            }
-            else
-            {
-                SetTransparentMaterial(tempBuilding, _cachedCommander.CachedHud.notAllowedMaterial, false);
+                FindBuildingLocation();
+                if (_validPlacement)
+                {
+                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, false);
+                }
+                else
+                {
+                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.notAllowedMaterial, false);
+                }
             }
         }
     }
@@ -62,23 +65,23 @@ public static class ConstructionHandler
             }
             else
             {
-                tempBuilding = Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure) as GameObject;
+                tempStructure = Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure) as GameObject;
 
-                if (tempBuilding.GetComponent<TempStructure>())
+                if (tempStructure.GetComponent<TempStructure>())
                 {
-                    tempBuilding.name = buildingName;
-                    tempBuilding.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
+                    tempStructure.name = buildingName;
+                    tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                     // retrieve build size from agent template
-                    tempBuilding.GetComponent<TempStructure>().BuildSize = buildingTemplate.GetComponent<Structure>().BuildSize;
-                    GridBuilder.StartMove(tempBuilding.GetComponent<TempStructure>());
+                    tempStructure.GetComponent<TempStructure>().BuildSize = buildingTemplate.GetComponent<Structure>().BuildSize;
+                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
                     tempCreator = creator;
-                    SetTransparentMaterial(tempBuilding, _cachedCommander.CachedHud.allowedMaterial, true);
+                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, true);
 
                     findingPlacement = true;
                 }
                 else
                 {
-                    Object.Destroy(tempBuilding);
+                    Object.Destroy(tempStructure);
                 }
             }
         }
@@ -92,15 +95,15 @@ public static class ConstructionHandler
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
-        if (findingPlacement && tempBuilding)
+        if (findingPlacement && tempStructure)
         {
             switch (direction)
             {
                 case UserInputKeyMappings.RotateLeftShortCut:
-                    tempBuilding.transform.Rotate(0, 90, 0);
+                    tempStructure.transform.Rotate(0, 90, 0);
                     break;
                 case UserInputKeyMappings.RotateRightShortCut:
-                    tempBuilding.transform.Rotate(0, -90, 0);
+                    tempStructure.transform.Rotate(0, -90, 0);
                     break;
                 default:
                     break;
@@ -113,23 +116,37 @@ public static class ConstructionHandler
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
         if (RTSInterfacing.HitPointIsGround(Input.mousePosition))
         {
-            tempBuilding.transform.position = Positioning.GetSnappedPosition(newLocation);
-            Vector2d pos = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-            _canPlace = GridBuilder.UpdateMove(pos);
+            if (!GridBuilder.IsMovingBuilding)
+            {
+                GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+            }
+            tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+            Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+            _validPlacement = GridBuilder.UpdateMove(pos);
         }
     }
 
     public static bool CanPlaceStructure()
     {
-        return _canPlace;
+        if (GridBuilder.EndMove() == PlacementResult.Placed)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public static void StartConstruction()
     {
         findingPlacement = false;
-        Vector2d buildPoint = new Vector2d(tempBuilding.transform.position.x, tempBuilding.transform.position.z);
-        RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempBuilding.gameObject.name, buildPoint, new Vector2d(0, tempBuilding.transform.rotation.y)) as RTSAgent;
-        Object.Destroy(tempBuilding.gameObject);
+        Vector2d buildPoint = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+        RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempStructure.gameObject.name, buildPoint, new Vector2d(0, tempStructure.transform.rotation.y)) as RTSAgent;
+
+        // remove temporary structure from grid
+        GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
+        Object.Destroy(tempStructure.gameObject);
 
         if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), buildPoint))
         {
@@ -156,8 +173,8 @@ public static class ConstructionHandler
     public static void CancelBuildingPlacement()
     {
         findingPlacement = false;
-        Object.Destroy(tempBuilding.gameObject);
-        tempBuilding = null;
+        Object.Destroy(tempStructure.gameObject);
+        tempStructure = null;
         tempCreator = null;
     }
 

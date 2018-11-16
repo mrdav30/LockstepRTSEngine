@@ -25,7 +25,6 @@ public static class GridBuilder
 
     public static void Reset()
     {
-        Debug.Log("Build grid reset");
         ClearTarget();
         IsMovingBuilding = false;
     }
@@ -124,7 +123,6 @@ public static class GridBuilder
     #region Unbuilding
     public static void Unbuild(IBuildable buildable)
     {
-        Debug.Log("unbuild");
         BuildGridAPI.Unbuild(buildable.GridPosition, buildable);
     }
     #endregion

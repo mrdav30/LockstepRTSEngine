@@ -627,7 +627,6 @@ namespace RTSLockstep
         readonly bool paused;
         private void HandleCollision(LSBody other)
         {
-            Debug.Log("move collision");
             if (!CanMove)
             {
                 return;
