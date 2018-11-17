@@ -79,11 +79,11 @@ namespace RTSLockstep
                 }
             }
         }
+    }
 
-        public enum GridType
-        {
-            Pathfinding,
-            Building,
-        }
+    public enum GridType
+    {
+        Building,
+        Pathfinding
     }
 }

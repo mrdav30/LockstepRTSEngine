@@ -7,11 +7,12 @@
 	    /// Describes the width and height of the buildable. This value does not change on the buildable.
 	    /// </summary>
 	    /// <value>The size of the build.</value>
-	    int BuildSize { get; }
-	    /// <summary>
-	    /// Function that relays to the buildable whether or not it's on a valid building spot.
-	    /// </summary>
-	    bool IsValidOnGrid { get; set; }
+	    int BuildSizeLow { get; }
+        int BuildSizeHigh { get; }
+        /// <summary>
+        /// Function that relays to the buildable whether or not it's on a valid building spot.
+        /// </summary>
+        bool IsValidOnGrid { get; set; }
 	    bool IsMoving { get; set; }
     }
 }

@@ -8,14 +8,17 @@ namespace RTSLockstep
         public bool provisioner;
         public int provisionAmount;
         public GameObject tempStructure;
-        [SerializeField]
-        private int _buildSize;
-
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
         /// </summary>
         /// <value>The size of the build.</value>
-        public int BuildSize { get { return _buildSize; } }
+        [SerializeField]
+        private int _buildSizeLow;
+        [SerializeField]
+        private int _buildSizeHigh;
+
+        public int BuildSizeLow { get { return _buildSizeLow; } }
+        public int BuildSizeHigh { get { return _buildSizeHigh; } }
 
         public Coordinate GridPosition { get; set; }
         /// <summary>

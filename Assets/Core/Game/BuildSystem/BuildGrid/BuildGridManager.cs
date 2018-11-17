@@ -40,7 +40,7 @@ public class BuildGridManager
 
     public IEnumerable<IBuildable> GetOccupyingBuildables(IBuildable buildable)
     {
-        if (!CanBuild(buildable.GridPosition, buildable.BuildSize))
+        if (!CanBuild(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
@@ -56,7 +56,7 @@ public class BuildGridManager
 
     public bool Construct(IBuildable buildable)
     {
-        if (CanBuild(buildable.GridPosition, buildable.BuildSize))
+        if (CanBuild(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
@@ -70,7 +70,7 @@ public class BuildGridManager
 
     public void Unbuild(IBuildable buildable)
     {
-        if (TryGetBuildCoordinates(buildable.GridPosition, buildable.BuildSize, bufferBuildCoordinates))
+        if (TryGetBuildCoordinates(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
@@ -89,13 +89,13 @@ public class BuildGridManager
 
     }
 
-    public bool CanBuild(Coordinate position, int size)
+    public bool CanBuild(Coordinate position, int sizeLow, int sizeHigh)
     {
-        if (TryGetBuildCoordinates(position, size, bufferBuildCoordinates) == false)
+        if (TryGetBuildCoordinates(position, sizeLow, sizeHigh, bufferBuildCoordinates) == false)
         {
             return false;
         }
-        this.GetSpacedNeighborCoordinates(position, size, this.bufferNeighborCoordinates);
+        this.GetSpacedNeighborCoordinates(position, sizeLow, sizeHigh, this.bufferNeighborCoordinates);
         for (int i = 0; i < this.bufferNeighborCoordinates.Count; i++)
         {
             Coordinate coor = this.bufferNeighborCoordinates[i];
@@ -155,51 +155,63 @@ public class BuildGridManager
         return value >= 0 && value < GridLength;
     }
 
-    private bool TryGetBuildCoordinates(Coordinate position, int size, FastList<Coordinate> output)
+    private bool TryGetBuildCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
     {
-        int half = size / 2;
-        int lowX = half, lowY = half;
-        int highX = half + 1, highY = half + 1;
+        int halfLow = sizeLow / 2;
+        int halfHigh = sizeHigh / 2;
 
-        if (size % 2 == 0)
+        int lowX = halfLow, lowY = halfHigh;
+        int highX = halfLow, highY = halfHigh;
+
+        if (sizeLow % 2 == 0)
         {
-            highX -= 1;
-            highY -= 1;
+            lowX -= 1;
+            lowY -= 1;
         }
+
         lowX = position.x - lowX;
         if (!IsOnGrid(lowX))
             return false;
-        highX = position.x + highX;
-        if (!IsOnGrid(highX))
-            return false;
         lowY = position.y - lowY;
         if (!IsOnGrid(lowY))
+            return false;
+        highX = position.x + highX;
+        if (!IsOnGrid(highX))
             return false;
         highY = position.y + highY;
         if (!IsOnGrid(highY))
             return false;
 
+        int width = highX - lowX;
+        int height = highY - lowY;
+
         output.FastClear();
-        for (int x = lowX; x <= highX; x++)
+
+        for (int x = 0; x <= width; x++)
         {
-            for (int y = lowY; y <= highY; y++)
+            for (int y = 0; y <= height; y++)
             {
-                output.Add(new Coordinate(x, y));
+                output.Add(new Coordinate(lowX + x, lowY + y));
             }
         }
 
         return true;
     }
 
-    public void GetSpacedNeighborCoordinates(Coordinate position, int size, FastList<Coordinate> output)
+    public void GetSpacedNeighborCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
     {
-        int half = size / 2;
-        int lowX = half, highX = half + 1, lowY = half, highY = half + 1;
-        if (size % 2 == 0)
+        int halfLow = sizeLow / 2;
+        int halfHigh = sizeHigh / 2;
+
+        int lowX = halfLow, lowY = halfHigh;
+        int highX = halfLow, highY = halfHigh;
+
+        if (sizeLow % 2 == 0)
         {
-            highX -= 1;
-            highY -= 1;
+            lowX -= 1;
+            lowY -= 1;
         }
+
         lowX = position.x - lowX;
         highX = position.x + highX;
         lowY = position.y - lowY;

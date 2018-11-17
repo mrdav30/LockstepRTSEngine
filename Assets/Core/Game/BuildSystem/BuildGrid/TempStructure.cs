@@ -7,7 +7,8 @@ public class TempStructure : MonoBehaviour, IBuildable
     /// Describes the width and height of the buildable. This value does not change on the buildable.
     /// </summary>
     /// <value>The size of the build.</value>
-    public int BuildSize { get; set; }
+    public int BuildSizeLow { get; set; }
+    public int BuildSizeHigh { get; set; }
 
     public Coordinate GridPosition { get; set; }
     /// <summary>

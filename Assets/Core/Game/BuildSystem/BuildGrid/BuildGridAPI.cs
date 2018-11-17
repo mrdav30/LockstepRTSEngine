@@ -30,7 +30,7 @@ public static class BuildGridAPI
     }
     internal static bool CanBuild(Coordinate buildPos, IBuildable building)
     {
-        return MainBuildGrid.CanBuild(buildPos, building.BuildSize);
+        return MainBuildGrid.CanBuild(buildPos, building.BuildSizeLow, building.BuildSizeHigh);
     }
 
     public static Coordinate ToGridPos(Vector2d worldPos)

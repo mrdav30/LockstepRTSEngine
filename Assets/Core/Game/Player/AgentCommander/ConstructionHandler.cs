@@ -72,7 +72,8 @@ public static class ConstructionHandler
                     tempStructure.name = buildingName;
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                     // retrieve build size from agent template
-                    tempStructure.GetComponent<TempStructure>().BuildSize = buildingTemplate.GetComponent<Structure>().BuildSize;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
                     GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
                     tempCreator = creator;
                     SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, true);
@@ -143,6 +144,7 @@ public static class ConstructionHandler
     {
         findingPlacement = false;
         Vector2d buildPoint = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+        var test = tempStructure.transform.rotation;
         RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempStructure.gameObject.name, buildPoint, new Vector2d(0, tempStructure.transform.rotation.y)) as RTSAgent;
 
         // remove temporary structure from grid
