@@ -7,9 +7,14 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempStructure;
+    private static AgentTag tempStructureTag;
     private static Vector3 lastLocation;
-    private static RTSAgent tempCreator;
+    private static RTSAgent tempConstructor;
     private static bool findingPlacement = false;
+    private static bool placingWall = false;
+
+    private static bool _dragging = false;
+
     private static AgentCommander _cachedCommander;
     private static bool _validPlacement;
     private static List<Material> oldMaterials = new List<Material>();
@@ -18,6 +23,7 @@ public static class ConstructionHandler
     public static void Initialize()
     {
         _cachedCommander = PlayerManager.MainController.Commander;
+        UserInputHelper.OnLeftTapHoldDown += HandleLeftTapHoldDown;
         GridBuilder.Initialize();
     }
 
@@ -28,7 +34,13 @@ public static class ConstructionHandler
         {
             if (!_cachedCommander.CachedHud._mouseOverHud)
             {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    _dragging = false;
+                }
+
                 FindBuildingLocation();
+
                 if (_validPlacement)
                 {
                     SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, false);
@@ -41,17 +53,17 @@ public static class ConstructionHandler
         }
     }
 
-    public static void CreateBuilding(RTSAgent agent, string buildingName)
+    public static void CreateBuilding(RTSAgent constructor, string buildingName)
     {
-        Vector2d buildPoint = new Vector2d(agent.transform.position.x, agent.transform.position.z + 10);
+        Vector2d buildPoint = new Vector2d(constructor.transform.position.x, constructor.transform.position.z + 10);
         if (_cachedCommander)
         {
             //cleanup later...
-            CreateBuilding(buildingName, buildPoint, agent, agent.GetPlayerArea());
+            CreateBuilding(buildingName, buildPoint, constructor, constructor.GetPlayerArea());
         }
     }
 
-    public static void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent creator, Rect playingArea)
+    public static void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent constructor, Rect playingArea)
     {
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
 
@@ -65,18 +77,26 @@ public static class ConstructionHandler
             }
             else
             {
-                tempStructure = Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure) as GameObject;
+                tempStructure = Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
-                    tempStructure.name = buildingName;
+                    tempStructure.name = buildingTemplate.GetComponent<Structure>().tempStructure.gameObject.name;
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
+
                     // retrieve build size from agent template
                     tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
                     tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
                     GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
-                    tempCreator = creator;
+
+                    tempStructureTag = buildingTemplate.Tag;
+                    tempConstructor = constructor;
                     SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, true);
+
+                    if (tempStructureTag == AgentTag.Wall)
+                    {
+                       // placingWall = true;
+                    }
 
                     findingPlacement = true;
                 }
@@ -96,15 +116,23 @@ public static class ConstructionHandler
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
-        if (findingPlacement && tempStructure)
+        if (findingPlacement
+            && tempStructure
+            && tempStructureTag != AgentTag.Wall)
         {
+            int prevLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
+            int prevhigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
             switch (direction)
             {
                 case UserInputKeyMappings.RotateLeftShortCut:
                     tempStructure.transform.Rotate(0, 90, 0);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = prevhigh;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = prevLow;
                     break;
                 case UserInputKeyMappings.RotateRightShortCut:
                     tempStructure.transform.Rotate(0, -90, 0);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = prevhigh;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = prevLow;
                     break;
                 default:
                     break;
@@ -115,40 +143,68 @@ public static class ConstructionHandler
     public static void FindBuildingLocation()
     {
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        if (RTSInterfacing.HitPointIsGround(Input.mousePosition) && lastLocation != newLocation)
+        if (RTSInterfacing.HitPointIsGround(Input.mousePosition)
+            && lastLocation != newLocation)
         {
             lastLocation = newLocation;
             if (!GridBuilder.IsMovingBuilding)
             {
                 GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
             }
+
+
             tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+
+            //if (tempStructureTag == AgentTag.Wall)
+            //{
+            //    tempStructure.GetComponent<LineGenerator>().Visualize(_dragging);
+            //}
+            
+       
             Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
             _validPlacement = GridBuilder.UpdateMove(pos);
         }
     }
 
+    private static void HandleLeftTapHoldDown()
+    {
+        if (findingPlacement
+            && tempStructureTag == AgentTag.Wall)
+        {
+            _dragging = true;
+        }
+    }
+
     public static bool CanPlaceStructure()
     {
-        if (GridBuilder.EndMove() == PlacementResult.Placed)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        //// ensure that user is not placing a line of walls
+        //if (!placingWall)
+        //{
+            if (GridBuilder.EndMove() == PlacementResult.Placed)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        //}
+        //else
+        //{
+        //    return false;
+        //}
     }
 
     public static void StartConstruction()
     {
         findingPlacement = false;
         Vector2d buildPoint = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
-        var test = tempStructure.transform.rotation;
-        RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempStructure.gameObject.name, buildPoint, new Vector2d(0, tempStructure.transform.rotation.y)) as RTSAgent;
+        RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempStructure.gameObject.name, buildPoint, new Vector2d(0, 0)) as RTSAgent;
 
         // remove temporary structure from grid
         GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
+        newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
+        newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
         Object.Destroy(tempStructure.gameObject);
 
         if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
@@ -156,7 +212,7 @@ public static class ConstructionHandler
             _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
             RestoreMaterials(newBuilding.gameObject);
             newBuilding.SetState(AnimState.Building);
-            newBuilding.SetPlayingArea(tempCreator.GetPlayerArea());
+            newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
             newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
             newBuilding.SetCommander(_cachedCommander);
 
@@ -178,7 +234,7 @@ public static class ConstructionHandler
         findingPlacement = false;
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
-        tempCreator = null;
+        tempConstructor = null;
     }
 
     public static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)

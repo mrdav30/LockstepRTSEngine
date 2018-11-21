@@ -190,9 +190,11 @@ namespace RTSLockstep
             if (NDRaycast.Raycast(ray, out hit))
             {
                 GameObject obj = hit.collider.gameObject;
-                if (obj)
+                //  did we hit the defined ground layer?
+                if (obj
+                    && obj.layer == LayerMask.NameToLayer("Ground"))
                 {
-                    return obj.transform.parent.name == "Ground";
+                    return true;
                 }
 
             }

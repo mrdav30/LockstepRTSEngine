@@ -17,8 +17,8 @@ namespace RTSLockstep
         [SerializeField]
         private int _buildSizeHigh;
 
-        public int BuildSizeLow { get { return _buildSizeLow; } }
-        public int BuildSizeHigh { get { return _buildSizeHigh; } }
+        public int BuildSizeLow { get { return _buildSizeLow; } set { _buildSizeLow = value; } }
+        public int BuildSizeHigh { get { return _buildSizeHigh; } set { _buildSizeHigh = value; } }
 
         public Coordinate GridPosition { get; set; }
         /// <summary>

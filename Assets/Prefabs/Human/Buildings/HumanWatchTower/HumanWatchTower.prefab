@@ -543,7 +543,7 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
-  Tag: 6
+  Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4116631394849956}
   objectName: HumanWatchTower
@@ -602,7 +602,8 @@ MonoBehaviour:
   provisionAmount: 0
   tempStructure: {fileID: 1496648592488480, guid: 6da9b120afaf44f46bf1caabe2983881,
     type: 2}
-  _buildSize: 5
+  _buildSizeLow: 0
+  _buildSizeHigh: 0
 --- !u!114 &114279839518768826
 MonoBehaviour:
   m_ObjectHideFlags: 1
