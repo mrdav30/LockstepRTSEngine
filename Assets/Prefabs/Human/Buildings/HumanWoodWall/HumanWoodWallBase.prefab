@@ -327,6 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7e1ae3c2dd4174ab039bbd185d585a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EmptyGO: {fileID: 1726086989265368}
 --- !u!114 &114980722669984856
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -338,7 +339,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 964999762295ace488b7626ade1e310f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emptyGO: {fileID: 1726086989265368}
 --- !u!120 &120176494205679078
 LineRenderer:
   m_ObjectHideFlags: 1

@@ -53,17 +53,17 @@ public static class ConstructionHandler
         }
     }
 
-    public static void CreateBuilding(RTSAgent constructor, string buildingName)
+    public static void CreateBuilding(RTSAgent constructingAgent, string buildingName)
     {
-        Vector2d buildPoint = new Vector2d(constructor.transform.position.x, constructor.transform.position.z + 10);
+        Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
         if (_cachedCommander)
         {
             //cleanup later...
-            CreateBuilding(buildingName, buildPoint, constructor, constructor.GetPlayerArea());
+            CreateBuilding(buildingName, buildPoint, constructingAgent, constructingAgent.GetPlayerArea());
         }
     }
 
-    public static void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent constructor, Rect playingArea)
+    public static void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent constructingAgent, Rect playingArea)
     {
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
 
@@ -81,7 +81,7 @@ public static class ConstructionHandler
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
-                    tempStructure.name = buildingTemplate.GetComponent<Structure>().tempStructure.gameObject.name;
+                    tempStructure.name = tempStructure.GetComponent<TempStructure>().EmptyGO.name;
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
 
                     // retrieve build size from agent template
@@ -90,12 +90,13 @@ public static class ConstructionHandler
                     GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
 
                     tempStructureTag = buildingTemplate.Tag;
-                    tempConstructor = constructor;
+                    tempConstructor = constructingAgent;
                     SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, true);
 
                     if (tempStructureTag == AgentTag.Wall)
                     {
-                       // placingWall = true;
+                        //  placingWall = true;
+                        tempStructure.GetComponent<LineGenerator>().Setup(tempStructure.GetComponent<TempStructure>().EmptyGO);
                     }
 
                     findingPlacement = true;

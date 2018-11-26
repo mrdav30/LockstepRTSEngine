@@ -3,12 +3,17 @@ using System.Collections;
 
 public class LineGenerator : MonoBehaviour
 {
-    public GameObject emptyGO;
+    private GameObject emptyGO;
 
     private GameObject instantiatedGO;
     private GameObject currentSnap;
     private bool phase1;
     private Vector3 lineWantedPosition;
+
+    public void Setup(GameObject gameObject)
+    {
+        emptyGO = gameObject;
+    }
 
     public void Update()
     {
