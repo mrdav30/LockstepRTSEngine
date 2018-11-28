@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Snap
+  - WallSegment
+  - Pole
   layers:
   - Default
   - TransparentFX

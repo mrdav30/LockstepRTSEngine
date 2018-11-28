@@ -11,9 +11,9 @@ public static class ConstructionHandler
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
     private static bool findingPlacement = false;
-    private static bool placingWall = false;
+  //  private static bool placingWall = false;
 
-    private static bool _dragging = false;
+   // private static bool _dragging = false;
 
     private static AgentCommander _cachedCommander;
     private static bool _validPlacement;
@@ -23,7 +23,7 @@ public static class ConstructionHandler
     public static void Initialize()
     {
         _cachedCommander = PlayerManager.MainController.Commander;
-        UserInputHelper.OnLeftTapHoldDown += HandleLeftTapHoldDown;
+    //    UserInputHelper.OnLeftTapHoldDown += HandleLeftTapHoldDown;
         GridBuilder.Initialize();
     }
 
@@ -34,10 +34,10 @@ public static class ConstructionHandler
         {
             if (!_cachedCommander.CachedHud._mouseOverHud)
             {
-                if (Input.GetMouseButtonUp(0))
-                {
-                    _dragging = false;
-                }
+                //if (Input.GetMouseButtonUp(0))
+                //{
+                //    _dragging = false;
+                //}
 
                 FindBuildingLocation();
 
@@ -96,7 +96,7 @@ public static class ConstructionHandler
                     if (tempStructureTag == AgentTag.Wall)
                     {
                         //  placingWall = true;
-                        tempStructure.GetComponent<LineGenerator>().Setup(tempStructure.GetComponent<TempStructure>().EmptyGO);
+                      //  tempStructure.GetComponent<LineGenerator>().Setup(tempStructure.GetComponent<TempStructure>().EmptyGO);
                     }
 
                     findingPlacement = true;
@@ -167,14 +167,14 @@ public static class ConstructionHandler
         }
     }
 
-    private static void HandleLeftTapHoldDown()
-    {
-        if (findingPlacement
-            && tempStructureTag == AgentTag.Wall)
-        {
-            _dragging = true;
-        }
-    }
+    //private static void HandleLeftTapHoldDown()
+    //{
+    //    if (findingPlacement
+    //        && tempStructureTag == AgentTag.Wall)
+    //    {
+    //        _dragging = true;
+    //    }
+    //}
 
     public static bool CanPlaceStructure()
     {
