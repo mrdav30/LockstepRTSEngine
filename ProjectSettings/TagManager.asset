@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Snap
-  - WallSegment
-  - Pole
+  - PolePrefab
+  - WallPrefab
   layers:
   - Default
   - TransparentFX
