@@ -709,8 +709,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   polePrefab: {fileID: 1448022868708058, guid: 75637d50d9290754483c1162ae71692e, type: 2}
   wallPrefab: {fileID: 1287509832937174, guid: 75637d50d9290754483c1162ae71692e, type: 2}
-  poleOffset: 5
-  yOffSet: 0.3
+  poleOffset: 10
+  yOffSet: 0
 --- !u!1001 &689575761
 Prefab:
   m_ObjectHideFlags: 0

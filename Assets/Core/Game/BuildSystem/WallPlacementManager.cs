@@ -1,4 +1,5 @@
 ﻿using RTSLockstep;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,18 +10,22 @@ public class WallPlacementManager : MonoBehaviour
     public GameObject polePrefab;
     public GameObject wallPrefab;
     // distance between poles to trigger spawning next segement
-    public int poleOffset = 5;
+    public int poleOffset;  // = 10
     // offet added to y axis of instantiated objects
-    public float yOffSet = 0.3f;
+    public float yOffSet; // = 0.3f
 
     private GameObject startPole;
     private GameObject lastPole;
     private GameObject endPole;
 
+    private int lastEndToStartDistance;
+
     private bool xSnapping;
     private bool zSnapping;
     private bool poleSnapping;
-    private Stack<GameObject> wallSegments;
+
+    private List<GameObject> polePrefabs;
+    private Dictionary<GameObject, GameObject> wallPrefabs;
 
     public static Transform OrganizerWallSegments;
 
@@ -30,7 +35,8 @@ public class WallPlacementManager : MonoBehaviour
         OrganizerWallSegments = LSUtility.CreateEmpty().transform;
         OrganizerWallSegments.gameObject.name = "OrganizerWallSegments";
 
-        wallSegments = new Stack<GameObject>();
+        polePrefabs = new List<GameObject>();
+        wallPrefabs = new Dictionary<GameObject, GameObject>();
     }
 
     // Update is called once per frame
@@ -47,7 +53,10 @@ public class WallPlacementManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            setWall();
+            if (creating)
+            {
+                setWall();
+            }
         }
         else if (Input.GetMouseButtonDown(1))
         {
@@ -62,11 +71,18 @@ public class WallPlacementManager : MonoBehaviour
         }
     }
 
+    Vector3 GridSnap(Vector3 originalPosition)
+    {
+        int granularity = 1;
+        Vector3 snappedPosition = new Vector3(Mathf.Floor(originalPosition.x / granularity) * granularity, originalPosition.y, Mathf.Floor(originalPosition.z / granularity) * granularity);
+        return snappedPosition;
+    }
+
     void startWall()
     {
         creating = true;
         Vector3 startPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        startPos = Positioning.GetSnappedPosition(startPos);
+        startPos = GridSnap(startPos);
 
         // create initial pole
         startPole = Instantiate(polePrefab, startPos, Quaternion.identity) as GameObject;
@@ -81,12 +97,12 @@ public class WallPlacementManager : MonoBehaviour
         }
 
         // create placement pole
-        // don't add to poles stack until set
         endPole = Instantiate(polePrefab, startPos, Quaternion.identity) as GameObject;
         endPole.transform.parent = OrganizerWallSegments;
         endPole.transform.position = new Vector3(startPos.x, startPos.y + yOffSet, startPos.z);
 
         lastPole = startPole;
+        lastEndToStartDistance = 0;
     }
 
     private GameObject ClostestPoleTo(Vector3 worldPoint)
@@ -95,7 +111,7 @@ public class WallPlacementManager : MonoBehaviour
         float distance = Mathf.Infinity;
         float currentDistance = Mathf.Infinity;
         string tag = "PolePrefab";
-        foreach (GameObject p in wallSegments)
+        foreach (GameObject p in polePrefabs)
         {
             if (p.tag == tag)
             {
@@ -114,7 +130,7 @@ public class WallPlacementManager : MonoBehaviour
     {
         creating = false;
         Vector3 endPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        endPos = Positioning.GetSnappedPosition(endPos);
+        endPos = GridSnap(endPos);
 
         if (xSnapping)
         {
@@ -129,14 +145,15 @@ public class WallPlacementManager : MonoBehaviour
             endPole.transform.position = new Vector3(endPos.x, endPos.y + yOffSet, endPos.z);
         }
 
-        wallSegments.Push(startPole);
-        wallSegments.Push(endPole);
+        polePrefabs.Clear();
+        wallPrefabs.Clear();
     }
 
     void updateWall()
     {
         Vector3 currentPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        currentPos = Positioning.GetSnappedPosition(currentPos);
+        currentPos = GridSnap(currentPos);
+        currentPos = new Vector3(currentPos.x, currentPos.y + yOffSet, currentPos.z);
 
         if (xSnapping)
         {
@@ -148,21 +165,32 @@ public class WallPlacementManager : MonoBehaviour
         }
         else
         {
-            endPole.transform.position = new Vector3(currentPos.x, currentPos.y + yOffSet, currentPos.z);
+            endPole.transform.position = currentPos;
         }
 
+        if (polePrefabs.Count > 0)
+        {
+            lastPole = polePrefabs[polePrefabs.Count -1];
+        }
 
         if (!currentPos.Equals(lastPole.transform.position))
         {
-            float endPoleToStartPole = Vector3.Distance(startPole.transform.position, endPole.transform.position);
-           // float lastPoleDistance = Vector3.Distance(currentPos, lastPole.transform.position);
-            float endPoleToLastPole = Vector3.Distance(lastPole.transform.position, endPole.transform.position);
-            // only if distance is equal to half of wall + pole zeta...
-            if (endPoleToStartPole >= poleOffset
-            //    && lastPoleDistance == poleOffset
-                && endPoleToLastPole >= poleOffset)
+            int endToStartDistance = (int)Math.Round(Vector3.Distance(startPole.transform.position, endPole.transform.position));
+            int lastToPosDistance = (int)Math.Round(Vector3.Distance(currentPos, lastPole.transform.position));
+            int endToLastDistance = (int)Math.Round(Vector3.Distance(endPole.transform.position, lastPole.transform.position));
+            // ensure end pole is far enough from start pole
+            if (endToStartDistance >= lastEndToStartDistance)
             {
-                createWallSegment(currentPos);
+                // ensure last instantiated pole is far enough from current pos
+                // and end pole is far enough from last pole
+                if (lastToPosDistance >= poleOffset
+                && endToLastDistance >= poleOffset)
+                {
+                    lastEndToStartDistance = endToStartDistance;
+                    Debug.Log("endToStartDistance " + endToStartDistance);
+                    Debug.Log("lastEndToStartDistance " + lastEndToStartDistance);
+                    createWallSegment(currentPos);
+                }
             }
         }
 
@@ -171,51 +199,49 @@ public class WallPlacementManager : MonoBehaviour
 
     void createWallSegment(Vector3 currentPos)
     {
-        //    Vector3 closestPolePosition = ClostestPoleTo(currentPos).transform.position;
-
         GameObject newPole = Instantiate(polePrefab, currentPos, Quaternion.identity);
-        wallSegments.Push(newPole);
+        polePrefabs.Add(newPole);
         newPole.transform.parent = OrganizerWallSegments;
 
         Vector3 middle = Vector3.Lerp(newPole.transform.position, lastPole.transform.position, .05f);
 
         GameObject newWall = Instantiate(wallPrefab, middle, Quaternion.identity);
-        wallSegments.Push(newWall);
+        wallPrefabs.Add(newPole, newWall);
         newWall.transform.parent = OrganizerWallSegments;
-      //  newWall.transform.LookAt(lastPole.transform);
-
-        lastPole = newPole;
     }
 
     void adjustWallSegments()
     {
         startPole.transform.LookAt(endPole.transform.position);
         endPole.transform.LookAt(startPole.transform.position);
-        float distance = Vector3.Distance(startPole.transform.position, endPole.transform.position);
 
-        Transform lastPoleChecked = startPole.transform;
-        foreach (GameObject ws in wallSegments)
+        if (polePrefabs.Count > 0)
         {
-            if (ws.tag == "PolePrefab")
+            GameObject adjustBasePole = startPole;
+            foreach (GameObject p in polePrefabs)
             {
-                ws.transform.position = startPole.transform.position + distance / 2 * lastPoleChecked.forward;
-                lastPoleChecked = ws.transform;
+
+                Vector3 newPos = adjustBasePole.transform.position + startPole.transform.TransformDirection(new Vector3(0, 0, poleOffset));
+                p.transform.position = newPos;
+                p.transform.rotation = startPole.transform.rotation;
+
+                GameObject wallSegement = wallPrefabs[p];
+                if (wallSegement)
+                {
+                     Vector3 middle = Vector3.Lerp(p.transform.position, adjustBasePole.transform.position, .05f);
+                     wallSegement.transform.position = middle;
+                    wallSegement.transform.rotation = p.transform.rotation;
+                }
+                adjustBasePole = p;
             }
-            else if (ws.tag == "WallPrefab")
-            {
-                Vector3 middle = Vector3.Lerp(ws.transform.position, lastPoleChecked.transform.position, .05f);
-                ws.transform.position = middle;
-            }
-         //   wall.transform.position = start.transform.position + distance / 2 * start.transform.forward;
-            ws.transform.rotation = startPole.transform.rotation;
-            //   ws.transform.localScale = new Vector3(ws.transform.localScale.x, ws.transform.localScale.y, distance);
         }
     }
 
     private void ClearTemporaryWalls()
     {
         creating = false;
-        wallSegments.Clear();
+        polePrefabs.Clear();
+        wallPrefabs.Clear();
         foreach (Transform child in OrganizerWallSegments)
         {
             GameObject.Destroy(child.gameObject);
