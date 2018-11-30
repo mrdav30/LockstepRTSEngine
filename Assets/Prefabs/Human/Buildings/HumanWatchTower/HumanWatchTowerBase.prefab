@@ -518,5 +518,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7e1ae3c2dd4174ab039bbd185d585a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentAgent: {fileID: 114113914783969338, guid: cb0a1c7eff9ab7c43b28213850b1bdac,
-    type: 2}

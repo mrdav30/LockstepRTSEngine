@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class TempStructure : MonoBehaviour, IBuildable
 {
-    public GameObject EmptyGO;
+  //  public GameObject EmptyGO;
+
     /// <summary>
     /// Describes the width and height of the buildable. This value does not change on the buildable.
     /// </summary>

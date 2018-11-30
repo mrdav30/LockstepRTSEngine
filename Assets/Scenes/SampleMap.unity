@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 219849900}
-  m_IndirectSpecularColor: {r: 0.5623202, g: 0.53287727, b: 0.49586946, a: 1}
+  m_IndirectSpecularColor: {r: 0.56227154, g: 0.5328908, b: 0.49588585, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -709,7 +709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   polePrefab: {fileID: 1448022868708058, guid: 75637d50d9290754483c1162ae71692e, type: 2}
   wallPrefab: {fileID: 1287509832937174, guid: 75637d50d9290754483c1162ae71692e, type: 2}
-  poleOffset: 10
+  poleOffset: 5
   yOffSet: 0
 --- !u!1001 &689575761
 Prefab:
