@@ -7,7 +7,6 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempStructure;
-    private static GameObject tempWallPole;
     private static AgentTag tempStructureTag;
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
@@ -17,6 +16,8 @@ public static class ConstructionHandler
     private static AgentCommander _cachedCommander;
     private static bool _validPlacement;
     private static List<Material> oldMaterials = new List<Material>();
+
+    private static Queue<GameObject> buildQueue = new Queue<GameObject>();
     #endregion
 
     public static void Initialize()
@@ -59,8 +60,7 @@ public static class ConstructionHandler
 
     private static void HandleLeftClickDrag()
     {
-        if (settingWall
-            && !_cachedCommander.CachedHud._mouseOverHud)
+        if (settingWall)
         {
             tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
         }
@@ -128,6 +128,11 @@ public static class ConstructionHandler
         return settingWall && findingPlacement;
     }
 
+    public static GameObject GetTempStructure()
+    {
+        return tempStructure;
+    }
+
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
@@ -162,41 +167,15 @@ public static class ConstructionHandler
             && lastLocation != newLocation)
         {
             lastLocation = newLocation;
- 
-            Vector2d pos = Vector2d.zero;
-            if (settingWall
-                && tempStructure.GetComponent<WallPositioningHelper>().IsPlacingWall())
+
+            if (!GridBuilder.IsMovingBuilding)
             {
-                if (tempWallPole.IsNull())
-                {
-                    tempWallPole = tempStructure.GetComponent<WallPositioningHelper>().GetEndPole();
-                    tempWallPole.AddComponent(tempStructure.GetComponent<TempStructure>());
-                }
-                else
-                {
-                    tempStructure.GetComponent<WallPositioningHelper>().Visualize(newLocation);
-                    tempStructure.transform.LookAt(tempWallPole.transform);
-
-                    if (!GridBuilder.IsMovingBuilding)
-                    {
-                        GridBuilder.StartMove(tempWallPole.GetComponent<TempStructure>());
-                    }
-
-                    pos = new Vector2d(tempWallPole.transform.position.x, tempWallPole.transform.position.z);
-                }
-            }
-            else
-            {
-                if (!GridBuilder.IsMovingBuilding)
-                {
-                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
-                }
-
-                tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
-
-                pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+                GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
             }
 
+            tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+
+            Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
             _validPlacement = GridBuilder.UpdateMove(pos);
         }
     }
@@ -219,6 +198,11 @@ public static class ConstructionHandler
         {
             return false;
         }
+    }
+
+    public static void SetBuildQueue(GameObject buildingProject)
+    {
+        buildQueue.Enqueue(buildingProject);
     }
 
     public static void StartConstruction()
@@ -262,11 +246,11 @@ public static class ConstructionHandler
         {
             settingWall = false;
             tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
-            if (tempWallPole.IsNotNull())
-            {
-                Object.Destroy(tempWallPole.gameObject);
-                tempWallPole = null;
-            }
+            //if (tempWallPole.IsNotNull())
+            //{
+            //    Object.Destroy(tempWallPole.gameObject);
+            //    tempWallPole = null;
+            //}
         }
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
