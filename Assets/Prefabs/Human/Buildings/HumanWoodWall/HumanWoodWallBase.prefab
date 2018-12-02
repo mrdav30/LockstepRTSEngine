@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114089219020986424}
   m_Layer: 2
   m_Name: Wall
-  m_TagString: WallPrefab
+  m_TagString: WallSegment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 114150836569383496}
   m_Layer: 2
   m_Name: Pole
-  m_TagString: PolePrefab
+  m_TagString: WallPillar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 114296914064970424}
   m_Layer: 11
   m_Name: HumanWoodWallBase
-  m_TagString: Snap
+  m_TagString: WallPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -222,11 +222,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9651390e4ac1bae46bbf95a3acbd8d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  polePrefab: {fileID: 1448022868708058}
+  pillarPrefab: {fileID: 1448022868708058}
   wallPrefab: {fileID: 1287509832937174}
-  poleOffset: 5
-  yOffSet: 0
-  OrganizerWallSegments: {fileID: 0}
+  poleOffset: 10
 --- !u!114 &114682440194327686
 MonoBehaviour:
   m_ObjectHideFlags: 1

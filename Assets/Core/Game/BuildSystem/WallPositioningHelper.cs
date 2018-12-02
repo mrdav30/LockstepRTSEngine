@@ -5,25 +5,23 @@ using UnityEngine;
 
 public class WallPositioningHelper : MonoBehaviour
 {
-    public GameObject polePrefab;
+    public GameObject pillarPrefab;
     public GameObject wallPrefab;
     // distance between poles to trigger spawning next segement
-    public int poleOffset;  // = 5
-    // offet added to y axis of instantiated objects
+    public int poleOffset;  // = 10
 
     private Vector3 currentPos;
     private bool _isPlacingWall;
-    private bool poleSnapping;
 
-    private GameObject startPole;
-    private GameObject lastPole;
-    private Vector3 endPolePos;
+    private GameObject startPillar;
+    private GameObject lastPillar;
+    private Vector3 endPillarPos;
 
-    private List<GameObject> polePrefabs;
+    private List<GameObject> pillarPrefabs;
     private Dictionary<int, GameObject> wallPrefabs;
     public Transform OrganizerWallSegments { get; private set; }
 
-    private List<GameObject> wallSegments;
+ //   private List<GameObject> wallSegments;
     private int lastEndToStartDistance;
 
     public void Setup()
@@ -31,9 +29,9 @@ public class WallPositioningHelper : MonoBehaviour
         OrganizerWallSegments = LSUtility.CreateEmpty().transform;
         OrganizerWallSegments.gameObject.name = "OrganizerWallSegments";
 
-        polePrefabs = new List<GameObject>();
+        pillarPrefabs = new List<GameObject>();
         wallPrefabs = new Dictionary<int, GameObject>();
-        wallSegments = new List<GameObject>();
+        //wallSegments = new List<GameObject>();
     }
 
     public void OnRightClick()
@@ -71,77 +69,75 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void StartWall()
     {
-        Vector3 startPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        startPos = Positioning.GetSnappedPosition(startPos);
-
+        Vector3 startPos = ConstructionHandler.GetTempStructure().transform.position;
+ 
         // create initial pole
-        startPole = Instantiate(polePrefab, startPos, Quaternion.identity) as GameObject;
-        startPole.transform.parent = OrganizerWallSegments;
-        //if (poleSnapping)
-        //{
-        //    startPole.transform.position = ClostestPoleTo(startPos).transform.position;
-        //}
-        //else
-        //{
-        startPole.transform.position = new Vector3(startPos.x, startPos.y, startPos.z);
-        //}
+        startPillar = Instantiate(pillarPrefab, startPos, Quaternion.identity) as GameObject;
+        startPillar.transform.parent = OrganizerWallSegments;
 
-        lastPole = startPole;
+        lastPillar = startPillar;
         lastEndToStartDistance = 0;
         _isPlacingWall = true;
     }
 
-    //private GameObject ClostestPoleTo(Vector3 worldPoint)
-    //{
-    //    GameObject closest = null;
-    //    float distance = Mathf.Infinity;
-    //    float currentDistance = Mathf.Infinity;
-    //    string tag = "Pole";
-    //    foreach (GameObject p in polePrefabs)
-    //    {
-    //        if (p.tag == tag)
-    //        {
-    //            currentDistance = Vector3.Distance(worldPoint, p.transform.position);
-    //            if (currentDistance < distance)
-    //            {
-    //                distance = currentDistance;
-    //                closest = p;
-    //            }
-    //        }
-    //    }
-    //    return closest;
-    //}
+    public GameObject ClosestPillarTo(Vector3 worldPoint, float distance)
+    {
+        GameObject closest = null;
+        float currentDistance = Mathf.Infinity;
+        string tag = "WallPillar";
+        foreach(Transform child in OrganizerWallSegments)
+        {
+            if (child.gameObject.tag == tag)
+            {
+                currentDistance = Vector3.Distance(worldPoint, child.gameObject.transform.position);
+                if (currentDistance < distance)
+                {
+                    closest = child.gameObject;
+                }
+            }
+        }
+        return closest;
+    }
 
     private void SetWall()
     {
-        foreach(GameObject ws in wallSegments)
-        {
-            ConstructionHandler.SetBuildQueue(ws);
-        }
+        //foreach (GameObject ws in wallSegments)
+        //{
+        //    ConstructionHandler.SetBuildQueue(ws);
+        //}
 
-        wallSegments.Clear();
+        //wallSegments.Clear();
         _isPlacingWall = false;
 
-        polePrefabs.Clear();
+        pillarPrefabs.Clear();
         wallPrefabs.Clear();
-
     }
 
     private void UpdateWall()
     {
-        currentPos = new Vector3(currentPos.x, currentPos.y, currentPos.z);
-        endPolePos = ConstructionHandler.GetTempStructure().transform.position;
+        currentPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
 
-        if (polePrefabs.Count > 0)
+        if (pillarPrefabs.Count > 0)
         {
-            lastPole = polePrefabs[polePrefabs.Count - 1];
+            lastPillar = pillarPrefabs[pillarPrefabs.Count - 1];
         }
 
-        if (!currentPos.Equals(lastPole.transform.position))
+        if (!currentPos.Equals(lastPillar.transform.position))
         {
-            int endToStartDistance = (int)Math.Round(Vector3.Distance(startPole.transform.position, endPolePos));
-            int lastToPosDistance = (int)Math.Round(Vector3.Distance(currentPos, lastPole.transform.position));
-            int endToLastDistance = (int)Math.Round(Vector3.Distance(endPolePos, lastPole.transform.position));
+            GameObject clostestPole = ClosestPillarTo(currentPos, 1);
+            if (clostestPole
+                && clostestPole.transform.position != lastPillar.transform.position)
+            {
+                Debug.Log("end snap!");
+                ConstructionHandler.GetTempStructure().transform.position = clostestPole.transform.position;
+            }
+
+            endPillarPos = ConstructionHandler.GetTempStructure().transform.position;
+
+
+            int endToStartDistance = (int)Math.Round(Vector3.Distance(startPillar.transform.position, endPillarPos));
+            int lastToPosDistance = (int)Math.Round(Vector3.Distance(currentPos, lastPillar.transform.position));
+            int endToLastDistance = (int)Math.Round(Vector3.Distance(endPillarPos, lastPillar.transform.position));
             // ensure end pole is far enough from start pole
             if (endToStartDistance > lastEndToStartDistance)
             {
@@ -155,7 +151,7 @@ public class WallPositioningHelper : MonoBehaviour
             }
             else if (endToStartDistance < lastEndToStartDistance)
             {
-                if (endToLastDistance < poleOffset)//                    &&lastToPosDistance < poleOffset
+                if (endToLastDistance <= 1)
                 {
                     RemoveLastWallSegment();
                 }
@@ -168,26 +164,26 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void CreateWallSegment(Vector3 currentPos)
     {
-        GameObject newPole = Instantiate(polePrefab, currentPos, Quaternion.identity);
-        polePrefabs.Add(newPole);
-        newPole.transform.parent = OrganizerWallSegments;
+        GameObject newPillar = Instantiate(pillarPrefab, currentPos, Quaternion.identity);
+        pillarPrefabs.Add(newPillar);
+        newPillar.transform.parent = OrganizerWallSegments;
 
-        Vector3 middle = Vector3.Lerp(newPole.transform.position, lastPole.transform.position, .05f);
+        Vector3 middle = 0.5f * (newPillar.transform.position + lastPillar.transform.position);
 
         GameObject newWall = Instantiate(wallPrefab, middle, Quaternion.identity);
         newWall.SetActive(true);
-        int ndx = polePrefabs.IndexOf(newPole);
+        int ndx = pillarPrefabs.IndexOf(newPillar);
         wallPrefabs.Add(ndx, newWall);
         newWall.transform.parent = OrganizerWallSegments;
     }
 
     private void RemoveLastWallSegment()
     {
-        if (polePrefabs.Count > 0)
+        if (pillarPrefabs.Count > 0)
         {
-            int ndx = polePrefabs.Count - 1;
-            Destroy(polePrefabs[ndx].gameObject);
-            polePrefabs.RemoveAt(ndx);
+            int ndx = pillarPrefabs.Count - 1;
+            Destroy(pillarPrefabs[ndx].gameObject);
+            pillarPrefabs.RemoveAt(ndx);
             GameObject wallSegement = wallPrefabs[ndx];
             if (wallSegement)
             {
@@ -196,35 +192,37 @@ public class WallPositioningHelper : MonoBehaviour
             }
         }
 
-        if (polePrefabs.Count == 0)
+        if (pillarPrefabs.Count == 0)
         {
-            lastPole = startPole;
+            lastPillar = startPillar;
         }
     }
 
     private void AdjustWallSegments()
     {
-        startPole.transform.LookAt(endPolePos);
-        ConstructionHandler.GetTempStructure().transform.LookAt(startPole.transform.position);
-      // endPole.transform.LookAt(startPole.transform.position);
+        startPillar.transform.LookAt(endPillarPos);
+        ConstructionHandler.GetTempStructure().transform.LookAt(startPillar.transform.position);
 
-        if (polePrefabs.Count > 0)
+        if (pillarPrefabs.Count > 0)
         {
-            GameObject adjustBasePole = startPole;
-            foreach (GameObject p in polePrefabs)
+            GameObject adjustBasePole = startPillar;
+            foreach (GameObject p in pillarPrefabs)
             {
 
-                Vector3 newPos = adjustBasePole.transform.position + startPole.transform.TransformDirection(new Vector3(0, 0, poleOffset));
+                Vector3 newPos = adjustBasePole.transform.position + startPillar.transform.TransformDirection(new Vector3(0, 0, poleOffset));
                 p.transform.position = newPos;
-                p.transform.rotation = startPole.transform.rotation;
+                p.transform.rotation = startPillar.transform.rotation;
 
-                int ndx = polePrefabs.IndexOf(p);
+                float distance = Vector3.Distance(adjustBasePole.transform.position, p.transform.position);
+
+                int ndx = pillarPrefabs.IndexOf(p);
                 GameObject wallSegement = wallPrefabs[ndx];
                 if (wallSegement)
                 {
-                    Vector3 middle = Vector3.Lerp(p.transform.position, adjustBasePole.transform.position, .05f);
+                    Vector3 middle = 0.5f * (p.transform.position + adjustBasePole.transform.position);
                     wallSegement.transform.position = middle;
                     wallSegement.transform.rotation = p.transform.rotation;
+                    //  wallSegement.transform.localScale = new Vector3(wallSegement.transform.localScale.x, wallSegement.transform.localScale.y, distance);
                 }
                 adjustBasePole = p;
             }
@@ -234,7 +232,7 @@ public class WallPositioningHelper : MonoBehaviour
     private void ClearTemporaryWalls()
     {
         _isPlacingWall = false;
-        polePrefabs.Clear();
+        pillarPrefabs.Clear();
         wallPrefabs.Clear();
     }
 

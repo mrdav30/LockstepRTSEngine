@@ -173,7 +173,22 @@ public static class ConstructionHandler
                 GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
             }
 
-            tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+            if (settingWall)
+            {
+                GameObject closestPillar = tempStructure.GetComponent<WallPositioningHelper>().ClosestPillarTo(newLocation, 1);
+                if (closestPillar)
+                {
+                    tempStructure.transform.position = closestPillar.transform.position;
+                }
+                else
+                {
+                    tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+                }
+            }
+            else
+            {
+                tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+            }
 
             Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
             _validPlacement = GridBuilder.UpdateMove(pos);

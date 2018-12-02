@@ -67,7 +67,7 @@ MonoBehaviour:
   - _name: HumanWoodWall
     _description: Wood Wall
     _icon: {fileID: 21300000, guid: aed9e13a31f26784cb5ec89319eba1d1, type: 3}
-    _prefab: {fileID: 1199525896770284, guid: 58670ee03c19ab846b9fbcc916ffd906, type: 2}
+    _prefab: {fileID: 1292614385033484, guid: 34052d5328a416249b8ccc42278bc079, type: 2}
   _worldObjectData:
   - _name: Sun
     _description: 
