@@ -7,6 +7,7 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempStructure;
+    private static GameObject tempWallPole;
     private static AgentTag tempStructureTag;
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
@@ -22,6 +23,9 @@ public static class ConstructionHandler
     {
         _cachedCommander = PlayerManager.MainController.Commander;
         GridBuilder.Initialize();
+
+        UserInputHelper.OnLeftTapUp += HandleLeftClickRelease;
+        UserInputHelper.OnLeftTapHoldDown += HandleLeftClickDrag;
     }
 
     // Update is called once per frame
@@ -31,24 +35,34 @@ public static class ConstructionHandler
         {
             if (!_cachedCommander.CachedHud._mouseOverHud)
             {
-                if (!settingWall)
-                {
-                    FindBuildingLocation();
-                }
-                else
-                {
-
-                }
+                FindBuildingLocation();
 
                 if (_validPlacement)
                 {
-                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, false);
+                    SetTransparentMaterial(GameResourceManager.AllowedMaterial, false);
                 }
                 else
                 {
-                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.notAllowedMaterial, false);
+                    SetTransparentMaterial(GameResourceManager.NotAllowedMaterial, false);
                 }
             }
+        }
+    }
+
+    private static void HandleLeftClickRelease()
+    {
+        if (settingWall)
+        {
+            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickUp();
+        }
+    }
+
+    private static void HandleLeftClickDrag()
+    {
+        if (settingWall
+            && !_cachedCommander.CachedHud._mouseOverHud)
+        {
+            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
         }
     }
 
@@ -80,25 +94,26 @@ public static class ConstructionHandler
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
-                    tempStructure.name = buildingName;// tempStructure.GetComponent<TempStructure>().EmptyGO.name;
-                    tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
-
+                    tempStructure.name = buildingName;
                     // retrieve build size from agent template
                     tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
                     tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
-                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
-
                     tempStructureTag = buildingTemplate.Tag;
                     tempConstructor = constructingAgent;
-                    SetTransparentMaterial(tempStructure, _cachedCommander.CachedHud.allowedMaterial, true);
+
+                    findingPlacement = true;
+                    SetTransparentMaterial(GameResourceManager.AllowedMaterial, true);
+                    tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
 
                     if (tempStructureTag == AgentTag.Wall)
                     {
                         settingWall = true;
-                        tempStructure.GetComponent<WallPlacementManager>().Setup();
+                        tempStructure.GetComponent<WallPositioningHelper>().Setup();
                     }
-
-                    findingPlacement = true;
+                    else
+                    {
+                        GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                    }
                 }
                 else
                 {
@@ -110,16 +125,16 @@ public static class ConstructionHandler
 
     public static bool IsFindingBuildingLocation()
     {
-        return findingPlacement;
+        return settingWall && findingPlacement;
     }
 
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
         if (findingPlacement
-            && tempStructure
             && !settingWall)
         {
+            //  keep track of previous values to update agent's size
             int prevLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
             int prevhigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
             switch (direction)
@@ -147,19 +162,41 @@ public static class ConstructionHandler
             && lastLocation != newLocation)
         {
             lastLocation = newLocation;
-            if (!GridBuilder.IsMovingBuilding)
+ 
+            Vector2d pos = Vector2d.zero;
+            if (settingWall
+                && tempStructure.GetComponent<WallPositioningHelper>().IsPlacingWall())
             {
-                GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                if (tempWallPole.IsNull())
+                {
+                    tempWallPole = tempStructure.GetComponent<WallPositioningHelper>().GetEndPole();
+                    tempWallPole.AddComponent(tempStructure.GetComponent<TempStructure>());
+                }
+                else
+                {
+                    tempStructure.GetComponent<WallPositioningHelper>().Visualize(newLocation);
+                    tempStructure.transform.LookAt(tempWallPole.transform);
+
+                    if (!GridBuilder.IsMovingBuilding)
+                    {
+                        GridBuilder.StartMove(tempWallPole.GetComponent<TempStructure>());
+                    }
+
+                    pos = new Vector2d(tempWallPole.transform.position.x, tempWallPole.transform.position.z);
+                }
+            }
+            else
+            {
+                if (!GridBuilder.IsMovingBuilding)
+                {
+                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                }
+
+                tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+
+                pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
             }
 
-            tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
-
-            //if (tempStructureTag == AgentTag.Wall)
-            //{
-            //    tempStructure.GetComponent<LineGenerator>().Visualize(_dragging);
-            //}
-
-            Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
             _validPlacement = GridBuilder.UpdateMove(pos);
         }
     }
@@ -170,13 +207,13 @@ public static class ConstructionHandler
         if (!settingWall)
         {
             if (GridBuilder.EndMove() == PlacementResult.Placed)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
@@ -192,8 +229,8 @@ public static class ConstructionHandler
 
         // remove temporary structure from grid
         GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
-        //newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
-        //newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
+        newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
+        newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
         Object.Destroy(tempStructure.gameObject);
 
         if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
@@ -221,18 +258,39 @@ public static class ConstructionHandler
     public static void CancelBuildingPlacement()
     {
         findingPlacement = false;
+        if (settingWall)
+        {
+            settingWall = false;
+            tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
+            if (tempWallPole.IsNotNull())
+            {
+                Object.Destroy(tempWallPole.gameObject);
+                tempWallPole = null;
+            }
+        }
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;
     }
 
-    public static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
+    private static void SetTransparentMaterial(Material material, bool storeExistingMaterial)
     {
         if (storeExistingMaterial)
         {
             oldMaterials.Clear();
         }
-        Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
+
+        Renderer[] renderers;
+
+        if (!settingWall)
+        {
+            renderers = tempStructure.GetComponentsInChildren<Renderer>();
+        }
+        else
+        {
+            renderers = tempStructure.GetComponent<WallPositioningHelper>().OrganizerWallSegments.GetComponentsInChildren<Renderer>();
+        }
+
         foreach (Renderer renderer in renderers)
         {
             if (storeExistingMaterial)
@@ -243,7 +301,7 @@ public static class ConstructionHandler
         }
     }
 
-    public static void RestoreMaterials(GameObject structure)
+    private static void RestoreMaterials(GameObject structure)
     {
         Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
         if (oldMaterials.Count == renderers.Length)

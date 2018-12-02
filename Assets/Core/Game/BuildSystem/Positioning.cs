@@ -5,6 +5,7 @@ using UnityEngine;
 
 public static class Positioning
 {
+    private static int granularity = 1;
 
     public static void SnapObjectToGrid(Transform obj)
     {
@@ -30,17 +31,17 @@ public static class Positioning
 
     public static Vector3 GetSnappedPosition(Vector3 pos)
     {
-        float xPos = Mathf.Round(pos.x) + 0.5f;
-        float yPos = Mathf.Round(pos.y);
-        float zPos = Mathf.Round(pos.z) + 0.5f;
+        float xPos = Mathf.Floor(pos.x / granularity) * granularity; // Mathf.Round(pos.x) + 0.5f;
+        float yPos = pos.y; // Mathf.Round(pos.y);
+        float zPos = Mathf.Floor(pos.z / granularity) * granularity;// Mathf.Round(pos.z) + 0.5f;
 
         return new Vector3(xPos, yPos, zPos);
     }
 
     public static Vector2d GetSnappedPositionD(Vector3 pos)
     {
-        float xPos = Mathf.Round(pos.x) + 0.5f;
-        float yPos = Mathf.Round(pos.y);
+        float xPos = Mathf.Floor(pos.x / granularity) * granularity;
+        float yPos = pos.y;
 
         return new Vector2d(xPos, yPos);
     }

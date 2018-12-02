@@ -55,7 +55,6 @@ public class HUD : MonoBehaviour
         cachedCommander = GetComponentInParent<AgentCommander>();
         if (cachedCommander && cachedCommander.human)
         {
-            //    agentController = PlayerManager.GetAgentController(cachedCommander.playerIndex);
             resourceValues = new Dictionary<ResourceType, long>();
             resourceLimits = new Dictionary<ResourceType, long>();
             resourceImages = new Dictionary<ResourceType, Texture2D>();
@@ -130,6 +129,7 @@ public class HUD : MonoBehaviour
             }
             GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
             GameResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
+            GameResourceManager.StoreConstructionMaterials(allowedMaterial, notAllowedMaterial);
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
             SetCursorState(CursorState.Select);
 

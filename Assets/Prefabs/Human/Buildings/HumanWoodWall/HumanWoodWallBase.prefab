@@ -28,7 +28,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1448022868708058
 GameObject:
   m_ObjectHideFlags: 0
@@ -56,6 +56,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4003334259573246}
   - component: {fileID: 114682440194327686}
+  - component: {fileID: 114296914064970424}
   m_Layer: 11
   m_Name: HumanWoodWallBase
   m_TagString: Snap
@@ -119,7 +120,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 6d45ceb2c47644e0f9ed999ead731689, type: 2}
+  - {fileID: 2100000, guid: d5b24f99b407d9e41931b0ff835ba2b1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -154,7 +155,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: b55c77afd57072b4c84a47d5274e46cf, type: 2}
+  - {fileID: 2100000, guid: d5b24f99b407d9e41931b0ff835ba2b1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -210,6 +211,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 507eaf9c84f40f742ae1986d34c0d5a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114296914064970424
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1578406621253206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9651390e4ac1bae46bbf95a3acbd8d6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  polePrefab: {fileID: 1448022868708058}
+  wallPrefab: {fileID: 1287509832937174}
+  poleOffset: 5
+  yOffSet: 0
+  OrganizerWallSegments: {fileID: 0}
 --- !u!114 &114682440194327686
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -221,4 +238,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7e1ae3c2dd4174ab039bbd185d585a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EmptyGO: {fileID: 0}

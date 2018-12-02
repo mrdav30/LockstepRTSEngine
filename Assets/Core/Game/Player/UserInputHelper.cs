@@ -52,6 +52,7 @@ public class UserInputHelper : BehaviourHelper
     public static AbilityDataItem QuickRally;
 
     public static event Action OnSingleLeftTapDown;
+    public static event Action OnLeftTapUp;
     public static event Action OnLeftTapHoldDown;
     public static event Action OnSingleRightTapDown;
     public static event Action OnDoubleLeftTapDown;
@@ -75,6 +76,8 @@ public class UserInputHelper : BehaviourHelper
             _isGathering = value;
         }
     }
+
+    private static bool _isDragging = false;
 
     private static bool Setted = false;
     private static Command curCom;
@@ -184,7 +187,16 @@ public class UserInputHelper : BehaviourHelper
                     HandleSingleRightClick();
                     if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
                 }
+                else if (Input.GetMouseButtonUp(0))
+                {
+                    _isDragging = false;
+                    if (OnLeftTapUp != null) { OnLeftTapUp(); }
+                }
 
+                if (_isDragging)
+                {
+                    OnLeftTapHoldDown();
+                }
 
                 if (tap == true && Time.time > tapTimer + tapThreshold)
                 {
@@ -193,7 +205,11 @@ public class UserInputHelper : BehaviourHelper
                     // left click hold action
                     if (Input.GetMouseButton(0))
                     {
-                        if (OnLeftTapHoldDown != null) { OnLeftTapHoldDown(); }
+                        if (OnLeftTapHoldDown != null)
+                        {
+                            _isDragging = true;
+                            OnLeftTapHoldDown();
+                        }
                     }
                     else
                     {
@@ -210,6 +226,7 @@ public class UserInputHelper : BehaviourHelper
                     {
                         switch (inputKey.Key)
                         {
+                            // these should probably be switched to events...
                             case UserInputKeyMappings.RotateLeftShortCut:
                                 ConstructionHandler.HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
                                 break;

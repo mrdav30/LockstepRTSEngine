@@ -146,11 +146,6 @@ namespace RTSLockstep
                     break;
                 default: break;
             }
-
-            if (_needsBuilding)
-            {
-                ConstructionHandler.SetTransparentMaterial(Agent.gameObject, Agent.GetCommander().CachedHud.allowedMaterial, true);
-            }
         }
     }
 }

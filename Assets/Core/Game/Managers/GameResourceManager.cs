@@ -7,7 +7,7 @@ using FastCollections;
 
 namespace RTSLockstep
 {
-    public class GameResourceManager
+    public static class GameResourceManager
     {
         #region properties
         public static int ScrollWidth { get { return 15; } }
@@ -16,34 +16,37 @@ namespace RTSLockstep
         public static float RotateSpeed { get { return 100; } }
         public static float MinCameraHeight { get { return 10; } }
         public static float MaxCameraHeight { get { return 40; } }
-        public static Vector3d InvalidPosition { get { return invalidPosition; } }
-        public static GUISkin SelectBoxSkin { get { return selectBoxSkin;  } }
-        public static Bounds InvalidBounds { get { return invalidBounds;  } }
+        public static Vector3d InvalidPosition { get { return _invalidPosition; } }
+        public static GUISkin SelectBoxSkin { get { return _selectBoxSkin;  } }
+        public static Bounds InvalidBounds { get { return _invalidBounds;  } }
         public static int HarvestSpeed { get { return 1; } }
         public static int BuildSpeed { get { return 1; } }  // used to make sure that all buildings update their progress for building Units at the same rate
-        public static Texture2D HealthyTexture { get { return healthyTexture; } }
-        public static Texture2D DamagedTexture { get { return damagedTexture; } }
-        public static Texture2D CriticalTexture { get { return criticalTexture; } }
+        public static Texture2D HealthyTexture { get { return _healthyTexture; } }
+        public static Texture2D DamagedTexture { get { return _damagedTexture; } }
+        public static Texture2D CriticalTexture { get { return _criticalTexture; } }
+        public static Material NotAllowedMaterial { get { return _notAllowedMaterial; } }
+        public static Material AllowedMaterial { get { return _allowedMaterial; } }
         public static bool MenuOpen { get; set; }
-        public static float PauseMenuHeight { get { return headerHeight + 2 * buttonHeight + 4 * padding; } }
-        public static float MenuWidth { get { return headerWidth + 2 * padding; } }
-        public static float ButtonHeight { get { return buttonHeight; } }
-        public static float ButtonWidth { get { return (MenuWidth - 3 * padding) / 2; } }
-        public static float HeaderHeight { get { return headerHeight; } }
-        public static float HeaderWidth { get { return headerWidth; } }
-        public static float TextHeight { get { return textHeight; } }
-        public static float Padding { get { return padding; } }
+        public static float PauseMenuHeight { get { return _headerHeight + 2 * _buttonHeight + 4 * _padding; } }
+        public static float MenuWidth { get { return _headerWidth + 2 * _padding; } }
+        public static float ButtonHeight { get { return _buttonHeight; } }
+        public static float ButtonWidth { get { return (MenuWidth - 3 * _padding) / 2; } }
+        public static float HeaderHeight { get { return _headerHeight; } }
+        public static float HeaderWidth { get { return _headerWidth; } }
+        public static float TextHeight { get { return _textHeight; } }
+        public static float Padding { get { return _padding; } }
         public static string LevelName { get; set; }
 
-        private static GUISkin selectBoxSkin;
-        private static Vector3d invalidPosition = new Vector3d(-99999, -99999, -99999);
-        private static Bounds invalidBounds = new Bounds(new Vector3(-99999, -99999, -99999), new Vector3(0, 0, 0));
+        private static GUISkin _selectBoxSkin;
+        private static Vector3d _invalidPosition = new Vector3d(-99999, -99999, -99999);
+        private static Bounds _invalidBounds = new Bounds(new Vector3(-99999, -99999, -99999), new Vector3(0, 0, 0));
       //  private static GameObjectList gameObjectList;
-        private static Texture2D healthyTexture, damagedTexture, criticalTexture;
-        private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
-        private static float buttonHeight = 40;
-        private static float headerHeight = 32, headerWidth = 256;
-        private static float textHeight = 25, padding = 15;
+        private static Texture2D _healthyTexture, _damagedTexture, _criticalTexture;
+        private static Material _allowedMaterial, _notAllowedMaterial;
+        private static Dictionary<ResourceType, Texture2D> _resourceHealthBarTextures;
+        private static float _buttonHeight = 40;
+        private static float _headerHeight = 32, _headerWidth = 256;
+        private static float _textHeight = 25, _padding = 15;
 
         public static readonly Dictionary<string, IAgentData> AgentCodeInterfacerMap = new Dictionary<string, IAgentData>();
         public static readonly Dictionary<string, RTSAgent> AgentCodeTemplateMap = new Dictionary<string, RTSAgent>();
@@ -137,10 +140,10 @@ namespace RTSLockstep
             }
         }
 
-        void Initialize()
+        public static void Initialize()
         {
-            RTSLockstep.PlayerManager.Load();
-            RTSLockstep.PlayerManager.SetAvatarTextures(Avatars);
+            PlayerManager.Load();
+            PlayerManager.SetAvatarTextures(Avatars);
         }
         #endregion
 
@@ -209,24 +212,30 @@ namespace RTSLockstep
 
         public static void StoreSelectBoxItems(GUISkin skin, Texture2D healthy, Texture2D damaged, Texture2D critical)
         {
-            selectBoxSkin = skin;
-            healthyTexture = healthy;
-            damagedTexture = damaged;
-            criticalTexture = critical;
+            _selectBoxSkin = skin;
+            _healthyTexture = healthy;
+            _damagedTexture = damaged;
+            _criticalTexture = critical;
+        }
+
+        public static void StoreConstructionMaterials(Material allowed, Material notAllowed)
+        {
+            _allowedMaterial = allowed;
+            _notAllowedMaterial = notAllowed;
         }
 
         public static Texture2D GetResourceHealthBar(ResourceType resourceType)
         {
-            if (resourceHealthBarTextures != null && resourceHealthBarTextures.ContainsKey(resourceType))
+            if (_resourceHealthBarTextures != null && _resourceHealthBarTextures.ContainsKey(resourceType))
             {
-                return resourceHealthBarTextures[resourceType];
+                return _resourceHealthBarTextures[resourceType];
             }
             return null;
         }
 
         public static void SetResourceHealthBarTextures(Dictionary<ResourceType, Texture2D> images)
         {
-            resourceHealthBarTextures = images;
+            _resourceHealthBarTextures = images;
         }
         #endregion
     }

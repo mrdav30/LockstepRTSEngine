@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 219849900}
-  m_IndirectSpecularColor: {r: 0.56227154, g: 0.5328908, b: 0.49588585, a: 1}
+  m_IndirectSpecularColor: {r: 0.5623202, g: 0.53287727, b: 0.49586946, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -628,7 +628,6 @@ GameObject:
   - component: {fileID: 534669905}
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
-  - component: {fileID: 534669906}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -696,21 +695,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 25, y: -63.6, z: 0}
---- !u!114 &534669906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 534669902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9651390e4ac1bae46bbf95a3acbd8d6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  polePrefab: {fileID: 1448022868708058, guid: 75637d50d9290754483c1162ae71692e, type: 2}
-  wallPrefab: {fileID: 1287509832937174, guid: 75637d50d9290754483c1162ae71692e, type: 2}
-  poleOffset: 5
-  yOffSet: 0
 --- !u!1001 &689575761
 Prefab:
   m_ObjectHideFlags: 0
