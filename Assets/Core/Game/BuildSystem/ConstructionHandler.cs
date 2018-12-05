@@ -11,7 +11,7 @@ public static class ConstructionHandler
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
     private static bool findingPlacement = false;
-    private static bool settingWall = false;
+    private static bool _constructingWall = false;
 
     private static AgentCommander _cachedCommander;
     private static bool _validPlacement;
@@ -52,7 +52,7 @@ public static class ConstructionHandler
 
     private static void HandleLeftClickRelease()
     {
-        if (settingWall)
+        if (_constructingWall)
         {
             tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickUp();
         }
@@ -60,7 +60,7 @@ public static class ConstructionHandler
 
     private static void HandleLeftClickDrag()
     {
-        if (settingWall)
+        if (_constructingWall)
         {
             tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
         }
@@ -68,11 +68,14 @@ public static class ConstructionHandler
 
     public static void CreateBuilding(RTSAgent constructingAgent, string buildingName)
     {
-        Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
-        if (_cachedCommander)
+        if (!IsFindingBuildingLocation())
         {
-            //cleanup later...
-            CreateBuilding(buildingName, buildPoint, constructingAgent, constructingAgent.GetPlayerArea());
+            Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
+            if (_cachedCommander)
+            {
+                //cleanup later...
+                CreateBuilding(buildingName, buildPoint, constructingAgent, constructingAgent.GetPlayerArea());
+            }
         }
     }
 
@@ -107,8 +110,9 @@ public static class ConstructionHandler
 
                     if (tempStructureTag == AgentTag.Wall)
                     {
-                        settingWall = true;
+                        _constructingWall = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
+                        tempStructure.gameObject.tag = "EndPillar";
                     }
                     else
                     {
@@ -125,7 +129,7 @@ public static class ConstructionHandler
 
     public static bool IsFindingBuildingLocation()
     {
-        return settingWall && findingPlacement;
+        return _constructingWall && findingPlacement;
     }
 
     public static GameObject GetTempStructure()
@@ -137,7 +141,7 @@ public static class ConstructionHandler
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
         if (findingPlacement
-            && !settingWall)
+            && !_constructingWall)
         {
             //  keep track of previous values to update agent's size
             int prevLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
@@ -173,17 +177,9 @@ public static class ConstructionHandler
                 GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
             }
 
-            if (settingWall)
+            if (_constructingWall)
             {
-                GameObject closestPillar = tempStructure.GetComponent<WallPositioningHelper>().ClosestPillarTo(newLocation, 1);
-                if (closestPillar)
-                {
-                    tempStructure.transform.position = closestPillar.transform.position;
-                }
-                else
-                {
-                    tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
-                }
+                tempStructure.GetComponent<WallPositioningHelper>().Visualize(newLocation);
             }
             else
             {
@@ -198,7 +194,7 @@ public static class ConstructionHandler
     public static bool CanPlaceStructure()
     {
         //// ensure that user is not placing walls
-        if (!settingWall)
+        if (!_constructingWall)
         {
             if (GridBuilder.EndMove() == PlacementResult.Placed)
             {
@@ -257,9 +253,9 @@ public static class ConstructionHandler
     public static void CancelBuildingPlacement()
     {
         findingPlacement = false;
-        if (settingWall)
+        if (_constructingWall)
         {
-            settingWall = false;
+            _constructingWall = false;
             tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
             //if (tempWallPole.IsNotNull())
             //{
@@ -281,7 +277,7 @@ public static class ConstructionHandler
 
         Renderer[] renderers;
 
-        if (!settingWall)
+        if (!_constructingWall)
         {
             renderers = tempStructure.GetComponentsInChildren<Renderer>();
         }
