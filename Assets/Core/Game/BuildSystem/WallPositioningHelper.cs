@@ -20,18 +20,13 @@ public class WallPositioningHelper : MonoBehaviour
 
     private List<GameObject> _pillarPrefabs;
     private Dictionary<int, GameObject> _wallPrefabs;
-    public Transform OrganizerWallSegments { get; private set; }
     private bool _startSnapped;
     private bool _endSnapped;
 
-    //   private List<GameObject> wallSegments;
     private int lastWallLength;
 
     public void Setup()
     {
-        OrganizerWallSegments = LSUtility.CreateEmpty().transform;
-        OrganizerWallSegments.gameObject.name = "OrganizerWallSegments";
-
         _startSnapped = false;
         _endSnapped = false;
         _isPlacingWall = false;
@@ -48,10 +43,12 @@ public class WallPositioningHelper : MonoBehaviour
             {
                 ConstructionHandler.GetTempStructure().transform.position = closestPillar.transform.position;
                 ConstructionHandler.GetTempStructure().transform.rotation = closestPillar.transform.rotation;
+                Debug.Log("start snap");
                 _startSnapped = true;
             }
             else
             {
+                Debug.Log("start unsnap");
                 _startSnapped = false;
                 ConstructionHandler.GetTempStructure().transform.position = Positioning.GetSnappedPosition(pos);
             }
@@ -59,7 +56,14 @@ public class WallPositioningHelper : MonoBehaviour
         else
         {
             ConstructionHandler.GetTempStructure().transform.position = Positioning.GetSnappedPosition(pos);
+
+            UpdateWall();
         }
+    }
+
+    public void OnLeftClick()
+    {
+        CreateStartPillar();
     }
 
     public void OnRightClick()
@@ -78,23 +82,6 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    public void OnLeftClickDrag()
-    {
-        if (_isPlacingWall)
-        {
-            UpdateWall();
-        }
-        else
-        {
-            CreateStartPillar();
-        }
-    }
-
-    public bool IsPlacingWall()
-    {
-        return this._isPlacingWall;
-    }
-
     private void CreateStartPillar()
     {
         Vector3 startPos = ConstructionHandler.GetTempStructure().transform.position;
@@ -103,14 +90,15 @@ public class WallPositioningHelper : MonoBehaviour
         if (!_startSnapped)
         {
             startPillar = Instantiate(pillarPrefab, startPos, Quaternion.identity) as GameObject;
-            _pillarPrefabs.Add(startPillar);
-            startPillar.transform.parent = OrganizerWallSegments;
+            startPillar.transform.parent = ConstructionHandler.OrganizerStructures;
         }
         else
         {
             startPillar = ClosestPillarTo(startPos, pillarRangeOffset);
-            _pillarPrefabs.Add(startPillar);
         }
+
+        startPillar.gameObject.name = pillarPrefab.gameObject.name;
+        _pillarPrefabs.Add(startPillar);
 
         lastPillar = startPillar;
         lastWallLength = 0;
@@ -122,7 +110,7 @@ public class WallPositioningHelper : MonoBehaviour
         GameObject closest = null;
         float currentDistance = Mathf.Infinity;
         string searchTag = "WallPillar";
-        foreach (Transform child in OrganizerWallSegments)
+        foreach (Transform child in ConstructionHandler.OrganizerStructures)
         {
             if (child.gameObject.tag == searchTag)
             {
@@ -138,13 +126,6 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void SetWall()
     {
-        //foreach (GameObject ws in wallSegments)
-        //{
-        //    ConstructionHandler.SetBuildQueue(ws);
-        //}
-
-        //wallSegments.Clear();
-
         //check if last pole was ever set
         if (!_endSnapped
             && _pillarPrefabs.Count == _wallPrefabs.Count)
@@ -153,11 +134,31 @@ public class WallPositioningHelper : MonoBehaviour
             CreateWallPillar(endPos);
         }
 
+
+        for (int i = 0; i < _pillarPrefabs.Count; i++)
+        {
+            //if(_startSnapped && i == 0)
+            //{
+            //    return;
+            //}
+
+            ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
+
+            int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
+            GameObject wallSegement;
+            if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+            {
+                ConstructionHandler.SetBuildQueue(wallSegement);
+            }
+        }
+
         _isPlacingWall = false;
         _startSnapped = false;
 
         _pillarPrefabs.Clear();
         _wallPrefabs.Clear();
+
+        ConstructionHandler.ProcessBuildQueue();
     }
 
     private void UpdateWall()
@@ -226,9 +227,10 @@ public class WallPositioningHelper : MonoBehaviour
     private void CreateWallPillar(Vector3 _currentPos)
     {
         GameObject newPillar = Instantiate(pillarPrefab, _currentPos, Quaternion.identity);
+        newPillar.gameObject.name = pillarPrefab.gameObject.name;
         newPillar.transform.LookAt(lastPillar.transform);
         _pillarPrefabs.Add(newPillar);
-        newPillar.transform.parent = OrganizerWallSegments;
+        newPillar.transform.parent = ConstructionHandler.OrganizerStructures;
     }
 
     private void CreateWallSegment(Vector3 _currentPos)
@@ -240,9 +242,10 @@ public class WallPositioningHelper : MonoBehaviour
             Vector3 middle = 0.5f * (endPillarPos + lastPillar.transform.position);
 
             GameObject newWall = Instantiate(wallPrefab, middle, Quaternion.identity);
+            newWall.gameObject.name = wallPrefab.gameObject.name;
             newWall.SetActive(true);
             _wallPrefabs.Add(ndx, newWall);
-            newWall.transform.parent = OrganizerWallSegments;
+            newWall.transform.parent = ConstructionHandler.OrganizerStructures;
         }
     }
 
@@ -326,12 +329,12 @@ public class WallPositioningHelper : MonoBehaviour
         _wallPrefabs.Clear();
     }
 
-    private void OnDestroy()
-    {
-        if (OrganizerWallSegments.IsNotNull()
-            && OrganizerWallSegments.childCount > 0)
-        {
-            Destroy(OrganizerWallSegments.gameObject);
-        }
-    }
+    //private void OnDestroy()
+    //{
+    //    if (ConstructionHandler.OrganizerStructures.IsNotNull()
+    //        && ConstructionHandler.OrganizerStructures.childCount > 0)
+    //    {
+    //        Destroy(ConstructionHandler.OrganizerStructures.gameObject);
+    //    }
+    //}
 }

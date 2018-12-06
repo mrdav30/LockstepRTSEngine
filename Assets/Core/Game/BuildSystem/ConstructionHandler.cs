@@ -17,7 +17,8 @@ public static class ConstructionHandler
     private static bool _validPlacement;
     private static List<Material> oldMaterials = new List<Material>();
 
-    private static Queue<GameObject> buildQueue = new Queue<GameObject>();
+    private static Queue<GameObject> _buildQueue = new Queue<GameObject>();
+    public static Transform OrganizerStructures { get; private set; }
     #endregion
 
     public static void Initialize()
@@ -25,8 +26,13 @@ public static class ConstructionHandler
         _cachedCommander = PlayerManager.MainController.Commander;
         GridBuilder.Initialize();
 
+        OrganizerStructures = LSUtility.CreateEmpty().transform;
+        OrganizerStructures.transform.parent = PlayerManager.MainController.Commander.GetComponentInChildren<RTSAgents>().transform;
+        OrganizerStructures.gameObject.name = "OrganizerStructures";
+
+        UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
         UserInputHelper.OnLeftTapUp += HandleLeftClickRelease;
-        UserInputHelper.OnLeftTapHoldDown += HandleLeftClickDrag;
+        //  UserInputHelper.OnLeftTapHoldDown += HandleLeftClickDrag;
     }
 
     // Update is called once per frame
@@ -50,6 +56,14 @@ public static class ConstructionHandler
         }
     }
 
+    private static void HandleSingleLeftClick()
+    {
+        if (_constructingWall)
+        {
+            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
+        }
+    }
+
     private static void HandleLeftClickRelease()
     {
         if (_constructingWall)
@@ -58,13 +72,13 @@ public static class ConstructionHandler
         }
     }
 
-    private static void HandleLeftClickDrag()
-    {
-        if (_constructingWall)
-        {
-            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
-        }
-    }
+    //private static void HandleLeftClickDrag()
+    //{
+    //    if (_constructingWall)
+    //    {
+    //        tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
+    //    }
+    //}
 
     public static void CreateBuilding(RTSAgent constructingAgent, string buildingName)
     {
@@ -112,7 +126,6 @@ public static class ConstructionHandler
                     {
                         _constructingWall = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
-                        tempStructure.gameObject.tag = "EndPillar";
                     }
                     else
                     {
@@ -211,11 +224,6 @@ public static class ConstructionHandler
         }
     }
 
-    public static void SetBuildQueue(GameObject buildingProject)
-    {
-        buildQueue.Enqueue(buildingProject);
-    }
-
     public static void StartConstruction()
     {
         findingPlacement = false;
@@ -248,6 +256,62 @@ public static class ConstructionHandler
         {
             Debug.Log("Couldn't place building!");
         }
+    }
+
+    public static void SetBuildQueue(GameObject buildingProject)
+    {
+        _buildQueue.Enqueue(buildingProject);
+    }
+
+    public static void ProcessBuildQueue()
+    {
+        findingPlacement = false;
+        _constructingWall = false;
+
+        if (CanPlaceStructure())
+        {
+            // remove temporary structure from grid
+            GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
+            Object.Destroy(tempStructure.gameObject);
+
+            while (_buildQueue.Count > 0)
+            {
+                GameObject qStructure = _buildQueue.Dequeue();
+                Vector2d buildPoint = new Vector2d(qStructure.transform.position.x, qStructure.transform.position.z);
+                //  Vector2d rotation = new Vector2d(qStructure.transform.rotation.x, qStructure.transform.rotation.y);
+                RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint) as RTSAgent;
+
+                newBuilding.transform.parent = OrganizerStructures.transform;
+                newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
+                newBuilding.GetComponentInChildren<WallPrefab>().transform.localRotation = qStructure.transform.localRotation;
+                //     newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
+                //     newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
+                Object.Destroy(qStructure.gameObject);
+
+                //    if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
+                //   {
+                _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
+                RestoreMaterials(newBuilding.gameObject);
+                newBuilding.SetState(AnimState.Building);
+                newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
+                newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+                newBuilding.SetCommander(_cachedCommander);
+
+                // send build command
+                //Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+                //buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
+                //UserInputHelper.SendCommand(buildCom);
+
+                newBuilding.GetAbility<Structure>().StartConstruction();
+                //   }
+                //     else
+                //    {
+                //   Debug.Log("Couldn't place building!");
+                //     }
+            }
+        }
+
+        Debug.Log(_buildQueue.Count);
     }
 
     public static void CancelBuildingPlacement()
@@ -283,7 +347,7 @@ public static class ConstructionHandler
         }
         else
         {
-            renderers = tempStructure.GetComponent<WallPositioningHelper>().OrganizerWallSegments.GetComponentsInChildren<Renderer>();
+            renderers = OrganizerStructures.GetComponentsInChildren<Renderer>();
         }
 
         foreach (Renderer renderer in renderers)
@@ -299,6 +363,7 @@ public static class ConstructionHandler
     private static void RestoreMaterials(GameObject structure)
     {
         Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
+
         if (oldMaterials.Count == renderers.Length)
         {
             for (int i = 0; i < renderers.Length; i++)

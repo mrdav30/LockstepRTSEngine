@@ -64,10 +64,14 @@ MonoBehaviour:
     _description: Green Pine
     _icon: {fileID: 0}
     _prefab: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  - _name: HumanWoodWall
+  - _name: HumanWoodWallPillar
     _description: Wood Wall
     _icon: {fileID: 21300000, guid: aed9e13a31f26784cb5ec89319eba1d1, type: 3}
     _prefab: {fileID: 1292614385033484, guid: 34052d5328a416249b8ccc42278bc079, type: 2}
+  - _name: HumanWoodWallSegment
+    _description: Wood Wall
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1442506107234032, guid: cda6769975c749048b581c54cd10f1c8, type: 2}
   _worldObjectData:
   - _name: Sun
     _description: 

@@ -21,9 +21,8 @@ GameObject:
   - component: {fileID: 4095109138493970}
   - component: {fileID: 33964461235814468}
   - component: {fileID: 23684944712676884}
-  - component: {fileID: 114089219020986424}
   m_Layer: 2
-  m_Name: Wall
+  m_Name: HumanWoodWallSegment
   m_TagString: WallSegment
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,9 +38,8 @@ GameObject:
   - component: {fileID: 4750734831513854}
   - component: {fileID: 33611208101094392}
   - component: {fileID: 23143763838896818}
-  - component: {fileID: 114150836569383496}
   m_Layer: 2
-  m_Name: Pole
+  m_Name: HumanWoodWallPillar
   m_TagString: WallPillar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -189,28 +187,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1287509832937174}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114089219020986424
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1287509832937174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 507eaf9c84f40f742ae1986d34c0d5a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &114150836569383496
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1448022868708058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 507eaf9c84f40f742ae1986d34c0d5a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114296914064970424
 MonoBehaviour:
   m_ObjectHideFlags: 1
