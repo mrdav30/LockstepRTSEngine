@@ -7,7 +7,6 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempStructure;
-    private static AgentTag tempStructureTag;
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
     private static bool findingPlacement = false;
@@ -46,11 +45,11 @@ public static class ConstructionHandler
 
                 if (_validPlacement)
                 {
-                    SetTransparentMaterial(GameResourceManager.AllowedMaterial, false);
+                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial, false);
                 }
                 else
                 {
-                    SetTransparentMaterial(GameResourceManager.NotAllowedMaterial, false);
+                    SetTransparentMaterial(tempStructure, GameResourceManager.NotAllowedMaterial, false);
                 }
             }
         }
@@ -111,26 +110,25 @@ public static class ConstructionHandler
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
-                    tempStructure.name = buildingName;
-                    // retrieve build size from agent template
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
-                    tempStructureTag = buildingTemplate.Tag;
-                    tempConstructor = constructingAgent;
-
-                    findingPlacement = true;
-                    SetTransparentMaterial(GameResourceManager.AllowedMaterial, true);
-                    tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
-
-                    if (tempStructureTag == AgentTag.Wall)
+                    if (buildingTemplate.Tag == AgentTag.Wall)
                     {
                         _constructingWall = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
                     }
                     else
                     {
+                        tempStructure.name = buildingName;
                         GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
                     }
+
+                    // retrieve build size from agent template
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
+                    tempConstructor = constructingAgent;
+
+                    findingPlacement = true;
+                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial, true);
+                    tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                 }
                 else
                 {
@@ -251,6 +249,8 @@ public static class ConstructionHandler
             UserInputHelper.SendCommand(buildCom);
 
             newBuilding.GetAbility<Structure>().StartConstruction();
+
+            oldMaterials.Clear();
         }
         else
         {
@@ -278,7 +278,6 @@ public static class ConstructionHandler
             {
                 GameObject qStructure = _buildQueue.Dequeue();
                 Vector2d buildPoint = new Vector2d(qStructure.transform.position.x, qStructure.transform.position.z);
-                //  Vector2d rotation = new Vector2d(qStructure.transform.rotation.x, qStructure.transform.rotation.y);
                 RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint) as RTSAgent;
 
                 newBuilding.transform.parent = OrganizerStructures.transform;
@@ -309,9 +308,9 @@ public static class ConstructionHandler
                 //   Debug.Log("Couldn't place building!");
                 //     }
             }
-        }
 
-        Debug.Log(_buildQueue.Count);
+            oldMaterials.Clear();
+        }
     }
 
     public static void CancelBuildingPlacement()
@@ -321,18 +320,13 @@ public static class ConstructionHandler
         {
             _constructingWall = false;
             tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
-            //if (tempWallPole.IsNotNull())
-            //{
-            //    Object.Destroy(tempWallPole.gameObject);
-            //    tempWallPole = null;
-            //}
         }
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;
     }
 
-    private static void SetTransparentMaterial(Material material, bool storeExistingMaterial)
+    private static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
     {
         if (storeExistingMaterial)
         {
@@ -341,14 +335,8 @@ public static class ConstructionHandler
 
         Renderer[] renderers;
 
-        if (!_constructingWall)
-        {
-            renderers = tempStructure.GetComponentsInChildren<Renderer>();
-        }
-        else
-        {
-            renderers = OrganizerStructures.GetComponentsInChildren<Renderer>();
-        }
+
+        renderers = structure.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
@@ -371,5 +359,23 @@ public static class ConstructionHandler
                 renderers[i].material = oldMaterials[i];
             }
         }
+    }
+
+    public static GameObject ClosestStructureTo(Vector3 worldPoint, float distance, string searchTag)
+    {
+        GameObject closest = null;
+        float currentDistance = Mathf.Infinity;
+        foreach (Transform child in ConstructionHandler.OrganizerStructures)
+        {
+            if (child.gameObject.tag == searchTag)
+            {
+                currentDistance = Vector3.Distance(worldPoint, child.gameObject.transform.position);
+                if (currentDistance < distance)
+                {
+                    closest = child.gameObject;
+                }
+            }
+        }
+        return closest;
     }
 }

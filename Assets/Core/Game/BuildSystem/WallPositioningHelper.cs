@@ -38,17 +38,15 @@ public class WallPositioningHelper : MonoBehaviour
     {
         if (!_isPlacingWall)
         {
-            GameObject closestPillar = ClosestPillarTo(pos, pillarRangeOffset);
+            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(pos, pillarRangeOffset, "WallPillar");
             if (closestPillar.IsNotNull())
             {
                 ConstructionHandler.GetTempStructure().transform.position = closestPillar.transform.position;
                 ConstructionHandler.GetTempStructure().transform.rotation = closestPillar.transform.rotation;
-                Debug.Log("start snap");
                 _startSnapped = true;
             }
             else
             {
-                Debug.Log("start unsnap");
                 _startSnapped = false;
                 ConstructionHandler.GetTempStructure().transform.position = Positioning.GetSnappedPosition(pos);
             }
@@ -94,7 +92,7 @@ public class WallPositioningHelper : MonoBehaviour
         }
         else
         {
-            startPillar = ClosestPillarTo(startPos, pillarRangeOffset);
+            startPillar = ConstructionHandler.ClosestStructureTo(startPos, pillarRangeOffset, "WallPillar");
         }
 
         startPillar.gameObject.name = pillarPrefab.gameObject.name;
@@ -103,25 +101,6 @@ public class WallPositioningHelper : MonoBehaviour
         lastPillar = startPillar;
         lastWallLength = 0;
         _isPlacingWall = true;
-    }
-
-    public GameObject ClosestPillarTo(Vector3 worldPoint, float distance)
-    {
-        GameObject closest = null;
-        float currentDistance = Mathf.Infinity;
-        string searchTag = "WallPillar";
-        foreach (Transform child in ConstructionHandler.OrganizerStructures)
-        {
-            if (child.gameObject.tag == searchTag)
-            {
-                currentDistance = Vector3.Distance(worldPoint, child.gameObject.transform.position);
-                if (currentDistance < distance)
-                {
-                    closest = child.gameObject;
-                }
-            }
-        }
-        return closest;
     }
 
     private void SetWall()
@@ -134,15 +113,12 @@ public class WallPositioningHelper : MonoBehaviour
             CreateWallPillar(endPos);
         }
 
-
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
-            //if(_startSnapped && i == 0)
-            //{
-            //    return;
-            //}
-
-            ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
+            if (!(_startSnapped && i == 0))
+            {
+                ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
+            }
 
             int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
             GameObject wallSegement;
@@ -152,11 +128,7 @@ public class WallPositioningHelper : MonoBehaviour
             }
         }
 
-        _isPlacingWall = false;
-        _startSnapped = false;
-
-        _pillarPrefabs.Clear();
-        _wallPrefabs.Clear();
+        ClearTemporaryWalls();
 
         ConstructionHandler.ProcessBuildQueue();
     }
@@ -174,7 +146,7 @@ public class WallPositioningHelper : MonoBehaviour
         {
             if (!_currentPos.Equals(lastPillar.transform.position))
             {
-                GameObject closestPillar = ClosestPillarTo(_currentPos, pillarRangeOffset);
+                GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, pillarRangeOffset, "WallPillar");
 
                 if (closestPillar.IsNotNull())
                 {
@@ -324,17 +296,10 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void ClearTemporaryWalls()
     {
+        _startSnapped = false;
+        _endSnapped = false;
         _isPlacingWall = false;
         _pillarPrefabs.Clear();
         _wallPrefabs.Clear();
     }
-
-    //private void OnDestroy()
-    //{
-    //    if (ConstructionHandler.OrganizerStructures.IsNotNull()
-    //        && ConstructionHandler.OrganizerStructures.childCount > 0)
-    //    {
-    //        Destroy(ConstructionHandler.OrganizerStructures.gameObject);
-    //    }
-    //}
 }
