@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23684944712676884}
   m_Layer: 2
   m_Name: HumanWoodWallSegment
-  m_TagString: WallSegment
+  m_TagString: WallPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -40,7 +40,7 @@ GameObject:
   - component: {fileID: 23143763838896818}
   m_Layer: 2
   m_Name: HumanWoodWallPillar
-  m_TagString: WallPillar
+  m_TagString: WallPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,7 +118,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: d5b24f99b407d9e41931b0ff835ba2b1, type: 2}
+  - {fileID: 2100000, guid: 6d45ceb2c47644e0f9ed999ead731689, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -153,7 +153,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: d5b24f99b407d9e41931b0ff835ba2b1, type: 2}
+  - {fileID: 2100000, guid: b55c77afd57072b4c84a47d5274e46cf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

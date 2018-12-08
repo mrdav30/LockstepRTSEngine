@@ -61,7 +61,14 @@ public class WallPositioningHelper : MonoBehaviour
 
     public void OnLeftClick()
     {
-        CreateStartPillar();
+        if (_isPlacingWall)
+        {
+            SetWall();
+        }
+        else
+        {
+            CreateStartPillar();
+        }
     }
 
     public void OnRightClick()
@@ -69,14 +76,6 @@ public class WallPositioningHelper : MonoBehaviour
         if (_isPlacingWall)
         {
             ClearTemporaryWalls();
-        }
-    }
-
-    public void OnLeftClickUp()
-    {
-        if (_isPlacingWall)
-        {
-            SetWall();
         }
     }
 
@@ -115,8 +114,9 @@ public class WallPositioningHelper : MonoBehaviour
 
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
+            // ignore first entry if start pillar was snapped, don't want to construct twice!
             if (!(_startSnapped && i == 0))
-            {
+            { 
                 ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
             }
 

@@ -14,7 +14,7 @@ public static class ConstructionHandler
 
     private static AgentCommander _cachedCommander;
     private static bool _validPlacement;
-    private static List<Material> oldMaterials = new List<Material>();
+    private static Dictionary<string, Material> oldMaterials = new Dictionary<string, Material>();
 
     private static Queue<GameObject> _buildQueue = new Queue<GameObject>();
     public static Transform OrganizerStructures { get; private set; }
@@ -30,8 +30,6 @@ public static class ConstructionHandler
         OrganizerStructures.gameObject.name = "OrganizerStructures";
 
         UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
-        UserInputHelper.OnLeftTapUp += HandleLeftClickRelease;
-        //  UserInputHelper.OnLeftTapHoldDown += HandleLeftClickDrag;
     }
 
     // Update is called once per frame
@@ -62,22 +60,6 @@ public static class ConstructionHandler
             tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
         }
     }
-
-    private static void HandleLeftClickRelease()
-    {
-        if (_constructingWall)
-        {
-            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickUp();
-        }
-    }
-
-    //private static void HandleLeftClickDrag()
-    //{
-    //    if (_constructingWall)
-    //    {
-    //        tempStructure.GetComponent<WallPositioningHelper>().OnLeftClickDrag();
-    //    }
-    //}
 
     public static void CreateBuilding(RTSAgent constructingAgent, string buildingName)
     {
@@ -117,6 +99,7 @@ public static class ConstructionHandler
                     }
                     else
                     {
+                        //rename temp structure to building name as a reference for controller later
                         tempStructure.name = buildingName;
                         GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
                     }
@@ -238,6 +221,7 @@ public static class ConstructionHandler
         {
             _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
             RestoreMaterials(newBuilding.gameObject);
+            oldMaterials.Clear();
             newBuilding.SetState(AnimState.Building);
             newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
             newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
@@ -279,6 +263,7 @@ public static class ConstructionHandler
                 GameObject qStructure = _buildQueue.Dequeue();
                 Vector2d buildPoint = new Vector2d(qStructure.transform.position.x, qStructure.transform.position.z);
                 RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint) as RTSAgent;
+                newBuilding.gameObject.name = qStructure.gameObject.name;
 
                 newBuilding.transform.parent = OrganizerStructures.transform;
                 newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
@@ -315,16 +300,18 @@ public static class ConstructionHandler
 
     public static void CancelBuildingPlacement()
     {
-        findingPlacement = false;
         if (_constructingWall)
         {
             _constructingWall = false;
             tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
         }
+
+        findingPlacement = false;
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;
     }
+
 
     private static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
     {
@@ -335,28 +322,34 @@ public static class ConstructionHandler
 
         Renderer[] renderers;
 
-
         renderers = structure.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
             if (storeExistingMaterial)
             {
-                oldMaterials.Add(renderer.material);
+                for(int i = 0; i < renderers.Length; i++)
+                {
+                    oldMaterials.Add(renderers[i].gameObject.name, renderer.material);
+                }
             }
             renderer.material = material;
         }
     }
 
-    private static void RestoreMaterials(GameObject structure)
+    public static void RestoreMaterials(GameObject structure)
     {
         Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
 
-        if (oldMaterials.Count == renderers.Length)
+        if (oldMaterials.Count > 0)
         {
             for (int i = 0; i < renderers.Length; i++)
             {
-                renderers[i].material = oldMaterials[i];
+                Material oldMaterial;
+                if (oldMaterials.TryGetValue(renderers[i].gameObject.name, out oldMaterial))
+                {
+                    renderers[i].material = oldMaterial;
+                }
             }
         }
     }
