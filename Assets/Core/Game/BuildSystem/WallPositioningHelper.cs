@@ -116,7 +116,7 @@ public class WallPositioningHelper : MonoBehaviour
         {
             // ignore first entry if start pillar was snapped, don't want to construct twice!
             if (!(_startSnapped && i == 0))
-            { 
+            {
                 ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
             }
 
@@ -279,11 +279,11 @@ public class WallPositioningHelper : MonoBehaviour
                         {
                             nextPillar = ConstructionHandler.GetTempStructure();
                         }
-                        
+
                         float distance = Vector3.Distance(_pillarPrefabs[i].transform.position, nextPillar.transform.position);
                         wallSegement.transform.localScale = new Vector3(wallSegement.transform.localScale.x, wallSegement.transform.localScale.y, distance);
                         wallSegement.transform.rotation = adjustBasePole.transform.rotation;
-                        
+
                         Vector3 middle = 0.5f * (_pillarPrefabs[i].transform.position + nextPillar.transform.position);
                         wallSegement.transform.position = middle;
                     }
@@ -302,22 +302,25 @@ public class WallPositioningHelper : MonoBehaviour
 
             for (int i = 0; i < _pillarPrefabs.Count; i++)
             {
-                renderers.Add(_pillarPrefabs[i].GetComponent<Renderer>());
-
-                if (_wallPrefabs.Count > 0)
+                if (!(_startSnapped && i == 0))
                 {
-                    int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
-                    GameObject wallSegement;
-                    if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+                    renderers.Add(_pillarPrefabs[i].GetComponent<Renderer>());
+
+                    if (_wallPrefabs.Count > 0)
                     {
-                        renderers.Add(wallSegement.GetComponent<Renderer>());
+                        int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
+                        GameObject wallSegement;
+                        if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+                        {
+                            renderers.Add(wallSegement.GetComponent<Renderer>());
+                        }
+                    }
+
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.material = material;
                     }
                 }
-            }
-
-            foreach (Renderer renderer in renderers)
-            {
-                renderer.material = material;
             }
         }
     }
