@@ -220,7 +220,6 @@ public static class ConstructionHandler
         if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
         {
             _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
-            RestoreMaterials(newBuilding.gameObject);
             oldMaterials.Clear();
             newBuilding.SetState(AnimState.Building);
             newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
@@ -275,7 +274,6 @@ public static class ConstructionHandler
                 //    if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
                 //   {
                 _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
-                RestoreMaterials(newBuilding.gameObject);
                 newBuilding.SetState(AnimState.Building);
                 newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
                 newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
@@ -312,7 +310,6 @@ public static class ConstructionHandler
         tempConstructor = null;
     }
 
-
     private static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
     {
         if (storeExistingMaterial)
@@ -320,36 +317,24 @@ public static class ConstructionHandler
             oldMaterials.Clear();
         }
 
-        Renderer[] renderers;
-
-        renderers = structure.GetComponentsInChildren<Renderer>();
-
-        foreach (Renderer renderer in renderers)
+        if (_constructingWall)
         {
-            if (storeExistingMaterial)
-            {
-                for(int i = 0; i < renderers.Length; i++)
-                {
-                    oldMaterials.Add(renderers[i].gameObject.name, renderer.material);
-                }
-            }
-            renderer.material = material;
+            structure.GetComponentInChildren<WallPositioningHelper>().SetTransparentMaterial(material);
         }
-    }
-
-    public static void RestoreMaterials(GameObject structure)
-    {
-        Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
-
-        if (oldMaterials.Count > 0)
+        else
         {
-            for (int i = 0; i < renderers.Length; i++)
+            Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
+
+            foreach (Renderer renderer in renderers)
             {
-                Material oldMaterial;
-                if (oldMaterials.TryGetValue(renderers[i].gameObject.name, out oldMaterial))
+                if (storeExistingMaterial)
                 {
-                    renderers[i].material = oldMaterial;
+                    for (int i = 0; i < renderers.Length; i++)
+                    {
+                        oldMaterials.Add(renderers[i].gameObject.name, renderer.material);
+                    }
                 }
+                renderer.material = material;
             }
         }
     }

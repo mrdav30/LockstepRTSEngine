@@ -294,6 +294,34 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
+    public void SetTransparentMaterial(Material material)
+    {
+        if (_pillarPrefabs.Count > 0)
+        {
+            List<Renderer> renderers = new List<Renderer>();
+
+            for (int i = 0; i < _pillarPrefabs.Count; i++)
+            {
+                renderers.Add(_pillarPrefabs[i].GetComponent<Renderer>());
+
+                if (_wallPrefabs.Count > 0)
+                {
+                    int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
+                    GameObject wallSegement;
+                    if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+                    {
+                        renderers.Add(wallSegement.GetComponent<Renderer>());
+                    }
+                }
+            }
+
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.material = material;
+            }
+        }
+    }
+
     private void ClearTemporaryWalls()
     {
         _startSnapped = false;
