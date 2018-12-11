@@ -8,7 +8,7 @@ public class WallPositioningHelper : MonoBehaviour
     public GameObject pillarPrefab;
     public GameObject wallPrefab;
     // distance between poles to trigger spawning next segement
-    public int poleOffset;  // = 10
+    public int PoleOffset;  // = 10
     private const int pillarRangeOffset = 3;
 
     private Vector3 _currentPos;
@@ -172,7 +172,7 @@ public class WallPositioningHelper : MonoBehaviour
                 {
                     // ensure last instantiated pole is far enough from current pos
                     // and end pole is far enough from last pole
-                    if (endToLastDistance >= poleOffset)
+                    if (endToLastDistance >= PoleOffset)
                     {
                         CreateWallPillar(_currentPos);
                     }
@@ -258,7 +258,7 @@ public class WallPositioningHelper : MonoBehaviour
                 // no need to adjust start pillar
                 if (i > 0)
                 {
-                    Vector3 newPos = adjustBasePole.transform.position + startPillar.transform.TransformDirection(new Vector3(0, 0, poleOffset));
+                    Vector3 newPos = adjustBasePole.transform.position + startPillar.transform.TransformDirection(new Vector3(0, 0, PoleOffset));
                     _pillarPrefabs[i].transform.position = newPos;
                     _pillarPrefabs[i].transform.rotation = startPillar.transform.rotation;
                 }
@@ -279,12 +279,12 @@ public class WallPositioningHelper : MonoBehaviour
                         {
                             nextPillar = ConstructionHandler.GetTempStructure();
                         }
-
-                        float distance = Vector3.Distance(adjustBasePole.transform.position, nextPillar.transform.position);
+                        
+                        float distance = Vector3.Distance(_pillarPrefabs[i].transform.position, nextPillar.transform.position);
                         wallSegement.transform.localScale = new Vector3(wallSegement.transform.localScale.x, wallSegement.transform.localScale.y, distance);
                         wallSegement.transform.rotation = adjustBasePole.transform.rotation;
-
-                        Vector3 middle = 0.5f * (nextPillar.transform.position + adjustBasePole.transform.position);
+                        
+                        Vector3 middle = 0.5f * (_pillarPrefabs[i].transform.position + nextPillar.transform.position);
                         wallSegement.transform.position = middle;
                     }
                 }
