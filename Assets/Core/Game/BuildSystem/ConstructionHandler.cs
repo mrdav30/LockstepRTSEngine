@@ -190,7 +190,8 @@ public static class ConstructionHandler
         //// ensure that user is not placing walls
         if (!_constructingWall)
         {
-            if (GridBuilder.EndMove() == PlacementResult.Placed)
+            PlacementResult canPlace = GridBuilder.EndMove();
+            if (canPlace == PlacementResult.Placed)
             {
                 return true;
             }
@@ -308,6 +309,7 @@ public static class ConstructionHandler
         Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;
+        GridBuilder.Reset();
     }
 
     private static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
