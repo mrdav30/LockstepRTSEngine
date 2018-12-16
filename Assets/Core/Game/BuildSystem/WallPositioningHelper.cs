@@ -91,7 +91,8 @@ public class WallPositioningHelper : MonoBehaviour
         }
         else
         {
-            startPillar = ConstructionHandler.ClosestStructureTo(startPos, pillarRangeOffset, "WallPillar");
+            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(startPos, pillarRangeOffset, "WallPillar");
+            startPillar = Instantiate(closestPillar);
         }
 
         startPillar.gameObject.name = pillarPrefab.gameObject.name;
@@ -330,6 +331,19 @@ public class WallPositioningHelper : MonoBehaviour
         _startSnapped = false;
         _endSnapped = false;
         _isPlacingWall = false;
+        for (int i = 0; i < _pillarPrefabs.Count; i++)
+        {
+            Destroy(_pillarPrefabs[i].gameObject);
+            if (_wallPrefabs.Count > 0)
+            {
+                int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
+                GameObject wallSegement;
+                if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+                {
+                    Destroy(wallSegement.gameObject);
+                }
+            }
+        }
         _pillarPrefabs.Clear();
         _wallPrefabs.Clear();
     }

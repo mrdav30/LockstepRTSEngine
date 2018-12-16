@@ -109,7 +109,6 @@ public class BuildGridManager
             Coordinate coor = bufferBuildCoordinates[i];
             if (this.IsOnGrid(coor.x, coor.y))
             {
-                var test = this.Grid[coor.x, coor.y];
                 if (this.Grid[coor.x, coor.y].Occupied)
                 {
                     return false;
