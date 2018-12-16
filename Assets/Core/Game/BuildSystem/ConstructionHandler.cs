@@ -39,7 +39,17 @@ public static class ConstructionHandler
         {
             if (!_cachedCommander.CachedHud._mouseOverHud)
             {
-                FindBuildingLocation();
+                if (!_constructingWall)
+                {
+                    FindStructureLocation();
+                }
+                else
+                {
+                    FindWallLocation();
+                }
+
+                Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+                _validPlacement = GridBuilder.UpdateMove(pos);
 
                 if (_validPlacement)
                 {
@@ -158,7 +168,7 @@ public static class ConstructionHandler
         }
     }
 
-    public static void FindBuildingLocation()
+    public static void FindStructureLocation()
     {
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
         if (RTSInterfacing.HitPointIsGround(Input.mousePosition)
@@ -171,18 +181,18 @@ public static class ConstructionHandler
                 GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
             }
 
-            if (_constructingWall)
-            {
-                tempStructure.GetComponent<WallPositioningHelper>().Visualize(newLocation);
-            }
-            else
-            {
-                tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
-            }
-
-            Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
-            _validPlacement = GridBuilder.UpdateMove(pos);
+            tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
         }
+    }
+
+    public static void FindWallLocation()
+    {
+        if (!GridBuilder.IsMovingBuilding)
+        {
+            GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+        }
+
+        tempStructure.GetComponent<WallPositioningHelper>().Visualize();
     }
 
     public static bool CanPlaceStructure()

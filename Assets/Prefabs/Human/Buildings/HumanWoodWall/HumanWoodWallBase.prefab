@@ -200,7 +200,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pillarPrefab: {fileID: 1448022868708058}
   wallPrefab: {fileID: 1287509832937174}
-  PoleOffset: 10
+  PillarOffset: 10
+  WallSegmentOffset: 1
 --- !u!114 &114682440194327686
 MonoBehaviour:
   m_ObjectHideFlags: 1
