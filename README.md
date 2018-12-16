@@ -68,6 +68,5 @@ Currently, only movement with crowd behaviors is implemented. If you'd like to c
 Example Scene Requires:
 ---------
 
-- [Rocks Pack](https://assetstore.unity.com/packages/3d/environments/rock-boulders-2452) - For rocks
 - [Post Processing Stack](https://assetstore.unity.com/packages/essentials/post-processing-stack-83912)
 - [Legacy Image Effects](https://assetstore.unity.com/packages/essentials/legacy-image-effects-83913)
