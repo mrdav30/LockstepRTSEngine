@@ -24,13 +24,25 @@ public static class BuildGridAPI
     {
         return MainBuildGrid.Construct(building);
     }
+
     internal static void Unbuild(IBuildable building)
     {
         MainBuildGrid.Unbuild(building);
     }
-    internal static bool CanBuild(Coordinate buildPos, IBuildable building)
+
+    internal static bool CanBuild(Coordinate buildPos, IBuildable buildable)
     {
-        return MainBuildGrid.CanBuild(buildPos, building.BuildSizeLow, building.BuildSizeHigh);
+        if (buildable.IsSnapped)
+        {
+            //Remove spacing so structures can be built right next to another
+            MainBuildGrid.SetBuildSpacing(0);
+        }
+        else
+        {
+            MainBuildGrid.SetBuildSpacing(defaultBuildSpacing);
+        }
+
+        return MainBuildGrid.CanBuild(buildPos, buildable.BuildSizeLow, buildable.BuildSizeHigh);
     }
 
     public static Coordinate ToGridPos(Vector2d worldPos)

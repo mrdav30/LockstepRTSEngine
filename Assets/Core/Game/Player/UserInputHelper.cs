@@ -372,14 +372,7 @@ public class UserInputHelper : BehaviourHelper
     {
         if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
         {
-            if (ConstructionHandler.IsFindingBuildingLocation())
-            {
-                if (ConstructionHandler.CanPlaceStructure())
-                {
-                    ConstructionHandler.StartConstruction();
-                }
-            }
-            else
+            if (!ConstructionHandler.IsFindingBuildingLocation())
             {
                 if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {

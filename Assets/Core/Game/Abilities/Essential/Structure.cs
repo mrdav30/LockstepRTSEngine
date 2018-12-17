@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace RTSLockstep
 {
+    /*
+     * Essential ability that attaches to any active structure 
+     */
     public class Structure : Ability, IBuildable
     {
         public bool provisioner;
@@ -12,13 +15,9 @@ namespace RTSLockstep
         /// Describes the width and height of the buildable. This value does not change on the buildable.
         /// </summary>
         /// <value>The size of the build.</value>
-        [SerializeField]
-        private int _buildSizeLow;
-        [SerializeField]
-        private int _buildSizeHigh;
+        public int BuildSizeLow { get; set; }
+        public int BuildSizeHigh { get; set; }
 
-        public int BuildSizeLow { get { return _buildSizeLow; } set { _buildSizeLow = value; } }
-        public int BuildSizeHigh { get { return _buildSizeHigh; } set { _buildSizeHigh = value; } }
 
         public Coordinate GridPosition { get; set; }
         /// <summary>
@@ -26,6 +25,7 @@ namespace RTSLockstep
         /// </summary>
         public bool IsValidOnGrid { get; set; }
         public bool IsMoving { get; set; }
+        public bool IsSnapped { get; set; }
 
         private bool _needsBuilding;
         private bool _needsRepair;

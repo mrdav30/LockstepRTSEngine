@@ -36,17 +36,18 @@ public static class GridBuilder
     #endregion
 
     #region Placing
-    public static bool Place(IBuildable buildable, Vector2d newPos)
+    public static bool Place(IBuildable buildable, Vector2d newPos, bool isSnapped)
     {
         SetTarget(buildable);
-        StartPlace();
+        StartPlace(isSnapped);
         UpdatePlace(newPos);
         return EndPlace();
     }
 
-    private static void StartPlace()
+    private static void StartPlace(bool isSnapped)
     {
         Target.IsMoving = true;
+        Target.IsSnapped = isSnapped;
     }
 
     private static bool UpdatePlace(Vector2d newPos)
@@ -71,7 +72,7 @@ public static class GridBuilder
     public static void StartMove(IBuildable buildable)
     {
         SetTarget(buildable);
-        StartPlace();
+        StartPlace(false);
         TargetOriginalValid = Target.IsValidOnGrid;
         TargetOriginalPosition = Target.GridPosition;
         if (TargetOriginalValid)

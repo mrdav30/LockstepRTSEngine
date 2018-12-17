@@ -95,6 +95,7 @@ public class BuildGridManager
         {
             return false;
         }
+
         this.GetSpacedNeighborCoordinates(position, sizeLow, sizeHigh, this.bufferNeighborCoordinates);
         for (int i = 0; i < this.bufferNeighborCoordinates.Count; i++)
         {
@@ -104,6 +105,7 @@ public class BuildGridManager
                 return false;
             }
         }
+
         for (int i = 0; i < bufferBuildCoordinates.Count; i++)
         {
             Coordinate coor = bufferBuildCoordinates[i];
@@ -242,5 +244,9 @@ public class BuildGridManager
         }
     }
 
+    public void SetBuildSpacing(int buildSpacing)
+    {
+        this.BuildSpacing = buildSpacing;
+    }
 }
 

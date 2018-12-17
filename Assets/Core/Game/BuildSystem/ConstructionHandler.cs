@@ -1,5 +1,6 @@
 ﻿using RTSLockstep;
 using RTSLockstep.Data;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,17 +36,22 @@ public static class ConstructionHandler
     // Update is called once per frame
     public static void Visualize()
     {
-        if (findingPlacement)
+        if (IsFindingBuildingLocation())
         {
             if (!_cachedCommander.CachedHud._mouseOverHud)
             {
-                if (!_constructingWall)
+                if (!GridBuilder.IsMovingBuilding)
                 {
-                    FindStructureLocation();
+                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                }
+
+                if (_constructingWall)
+                {
+                    tempStructure.GetComponent<WallPositioningHelper>().Visualize();
                 }
                 else
                 {
-                    FindWallLocation();
+                    FindStructureLocation();
                 }
 
                 Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
@@ -65,9 +71,17 @@ public static class ConstructionHandler
 
     private static void HandleSingleLeftClick()
     {
-        if (_constructingWall)
+        if (IsFindingBuildingLocation())
         {
-            tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
+            if (_constructingWall)
+            {
+                tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
+
+            }
+            else
+            {
+                ProcessConstructionQueue();
+            }
         }
     }
 
@@ -98,25 +112,28 @@ public static class ConstructionHandler
             }
             else
             {
-                tempStructure = Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+                tempStructure = UnityEngine.Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
+                    Vector3 objectSize = Vector3.zero;
                     if (buildingTemplate.Tag == AgentTag.Wall)
                     {
                         _constructingWall = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
+                        //get size based on the mesh renderer attached to the base pillar
+                        objectSize = Vector3.Scale(tempStructure.GetComponent<WallPositioningHelper>().pillarPrefab.transform.localScale, tempStructure.GetComponent<WallPositioningHelper>().pillarPrefab.GetComponent<MeshRenderer>().bounds.size);
                     }
                     else
                     {
-                        //rename temp structure to building name as a reference for controller later
-                        tempStructure.name = buildingName;
-                        GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                        //get size based on the mesh renderer attached to the empty GO
+                        objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponent<MeshRenderer>().bounds.size);
                     }
 
                     // retrieve build size from agent template
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = buildingTemplate.GetComponent<Structure>().BuildSizeLow;
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = buildingTemplate.GetComponent<Structure>().BuildSizeHigh;
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
+
                     tempConstructor = constructingAgent;
 
                     findingPlacement = true;
@@ -125,7 +142,7 @@ public static class ConstructionHandler
                 }
                 else
                 {
-                    Object.Destroy(tempStructure);
+                    UnityEngine.Object.Destroy(tempStructure);
                 }
             }
         }
@@ -133,7 +150,7 @@ public static class ConstructionHandler
 
     public static bool IsFindingBuildingLocation()
     {
-        return _constructingWall && findingPlacement;
+        return _constructingWall || findingPlacement;
     }
 
     public static GameObject GetTempStructure()
@@ -176,39 +193,16 @@ public static class ConstructionHandler
         {
             lastLocation = newLocation;
 
-            if (!GridBuilder.IsMovingBuilding)
-            {
-                GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
-            }
-
             tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
         }
     }
 
-    public static void FindWallLocation()
-    {
-        if (!GridBuilder.IsMovingBuilding)
-        {
-            GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
-        }
-
-        tempStructure.GetComponent<WallPositioningHelper>().Visualize();
-    }
-
     public static bool CanPlaceStructure()
     {
-        //// ensure that user is not placing walls
-        if (!_constructingWall)
+        PlacementResult canPlace = GridBuilder.EndMove();
+        if (canPlace == PlacementResult.Placed)
         {
-            PlacementResult canPlace = GridBuilder.EndMove();
-            if (canPlace == PlacementResult.Placed)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
         else
         {
@@ -216,58 +210,33 @@ public static class ConstructionHandler
         }
     }
 
-    public static void StartConstruction()
-    {
-        findingPlacement = false;
-        Vector2d buildPoint = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
-        RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(tempStructure.gameObject.name, buildPoint, new Vector2d(0, 0)) as RTSAgent;
-
-        // remove temporary structure from grid
-        GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
-        newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
-        newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
-        Object.Destroy(tempStructure.gameObject);
-
-        if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
-        {
-            _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
-            oldMaterials.Clear();
-            newBuilding.SetState(AnimState.Building);
-            newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
-            newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-            newBuilding.SetCommander(_cachedCommander);
-
-            // send build command
-            Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-            buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
-            UserInputHelper.SendCommand(buildCom);
-
-            newBuilding.GetAbility<Structure>().StartConstruction();
-
-            oldMaterials.Clear();
-        }
-        else
-        {
-            Debug.Log("Couldn't place building!");
-        }
-    }
-
-    public static void SetBuildQueue(GameObject buildingProject)
+    public static void SetConstructionQueue(GameObject buildingProject)
     {
         _buildQueue.Enqueue(buildingProject);
     }
 
-    public static void ProcessBuildQueue()
+    public static void ProcessConstructionQueue()
     {
-        findingPlacement = false;
-        _constructingWall = false;
-
         if (CanPlaceStructure())
         {
             // remove temporary structure from grid
             GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
-            Object.Destroy(tempStructure.gameObject);
 
+            //if we're not building a wall, add the tempstructure to the build queue
+            if (!_constructingWall
+                && _buildQueue.Count > 0)
+            {
+                tempStructure.gameObject.name = tempStructure.GetComponent<TempStructure>().EmptyGO.name;
+                SetConstructionQueue(tempStructure);
+            }
+
+            findingPlacement = false;
+            _constructingWall = false;
+
+            //temp structure no longer required
+            UnityEngine.Object.Destroy(tempStructure.gameObject);
+
+            int ndx = 0;
             while (_buildQueue.Count > 0)
             {
                 GameObject qStructure = _buildQueue.Dequeue();
@@ -278,29 +247,41 @@ public static class ConstructionHandler
                 newBuilding.transform.parent = OrganizerStructures.transform;
                 newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
                 newBuilding.GetComponentInChildren<WallPrefab>().transform.localRotation = qStructure.transform.localRotation;
-                //     newBuilding.GetAbility<Structure>().BuildSizeLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
-                //     newBuilding.GetAbility<Structure>().BuildSizeHigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
-                Object.Destroy(qStructure.gameObject);
 
-                //    if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
-                //   {
-                _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
-                newBuilding.SetState(AnimState.Building);
-                newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
-                newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-                newBuilding.SetCommander(_cachedCommander);
+                //get size based on the mesh renderer attached to the base prefab
+                Vector3 objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponent<MeshRenderer>().bounds.size);
+                newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
+                newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
 
-                // send build command
-                //Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                //buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
-                //UserInputHelper.SendCommand(buildCom);
+                //queue object no longer required
+                UnityEngine.Object.Destroy(qStructure.gameObject);
 
-                newBuilding.GetAbility<Structure>().StartConstruction();
-                //   }
-                //     else
-                //    {
-                //   Debug.Log("Couldn't place building!");
-                //     }
+                //send false to disable building spacing so walls can snap
+                bool canSnap = newBuilding.Tag == AgentTag.Wall;
+                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position, canSnap))
+                {
+                    _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
+                    newBuilding.SetState(AnimState.Building);
+                    newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
+                    newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+                    newBuilding.SetCommander(_cachedCommander);
+
+                    if (ndx == 0)
+                    {
+                        // send build command
+                        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+                        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
+                        UserInputHelper.SendCommand(buildCom);
+                    }
+
+                    newBuilding.GetAbility<Structure>().StartConstruction();
+                }
+                else
+                {
+                    Debug.Log("Couldn't place building!");
+                }
+
+                ndx++;
             }
 
             oldMaterials.Clear();
@@ -316,7 +297,7 @@ public static class ConstructionHandler
         }
 
         findingPlacement = false;
-        Object.Destroy(tempStructure.gameObject);
+        UnityEngine.Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;
         GridBuilder.Reset();

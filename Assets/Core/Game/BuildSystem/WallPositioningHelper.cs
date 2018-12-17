@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Attaches to wall base prefab 
+ */
 public class WallPositioningHelper : MonoBehaviour
 {
     public GameObject pillarPrefab;
@@ -122,20 +125,20 @@ public class WallPositioningHelper : MonoBehaviour
             // ignore first entry if start pillar was snapped, don't want to construct twice!
             if (!(_startSnapped && i == 0))
             {
-                ConstructionHandler.SetBuildQueue(_pillarPrefabs[i]);
+                ConstructionHandler.SetConstructionQueue(_pillarPrefabs[i]);
             }
 
             int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
             GameObject wallSegement;
             if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
             {
-                ConstructionHandler.SetBuildQueue(wallSegement);
+                ConstructionHandler.SetConstructionQueue(wallSegement);
             }
         }
 
         ClearTemporaryWalls();
 
-        ConstructionHandler.ProcessBuildQueue();
+        ConstructionHandler.ProcessConstructionQueue();
     }
 
     private void UpdateWall()
@@ -341,6 +344,9 @@ public class WallPositioningHelper : MonoBehaviour
         _startSnapped = false;
         _endSnapped = false;
         _isPlacingWall = false;
+
+
+
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
             Destroy(_pillarPrefabs[i].gameObject);

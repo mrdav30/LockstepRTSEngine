@@ -14,5 +14,6 @@
         /// </summary>
         bool IsValidOnGrid { get; set; }
 	    bool IsMoving { get; set; }
+        bool IsSnapped { get; set; }
     }
 }
