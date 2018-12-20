@@ -127,7 +127,7 @@ public static class ConstructionHandler
                     else
                     {
                         //get size based on the mesh renderer attached to the empty GO
-                        objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponent<MeshRenderer>().bounds.size);
+                        objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponentInChildren<MeshRenderer>().bounds.size);
                     }
 
                     // retrieve build size from agent template
@@ -224,7 +224,7 @@ public static class ConstructionHandler
 
             //if we're not building a wall, add the tempstructure to the build queue
             if (!_constructingWall
-                && _buildQueue.Count > 0)
+                && _buildQueue.Count == 0)
             {
                 tempStructure.gameObject.name = tempStructure.GetComponent<TempStructure>().EmptyGO.name;
                 SetConstructionQueue(tempStructure);
@@ -245,11 +245,19 @@ public static class ConstructionHandler
                 newBuilding.gameObject.name = qStructure.gameObject.name;
 
                 newBuilding.transform.parent = OrganizerStructures.transform;
-                newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
-                newBuilding.GetComponentInChildren<WallPrefab>().transform.localRotation = qStructure.transform.localRotation;
+                Vector3 objectSize = Vector3.zero;
+                if (newBuilding.Tag == AgentTag.Wall)
+                {
+                    newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
+                    newBuilding.GetComponentInChildren<WallPrefab>().transform.localRotation = qStructure.transform.localRotation;
 
-                //get size based on the mesh renderer attached to the base prefab
-                Vector3 objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponent<MeshRenderer>().bounds.size);
+                    objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponent<MeshRenderer>().bounds.size);
+                }
+                else
+                {
+                    objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponentInChildren<MeshRenderer>().bounds.size);
+                }
+
                 newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
                 newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
 

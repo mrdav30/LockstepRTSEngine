@@ -32,16 +32,6 @@ public static class BuildGridAPI
 
     internal static bool CanBuild(Coordinate buildPos, IBuildable buildable)
     {
-        //if (buildable.IsSnapped)
-        //{
-        //    //Remove spacing so structures can be built right next to another
-        //    MainBuildGrid.SetBuildSpacing(0);
-        //}
-        //else
-        //{
-        //    MainBuildGrid.SetBuildSpacing(defaultBuildSpacing);
-        //}
-
         return MainBuildGrid.CanBuild(buildPos, buildable);
     }
 
