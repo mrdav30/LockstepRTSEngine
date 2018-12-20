@@ -59,11 +59,11 @@ public static class ConstructionHandler
 
                 if (_validPlacement)
                 {
-                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial, false);
+                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                 }
                 else
                 {
-                    SetTransparentMaterial(tempStructure, GameResourceManager.NotAllowedMaterial, false);
+                    SetTransparentMaterial(tempStructure, GameResourceManager.NotAllowedMaterial);
                 }
             }
         }
@@ -137,7 +137,7 @@ public static class ConstructionHandler
                     tempConstructor = constructingAgent;
 
                     findingPlacement = true;
-                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial, true);
+                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                 }
                 else
@@ -303,13 +303,8 @@ public static class ConstructionHandler
         GridBuilder.Reset();
     }
 
-    private static void SetTransparentMaterial(GameObject structure, Material material, bool storeExistingMaterial)
+    private static void SetTransparentMaterial(GameObject structure, Material material)
     {
-        if (storeExistingMaterial)
-        {
-            oldMaterials.Clear();
-        }
-
         if (_constructingWall)
         {
             structure.GetComponentInChildren<WallPositioningHelper>().SetTransparentMaterial(material);
@@ -320,13 +315,6 @@ public static class ConstructionHandler
 
             foreach (Renderer renderer in renderers)
             {
-                if (storeExistingMaterial)
-                {
-                    for (int i = 0; i < renderers.Length; i++)
-                    {
-                        oldMaterials.Add(renderers[i].gameObject.name, renderer.material);
-                    }
-                }
                 renderer.material = material;
             }
         }

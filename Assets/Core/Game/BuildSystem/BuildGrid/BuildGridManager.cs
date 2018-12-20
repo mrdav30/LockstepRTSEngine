@@ -40,7 +40,7 @@ public class BuildGridManager
 
     public IEnumerable<IBuildable> GetOccupyingBuildables(IBuildable buildable)
     {
-        if (!CanBuild(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh))
+        if (!CanBuild(buildable.GridPosition, buildable))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
@@ -56,7 +56,7 @@ public class BuildGridManager
 
     public bool Construct(IBuildable buildable)
     {
-        if (CanBuild(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh))
+        if (CanBuild(buildable.GridPosition, buildable))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
@@ -89,18 +89,18 @@ public class BuildGridManager
 
     }
 
-    public bool CanBuild(Coordinate position, int sizeLow, int sizeHigh)
+    public bool CanBuild(Coordinate position, IBuildable buildable)
     {
-        if (TryGetBuildCoordinates(position, sizeLow, sizeHigh, bufferBuildCoordinates) == false)
+        if (TryGetBuildCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates) == false)
         {
             return false;
         }
 
-        this.GetSpacedNeighborCoordinates(position, sizeLow, sizeHigh, this.bufferNeighborCoordinates);
+        this.GetSpacedNeighborCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, this.bufferNeighborCoordinates);
         for (int i = 0; i < this.bufferNeighborCoordinates.Count; i++)
         {
             Coordinate coor = this.bufferNeighborCoordinates[i];
-            if (Grid[coor.x, coor.y].Occupied)
+            if (Grid[coor.x, coor.y].Occupied && !buildable.IsSnapped)
             {
                 return false;
             }
@@ -111,7 +111,7 @@ public class BuildGridManager
             Coordinate coor = bufferBuildCoordinates[i];
             if (this.IsOnGrid(coor.x, coor.y))
             {
-                if (this.Grid[coor.x, coor.y].Occupied)
+                if (this.Grid[coor.x, coor.y].Occupied && !buildable.IsSnapped)
                 {
                     return false;
                 }
@@ -244,9 +244,9 @@ public class BuildGridManager
         }
     }
 
-    public void SetBuildSpacing(int buildSpacing)
-    {
-        this.BuildSpacing = buildSpacing;
-    }
+    //public void SetBuildSpacing(int buildSpacing)
+    //{
+    //    this.BuildSpacing = buildSpacing;
+    //}
 }
 
