@@ -11,9 +11,24 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1578406621253206}
   m_IsPrefabAsset: 1
---- !u!1 &1287509832937174
+--- !u!1 &1217730045509884
 GameObject:
   m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4594227347151834}
+  m_Layer: 0
+  m_Name: HumanWoodWallSegment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!1 &1287509832937174
+GameObject:
+  m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
@@ -22,15 +37,15 @@ GameObject:
   - component: {fileID: 33964461235814468}
   - component: {fileID: 23684944712676884}
   m_Layer: 2
-  m_Name: HumanWoodWallSegment
+  m_Name: Wall
   m_TagString: WallPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1448022868708058
 GameObject:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
@@ -39,7 +54,7 @@ GameObject:
   - component: {fileID: 33611208101094392}
   - component: {fileID: 23143763838896818}
   m_Layer: 2
-  m_Name: HumanWoodWallPillar
+  m_Name: Pole
   m_TagString: WallPrefab
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53,11 +68,26 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4003334259573246}
-  - component: {fileID: 114682440194327686}
+  - component: {fileID: 114584971779787512}
   - component: {fileID: 114296914064970424}
   m_Layer: 11
   m_Name: HumanWoodWallBase
   m_TagString: WallPrefab
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1830645847949502
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4964463936567184}
+  m_Layer: 2
+  m_Name: HumanWoodWallPillar
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,8 +102,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4750734831513854}
-  - {fileID: 4095109138493970}
+  - {fileID: 4594227347151834}
+  - {fileID: 4964463936567184}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -85,10 +115,24 @@ Transform:
   m_GameObject: {fileID: 1287509832937174}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 7.75, z: 9.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+  m_Father: {fileID: 4594227347151834}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4594227347151834
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1217730045509884}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 7.75, z: 9.1}
+  m_Children:
+  - {fileID: 4095109138493970}
   m_Father: {fileID: 4003334259573246}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4750734831513854
 Transform:
@@ -98,10 +142,24 @@ Transform:
   m_GameObject: {fileID: 1448022868708058}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 8, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4003334259573246}
+  m_Father: {fileID: 4964463936567184}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4964463936567184
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1830645847949502}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.9, y: 8, z: 0.9}
+  m_Children:
+  - {fileID: 4750734831513854}
+  m_Father: {fileID: 4003334259573246}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23143763838896818
 MeshRenderer:
@@ -198,11 +256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9651390e4ac1bae46bbf95a3acbd8d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pillarPrefab: {fileID: 1448022868708058}
-  wallPrefab: {fileID: 1287509832937174}
-  PillarOffset: 10
-  WallSegmentOffset: 1
---- !u!114 &114682440194327686
+--- !u!114 &114584971779787512
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -213,3 +267,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7e1ae3c2dd4174ab039bbd185d585a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EmptyGO: {fileID: 1830645847949502}
+  PillarPrefab: {fileID: 1830645847949502}
+  WallPrefab: {fileID: 1217730045509884}

@@ -261,7 +261,7 @@ namespace RTSLockstep
                 if (GlobalAgentActive[i])
                 {
                     RTSAgent agent = GlobalAgents[i];
-                    int n1 = agent.Body._position.GetHashCode() + agent.Body._rotation.GetStateHash();
+                    int n1 = agent.Body._position.GetHashCode() + agent.Body._rotation.GetHashCode();
                     switch (operationToggle)
                     {
                         case 0:
@@ -415,9 +415,56 @@ namespace RTSLockstep
         public RTSAgent CreateAgent(string agentCode, Vector2d position)
         {
             RTSAgent agent = CreateAgent(agentCode, position, Vector2d.right);
+            return agent;
+        }
+
+        public RTSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
+        {
+            var agent = CreateRawAgent(agentCode, position, rotation);
+
+            InitializeAgent(agent, position, rotation);
             if (onCreateAgent != null)
                 onCreateAgent(agent);
+
             return agent;
+        }
+
+        /// <summary>
+        /// Create an uninitialized RTSAgent
+        /// </summary>
+        /// <returns>The raw agent.</returns>
+        /// <param name="agentCode">Agent code.</param>
+        /// <param name="isBare">If set to <c>true</c> is bare.</param>
+        public static RTSAgent CreateRawAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
+        {
+            if (!GameResourceManager.IsValidAgentCode(agentCode))
+            {
+                throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
+            }
+            FastStack<RTSAgent> cache = CachedAgents[agentCode];
+            RTSAgent curAgent = null;
+
+            if (cache.IsNotNull() && cache.Count > 0)
+            {
+                curAgent = cache.Pop();
+                ushort agentCodeID = GameResourceManager.GetAgentCodeIndex(agentCode);
+                Debug.Log(curAgent.TypeIndex);
+                TypeAgentsActive[agentCodeID][curAgent.TypeIndex] = true;
+            }
+            else
+            {
+                IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[agentCode];
+
+                Vector3 pos = startPosition.ToVector3();
+                Quaternion rot = new Quaternion(0, startRotation.y, 0, startRotation.x);
+
+                curAgent = GameObject.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject, pos, rot).GetComponent<RTSAgent>();
+                curAgent.Setup(interfacer);
+
+                RegisterRawAgent(curAgent);
+
+            }
+            return curAgent;
         }
 
         public static void RegisterRawAgent(RTSAgent agent)
@@ -440,48 +487,6 @@ namespace RTSLockstep
             agent.TypeIndex = (ushort)(typeAgents.Count);
             typeAgents.Add(agent);
             typeActive.Add(true);
-        }
-
-        /// <summary>
-        /// Create an uninitialized RTSAgent
-        /// </summary>
-        /// <returns>The raw agent.</returns>
-        /// <param name="agentCode">Agent code.</param>
-        /// <param name="isBare">If set to <c>true</c> is bare.</param>
-        public static RTSAgent CreateRawAgent(string agentCode)
-        {
-            if (!GameResourceManager.IsValidAgentCode(agentCode))
-            {
-                throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
-            }
-            FastStack<RTSAgent> cache = CachedAgents[agentCode];
-            RTSAgent curAgent = null;
-
-            if (cache.IsNotNull() && cache.Count > 0)
-            {
-                curAgent = cache.Pop();
-                ushort agentCodeID = GameResourceManager.GetAgentCodeIndex(agentCode);
-                Debug.Log(curAgent.TypeIndex);
-                TypeAgentsActive[agentCodeID][curAgent.TypeIndex] = true;
-            }
-            else
-            {
-                IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[agentCode];
-
-                curAgent = GameObject.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject).GetComponent<RTSAgent>();
-                curAgent.Setup(interfacer);
-
-                RegisterRawAgent(curAgent);
-
-            }
-            return curAgent;
-        }
-        public RTSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
-        {
-            var agent = CreateRawAgent(agentCode);
-            InitializeAgent(agent, position, rotation);
-
-            return agent;
         }
 
         /// <summary>

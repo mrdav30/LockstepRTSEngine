@@ -19,7 +19,7 @@ namespace RTSLockstep
 
         private long collisionTurnThreshold;
         bool bufferStartTurn;
-        Vector2d bufferTargetRot;
+        Vector2d bufferTargetRotation;
         bool isColliding;
 
         protected override void OnSetup()
@@ -113,7 +113,7 @@ namespace RTSLockstep
             if (bufferStartTurn)
             {
                 bufferStartTurn = false;
-                _StartTurn(bufferTargetRot);
+                _StartTurn(bufferTargetRotation);
             }
         }
 
@@ -133,7 +133,7 @@ namespace RTSLockstep
         public void StartTurnDirection(Vector2d targetDirection)
         {
             bufferStartTurn = true;
-            bufferTargetRot = targetDirection.ToRotation();
+            bufferTargetRotation = targetDirection.ToRotation();
         }
 
         //TODO: Implement this!
@@ -190,7 +190,7 @@ namespace RTSLockstep
             SaveManager.WriteVector2d(writer, "TargetRotation", targetRotation);
             SaveManager.WriteLong(writer, "CachedBeginCheck", cachedBeginCheck);
             SaveManager.WriteBoolean(writer, "BufferStartTurn", bufferStartTurn);
-            SaveManager.WriteVector2d(writer, "BufferTargetRot", bufferTargetRot);
+            SaveManager.WriteVector2d(writer, "bufferTargetRotation", bufferTargetRotation);
             SaveManager.WriteBoolean(writer, "Colliding", isColliding);
         }
 
@@ -211,8 +211,8 @@ namespace RTSLockstep
                 case "BufferStartTurn":
                     bufferStartTurn = (bool)readValue;
                     break;
-                case "BufferTargetRot":
-                    bufferTargetRot = LoadManager.LoadVector2d(reader);
+                case "bufferTargetRotation":
+                    bufferTargetRotation = LoadManager.LoadVector2d(reader);
                     break;
                 case "Colliding":
                     isColliding = (bool)readValue;

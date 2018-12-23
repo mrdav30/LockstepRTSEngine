@@ -24,9 +24,9 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 4
+  m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: ad8dc697f80c6f84abb3e88dcdd5e6b5, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: ca7bb5d86e6a0b64e807af41edd31bb7, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 219849900}
-  m_IndirectSpecularColor: {r: 0.5623202, g: 0.53287727, b: 0.49586946, a: 1}
+  m_IndirectSpecularColor: {r: 0.49780262, g: 0.49780262, b: 0.49780262, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -154,52 +154,6 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c7c086e884bd6aa42aa864a1ab449cea, type: 2}
-  m_IsPrefabAsset: 0
---- !u!1001 &79379746
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 34
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Name
-      value: JungleGreenPine_XL (2)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
   m_IsPrefabAsset: 0
 --- !u!1 &87167291
 GameObject:
@@ -416,23 +370,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Spawns:
-  - AgentCode: HumanTownHall
+  - AgentCode: HumanWorker
     Count: 1
     ControllerCode: Player 1
     Position:
-      x: -655360
-      y: -655360
-  - AgentCode: HumanWorker
-    Count: 5
-    ControllerCode: Player 1
-    Position:
       x: 0
-      y: 0
-  - AgentCode: HumanFootman
-    Count: 10
-    ControllerCode: Hostile
-    Position:
-      x: -4915200
       y: 0
   AutoCommand: 0
 --- !u!114 &87167299
@@ -505,18 +447,6 @@ Light:
   m_CorrespondingSourceObject: {fileID: 108317614670847690, guid: e7fc641f62ca86a46b2a77a821393dfd,
     type: 2}
   m_PrefabInternal: {fileID: 1178927199}
---- !u!114 &222806206 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 79379746}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
---- !u!114 &248141995 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 2032695365}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
 --- !u!114 &523455869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -563,61 +493,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _environmentBodies: []
   _environmentObjects: []
-  _environmentAgents:
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 222806206}
-    Position:
-      x: 524288
-      y: 2228224
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 248141995}
-    Position:
-      x: 557056
-      y: 2392064
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 1136415046}
-    Position:
-      x: 65536
-      y: 2621440
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 1140754943}
-    Position:
-      x: -393216
-      y: 2326528
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 1561281352}
-    Position:
-      x: -393216
-      y: 1736704
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: JungleGreenPine_XL
-    Agent: {fileID: 2035763923}
-    Position:
-      x: -917504
-      y: 1966080
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
+  _environmentAgents: []
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,72 +613,6 @@ Prefab:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 128830cd048d508489d67e66eb42a2f1, type: 2}
   m_IsPrefabAsset: 0
---- !u!1001 &859556239
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 35.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Name
-      value: JungleGreenPine_XL (4)
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1062187151898614, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1619905845099784, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1309315727913746, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1362254081914404, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &987474124
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,64 +645,6 @@ Transform:
   m_Father: {fileID: 87167302}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1047234464
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 26.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Name
-      value: JungleGreenPine_XL (1)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  m_IsPrefabAsset: 0
---- !u!114 &1136415046 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 1882569321}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
---- !u!114 &1140754943 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 859556239}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
 --- !u!1001 &1178927199
 Prefab:
   m_ObjectHideFlags: 0
@@ -940,64 +692,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4936176028545174, guid: 128830cd048d508489d67e66eb42a2f1,
     type: 2}
   m_PrefabInternal: {fileID: 689575761}
---- !u!114 &1561281352 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 1047234464}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
---- !u!1001 &1613980974
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -14
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114273761097470604, guid: 8d46db17eb07485439ed5f72a4913ab7,
-        type: 2}
-      propertyPath: _internalBody._radius
-      value: 131072
-      objectReference: {fileID: 0}
-    - target: {fileID: 114273761097470604, guid: 8d46db17eb07485439ed5f72a4913ab7,
-        type: 2}
-      propertyPath: _internalBody._height
-      value: 917504
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  m_IsPrefabAsset: 0
 --- !u!1 &1801105993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1041,101 +735,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b470a01d0f0845d4799edc328e93b227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &1882569321
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Name
-      value: JungleGreenPine_XL (3)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  m_IsPrefabAsset: 0
---- !u!1001 &2032695365
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 8.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 36.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4711257885876698, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_RootOrder
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-      propertyPath: m_Name
-      value: JungleGreenPine_XL (5)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
-  m_IsPrefabAsset: 0
---- !u!114 &2035763923 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114994692316010246, guid: 8d46db17eb07485439ed5f72a4913ab7,
-    type: 2}
-  m_PrefabInternal: {fileID: 1613980974}
-  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}

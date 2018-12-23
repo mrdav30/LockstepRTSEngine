@@ -116,19 +116,14 @@ public static class ConstructionHandler
 
                 if (tempStructure.GetComponent<TempStructure>())
                 {
-                    Vector3 objectSize = Vector3.zero;
                     if (buildingTemplate.Tag == AgentTag.Wall)
                     {
                         _constructingWall = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
-                        //get size based on the mesh renderer attached to the base pillar
-                        objectSize = Vector3.Scale(tempStructure.GetComponent<WallPositioningHelper>().pillarPrefab.transform.localScale, tempStructure.GetComponent<WallPositioningHelper>().pillarPrefab.GetComponent<MeshRenderer>().bounds.size);
                     }
-                    else
-                    {
-                        //get size based on the mesh renderer attached to the empty GO
-                        objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponentInChildren<MeshRenderer>().bounds.size);
-                    }
+
+                    //get size based on the mesh renderer attached to the empty GO
+                    Vector3 objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponentInChildren<MeshRenderer>().bounds.size);
 
                     // retrieve build size from agent template
                     tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
@@ -240,24 +235,19 @@ public static class ConstructionHandler
             while (_buildQueue.Count > 0)
             {
                 GameObject qStructure = _buildQueue.Dequeue();
-                Vector2d buildPoint = new Vector2d(qStructure.transform.position.x, qStructure.transform.position.z);
-                RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint) as RTSAgent;
-                newBuilding.gameObject.name = qStructure.gameObject.name;
+                Vector2d buildPoint = new Vector2d(qStructure.transform.localPosition.x, qStructure.transform.localPosition.z);
+                Vector2d rotationPoint = new Vector2d(qStructure.transform.localRotation.w, qStructure.transform.localRotation.y);
 
+                RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint, rotationPoint) as RTSAgent;
+                newBuilding.gameObject.name = qStructure.gameObject.name;
                 newBuilding.transform.parent = OrganizerStructures.transform;
-                Vector3 objectSize = Vector3.zero;
+
                 if (newBuilding.Tag == AgentTag.Wall)
                 {
-                    newBuilding.GetComponentInChildren<WallPrefab>().transform.localScale = qStructure.transform.localScale;
-                    newBuilding.GetComponentInChildren<WallPrefab>().transform.localRotation = qStructure.transform.localRotation;
-
-                    objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponent<MeshRenderer>().bounds.size);
-                }
-                else
-                {
-                    objectSize = Vector3.Scale(qStructure.transform.localScale, qStructure.GetComponentInChildren<MeshRenderer>().bounds.size);
+                    newBuilding.transform.localScale = qStructure.transform.localScale;
                 }
 
+                Vector3 objectSize = Vector3.Scale(newBuilding.transform.localScale, newBuilding.GetComponentInChildren<MeshRenderer>().bounds.size);
                 newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
                 newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
 
@@ -287,12 +277,11 @@ public static class ConstructionHandler
                 else
                 {
                     Debug.Log("Couldn't place building!");
+                    _buildQueue.Clear();
                 }
 
                 ndx++;
             }
-
-            oldMaterials.Clear();
         }
     }
 

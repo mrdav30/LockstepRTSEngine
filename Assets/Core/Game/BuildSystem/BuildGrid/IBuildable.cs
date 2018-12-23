@@ -1,7 +1,6 @@
 ﻿namespace RTSLockstep{
     public interface IBuildable
     {
-
 	    Coordinate GridPosition { get; set; }
 	    /// <summary>
 	    /// Describes the width and height of the buildable. This value does not change on the buildable.

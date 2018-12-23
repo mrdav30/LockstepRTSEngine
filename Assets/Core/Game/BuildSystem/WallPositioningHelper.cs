@@ -8,26 +8,24 @@ using UnityEngine;
  */
 public class WallPositioningHelper : MonoBehaviour
 {
-    public GameObject pillarPrefab;
-    public GameObject wallPrefab;
     // distance between pillar to trigger spawning next pillar
-    public int PillarOffset;  // = 10
+    private const int _pillarOffset = 10;
     // distance between last pillar to trigger spawning next wall segment
-    public int WallSegmentOffset; // = 1
-    private const int pillarRangeOffset = 3;
+    private const int _wallSegmentOffset = 1;
+    private const int _pillarRangeOffset = 3;
 
     private Vector3 _currentPos;
     private bool _isPlacingWall;
 
-    private GameObject startPillar;
-    private GameObject lastPillar;
+    private GameObject _startPillar;
+    private GameObject _lastPillar;
 
     private List<GameObject> _pillarPrefabs;
     private Dictionary<int, GameObject> _wallPrefabs;
     private bool _startSnapped;
     private bool _endSnapped;
 
-    private int lastWallLength;
+    private int _lastWallLength;
 
     public void Setup()
     {
@@ -36,7 +34,7 @@ public class WallPositioningHelper : MonoBehaviour
         _isPlacingWall = false;
         _pillarPrefabs = new List<GameObject>();
         _wallPrefabs = new Dictionary<int, GameObject>();
-        lastWallLength = 0;
+        _lastWallLength = 0;
     }
 
     public void Visualize()
@@ -45,7 +43,7 @@ public class WallPositioningHelper : MonoBehaviour
 
         if (!_isPlacingWall)
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, pillarRangeOffset, "WallPillar");
+            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, _pillarRangeOffset, "WallPillar");
             if (closestPillar.IsNotNull())
             {
                 ConstructionHandler.GetTempStructure().transform.position = closestPillar.transform.position;
@@ -93,20 +91,20 @@ public class WallPositioningHelper : MonoBehaviour
         // create initial pole
         if (!_startSnapped)
         {
-            startPillar = Instantiate(pillarPrefab, startPos, Quaternion.identity) as GameObject;
-            startPillar.transform.parent = ConstructionHandler.OrganizerStructures;
+            _startPillar = Instantiate(GetComponentInParent<TempStructure>().PillarPrefab, startPos, Quaternion.identity) as GameObject;
+            _startPillar.transform.parent = ConstructionHandler.OrganizerStructures;
         }
         else
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(startPos, pillarRangeOffset, "WallPillar");
-            startPillar = Instantiate(closestPillar);
+            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(startPos, _pillarRangeOffset, "WallPillar");
+            _startPillar = Instantiate(closestPillar);
         }
 
-        startPillar.gameObject.name = pillarPrefab.gameObject.name;
-        _pillarPrefabs.Add(startPillar);
+        _startPillar.gameObject.name = GetComponentInParent<TempStructure>().PillarPrefab.gameObject.name;
+        _pillarPrefabs.Add(_startPillar);
 
-        lastPillar = startPillar;
-        lastWallLength = 0;
+        _lastPillar = _startPillar;
+        _lastWallLength = 0;
         _isPlacingWall = true;
     }
 
@@ -145,20 +143,20 @@ public class WallPositioningHelper : MonoBehaviour
     {
         if (_pillarPrefabs.Count > 0)
         {
-            lastPillar = _pillarPrefabs[_pillarPrefabs.Count - 1];
+            _lastPillar = _pillarPrefabs[_pillarPrefabs.Count - 1];
         }
         else
         {
-            lastPillar = startPillar;
+            _lastPillar = _startPillar;
         }
 
-        if (lastPillar.IsNotNull())
+        if (_lastPillar.IsNotNull())
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, pillarRangeOffset, "WallPillar");
+            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, _pillarRangeOffset, "WallPillar");
 
             if (closestPillar.IsNotNull())
             {
-                if (!closestPillar.transform.position.Equals(lastPillar.transform.position))
+                if (!closestPillar.transform.position.Equals(_lastPillar.transform.position))
                 {
                     ConstructionHandler.GetTempStructure().transform.position = closestPillar.transform.position;
                     ConstructionHandler.GetTempStructure().transform.rotation = closestPillar.transform.rotation;
@@ -171,31 +169,31 @@ public class WallPositioningHelper : MonoBehaviour
             }
 
             //distance from start pillar to last instantiated pillar
-            int startToLastDistance = (int)Math.Round(Vector3.Distance(startPillar.transform.position, lastPillar.transform.position));
+            int startToLastDistance = (int)Math.Round(Vector3.Distance(_startPillar.transform.position, _lastPillar.transform.position));
             //distance from current position to last instantiated pillar
-            int currentToLastDistance = (int)Math.Ceiling(Vector3.Distance(_currentPos, lastPillar.transform.position));
+            int currentToLastDistance = (int)Math.Ceiling(Vector3.Distance(_currentPos, _lastPillar.transform.position));
             //distance from start pillar to current position
-            int currentWallLength = (int)Math.Round(Vector3.Distance(startPillar.transform.position, _currentPos));
+            int currentWallLength = (int)Math.Round(Vector3.Distance(_startPillar.transform.position, _currentPos));
 
-            if (currentWallLength != lastWallLength)
+            if (currentWallLength != _lastWallLength)
             {
-                if (currentWallLength > lastWallLength
+                if (currentWallLength > _lastWallLength
                     && currentWallLength > startToLastDistance)
                 {
                     //check if end pole is far enough from start pillar
-                    if (currentToLastDistance >= PillarOffset)
+                    if (currentToLastDistance >= _pillarOffset)
                     {
                         CreateWallPillar(_currentPos);
                     }
 
-                    if (currentToLastDistance >= WallSegmentOffset)
+                    if (currentToLastDistance >= _wallSegmentOffset)
                     {
                         CreateWallSegment(_currentPos);
                     }
 
-                    lastWallLength = currentWallLength;
+                    _lastWallLength = currentWallLength;
                 }
-                else if (currentWallLength < lastWallLength)
+                else if (currentWallLength < _lastWallLength)
                 {
                     // remove segments if length is shorter than last check
                     // and mouse is within distance of last instantiated pillar
@@ -204,7 +202,7 @@ public class WallPositioningHelper : MonoBehaviour
                         RemoveLastWallSegment();
                     }
 
-                    lastWallLength = currentWallLength;
+                    _lastWallLength = currentWallLength;
                 }
             }
 
@@ -214,23 +212,23 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void CreateWallPillar(Vector3 _currentPos)
     {
-        GameObject newPillar = Instantiate(pillarPrefab, _currentPos, Quaternion.identity);
-        newPillar.gameObject.name = pillarPrefab.gameObject.name;
-        newPillar.transform.LookAt(lastPillar.transform);
+        GameObject newPillar = Instantiate(GetComponentInParent<TempStructure>().PillarPrefab, _currentPos, Quaternion.identity);
+        newPillar.gameObject.name = GetComponentInParent<TempStructure>().PillarPrefab.gameObject.name;
+        newPillar.transform.LookAt(_lastPillar.transform);
         _pillarPrefabs.Add(newPillar);
         newPillar.transform.parent = ConstructionHandler.OrganizerStructures;
     }
 
     private void CreateWallSegment(Vector3 _currentPos)
     {
-        int ndx = _pillarPrefabs.IndexOf(lastPillar);
+        int ndx = _pillarPrefabs.IndexOf(_lastPillar);
         //only create wall segment if dictionary doesn't contain pillar index
         if (!_wallPrefabs.ContainsKey(ndx))
         {
-            Vector3 middle = 0.5f * (_currentPos + lastPillar.transform.position);
+            Vector3 middle = 0.5f * (_currentPos + _lastPillar.transform.position);
 
-            GameObject newWall = Instantiate(wallPrefab, middle, Quaternion.identity);
-            newWall.gameObject.name = wallPrefab.gameObject.name;
+            GameObject newWall = Instantiate(GetComponentInParent<TempStructure>().WallPrefab, middle, Quaternion.identity);
+            newWall.gameObject.name = GetComponentInParent<TempStructure>().WallPrefab.gameObject.name;
             newWall.SetActive(true);
             _wallPrefabs.Add(ndx, newWall);
             newWall.transform.parent = ConstructionHandler.OrganizerStructures;
@@ -262,20 +260,20 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void AdjustWallSegments()
     {
-        startPillar.transform.LookAt(ConstructionHandler.GetTempStructure().transform);
-        ConstructionHandler.GetTempStructure().transform.LookAt(startPillar.transform.position);
+        _startPillar.transform.LookAt(ConstructionHandler.GetTempStructure().transform);
+        ConstructionHandler.GetTempStructure().transform.LookAt(_startPillar.transform.position);
 
         if (_pillarPrefabs.Count > 0)
         {
-            GameObject adjustBasePole = startPillar;
+            GameObject adjustBasePole = _startPillar;
             for (int i = 0; i < _pillarPrefabs.Count; i++)
             {
                 // no need to adjust start pillar
                 if (i > 0)
                 {
-                    Vector3 newPos = adjustBasePole.transform.position + startPillar.transform.TransformDirection(new Vector3(0, 0, PillarOffset));
+                    Vector3 newPos = adjustBasePole.transform.position + _startPillar.transform.TransformDirection(new Vector3(0, 0, _pillarOffset));
                     _pillarPrefabs[i].transform.position = newPos;
-                    _pillarPrefabs[i].transform.rotation = startPillar.transform.rotation;
+                    _pillarPrefabs[i].transform.rotation = _startPillar.transform.rotation;
                 }
 
                 if (_wallPrefabs.Count > 0)
@@ -318,7 +316,7 @@ public class WallPositioningHelper : MonoBehaviour
             {
                 if (!(_startSnapped && i == 0))
                 {
-                    renderers.Add(_pillarPrefabs[i].GetComponent<Renderer>());
+                    renderers.Add(_pillarPrefabs[i].GetComponentInChildren<Renderer>());
 
                     if (_wallPrefabs.Count > 0)
                     {
@@ -326,7 +324,7 @@ public class WallPositioningHelper : MonoBehaviour
                         GameObject wallSegement;
                         if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
                         {
-                            renderers.Add(wallSegement.GetComponent<Renderer>());
+                            renderers.Add(wallSegement.GetComponentInChildren<Renderer>());
                         }
                     }
 

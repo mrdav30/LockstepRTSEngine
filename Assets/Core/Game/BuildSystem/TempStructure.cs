@@ -4,6 +4,8 @@ using UnityEngine;
 public class TempStructure : MonoBehaviour, IBuildable
 {
     public GameObject EmptyGO;
+    public GameObject PillarPrefab;
+    public GameObject WallPrefab;
 
     /// <summary>
     /// Describes the width and height of the buildable. This value does not change on the buildable.

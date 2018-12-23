@@ -58,7 +58,7 @@ Transform:
   m_GameObject: {fileID: 1524213206702520}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 8, z: 0.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4714053328235688}
   m_RootOrder: 0
@@ -182,8 +182,6 @@ MonoBehaviour:
   provisionAmount: 0
   tempStructure: {fileID: 1578406621253206, guid: 75637d50d9290754483c1162ae71692e,
     type: 2}
-  _buildSizeLow: 2
-  _buildSizeHigh: 6
 --- !u!114 &114198207033571582
 MonoBehaviour:
   m_ObjectHideFlags: 1
