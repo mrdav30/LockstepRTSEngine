@@ -20,5 +20,5 @@ public class TempStructure : MonoBehaviour, IBuildable
     /// </summary>
     public bool IsValidOnGrid { get; set; }
     public bool IsMoving { get; set; }
-    public bool IsSnapped { get; set; }
+    public bool IsOverlay { get; set; }
 }

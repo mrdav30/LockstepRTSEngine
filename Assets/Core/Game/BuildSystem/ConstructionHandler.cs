@@ -10,7 +10,7 @@ public static class ConstructionHandler
     private static GameObject tempStructure;
     private static Vector3 lastLocation;
     private static RTSAgent tempConstructor;
-    private static bool findingPlacement = false;
+    private static bool _findingPlacement = false;
     private static bool _constructingWall = false;
 
     private static AgentCommander _cachedCommander;
@@ -45,14 +45,7 @@ public static class ConstructionHandler
                     GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
                 }
 
-                if (_constructingWall)
-                {
-                    tempStructure.GetComponent<WallPositioningHelper>().Visualize();
-                }
-                else
-                {
-                    FindStructureLocation();
-                }
+                FindStructureLocation();
 
                 Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
                 _validPlacement = GridBuilder.UpdateMove(pos);
@@ -85,21 +78,9 @@ public static class ConstructionHandler
         }
     }
 
-    public static void CreateBuilding(RTSAgent constructingAgent, string buildingName)
+    public static void CreateStructure(string buildingName, RTSAgent constructingAgent, Rect playingArea)
     {
-        if (!IsFindingBuildingLocation())
-        {
-            Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
-            if (_cachedCommander)
-            {
-                //cleanup later...
-                CreateBuilding(buildingName, buildPoint, constructingAgent, constructingAgent.GetPlayerArea());
-            }
-        }
-    }
-
-    public static void CreateBuilding(string buildingName, Vector2d buildPoint, RTSAgent constructingAgent, Rect playingArea)
-    {
+        Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
 
         if (buildingTemplate.MyAgentType == AgentType.Building
@@ -119,19 +100,18 @@ public static class ConstructionHandler
                     if (buildingTemplate.Tag == AgentTag.Wall)
                     {
                         _constructingWall = true;
+                        tempStructure.GetComponent<TempStructure>().IsOverlay = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
                     }
 
                     //get size based on the mesh renderer attached to the empty GO
                     Vector3 objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponentInChildren<MeshRenderer>().bounds.size);
-
-                    // retrieve build size from agent template
                     tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
                     tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
 
                     tempConstructor = constructingAgent;
 
-                    findingPlacement = true;
+                    _findingPlacement = true;
                     SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                 }
@@ -145,7 +125,7 @@ public static class ConstructionHandler
 
     public static bool IsFindingBuildingLocation()
     {
-        return _constructingWall || findingPlacement;
+        return _constructingWall || _findingPlacement;
     }
 
     public static GameObject GetTempStructure()
@@ -156,7 +136,7 @@ public static class ConstructionHandler
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
-        if (findingPlacement
+        if (_findingPlacement
             && !_constructingWall)
         {
             //  keep track of previous values to update agent's size
@@ -189,6 +169,11 @@ public static class ConstructionHandler
             lastLocation = newLocation;
 
             tempStructure.transform.position = Positioning.GetSnappedPosition(newLocation);
+
+            if (_constructingWall)
+            {
+                tempStructure.GetComponent<WallPositioningHelper>().Visualize();
+            }
         }
     }
 
@@ -225,7 +210,7 @@ public static class ConstructionHandler
                 SetConstructionQueue(tempStructure);
             }
 
-            findingPlacement = false;
+            _findingPlacement = false;
             _constructingWall = false;
 
             //temp structure no longer required
@@ -245,18 +230,17 @@ public static class ConstructionHandler
                 if (newBuilding.Tag == AgentTag.Wall)
                 {
                     newBuilding.transform.localScale = qStructure.transform.localScale;
+                    newBuilding.GetAbility<Structure>().IsOverlay = true;
                 }
 
-                Vector3 objectSize = Vector3.Scale(newBuilding.transform.localScale, newBuilding.GetComponentInChildren<MeshRenderer>().bounds.size);
-                newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
-                newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
+                newBuilding.Body.CalculateBounds();
+                newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.x);
+                newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.z);
 
                 //queue object no longer required
                 UnityEngine.Object.Destroy(qStructure.gameObject);
 
-                //send false to disable building spacing so walls can snap
-                bool canSnap = newBuilding.Tag == AgentTag.Wall;
-                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position, canSnap))
+                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
                 {
                     _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
                     newBuilding.SetState(AnimState.Building);
@@ -277,11 +261,15 @@ public static class ConstructionHandler
                 else
                 {
                     Debug.Log("Couldn't place building!");
-                    _buildQueue.Clear();
+                    //       _buildQueue.Clear();
                 }
 
                 ndx++;
             }
+        }
+        else
+        {
+            Debug.Log("Invalid end placement!");
         }
     }
 
@@ -293,7 +281,7 @@ public static class ConstructionHandler
             tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
         }
 
-        findingPlacement = false;
+        _findingPlacement = false;
         UnityEngine.Object.Destroy(tempStructure.gameObject);
         tempStructure = null;
         tempConstructor = null;

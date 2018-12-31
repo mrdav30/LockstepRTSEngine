@@ -481,7 +481,7 @@ namespace RTSLockstep
 
                 if (Forward != Vector2d.zero)
                 {
-                    visualRotation = GetvisualRotation();
+                    visualRotation = GetVisualRotation();
                 }
 
                 lastvisualRotationation = visualRotation;
@@ -571,6 +571,41 @@ namespace RTSLockstep
         void CheckVariables()
         {
 
+        }
+
+        void BuildChangedValues()
+        {
+            if (PositionChanged || RotationChanged)
+            {
+                BuildPoints();
+                BuildBounds();
+                //Reset this value so we're not permanently considered colliding against wall
+                this.ImmovableCollisionDirection = Vector2d.zero;
+            }
+
+            if (PositionChanged || this.HeightPosChanged)
+            {
+                PositionChangedBuffer = true;
+                PositionChanged = false;
+                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
+                this.HeightPosChanged = false;
+            }
+            else
+            {
+                PositionChangedBuffer = false;
+            }
+
+            if (RotationChanged)
+            {
+                _rotation.Normalize();
+                RotationChangedBuffer = true;
+                RotationChanged = false;
+                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
+            }
+            else
+            {
+                RotationChangedBuffer = false;
+            }
         }
 
         public void BuildPoints()
@@ -676,49 +711,15 @@ namespace RTSLockstep
             return this._selectionBounds;
         }
 
+        //integrate into LSF
         public void SetSelectionBounds(Bounds value)
         {
             this._selectionBounds = value;
         }
 
-        Quaternion GetvisualRotation()
+        Quaternion GetVisualRotation()
         {
             return Quaternion.LookRotation(Forward.ToVector3(0));
-        }
-
-        void BuildChangedValues()
-        {
-            if (PositionChanged || RotationChanged)
-            {
-                BuildPoints();
-                BuildBounds();
-                //Reset this value so we're not permanently considered colliding against wall
-                this.ImmovableCollisionDirection = Vector2d.zero;
-            }
-
-            if (PositionChanged || this.HeightPosChanged)
-            {
-                PositionChangedBuffer = true;
-                PositionChanged = false;
-                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
-                this.HeightPosChanged = false;
-            }
-            else
-            {
-                PositionChangedBuffer = false;
-            }
-
-            if (RotationChanged)
-            {
-                _rotation.Normalize();
-                RotationChangedBuffer = true;
-                RotationChanged = false;
-                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
-            }
-            else
-            {
-                RotationChangedBuffer = false;
-            }
         }
 
         public void SetVisuals()
@@ -728,7 +729,7 @@ namespace RTSLockstep
                 if (PhysicsManager.ResetAccumulation)
                 {
                     DoSetVisualPosition(Position.ToVector3(HeightPos.ToFloat()));
-                    DoSetvisualRotation(Rotation);
+                    DoSetVisualRotation(Rotation);
                 }
                 //PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
                 if (CanSetVisualPosition)
@@ -748,14 +749,14 @@ namespace RTSLockstep
             }
         }
 
-        private void DoSetvisualRotation(Vector2d rot)
+        private void DoSetVisualRotation(Vector2d rot)
         {
             if (this.CanSetvisualRotation)
             {
                 lastvisualRotationation = RotationalTransform.rotation;
                 if (Forward != Vector2d.zero)
                 {
-                    visualRotation = GetvisualRotation();
+                    visualRotation = GetVisualRotation();
                 }
             }
         }

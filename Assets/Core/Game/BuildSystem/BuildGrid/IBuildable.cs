@@ -13,6 +13,9 @@
         /// </summary>
         bool IsValidOnGrid { get; set; }
 	    bool IsMoving { get; set; }
-        bool IsSnapped { get; set; }
+        /// <summary>
+        /// Set to true to allow buildable to build on top of other structures.
+        /// </summary>
+        bool IsOverlay { get; set; }
     }
 }

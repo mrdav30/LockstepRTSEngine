@@ -102,20 +102,18 @@ public class BuildGridManager
         {
             Coordinate coor = this.bufferNeighborCoordinates[i];
 
-            if (Grid[coor.x, coor.y].Occupied && !buildable.IsSnapped)
+            if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
             {
                 return false;
             }
         }
 
-     //   Debug.Log("Build position " + position);
         for (int i = 0; i < bufferBuildCoordinates.Count; i++)
         {
             Coordinate coor = bufferBuildCoordinates[i];
-        //    Debug.Log("buffer position " + coor);
             if (this.IsOnGrid(coor.x, coor.y))
             {
-                if (this.Grid[coor.x, coor.y].Occupied && !buildable.IsSnapped)
+                if (this.Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
                 {
                     return false;
                 }
@@ -168,14 +166,6 @@ public class BuildGridManager
         int lowX = halfLow, lowY = halfHigh;
         int highX = halfLow, highY = halfHigh;
 
-        //if (sizeLow % 2 == 0)
-        //{
-        //    //lowX -= 1;
-        //    //lowY -= 1;
-        //    highX -= 1;
-        //    highY -= 1;
-        //}
-
         lowX = position.x - lowX;
         if (!IsOnGrid(lowX))
             return false;
@@ -189,15 +179,10 @@ public class BuildGridManager
         if (!IsOnGrid(highY))
             return false;
 
-       // int width = highX - lowX;
-      //  int height = highY - lowY;
-
         output.FastClear();
-
-        //  for (int x = 0; x <= width; x++)
+        
         for (int x = lowX; x <= highX; x++)
         {
-            //for (int y = 0; y <= height; y++)
             for (int y = lowY; y <= highY; y++)
             {
                 output.Add(new Coordinate(x, y));
@@ -214,14 +199,6 @@ public class BuildGridManager
 
         int lowX = halfLow, lowY = halfHigh;
         int highX = halfLow, highY = halfHigh;
-
-        //if (sizeLow % 2 == 0)
-        //{
-        //    //lowX -= 1;
-        //    //lowY -= 1;
-        //    highX -= 1;
-        //    highY -= 1;
-        //}
 
         lowX = position.x - lowX;
         highX = position.x + highX;
@@ -255,10 +232,5 @@ public class BuildGridManager
             }
         }
     }
-
-    //public void SetBuildSpacing(int buildSpacing)
-    //{
-    //    this.BuildSpacing = buildSpacing;
-    //}
 }
 

@@ -25,7 +25,7 @@ namespace RTSLockstep
         /// </summary>
         public bool IsValidOnGrid { get; set; }
         public bool IsMoving { get; set; }
-        public bool IsSnapped { get; set; }
+        public bool IsOverlay { get; set; }
 
         private bool _needsBuilding;
         private bool _needsRepair;
@@ -68,7 +68,7 @@ namespace RTSLockstep
 
         public void StartConstruction()
         {
-            Agent.Body.CalculateBounds();
+           // Agent.Body.CalculateBounds();
             _needsBuilding = true;
             IsCasting = true;
             cachedHealth.HealthAmount = 0;

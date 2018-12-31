@@ -39,7 +39,7 @@ public class WallPositioningHelper : MonoBehaviour
 
     public void Visualize()
     {
-        _currentPos = RTSInterfacing.GetWorldPos3(Input.mousePosition);
+        _currentPos = ConstructionHandler.GetTempStructure().transform.position;
 
         if (!_isPlacingWall)
         {
@@ -58,8 +58,6 @@ public class WallPositioningHelper : MonoBehaviour
         }
         else
         {
-            ConstructionHandler.GetTempStructure().transform.position = Positioning.GetSnappedPosition(_currentPos);
-
             UpdateWall();
         }
     }
