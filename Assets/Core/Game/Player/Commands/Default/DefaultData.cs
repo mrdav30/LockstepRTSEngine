@@ -129,6 +129,6 @@ namespace RTSLockstep
         Byte,
         Bool,
         String,
-        ByteArray,
+        ByteArray
     }
 }

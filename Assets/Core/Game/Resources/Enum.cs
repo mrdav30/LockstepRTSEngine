@@ -85,4 +85,14 @@
         RallyShortCut,
         AttackShortCut
     }
+
+    //Implemented as flags for selecting multiple types.
+    [System.Flags]
+    public enum AllegianceType : byte
+    {
+        Neutral = 1 << 0,
+        Friendly = 1 << 1,
+        Enemy = 1 << 2,
+        All = 0xff
+    }
 }

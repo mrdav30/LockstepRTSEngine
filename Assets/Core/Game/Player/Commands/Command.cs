@@ -1,19 +1,14 @@
-﻿using System;
+﻿using FastCollections;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
-using System.Reflection;
-using FastCollections;
 namespace RTSLockstep
 {
     public partial class Command
     {
-
-		public static void Setup () {
-            RegisterDefaults ();
+        public static void Setup()
+        {
+            RegisterDefaults();
         }
-
-
 
         private static readonly FastList<byte> serializeList = new FastList<byte>();
         private static readonly Writer writer = new Writer(serializeList);
@@ -23,31 +18,32 @@ namespace RTSLockstep
 
         private static BiDictionary<Type, ushort> RegisteredData = new BiDictionary<Type, ushort>();
 
-		static void RegisterDefaults ()
-		{
-//			#if UNITY_IOS
-				Register<DefaultData> ();
-				Register<EmptyData> ();
-				Register<Coordinate> ();
-				Register<Selection> ();
-				Register<Vector2d> ();
-				Register<Vector3d> ();
-//			#else
-//				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
-//				{
-//					if (t.GetInterface("ICommandData") != null)
-//					{
-//						Register (t);
-//					} 
-//				}
-//			#endif
-		}
+        static void RegisterDefaults()
+        {
+            //			#if UNITY_IOS
+            Register<DefaultData>();
+            Register<EmptyData>();
+            Register<Coordinate>();
+            Register<Selection>();
+            Register<Vector2d>();
+            Register<Vector3d>();
+            //			#else
+            //				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+            //				{
+            //					if (t.GetInterface("ICommandData") != null)
+            //					{
+            //						Register (t);
+            //					} 
+            //				}
+            //			#endif
+        }
 
         private static void Register<TData>() where TData : ICommandData
         {
-            Register (typeof(TData));
+            Register(typeof(TData));
         }
-        private static void Register (Type t) {
+        private static void Register(Type t)
+        {
             if (RegisterCount > ushort.MaxValue)
             {
                 throw new System.Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
@@ -62,16 +58,14 @@ namespace RTSLockstep
         /// Backward compatability for InputCode
         /// </summary>
         /// <value>The le input.</value>
-        private Dictionary<ushort,FastList<ICommandData>> ContainedData = new Dictionary<ushort,FastList<ICommandData>>();
+        private Dictionary<ushort, FastList<ICommandData>> ContainedData = new Dictionary<ushort, FastList<ICommandData>>();
         private ushort ContainedTypesCount;
-
 
         public Command()
         {
         }
 
-
-		public Command(ushort inputCode, byte controllerID = byte.MaxValue)
+        public Command(ushort inputCode, byte controllerID = byte.MaxValue)
         {
             this.Initialize();
             this.InputCode = inputCode;
@@ -87,7 +81,7 @@ namespace RTSLockstep
         public void Add<TData>(params TData[] addItems) where TData : ICommandData
         {
             for (int i = 0; i < addItems.Length; i++)
-                Add(addItems [i]);
+                Add(addItems[i]);
         }
 
         public void Add<TData>(TData item) where TData : ICommandData
@@ -103,18 +97,19 @@ namespace RTSLockstep
                 if (items.Count == 0)
                     ContainedTypesCount++;
                 items.Add(item);
-            } else
+            }
+            else
             {
                 throw new System.Exception(string.Format("Type '{0}' not registered.", typeof(TData)));
             }
         }
 
-        public bool ContainsData <TData>()
+        public bool ContainsData<TData>()
         {
-            return GetDataCount<TData> () > 0;
+            return GetDataCount<TData>() > 0;
         }
 
-        public int GetDataCount <TData>()
+        public int GetDataCount<TData>()
         {
             ushort dataID;
             if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
@@ -127,52 +122,67 @@ namespace RTSLockstep
             return items.Count;
         }
 
-        public TData GetData <TData>(int index = 0) where TData : ICommandData
+        public TData GetData<TData>(int index = 0) where TData : ICommandData
         {
-			TData item;
-			if (TryGetData (out item, index)) {
-				return item;
-			}
-			return default(TData);
+            TData item;
+            if (TryGetData(out item, index))
+            {
+                return item;
+            }
+            return default(TData);
         }
-		public TData[] GetDataArray<TData>() where TData : ICommandData{
-			int count = this.GetDataCount<TData> ();
-			TData[] array = new TData[count];
-			for (int i = 0; i < count; i++) {
-				array [i] = GetData<TData> (i);
-			}
-			return array;
-		}
-        public bool TryGetData<TData> (out TData data, int index = 0) where TData : ICommandData
+
+        public TData[] GetDataArray<TData>() where TData : ICommandData
+        {
+            int count = this.GetDataCount<TData>();
+            TData[] array = new TData[count];
+            for (int i = 0; i < count; i++)
+            {
+                array[i] = GetData<TData>(i);
+            }
+            return array;
+        }
+
+        public bool TryGetData<TData>(out TData data, int index = 0) where TData : ICommandData
         {
             data = default(TData);
             ushort dataID;
-            if (!RegisteredData.TryGetValue (typeof (TData), out dataID)) return false;
+            if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            {
+                return false;
+            }
             FastList<ICommandData> items;
-            if (!this.ContainedData.TryGetValue(dataID, out items)) return false;
-            if (items.Count <= index) return false;
+            if (!this.ContainedData.TryGetValue(dataID, out items))
+            {
+                return false;
+            }
+            if (items.Count <= index)
+            {
+                return false;
+            }
             data = (TData)items[index];
             return true;
         }
 
-        public void SetData<TData> (TData value, int index = 0) where TData : ICommandData
+        public void SetData<TData>(TData value, int index = 0) where TData : ICommandData
         {
             this.ContainedData[RegisteredData[typeof(TData)]][index] = value;
         }
 
-        public bool SetFirstData<TData> (TData value) where TData : ICommandData
+        public bool SetFirstData<TData>(TData value) where TData : ICommandData
         {
             ushort dataID;
-            if (!RegisteredData.TryGetValue (typeof (TData), out dataID)) return false;
+            if (!RegisteredData.TryGetValue(typeof(TData), out dataID)) return false;
             FastList<ICommandData> items;
             if (!this.ContainedData.TryGetValue(dataID, out items)) return false;
-            if(items.Count == 0)
+            if (items.Count == 0)
                 items.Add(value);
             else
                 items[0] = value;
             return true;
         }
-        public void ClearData<TData> () {
+        public void ClearData<TData>()
+        {
             this.ContainedData[RegisteredData[typeof(TData)]].Clear();
         }
 
@@ -209,19 +219,19 @@ namespace RTSLockstep
             get
             {
                 writer.Reset();
-                
+
 
                 //Essential Information
-                writer.Write((byte)ControllerID);
-                writer.Write((ushort)InputCode);
-                writer.Write((ushort)ContainedTypesCount);
-                foreach (KeyValuePair<ushort,FastList<ICommandData>> pair in ContainedData)
+                writer.Write(ControllerID);
+                writer.Write(InputCode);
+                writer.Write(ContainedTypesCount);
+                foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in ContainedData)
                 {
                     writer.Write(pair.Key);
                     writer.Write((ushort)pair.Value.Count);
                     for (int i = 0; i < pair.Value.Count; i++)
                     {
-                        pair.Value [i].Write(writer);
+                        pair.Value[i].Write(writer);
                     }
                 }
 
@@ -240,18 +250,19 @@ namespace RTSLockstep
             return items;
         }
 
-		public Command Clone()
-		{
-			Command com = new Command();
-			com.ControllerID = this.ControllerID;
-			com.InputCode = this.InputCode;
-			foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in this.ContainedData) {
-				FastList<ICommandData> list = new FastList<ICommandData>();
-				pair.Value.CopyTo(list);
+        public Command Clone()
+        {
+            Command com = new Command();
+            com.ControllerID = this.ControllerID;
+            com.InputCode = this.InputCode;
+            foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in this.ContainedData)
+            {
+                FastList<ICommandData> list = new FastList<ICommandData>();
+                pair.Value.CopyTo(list);
 
-				com.ContainedData.Add(pair.Key,list);
-			}
-			return com;
-		}
+                com.ContainedData.Add(pair.Key, list);
+            }
+            return com;
+        }
     }
 }

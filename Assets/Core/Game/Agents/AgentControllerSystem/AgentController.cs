@@ -291,11 +291,6 @@ namespace RTSLockstep
             return _commander.transform.GetComponentInChildren<HUD>();
         }
 
-        //public ConstructionHandler GetCommanderBuilderManager()
-        //{
-        //    return _commander.transform.GetComponentInChildren<ConstructionHandler>();
-        //}
-
         public static AgentController GetInstanceManager(int index)
         {
             if (index >= AgentController.InstanceManagers.Count)
@@ -362,8 +357,6 @@ namespace RTSLockstep
             SelectedAgents.Remove(agent);
             SelectionChanged = true;
         }
-
-
 
         public Selection GetSelection(Command com)
         {
@@ -494,23 +487,9 @@ namespace RTSLockstep
         /// </summary>
         /// <returns>The bare agent.</returns>
         /// <param name="agentCode">Agent code.</param>
-        public RTSAgent CreateBareAgent(string agentCode)
+        public RTSAgent CreateBareAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
         {
-            var agent = CreateRawAgent(agentCode);
-            AddAgent(agent);
-            agent.InitializeBare();
-            return agent;
-        }
-
-        /// <summary>
-        /// Creates an agent without initialization
-        /// </summary>
-        /// <returns>The dumb agent.</returns>
-        /// <param name="agentCode">Agent code.</param>
-        public RTSAgent CreateDumbAgent(string agentCode)
-        {
-            var agent = CreateRawAgent(agentCode);
-            AddAgent(agent);
+            var agent = CreateRawAgent(agentCode, startPosition, startRotation);
             return agent;
         }
 
@@ -648,15 +627,4 @@ namespace RTSLockstep
         }
         #endregion
     }
-
-    //Implemented as flags for selecting multiple types.
-    [System.Flags]
-    public enum AllegianceType : byte
-    {
-        Neutral = 1 << 0,
-        Friendly = 1 << 1,
-        Enemy = 1 << 2,
-        All = 0xff
-    }
-
 }
