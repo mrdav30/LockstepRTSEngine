@@ -22,6 +22,9 @@ GameObject:
   - component: {fileID: 114152355441080642}
   - component: {fileID: 114257691972267520}
   - component: {fileID: 114584689688356804}
+  - component: {fileID: 114671690668151502}
+  - component: {fileID: 114307541140112106}
+  - component: {fileID: 114761754102502586}
   m_Layer: 0
   m_Name: AgentCommander
   m_TagString: Untagged
@@ -352,6 +355,21 @@ MonoBehaviour:
   playerDetailsSkin: {fileID: 11400000, guid: 4f1fd3e4b2e72654e851beed2bd50e07, type: 2}
   clickSound: {fileID: 8300000, guid: 96bdb24aa54142e4f9b4295015ce32a1, type: 3}
   clickVolume: 1
+--- !u!114 &114307541140112106
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1048473000217382}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35179f2cc087d414b8466ba9dc96b2ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainSkin: {fileID: 0}
+  selectionSkin: {fileID: 0}
+  clickSound: {fileID: 0}
+  clickVolume: 1
 --- !u!114 &114458415239988250
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -414,6 +432,21 @@ MonoBehaviour:
       startLimit: 1000
     - startValue: 1000
       startLimit: 1000
+--- !u!114 &114671690668151502
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1048473000217382}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c983fdebd08671541b6ac8a06c7eb46a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mySkin: {fileID: 11400000, guid: 1f6802d3e0f17804490e2aaf9ad5930a, type: 2}
+  header: {fileID: 2800000, guid: c9f33d50c4d75bc4fb9607ea6b0737e5, type: 3}
+  clickSound: {fileID: 0}
+  clickVolume: 1
 --- !u!114 &114725955203122896
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -425,3 +458,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71ff8539d44bd9a4cac97a5e63d3e0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114761754102502586
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1048473000217382}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846e7c998788a954987711b4772bf957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mySkin: {fileID: 0}
+  selectionSkin: {fileID: 0}
+  clickSound: {fileID: 0}
+  clickVolume: 1
