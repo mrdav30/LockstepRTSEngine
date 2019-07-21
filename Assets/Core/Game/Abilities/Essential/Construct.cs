@@ -1,6 +1,4 @@
-﻿using FastCollections;
-using Newtonsoft.Json;
-using RTSLockstep;
+﻿using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
@@ -324,21 +322,51 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetBuilding(RTSAgent project)
+        public void SetBuilding(string agentCode, Vector2d targetPOS, Vector2d targetRotation, Vector3d targetLocalScale)
         {
-            if (project != Agent && project != null)
+            if (agentCode != null)
             {
-                Agent.Tag = AgentTag.Builder;
+                RTSAgent newBuilding = Agent.Controller.CreateAgent(agentCode, targetPOS, targetRotation) as RTSAgent;
 
-                CurrentProject = project;
-                IsBuilding = true;
-                IsCasting = true;
-                fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
-                fastRangeToTarget *= fastRangeToTarget;
-
-                if (!CheckRange())
+                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
                 {
-                    StartBuildMove(CurrentProject.Body.Position);
+                    Agent.GetCommander().CachedResourceManager.RemoveResources(newBuilding);
+                    newBuilding.SetState(AnimState.Building);
+                    newBuilding.SetPlayingArea(Agent.GetPlayerArea());
+                    newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+                    newBuilding.SetCommander(Agent.GetCommander());
+
+                    newBuilding.gameObject.name = agentCode;
+                    newBuilding.transform.parent = ConstructionHandler.OrganizerStructures.transform;
+
+                    if (newBuilding.Tag == AgentTag.Wall)
+                    {
+                        newBuilding.transform.localScale = targetLocalScale.ToVector3();
+                        newBuilding.GetAbility<Structure>().IsOverlay = true;
+                    }
+
+                    newBuilding.Body.CalculateBounds();
+                    newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.x);
+                    newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.z);
+
+                    newBuilding.GetAbility<Structure>().StartConstruction();
+
+                    Agent.Tag = AgentTag.Builder;
+
+                    CurrentProject = newBuilding;
+                    IsBuilding = true;
+                    IsCasting = true;
+                    fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
+                    fastRangeToTarget *= fastRangeToTarget;
+
+                    if (!CheckRange())
+                    {
+                        StartBuildMove(CurrentProject.Body.Position);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Couldn't place building!");
                 }
             }
         }
@@ -390,24 +418,19 @@ namespace RTSLockstep
         protected override void OnExecute(Command com)
         {
             DefaultData target;
-            if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
+            Vector2d targetPOS;
+            Vector2d targetRotation;
+            Vector3d targetLocalScale;
+            com.TryGetData<DefaultData>(out target);
+            if (target != null)
             {
+                com.TryGetData<Vector2d>(out targetPOS, 0);
+                com.TryGetData<Vector2d>(out targetRotation, 1);
+                com.TryGetData<Vector3d>(out targetLocalScale, 2);
+
                 IsFocused = true;
                 IsBuildMoving = false;
-                RTSAgent tempTarget;
-                ushort targetValue = (ushort)target.Value;
-                if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
-                {
-                    RTSAgent building = (RTSAgent)tempTarget;
-                    if (building && building.GetAbility<Structure>().UnderConstruction())
-                    {
-                        SetBuilding(building);
-                    }
-                }
-                else
-                {
-                    Debug.Log("nope");
-                }
+                SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
             }
         }
 

@@ -69,7 +69,6 @@ public static class ConstructionHandler
             if (_constructingWall)
             {
                 tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
-
             }
             else
             {
@@ -220,48 +219,22 @@ public static class ConstructionHandler
             while (_buildQueue.Count > 0)
             {
                 GameObject qStructure = _buildQueue.Dequeue();
-                Vector2d buildPoint = new Vector2d(qStructure.transform.localPosition.x, qStructure.transform.localPosition.z);
-                Vector2d rotationPoint = new Vector2d(qStructure.transform.localRotation.w, qStructure.transform.localRotation.y);
-
-                RTSAgent newBuilding = _cachedCommander.GetController().CreateAgent(qStructure.gameObject.name, buildPoint, rotationPoint) as RTSAgent;
-                newBuilding.gameObject.name = qStructure.gameObject.name;
-                newBuilding.transform.parent = OrganizerStructures.transform;
-
-                if (newBuilding.Tag == AgentTag.Wall)
-                {
-                    newBuilding.transform.localScale = qStructure.transform.localScale;
-                    newBuilding.GetAbility<Structure>().IsOverlay = true;
-                }
-
-                newBuilding.Body.CalculateBounds();
-                newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.x);
-                newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.z);
+                Vector2d qBuildPoint = new Vector2d(qStructure.transform.localPosition.x, qStructure.transform.localPosition.z);
+                Vector2d qRotationPoint = new Vector2d(qStructure.transform.localRotation.w, qStructure.transform.localRotation.y);
+                Vector3d qLocalScale = new Vector3d(qStructure.transform.localScale);
 
                 //queue object no longer required
                 UnityEngine.Object.Destroy(qStructure.gameObject);
 
-                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
+                if (ndx == 0)
                 {
-                    _cachedCommander.CachedResourceManager.RemoveResources(newBuilding);
-                    newBuilding.SetState(AnimState.Building);
-                    newBuilding.SetPlayingArea(tempConstructor.GetPlayerArea());
-                    newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-                    newBuilding.SetCommander(_cachedCommander);
-
-                    if (ndx == 0)
-                    {
-                        // send build command
-                        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, newBuilding.GlobalID));
-                        UserInputHelper.SendCommand(buildCom);
-                    }
-
-                    newBuilding.GetAbility<Structure>().StartConstruction();
-                }
-                else
-                {
-                    Debug.Log("Couldn't place building!");
-                    //       _buildQueue.Clear();
+                    // send build command
+                    Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+                    buildCom.Add<DefaultData>(new DefaultData(DataType.String, qStructure.gameObject.name));
+                    buildCom.Add<Vector2d>(qBuildPoint);
+                    buildCom.Add<Vector2d>(qRotationPoint);
+                    buildCom.Add<Vector3d>(qLocalScale);
+                    UserInputHelper.SendCommand(buildCom);
                 }
 
                 ndx++;
