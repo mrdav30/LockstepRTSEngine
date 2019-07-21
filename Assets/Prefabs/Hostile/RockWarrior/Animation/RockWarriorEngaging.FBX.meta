@@ -122,7 +122,7 @@ ModelImporter:
     2100000: monster_085
     4300000: monster_085
     7400000: Take 001
-    7400002: atk01
+    7400002: Engaging
     9500000: //RootNode
     13700000: monster_085
   externalObjects:
@@ -159,7 +159,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: atk01
+      name: Engaging
       takeName: Take 001
       firstFrame: 0
       lastFrame: 40
@@ -169,7 +169,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

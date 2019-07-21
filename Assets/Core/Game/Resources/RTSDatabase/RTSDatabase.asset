@@ -72,6 +72,10 @@ MonoBehaviour:
     _description: Wood Wall
     _icon: {fileID: 0}
     _prefab: {fileID: 1442506107234032, guid: cda6769975c749048b581c54cd10f1c8, type: 2}
+  - _name: RockWarrior
+    _description: Warrior
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1000013931707134, guid: 8f46609a7e6441847825dd7c238301f7, type: 2}
   _worldObjectData:
   - _name: Sun
     _description: 

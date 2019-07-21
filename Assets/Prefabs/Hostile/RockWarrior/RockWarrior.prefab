@@ -830,8 +830,17 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4000010907238942}
+  - component: {fileID: 114061601890469220}
+  - component: {fileID: 114614306233172148}
+  - component: {fileID: 114952414954639992}
+  - component: {fileID: 114663279844443730}
+  - component: {fileID: 114951773368346060}
+  - component: {fileID: 114588237757547290}
+  - component: {fileID: 114783308967027076}
+  - component: {fileID: 114500290942403552}
+  - component: {fileID: 114384064150427766}
   - component: {fileID: 95000011980069812}
-  - component: {fileID: 64000012120994960}
+  - component: {fileID: 114491111891892718}
   m_Layer: 0
   m_Name: RockWarrior
   m_TagString: Untagged
@@ -1074,7 +1083,7 @@ Transform:
   m_GameObject: {fileID: 1000013931707134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.5, y: 3, z: 2.5}
   m_Children:
   - {fileID: 4000013269564050}
   - {fileID: 4000013360179332}
@@ -1704,20 +1713,6 @@ Transform:
   m_Father: {fileID: 4000011775341228}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &64000012120994960
-MeshCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000013931707134}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 1
-  m_CookingOptions: 14
-  m_SkinWidth: 0.01
-  m_Mesh: {fileID: 0}
 --- !u!95 &95000011980069812
 Animator:
   serializedVersion: 3
@@ -1728,14 +1723,245 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 99d8422685f73f541ab1edd3494688be, type: 3}
   m_Controller: {fileID: 9100000, guid: 75a6978d59fc3fc46ae58d624e398b6c, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114061601890469220
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _deathTime: 64
+  _agentType: 0
+  _globalID: 0
+  _boxPriority: 0
+  _selectionPriority: 0
+  _selectable: 1
+  Tag: 0
+  _selectionRadius: -1
+  _visualCenter: {fileID: 0}
+  objectName: RockWarrior
+  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
+  resourceCost:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 00000000020000000400000005000000060000000300000001000000
+    _keys: 00000000020000000400000005000000060000000300000001000000
+    _values: 00000000000000000000000000000000000000000000000000000000
+--- !u!114 &114384064150427766
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10ab47e8be691884ea9e3dc0b8a53e50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAnimState: 0
+  idling: Idling
+  moving: Moving
+  engaging: Engaging
+  specialEngaging: specialEngaging
+  dying: Dying
+  fire: fire
+  specialFire: specialFire
+  specialAttack: specialAttack
+  extra: extra
+  attackSound: {fileID: 0}
+  selectSound: {fileID: 0}
+  useWeaponSound: {fileID: 0}
+  attackVolume: 1
+  selectVolume: 1
+  useWeaponVolume: 1
+  driveSound: {fileID: 0}
+  moveSound: {fileID: 0}
+  driveVolume: 0.5
+  moveVolume: 1
+--- !u!114 &114491111891892718
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114500290942403552
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c3ba75de30de14a9f9bc835c539797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapIndex: 0
+  _bonusHeight: 0
+--- !u!114 &114588237757547290
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e75e671c55b575f41a36fa643e36f28e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  _projectileCode: Melee
+  _range: 131072
+  _sight: 1310720
+  _damage: 983040
+  _attackInterval: 98304
+  _targetAllegiance: 4
+  _trackAttackAngle: 1
+  _attackAngle: 11380
+  _projectileOffset:
+    x: 0
+    y: 0
+    z: 0
+  _secondaryProjectileOffsets: []
+  _cycleProjectiles: 0
+  _windup: 0
+  _increasePriority: 1
+--- !u!114 &114614306233172148
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff94a4d3f2f0f8042b26ec6eb7a1fdd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _internalBody:
+    _position:
+      x: 0
+      y: 0
+    _rotation:
+      x: 0
+      y: 65536
+    _heightPos: 0
+    _velocity:
+      x: 0
+      y: 0
+    _preventCulling: 0
+    RealPoints: []
+    Edges: []
+    EdgeNorms: []
+    ImmovableCollisionDirection:
+      x: 0
+      y: 0
+    _shape: 1
+    _isTrigger: 0
+    _layer: 0
+    _halfWidth: 32768
+    _halfHeight: 32768
+    _radius: 180395
+    _immovable: 0
+    _basePriority: 0
+    _vertices: []
+    _height: 425984
+    _positionalTransform: {fileID: 4000010907238942}
+    _rotationalTransform: {fileID: 4000010907238942}
+--- !u!114 &114663279844443730
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2eb9038d7faa5543b6840b91aa6a287, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  Destination:
+    x: 0
+    y: 0
+  _canMove: 1
+  _canTurn: 1
+  _speed: 131072
+  _acceleration: 65536
+  _canPathfind: 1
+  DrawPath: 1
+--- !u!114 &114783308967027076
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 32768000
+  _currentHealth: 0
+--- !u!114 &114951773368346060
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b80843a30ec58647844089c837453fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _turnRate:
+    x: 65024
+    y: 8171
+--- !u!114 &114952414954639992
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 345c7828092748447b3958442e1ff48a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!137 &137000010749321264
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

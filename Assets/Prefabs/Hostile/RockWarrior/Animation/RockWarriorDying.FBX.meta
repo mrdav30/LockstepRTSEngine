@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2f302f26af5a2174fae17425dffd1398
+guid: f3d7ce15c11d0fb4aa828cb27bbcc3d2
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -121,7 +121,7 @@ ModelImporter:
     400114: S
     4300000: monster_085
     7400000: Take 001
-    7400002: run
+    7400002: Dying
     9500000: //RootNode
     13700000: monster_085
   externalObjects: {}
@@ -153,10 +153,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: run
+      name: Dying
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 40
+      lastFrame: 30
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

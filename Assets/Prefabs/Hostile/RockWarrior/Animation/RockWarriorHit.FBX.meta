@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c7012d6c43a328d46b280760af6d435c
+guid: f04b033c20dcc67408618f03dc221015
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -121,7 +121,7 @@ ModelImporter:
     400114: S
     4300000: monster_085
     7400000: Take 001
-    7400002: idle
+    7400002: Hit
     9500000: //RootNode
     13700000: monster_085
   externalObjects: {}
@@ -153,10 +153,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: idle
+      name: Hit
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 40
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
