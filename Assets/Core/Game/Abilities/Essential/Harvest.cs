@@ -25,7 +25,6 @@ namespace RTSLockstep
         //Stuff for the logic
         private bool inRange;
         private int basePriority;
-        private int searchCount;
         private long harvestCount;
         private int loadedDepositId = -1;
 
@@ -87,7 +86,6 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             basePriority = Agent.Body.Priority;
-            searchCount = LSUtility.GetRandom(searchRate) + 1;
             harvestCount = 0;
             IsHarvesting = false;
             IsHarvestMoving = false;
@@ -140,10 +138,6 @@ namespace RTSLockstep
                     {
                         BehaveWithStorage();
                     }
-                    else
-                    {
-                        BehaveWithNoTarget();
-                    }
 
                     if (IsHarvestMoving)
                     {
@@ -177,7 +171,6 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopHarvesting();
-                BehaveWithNoTarget();
                 return;
             }
 
@@ -247,18 +240,6 @@ namespace RTSLockstep
                         }
                     }
 
-                    if (IsHarvestMoving)
-                    {
-                        searchCount -= 1;
-                        if (searchCount <= 0)
-                        {
-                            searchCount = searchRate;
-                            if (cachedAI.ShouldMakeDecision())
-                            {
-                                cachedAI.DecideWhatToDo();
-                            }
-                        }
-                    }
                     if (inRange == true)
                     {
                         inRange = false;
@@ -301,7 +282,6 @@ namespace RTSLockstep
             if (!closestResourceStore || closestResourceStore.IsActive == false)
             {
                 //Target's lifecycle has ended
-                BehaveWithNoTarget();
                 return;
             }
 
@@ -372,18 +352,6 @@ namespace RTSLockstep
                         }
                     }
 
-                    if (IsHarvestMoving)
-                    {
-                        searchCount -= 1;
-                        if (searchCount <= 0)
-                        {
-                            searchCount = searchRate;
-                            if (cachedAI.ShouldMakeDecision())
-                            {
-                                cachedAI.DecideWhatToDo();
-                            }
-                        }
-                    }
                     if (inRange == true)
                     {
                         inRange = false;
@@ -417,30 +385,6 @@ namespace RTSLockstep
             {
                 cachedMove.PauseAutoStop();
                 cachedMove.PauseCollisionStop();
-            }
-        }
-
-        void BehaveWithNoTarget()
-        {
-            if (IsHarvestMoving || IsHarvesting == false && IsEmptying == false)// || Agent.IsCasting == false
-            {
-                if (IsHarvestMoving)
-                {
-                    searchCount -= 8;
-                }
-                else
-                {
-                    searchCount -= 2;
-                }
-
-                if (searchCount <= 0)
-                {
-                    searchCount = searchRate;
-                    if (cachedAI.ShouldMakeDecision())
-                    {
-                        cachedAI.DecideWhatToDo();
-                    }
-                }
             }
         }
 
@@ -727,7 +671,6 @@ namespace RTSLockstep
             }
             SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
-            SaveManager.WriteInt(writer, "SearchCount", searchCount);
             SaveManager.WriteLong(writer, "HarvestCount", harvestCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
@@ -763,9 +706,6 @@ namespace RTSLockstep
                     break;
                 case "InRange":
                     inRange = (bool)readValue;
-                    break;
-                case "SearchCount":
-                    searchCount = (int)readValue;
                     break;
                 case "HarvestCount":
                     harvestCount = (long)readValue;

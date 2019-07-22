@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using UnityEngine;
-using RTSLockstep.Data;
-using RTSLockstep;
-using Newtonsoft.Json;
 
 namespace RTSLockstep
 {
     [UnityEngine.DisallowMultipleComponent]
     public class Attack : ActiveAbility
     {
-        private const int SearchRate = (int)(LockstepManager.FrameRate / 2);
+        private const int SearchRate = LockstepManager.FrameRate / 2;
         public const long MissModifier = FixedMath.One / 2;
 
         public virtual bool CanMove { get; private set; }
@@ -50,7 +48,6 @@ namespace RTSLockstep
         { //Allegiance to the target
             get { return this._targetAllegiance; }
         }
-
 
         public virtual Vector3d ProjectileOffset { get { return _projectileOffset; } }
 
@@ -110,7 +107,6 @@ namespace RTSLockstep
 
         long windupCount;
 
-
         [SerializeField]
         protected bool _increasePriority = true;
 
@@ -129,7 +125,6 @@ namespace RTSLockstep
 
         private int basePriority;
         private uint targetVersion;
-        private int searchCount;
         private long attackCount;
 
         public bool IsAttackMoving { get; private set; }
@@ -142,8 +137,11 @@ namespace RTSLockstep
         {
             cachedTurn = Agent.GetAbility<Turn>();
             cachedMove = Agent.GetAbility<Move>();
+
             if (Sight < Range)
+            {
                 _sight = Range + FixedMath.One * 5;
+            }
 
             //fastRange = (Range * Range);
             basePriority = cachedBody.Priority;
@@ -178,7 +176,6 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             basePriority = Agent.Body.Priority;
-            searchCount = LSUtility.GetRandom(SearchRate) + 1;
             attackCount = 0;
             Target = null;
             IsAttackMoving = false;
@@ -199,7 +196,7 @@ namespace RTSLockstep
                 RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedTargetId);
                 if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Building)
                 {
-                    Target = (RTSAgent)obj;
+                    Target = obj;
                 }
             }
         }
@@ -222,10 +219,6 @@ namespace RTSLockstep
                 if (Target != null)
                 {
                     BehaveWithTarget();
-                }
-                else
-                {
-                    BehaveWithNoTarget();
                 }
             }
 
@@ -276,7 +269,6 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopEngage();
-                BehaveWithNoTarget();
                 return;
             }
 
@@ -291,7 +283,10 @@ namespace RTSLockstep
                     if (!inRange)
                     {
                         if (CanMove)
+                        {
                             cachedMove.StopMove();
+                        }
+
                         inRange = true;
                     }
                     Agent.SetState(EngagingAnimState);
@@ -352,20 +347,6 @@ namespace RTSLockstep
                         }
                     }
 
-                    if (IsAttackMoving || isFocused == false)
-                    {
-                        searchCount -= 1;
-                        if (searchCount <= 0)
-                        {
-                            searchCount = SearchRate;
-                            if (ScanAndEngage())
-                            {
-                            }
-                            else
-                            {
-                            }
-                        }
-                    }
                     if (inRange == true)
                     {
                         inRange = false;
@@ -406,30 +387,6 @@ namespace RTSLockstep
             {
                 cachedMove.PauseAutoStop();
                 cachedMove.PauseCollisionStop();
-            }
-        }
-
-        void BehaveWithNoTarget()
-        {
-            if (IsAttackMoving || Agent.IsCasting == false)
-            {
-                if (IsAttackMoving)
-                {
-                    {
-                        searchCount -= 8;
-                    }
-                }
-                else
-                {
-                    searchCount -= 2;
-                }
-                if (searchCount <= 0)
-                {
-                    searchCount = SearchRate;
-                    if (ScanAndEngage())
-                    {
-                    }
-                }
             }
         }
 
@@ -601,7 +558,9 @@ namespace RTSLockstep
                     if (!CheckRange())
                     {
                         if (CanMove)
+                        {
                             cachedMove.StartMove(Target.Body.Position);
+                        }
                     }
                 }
             }
@@ -696,9 +655,13 @@ namespace RTSLockstep
                 RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+                {
                     Engage(tempTarget);
+                }
                 else
+                {
                     Debug.Log("nope");
+                }
             }
         }
 
@@ -816,9 +779,15 @@ namespace RTSLockstep
         void OnDrawGizmos()
         {
             if (Agent == null || Agent.IsActive == false)
+            {
                 return;
+            }
+
             if (Agent.Body == null)
+            {
                 Debug.Log(Agent.gameObject);
+            }
+
             Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : this.transform.position, this.Range.ToFloat());
         }
 #endif
@@ -836,7 +805,6 @@ namespace RTSLockstep
 
             SaveManager.WriteBoolean(writer, "Focused", isFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
-            SaveManager.WriteInt(writer, "SearchCount", searchCount);
             SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
@@ -864,9 +832,6 @@ namespace RTSLockstep
                     break;
                 case "InRange":
                     inRange = (bool)readValue;
-                    break;
-                case "SearchCount":
-                    searchCount = (int)readValue;
                     break;
                 case "AttackCount":
                     attackCount = (long)readValue;

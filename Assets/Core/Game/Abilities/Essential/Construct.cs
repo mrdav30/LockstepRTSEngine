@@ -22,7 +22,6 @@ namespace RTSLockstep
         //Stuff for the logic
         private bool inRange;
         private int basePriority;
-        private int searchCount;
         private long constructCount;
         private int loadedProjectId = -1;
 
@@ -75,14 +74,12 @@ namespace RTSLockstep
             if (!IsBuildMoving && IsBuilding)
             {
                 StopBuilding();
-                BehaveWithNoTarget();
             }
         }
 
         protected override void OnInitialize()
         {
             basePriority = Agent.Body.Priority;
-            searchCount = LSUtility.GetRandom(searchRate) + 1;
             constructCount = 0;
             CurrentProject = null;
             IsBuilding = false;
@@ -126,10 +123,6 @@ namespace RTSLockstep
                 {
                     BehaveWithTarget();
                 }
-                else
-                {
-                    BehaveWithNoTarget();
-                }
 
                 if (IsBuildMoving)
                 {
@@ -150,7 +143,6 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopBuilding();
-                BehaveWithNoTarget();
                 return;
             }
 
@@ -219,20 +211,6 @@ namespace RTSLockstep
                         }
                     }
 
-                    if (IsBuildMoving || IsFocused == false)
-                    {
-                        searchCount -= 1;
-                        if (searchCount <= 0)
-                        {
-                            searchCount = searchRate;
-                            //if (ScanAndEngage())
-                            //{
-                            //}
-                            //else
-                            //{
-                            //}
-                        }
-                    }
                     if (inRange == true)
                     {
                         inRange = false;
@@ -266,29 +244,6 @@ namespace RTSLockstep
             {
                 cachedMove.PauseAutoStop();
                 cachedMove.PauseCollisionStop();
-            }
-        }
-
-        void BehaveWithNoTarget()
-        {
-            if (IsBuildMoving)// || Agent.IsCasting == false
-            {
-                if (IsBuildMoving)
-                {
-                    searchCount -= 8;
-                }
-                else
-                {
-                    searchCount -= 2;
-                }
-
-                if (searchCount <= 0)
-                {
-                    searchCount = searchRate;
-                    //if (ScanAndEngage())
-                    //{
-                    //}
-                }
             }
         }
 
@@ -461,7 +416,6 @@ namespace RTSLockstep
             }
             SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
-            SaveManager.WriteInt(writer, "SearchCount", searchCount);
             SaveManager.WriteLong(writer, "ConstructCount", constructCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
@@ -488,9 +442,6 @@ namespace RTSLockstep
                     break;
                 case "InRange":
                     inRange = (bool)readValue;
-                    break;
-                case "SearchCount":
-                    searchCount = (int)readValue;
                     break;
                 case "ConstructCount":
                     constructCount = (long)readValue;
