@@ -99,7 +99,10 @@ public class UserInputHelper : BehaviourHelper
         QuickRally = AbilityDataItem.FindInterfacer("Spawner");
 
         if (GUIManager == null)
+        {
             GUIManager = new RTSGUIManager();
+        }
+
         Setted = true;
     }
 
@@ -170,9 +173,9 @@ public class UserInputHelper : BehaviourHelper
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    // left double click action
                     if (Time.time < tapTimer + tapThreshold)
                     {
+                        // left double click action
                         if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
                         tap = false;
                         return;
@@ -191,11 +194,6 @@ public class UserInputHelper : BehaviourHelper
                 {
                     _isDragging = false;
                     if (OnLeftTapUp != null) { OnLeftTapUp(); }
-                }
-
-                if (_isDragging)
-                {
-                    OnLeftTapHoldDown();
                 }
 
                 if (tap == true && Time.time > tapTimer + tapThreshold)
