@@ -1,7 +1,6 @@
 ﻿using System;
 using RTSLockstep.Data;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace RTSLockstep
 {
@@ -39,6 +38,7 @@ namespace RTSLockstep
             {
                 return false;
             }
+
             return base.ShouldMakeDecision();
         }
 

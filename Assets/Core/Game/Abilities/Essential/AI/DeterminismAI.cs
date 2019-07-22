@@ -7,6 +7,8 @@ namespace RTSLockstep
 {
     public class DeterminismAI : Ability
     {
+        public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
+
         protected bool canAttack;
         protected LSBody cachedBody;
         protected Health cachedHealth;
@@ -23,6 +25,12 @@ namespace RTSLockstep
 
         #region Serialized Values (Further description in properties)
         #endregion
+
+        protected override void OnSetup()
+        {
+            base.OnSetup();
+            CachedAgentValid = this.AgentValid;
+        }
 
         protected override void OnInitialize()
         {
@@ -79,30 +87,10 @@ namespace RTSLockstep
         {
             //determine what should be done by the agent at the current point in time
             //need sight from attack ability to be able to scan...
-            if(cachedAttack)
-               nearbyAgent = DoScan();
-
-            //if (CanAttack())
-            //{
-            //    List<WorldObject> enemyObjects = new List<WorldObject>();
-            //    foreach (WorldObject nearbyObject in nearbyObjects)
-            //    {
-            //        Resource resource = nearbyObject.GetComponent<Resource>();
-            //        if (resource)
-            //        {
-            //            continue;
-            //        }
-            //        if (nearbyObject.GetPlayer() != player)
-            //        {
-            //            enemyObjects.Add(nearbyObject);
-            //        }
-            //    }
-            //    WorldObject closestObject = WorkManager.FindNearestWorldObjectInListToPosition(enemyObjects, currentPosition);
-            //    if (closestObject)
-            //    {
-            //        BeginAttack(closestObject);
-            //    }
-            //}
+            if (cachedAttack)
+            {
+                nearbyAgent = DoScan();
+            }
         }
 
         protected virtual Func<RTSAgent, bool> AgentConditional
@@ -129,6 +117,11 @@ namespace RTSLockstep
                             );
 
             return agent;
+        }
+
+        protected virtual bool AgentValid(RTSAgent agent)
+        {
+            return true;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)

@@ -57,7 +57,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && cachedAttack.CachedAgentValid(other);
+                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
                     };
                 }
                 else
@@ -65,7 +65,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && cachedAttack.CachedAgentValid(other);
+                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
                     };
                 }
                 return agentConditional;

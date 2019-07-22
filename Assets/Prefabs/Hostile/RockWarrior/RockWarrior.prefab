@@ -1748,7 +1748,7 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
-  Tag: 0
+  Tag: 3
   _selectionRadius: -1
   _visualCenter: {fileID: 0}
   objectName: RockWarrior

@@ -153,7 +153,6 @@ namespace RTSLockstep
             }
 
             CanTurn = cachedTurn.IsNotNull();
-            CachedAgentValid = this.AgentValid;
         }
 
         private void HandleOnArrive()
@@ -584,13 +583,7 @@ namespace RTSLockstep
             {
                 if (IsAttackMoving)
                 {
-                    if (ScanAndEngage() == false)
-                    {
-                        cachedMove.StartMove(this.Destination);
-                    }
-                    else
-                    {
-                    }
+                    cachedMove.StartMove(this.Destination);
                 }
                 else
                 {
@@ -679,68 +672,6 @@ namespace RTSLockstep
             this.Destination = cachedMove.Destination;
         }
 
-        private bool ScanAndEngage()
-        {
-            RTSAgent agent = DoScan();
-            if (agent == null || agent == Target)
-            {
-                return false;
-            }
-            else
-            {
-                Engage(agent);
-                return true;
-            }
-        }
-
-        public bool ScanWithinRangeAndEngage()
-        {
-            RTSAgent agent = this.DoScan();
-            if (agent == null)
-            {
-                return false;
-            }
-            else
-            {
-                Engage(agent);
-                return true;
-            }
-        }
-
-        protected virtual bool AgentValid(RTSAgent agent)
-        {
-            return true;
-        }
-
-        public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
-
-        //TODO: Consolidate the checks in LSInfluencer
-        protected Func<RTSAgent, bool> AgentConditional
-        {
-            get
-            {
-                Func<RTSAgent, bool> agentConditional = null;
-
-                if (this.Damage >= 0)
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
-                    };
-                }
-                else
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
-                    };
-                }
-                return agentConditional;
-            }
-        }
-
         protected virtual bool HardAgentConditional()
         {
             Health health = Target.GetAbility<Health>();
@@ -759,22 +690,6 @@ namespace RTSLockstep
             return true;
         }
 
-        protected virtual RTSAgent DoScan()
-        {
-            Func<RTSAgent, bool> agentConditional = AgentConditional;
-
-            RTSAgent agent = InfluenceManager.Scan(
-                                this.cachedBody.Position,
-                                this.Sight,
-                                agentConditional,
-                                (bite) =>
-                                {
-                                    return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
-                                }
-                            );
-
-            return agent;
-        }
 #if UNITY_EDITOR
         void OnDrawGizmos()
         {
