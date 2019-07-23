@@ -15,7 +15,7 @@ namespace RTSLockstep
         private Attack cachedAttack;
         protected LSBody CachedBody { get { return Agent.Body; } }
         private RTSAgent CurrentProject;
-        private bool IsBuildMoving;
+        public bool IsBuildMoving { get; private set; }
         public bool IsBuilding { get; private set; }
         public bool IsFocused { get; private set; }
 

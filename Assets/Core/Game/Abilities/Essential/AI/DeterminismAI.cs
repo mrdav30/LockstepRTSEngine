@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -17,8 +17,9 @@ namespace RTSLockstep
         protected Turn cachedTurn;
 
         //we want to restrict how many decisions are made to help with game performance
-        //the default time at the moment is a tenth of a second
-        private float timeSinceLastDecision = 0.0f, timeBetweenDecisions = 0.1f;
+        protected const int SearchRate = LockstepManager.FrameRate / 2;
+        protected int searchCount;
+
         //convert to fast list...
         protected List<RTSAgent> nearbyObjects;
         protected RTSAgent nearbyAgent;
@@ -39,11 +40,13 @@ namespace RTSLockstep
             cachedAttack = Agent.GetAbility<Attack>();
             cachedMove = Agent.GetAbility<Move>();
             cachedTurn = Agent.GetAbility<Turn>();
+
+            searchCount = LSUtility.GetRandom(SearchRate) + 1;
         }
 
         protected override void OnVisualize()
         {
-            if (ShouldMakeDecision())
+            if (!ReplayManager.IsPlayingBack && ShouldMakeDecision())
             {
                 DecideWhatToDo();
             }
@@ -56,24 +59,29 @@ namespace RTSLockstep
         */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedAttack && cachedAttack.IsCasting)
+            if (cachedAttack && (cachedAttack.IsCasting))
             {
                 return false;
             }
             else if (cachedMove && cachedMove.IsMoving)
             {
+                searchCount -= 8;
                 return false;
             }
-
-            //we are not doing anything at the moment
-            if (timeSinceLastDecision > timeBetweenDecisions)
+            else
             {
-                timeSinceLastDecision = 0.0f;
+                searchCount -= 2;
+            }
+
+            if (searchCount <= 0)
+            {
+                searchCount = SearchRate;
+                //we are not doing anything at the moment
                 return true;
             }
             else
             {
-                timeSinceLastDecision += Time.deltaTime;
+                searchCount -= 1;
                 return false;
             }
         }
@@ -127,12 +135,18 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
+            SaveManager.WriteInt(writer, "SearchCount", searchCount);
         }
 
         protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
         {
             base.HandleLoadedProperty(reader, propertyName, readValue);
-
+            switch (propertyName)
+            {
+                case "SearchCount":
+                    searchCount = (int)readValue;
+                    break;
+            }
         }
     }
 }

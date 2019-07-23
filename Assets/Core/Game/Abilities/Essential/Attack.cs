@@ -7,7 +7,6 @@ namespace RTSLockstep
     [UnityEngine.DisallowMultipleComponent]
     public class Attack : ActiveAbility
     {
-        private const int SearchRate = LockstepManager.FrameRate / 2;
         public const long MissModifier = FixedMath.One / 2;
 
         public virtual bool CanMove { get; private set; }
