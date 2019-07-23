@@ -86,9 +86,10 @@ namespace RTSLockstep
             }
         }
 
-        public virtual void CanAttack()
+        public virtual bool CanAttack()
         {
             //default behaviour needs to be overidden by children
+            return false;
         }
 
         public virtual void DecideWhatToDo()
@@ -98,6 +99,21 @@ namespace RTSLockstep
             if (cachedAttack)
             {
                 nearbyAgent = DoScan();
+            }
+        }
+
+        public virtual void InfluenceAttack()
+        {
+            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
+            {
+                // send attack command
+                Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
+                attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                attackCom.ControllerID = Agent.Controller.ControllerID;
+
+                attackCom.Add<Influence>(new Influence(Agent));
+
+                CommandManager.SendCommand(attackCom);
             }
         }
 

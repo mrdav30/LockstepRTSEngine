@@ -1,7 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
-using System;
-using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -20,56 +17,35 @@ namespace RTSLockstep
             cachedSpawner = Agent.GetAbility<Spawner>();
         }
 
-        public override void CanAttack()
+        public override bool CanAttack()
         {
-            if (cachedAttack)
+            if (cachedStructure && cachedAttack)
             {
                 if (cachedStructure.UnderConstruction() || cachedHealth.HealthAmount == 0)
                 {
-                    canAttack = false;
+                    return false;
                 }
-                canAttack = true;
+
+                return true;
             }
-            canAttack = false;
+
+            return false;
         }
 
         public override bool ShouldMakeDecision()
         {
             if (Agent.GetAbility<Structure>().UnderConstruction())
-            {              
+            {
                 return false;
             }
-            else
-            {
-                return base.ShouldMakeDecision();
-            }
+
+            return base.ShouldMakeDecision();
         }
 
-        //TODO: Consolidate the checks in LSInfluencer
-        protected override Func<RTSAgent, bool> AgentConditional
+        public override void DecideWhatToDo()
         {
-            get
-            {
-                Func<RTSAgent, bool> agentConditional = null;
-
-                if (cachedAttack.Damage >= 0)
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
-                    };
-                }
-                else
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
-                    };
-                }
-                return agentConditional;
-            }
+            base.DecideWhatToDo();
+            InfluenceAttack();
         }
 
         protected override void OnSaveDetails(JsonWriter writer)

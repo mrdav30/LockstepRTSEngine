@@ -19,13 +19,14 @@ namespace RTSLockstep
             cachedHarvest = Agent.GetAbility<Harvest>();
         }
 
-        public override void CanAttack()
+        public override bool CanAttack()
         {
-            if (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying || cachedBuild.IsBuilding)
+            if (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying || cachedConstruct.IsBuilding)
             {
-                canAttack = false;
+                return false;
             }
-            canAttack = true;
+
+            return true;
         }
 
         public override bool ShouldMakeDecision()
