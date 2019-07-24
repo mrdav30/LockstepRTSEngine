@@ -310,7 +310,6 @@ namespace RTSLockstep
             return new AgentController(defaultAllegiance, controllerName);
         }
 
-
         public void CreateCommander()
         {
             if (Commander != null)
@@ -364,7 +363,18 @@ namespace RTSLockstep
             {
                 return previousSelection;
             }
+
             return com.GetData<Selection>();
+        }
+
+        public Influence GetInfluencedAgent(Command com)
+        {
+            if (com.ContainsData<Influence>() == false)
+            {
+                return null;
+            }
+
+            return com.GetData<Influence>();
         }
 
         public void Execute(Command com)
@@ -376,20 +386,29 @@ namespace RTSLockstep
 
             BehaviourHelperManager.Execute(com);
             Selection selection = GetSelection(com);
-            for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
+            Influence influence = GetInfluencedAgent(com);
+
+            if (selection != null && selection.selectedAgentLocalIDs.Count > 0)
             {
-                ushort selectedAgentID = selection.selectedAgentLocalIDs[i];
-                if (LocalAgentActive[selectedAgentID])
+                for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
                 {
-                    var agent = LocalAgents[selectedAgentID];
-                    ////Prevent executing twice on commander
-                    //if (Commander.IsNull() || agent != Commander.Agent) {
-                    agent.Execute(com);
-                    //}
+                    ushort selectedAgentID = selection.selectedAgentLocalIDs[i];
+                    if (LocalAgentActive[selectedAgentID])
+                    {
+                        var agent = LocalAgents[selectedAgentID];
+                        agent.Execute(com);
+                    }
                 }
             }
-            //if (Commander.IsNotNull())
-            //Commander.Agent.Execute (com);
+            else if (influence.IsNotNull())
+            {
+                ushort influencedAgentID = influence.InfluencedAgentLocalID;
+                if (LocalAgentActive[influencedAgentID])
+                {
+                    var agent = LocalAgents[influencedAgentID];
+                    agent.Execute(com);
+                }
+            }
         }
 
         public void AddAgent(RTSAgent agent)

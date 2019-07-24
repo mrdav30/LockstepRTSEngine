@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using RTSLockstep.Data;
-using Newtonsoft.Json;
+using System;
 
 namespace RTSLockstep
 {
-    public class WorkerAI: DeterminismAI
+    public class WorkerAI : DeterminismAI
     {
-        protected Construct cachedBuild;
+        protected Construct cachedConstruct;
         protected Harvest cachedHarvest;
 
         #region Serialized Values (Further description in properties)
@@ -15,7 +15,7 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             base.OnInitialize();
-            cachedBuild = Agent.GetAbility<Construct>();
+            cachedConstruct = Agent.GetAbility<Construct>();
             cachedHarvest = Agent.GetAbility<Harvest>();
         }
 
@@ -35,7 +35,7 @@ namespace RTSLockstep
             {
                 return false;
             }
-            else if (Agent.Tag == AgentTag.Builder && cachedBuild.IsBuilding)
+            else if (Agent.Tag == AgentTag.Builder && cachedConstruct.IsBuilding)
             {
                 return false;
             }
@@ -48,41 +48,59 @@ namespace RTSLockstep
             base.DecideWhatToDo();
             if (Agent.Tag == AgentTag.Harvester && !cachedHarvest.IsFocused)
             {
-                if (nearbyAgent)
+                InfluenceHarvest();
+            }
+            else if (Agent.Tag == AgentTag.Builder && !cachedConstruct.IsFocused)
+            {
+                InfluenceConstruction();
+            }
+        }
+
+        private void InfluenceHarvest()
+        {
+            if (nearbyAgent)
+            {
+                ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
+                // only harvest resources the worker is assigned to
+                if (closestResource
+                    && closestResource.ResourceType == cachedHarvest.HarvestType)
                 {
-                    ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
-                    // only harvest resources the worker is assigned to
-                    if (closestResource 
-                        && closestResource.ResourceType == cachedHarvest.HarvestType)
-                    {
-                        // send harvest command
-                        Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
-                        harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                        Agent.Execute(harvestCom);
-                    }
-                }
-                else
-                {
-                    cachedHarvest.SetResourceTarget(null);
+                    // send harvest command
+                    Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
+                    harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                    harvestCom.ControllerID = Agent.Controller.ControllerID;
+
+                    harvestCom.Add<Influence>(new Influence(Agent));
+
+                    CommandManager.SendCommand(harvestCom);
                 }
             }
-            if (Agent.Tag == AgentTag.Builder && !cachedBuild.IsFocused)
+            else
             {
-                if (nearbyAgent)
+                cachedHarvest.SetResourceTarget(null);
+            }
+        }
+
+        private void InfluenceConstruction()
+        {
+            if (nearbyAgent)
+            {
+                Structure closestBuilding = nearbyAgent.GetComponent<Structure>();
+                if (closestBuilding)
                 {
-                    Structure closestBuilding = nearbyAgent.GetComponent<Structure>();
-                    if (closestBuilding)
-                    {
-                        // send build command
-                        Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                        buildCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                        Agent.Execute(buildCom);
-                    }
+                    // send construct command
+                    Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+                    constructCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                    constructCom.ControllerID = Agent.Controller.ControllerID;
+
+                    constructCom.Add<Influence>(new Influence(Agent));
+
+                    CommandManager.SendCommand(constructCom);
                 }
-                else
-                {
-                    cachedBuild.SetCurrentProject(null);
-                }
+            }
+            else
+            {
+                cachedConstruct.SetCurrentProject(null);
             }
         }
 
