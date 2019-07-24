@@ -5,10 +5,8 @@ namespace RTSLockstep
 {
     public partial class Command
     {
-        public static void Setup()
-        {
-            RegisterDefaults();
-        }
+        public byte ControllerID;
+        public ushort InputCode;
 
         private static readonly FastList<byte> serializeList = new FastList<byte>();
         private static readonly Writer writer = new Writer(serializeList);
@@ -17,6 +15,17 @@ namespace RTSLockstep
         private static ushort RegisterCount;
 
         private static BiDictionary<Type, ushort> RegisteredData = new BiDictionary<Type, ushort>();
+        /// <summary>
+        /// Backward compatability for InputCode
+        /// </summary>
+        /// <value>The le input.</value>
+        private Dictionary<ushort, FastList<ICommandData>> ContainedData = new Dictionary<ushort, FastList<ICommandData>>();
+        private ushort ContainedTypesCount;
+
+        public static void Setup()
+        {
+            RegisterDefaults();
+        }
 
         static void RegisterDefaults()
         {
@@ -25,6 +34,7 @@ namespace RTSLockstep
             Register<EmptyData>();
             Register<Coordinate>();
             Register<Selection>();
+            Register<Influence>();
             Register<Vector2d>();
             Register<Vector3d>();
             //			#else
@@ -42,24 +52,20 @@ namespace RTSLockstep
         {
             Register(typeof(TData));
         }
+
         private static void Register(Type t)
         {
             if (RegisterCount > ushort.MaxValue)
             {
                 throw new System.Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
             }
-            if (RegisteredData.ContainsKey(t)) return;
+            if (RegisteredData.ContainsKey(t))
+            {
+                return;
+            }
+
             RegisteredData.Add(t, RegisterCount++);
         }
-
-        public byte ControllerID;
-        public ushort InputCode;
-        /// <summary>
-        /// Backward compatability for InputCode
-        /// </summary>
-        /// <value>The le input.</value>
-        private Dictionary<ushort, FastList<ICommandData>> ContainedData = new Dictionary<ushort, FastList<ICommandData>>();
-        private ushort ContainedTypesCount;
 
         public Command()
         {
@@ -95,7 +101,10 @@ namespace RTSLockstep
                     throw new Exception("No more than '{0}' of a type can be added to a Command.");
                 }
                 if (items.Count == 0)
+                {
                     ContainedTypesCount++;
+                }
+
                 items.Add(item);
             }
             else
@@ -213,13 +222,11 @@ namespace RTSLockstep
             return reader.Position - StartIndex;
         }
 
-
         public byte[] Serialized
         {
             get
             {
                 writer.Reset();
-
 
                 //Essential Information
                 writer.Write(ControllerID);
