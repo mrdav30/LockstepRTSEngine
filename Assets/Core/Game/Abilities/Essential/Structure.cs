@@ -32,12 +32,12 @@ namespace RTSLockstep
         private bool _provisioned;
         private int upgradeLevel;
         private Health cachedHealth;
-        private Spawner cachedSpawner;
+        private Rally cachedRally;
 
         protected override void OnSetup()
         {
             cachedHealth = Agent.GetAbility<Health>();
-            cachedSpawner = Agent.GetAbility<Spawner>();
+            cachedRally = Agent.GetAbility<Rally>();
 
             upgradeLevel = 1;
         }
@@ -72,9 +72,9 @@ namespace RTSLockstep
             _needsBuilding = true;
             IsCasting = true;
             cachedHealth.HealthAmount = 0;
-            if (cachedSpawner)
+            if (cachedRally)
             {
-                cachedSpawner.SetSpawnPoint();
+                cachedRally.SetSpawnPoint();
             }
         }
 

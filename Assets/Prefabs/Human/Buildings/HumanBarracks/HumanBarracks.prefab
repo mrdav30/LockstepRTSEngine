@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 114793864021752714}
   - component: {fileID: 114719505328788896}
   - component: {fileID: 114973044214609618}
+  - component: {fileID: 114756668573786868}
   - component: {fileID: 114101414404568314}
   - component: {fileID: 114686156804767258}
   - component: {fileID: 114958349450188848}
@@ -2196,7 +2197,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 1
+      isExpanded: 0
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -2211,7 +2212,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
+    isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 00000000000000000000000000000000000000000000000000000000
@@ -2382,7 +2383,19 @@ MonoBehaviour:
   provisionAmount: 0
   tempStructure: {fileID: 1527426487528806, guid: 9f428967f6ce17a4e86373516dc6ee35,
     type: 2}
-  _buildSize: 5
+--- !u!114 &114756668573786868
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1197058999540568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6198b508e9be9de4485c6e4ef1c24a4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  rallyPointImage: {fileID: 2800000, guid: c6c3f7a569545784780afde54bc6ee25, type: 3}
 --- !u!114 &114759572138077454
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2471,9 +2484,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  rallyPointImage: {fileID: 2800000, guid: c6c3f7a569545784780afde54bc6ee25, type: 3}
   spawnIncrement: 2
-  _maxSpawnProgress: 25
+  _maxSpawnProgress: 5
   _spawnActions:
   - HumanFootman
   _spawnInterval: 65536

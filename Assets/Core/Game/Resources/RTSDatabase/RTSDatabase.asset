@@ -96,6 +96,7 @@ MonoBehaviour:
   - _name: Spawner
   - _name: Construct
   - _name: Harvest
+  - _name: Rally
   _projectileData:
   - _name: Melee
     _description: 
@@ -141,7 +142,7 @@ MonoBehaviour:
     _script:
       _classRef: RTSLockstep.Spawner, Assembly-CSharp
     _listenInputCode: Spawner
-    _informationGather: 4
+    _informationGather: 0
   - _name: Stop
     _description: 
     _icon: {fileID: 0}
@@ -156,6 +157,13 @@ MonoBehaviour:
       _classRef: RTSLockstep.Construct, Assembly-CSharp
     _listenInputCode: Construct
     _informationGather: 3
+  - _name: Rally
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Rally, Assembly-CSharp
+    _listenInputCode: Rally
+    _informationGather: 1
   _unitConfigElementData: []
   _unitConfigData: []
   _avatarData:

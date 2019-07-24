@@ -366,26 +366,28 @@ public class HUD : MonoBehaviour
         int topPos = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
+
         if (cachedCommander.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
         {
             PlayClick();
             agent.Die();
         }
-        if (agent.GetAbility<Spawner>() && agent.GetAbility<Spawner>().hasSpawnPoint())
+
+        if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint())
         {
             leftPos += width + BUTTON_SPACING;
-            if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Spawner>().rallyPointImage))
+            if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Rally>().rallyPointImage))
             {
                 PlayClick();
                 if (activeCursorState != CursorState.RallyPoint)
                 {
-                    agent.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
+                    agent.GetAbility<Rally>().SetFlagState(FlagState.SettingFlag);
                     SetCursorState(CursorState.RallyPoint);
                     SetCursorLock(true);
                 }
                 else
                 {
-                    agent.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
+                    agent.GetAbility<Rally>().SetFlagState(FlagState.FlagSet);
                     SetCursorLock(false);
                     SetCursorState(CursorState.Select);
                 }
@@ -540,6 +542,7 @@ public class HUD : MonoBehaviour
             int row = i / 2;
             Rect pos = GetButtonPos(row, column);
             Texture2D action = GameResourceManager.GetBuildImage(actions[i]);
+
             if (action)
             {
                 //create the button and handle the click of that button

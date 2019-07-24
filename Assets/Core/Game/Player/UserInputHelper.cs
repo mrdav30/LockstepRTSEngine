@@ -96,7 +96,7 @@ public class UserInputHelper : BehaviourHelper
         QuickTarget = AbilityDataItem.FindInterfacer("Attack");
         QuickHarvest = AbilityDataItem.FindInterfacer("Harvest");
         QuickBuild = AbilityDataItem.FindInterfacer("Construct");
-        QuickRally = AbilityDataItem.FindInterfacer("Spawner");
+        QuickRally = AbilityDataItem.FindInterfacer("Rally");
 
         if (GUIManager == null)
         {
@@ -374,7 +374,7 @@ public class UserInputHelper : BehaviourHelper
             {
                 if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>() != null && Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                    if (Selector.MainSelectedAgent.GetAbility<Rally>() != null && Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                     {
                         //call harvest command
                         SelectionManager.SetSelectionLock(true);
@@ -407,19 +407,19 @@ public class UserInputHelper : BehaviourHelper
                 if (Selector.MainSelectedAgent
                     && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Spawner>()
+                    if (Selector.MainSelectedAgent.GetAbility<Rally>()
                         && !Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
                     {
-                        if (Selector.MainSelectedAgent.GetAbility<Spawner>().GetFlagState() == FlagState.SettingFlag)
+                        if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                         {
-                            Selector.MainSelectedAgent.GetAbility<Spawner>().SetFlagState(FlagState.SetFlag);
+                            Selector.MainSelectedAgent.GetAbility<Rally>().SetFlagState(FlagState.SetFlag);
                             PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
                             PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
                         }
                         else
                         {
                             Vector2d rallyPoint = RTSInterfacing.GetWorldPosD(Input.mousePosition);
-                            Selector.MainSelectedAgent.GetAbility<Spawner>().SetRallyPoint(rallyPoint.ToVector3());
+                            Selector.MainSelectedAgent.GetAbility<Rally>().SetRallyPoint(rallyPoint.ToVector3());
                         }
                     }
 

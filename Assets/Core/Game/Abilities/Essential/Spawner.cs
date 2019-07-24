@@ -9,12 +9,10 @@ namespace RTSLockstep
     [UnityEngine.DisallowMultipleComponent]
     public class Spawner : ActiveAbility
     {
-        private Vector3 spawnPoint;
-        private Vector3 rallyPoint;
-        private FlagState _flagState;
         private Queue<string> spawnQueue;
         private long currentSpawnProgress;
         private LSBody CachedBody { get { return Agent.Body; } }
+        private Rally cachedRally;
 
         //Stuff for the logic
         private int basePriority;
@@ -22,7 +20,6 @@ namespace RTSLockstep
         public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
-        public Texture2D rallyPointImage;
         [SerializeField]
         private long spawnIncrement = FixedMath.One;
         [SerializeField]
@@ -43,7 +40,6 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            Agent.OnSelectedChange += HandleSelectedChange;
             spawnQueue = new Queue<string>();
 
             basePriority = CachedBody.Priority;
@@ -55,9 +51,7 @@ namespace RTSLockstep
             spawnCount = 0;
             IsFocused = false;
 
-            //caching parameters
-            var spawnVersion = Agent.SpawnVersion;
-            var controller = Agent.Controller;
+            cachedRally = Agent.GetAbility<Rally>();
         }
 
         protected override void OnSimulate()
@@ -100,38 +94,6 @@ namespace RTSLockstep
                 values[pos++] = unit;
             }
             return values;
-        }
-
-        public void HandleSelectedChange()
-        {
-            if (Agent.GetCommander() == PlayerManager.MainController.Commander)
-            {
-                RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
-                if (Agent.IsSelected)
-                {
-                    if (flag && spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3())
-                    {
-                        if (_flagState == FlagState.FlagSet)
-                        {
-                            flag.transform.localPosition = rallyPoint;
-                            flag.transform.forward = transform.forward;
-                            flag.Enable();
-                        }
-                        else
-                        {
-                            flag.transform.localPosition = Agent.Body.Position3d.ToVector3();
-                            flag.Disable();
-                        }
-                    }
-                }
-                else
-                {
-                    if (flag)
-                    {
-                        flag.Disable();
-                    }
-                }
-            }
         }
 
         public float getBuildPercentage()
@@ -205,18 +167,21 @@ namespace RTSLockstep
                     //}
                     Vector2d spawnOutside = new Vector2d(this.transform.position);
                     RTSAgent agent = Agent.Controller.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
-                    RTSAgent newUnit = agent as RTSAgent;
-                    if (newUnit && spawnPoint != rallyPoint)
+                    agent.SetProvision(true);
+
+                    if (cachedRally)
                     {
-                        newUnit.SetProvision(true);
+                        if (cachedRally.spawnPoint != cachedRally.rallyPoint)
+                        {                          
+                            Command moveCom = new Command(AbilityDataItem.FindInterfacer("Move").ListenInputID);
+                            moveCom.Add<Vector2d>(new Vector2d(cachedRally.rallyPoint));
+                            moveCom.ControllerID = agent.Controller.ControllerID;
+                            moveCom.Add<Influence>(new Influence(agent));
 
-                        Command moveCom = new Command(AbilityDataItem.FindInterfacer("Move").ListenInputID);
-                        moveCom.Add<Vector2d>(new Vector2d(rallyPoint));
-                        moveCom.ControllerID = Agent.Controller.ControllerID;
-                        moveCom.Add<Influence>(new Influence(newUnit));
-
-                        CommandManager.SendCommand(moveCom);               
+                            CommandManager.SendCommand(moveCom);
+                        }
                     }
+
                 }
                 currentSpawnProgress = 0;
             }
@@ -227,66 +192,14 @@ namespace RTSLockstep
             get { return AnimState.Spawning; }
         }
 
-        public void SetRallyPoint(Vector3 position)
-        {
-            rallyPoint = position;
-            if (Agent.GetCommander() && Agent.IsSelected)
-            {
-                RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
-                if (flag)
-                {
-                    if (!flag.ActiveStatus)
-                    {
-                        flag.Enable();
-                    }
-                    flag.transform.localPosition = rallyPoint;
-                    _flagState = FlagState.FlagSet;
-                    Agent.Controller.GetCommanderHUD().SetCursorLock(false);
-                    Agent.Controller.GetCommanderHUD().SetCursorState(CursorState.Select);
-                    SelectionManager.SetSelectionLock(false);
-                }
-            }
-        }
-
-        public void SetSpawnPoint()
-        {
-            long spawnX = (long)(Agent.Body.GetSelectionBounds().center.x + transform.forward.x * Agent.Body.GetSelectionBounds().extents.x + transform.forward.x * 10);
-            long spawnZ = (long)(Agent.Body.GetSelectionBounds().center.z + transform.forward.z * Agent.Body.GetSelectionBounds().extents.z + transform.forward.z * 10);
-            spawnPoint = new Vector3(spawnX, 0, spawnZ);
-            rallyPoint = spawnPoint;
-        }
-
         protected override void OnExecute(Command com)
         {
             DefaultData action;
-            Vector2d pos;
-            if (com.TryGetData<Vector2d>(out pos))
-            {
-                if (pos.ToVector3d() != GameResourceManager.InvalidPosition)
-                {
-                    SetRallyPoint(pos.ToVector3());
-                }
-            }
-            else if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
+            if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
             {
                 String unit = action.Value.ToString();
                 CreateUnit(unit);
             }
-        }
-
-        public bool hasSpawnPoint()
-        {
-            return spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3();
-        }
-
-        public FlagState GetFlagState()
-        {
-            return this._flagState;
-        }
-
-        public void SetFlagState(FlagState value)
-        {
-            this._flagState = value;
         }
 
         public int GetSpawnQueueCount()
@@ -302,9 +215,6 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            SaveManager.WriteVector(writer, "SpawnPoint", spawnPoint);
-            SaveManager.WriteVector(writer, "RallyPoint", rallyPoint);
-            SaveManager.WriteString(writer, "FlagState", _flagState.ToString());
             SaveManager.WriteFloat(writer, "SpawnProgress", currentSpawnProgress);
             SaveManager.WriteLong(writer, "SpawnCount", spawnCount);
             SaveManager.WriteStringArray(writer, "SpawnQueue", spawnQueue.ToArray());
@@ -315,15 +225,6 @@ namespace RTSLockstep
             base.HandleLoadedProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
-                case "SpawnPoint":
-                    spawnPoint = LoadManager.LoadVector(reader);
-                    break;
-                case "RallyPoint":
-                    rallyPoint = LoadManager.LoadVector(reader);
-                    break;
-                case "FlagState":
-                    _flagState = WorkManager.GetFlagState((string)readValue);
-                    break;
                 case "SpawnProgress":
                     currentSpawnProgress = (long)readValue;
                     break;
