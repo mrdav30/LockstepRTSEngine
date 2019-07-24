@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -175,7 +176,7 @@ namespace RTSLockstep
                 if (windupCount >= Windup)
                 {
                     windupCount = 0;
-                    ProcessBuildQueue();
+                    ProcessSpawnQueue();
                     while (this.spawnCount >= _spawnInterval)
                     {
                         //resetting back down after attack is fired
@@ -191,7 +192,7 @@ namespace RTSLockstep
             }
         }
 
-        protected void ProcessBuildQueue()
+        protected void ProcessSpawnQueue()
         {
             currentSpawnProgress += spawnIncrement;
             if (currentSpawnProgress > _maxSpawnProgress)
@@ -208,7 +209,13 @@ namespace RTSLockstep
                     if (newUnit && spawnPoint != rallyPoint)
                     {
                         newUnit.SetProvision(true);
-                        newUnit.GetAbility<Move>().StartMove(new Vector2d(rallyPoint));
+
+                        Command moveCom = new Command(AbilityDataItem.FindInterfacer("Move").ListenInputID);
+                        moveCom.Add<Vector2d>(new Vector2d(rallyPoint));
+                        moveCom.ControllerID = Agent.Controller.ControllerID;
+                        moveCom.Add<Influence>(new Influence(newUnit));
+
+                        CommandManager.SendCommand(moveCom);               
                     }
                 }
                 currentSpawnProgress = 0;
