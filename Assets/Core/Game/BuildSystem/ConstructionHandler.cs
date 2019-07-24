@@ -234,6 +234,7 @@ public static class ConstructionHandler
                     buildCom.Add<Vector2d>(qBuildPoint);
                     buildCom.Add<Vector2d>(qRotationPoint);
                     buildCom.Add<Vector3d>(qLocalScale);
+
                     UserInputHelper.SendCommand(buildCom);
                 }
 

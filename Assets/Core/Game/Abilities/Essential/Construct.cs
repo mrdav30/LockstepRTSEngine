@@ -309,15 +309,7 @@ namespace RTSLockstep
                     Agent.Tag = AgentTag.Builder;
 
                     CurrentProject = newBuilding;
-                    IsBuilding = true;
-                    IsCasting = true;
-                    fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
-                    fastRangeToTarget *= fastRangeToTarget;
-
-                    if (!CheckRange())
-                    {
-                        StartBuildMove(CurrentProject.Body.Position);
-                    }
+                    StartBuildMove();
                 }
                 else
                 {
@@ -361,31 +353,60 @@ namespace RTSLockstep
             StopBuilding(true);
         }
 
-        public virtual void StartBuildMove(Vector2d destination)
+        public virtual void StartBuildMove()
         {
-            Agent.StopCast(this.ID);
+            IsBuilding = true;
+            IsCasting = true;
+            fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
+            fastRangeToTarget *= fastRangeToTarget;
 
-            IsBuildMoving = true;
-            //send move command
-            cachedMove.StartMove(destination);
+            if (!CheckRange())
+            {
+                Agent.StopCast(this.ID);
+
+                IsBuildMoving = true;
+                //send move command
+                cachedMove.StartMove(CurrentProject.Body.Position);
+            }
         }
 
         protected override void OnExecute(Command com)
         {
             DefaultData target;
-            Vector2d targetPOS;
-            Vector2d targetRotation;
-            Vector3d targetLocalScale;
+
             com.TryGetData<DefaultData>(out target);
             if (target != null)
             {
-                com.TryGetData<Vector2d>(out targetPOS, 0);
-                com.TryGetData<Vector2d>(out targetRotation, 1);
-                com.TryGetData<Vector3d>(out targetLocalScale, 2);
-
                 IsFocused = true;
                 IsBuildMoving = false;
-                SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
+                // construction hasn't started yet, only a name reference given
+                if (target.Is(DataType.String))
+                {
+                    Vector2d targetPOS;
+                    Vector2d targetRotation;
+                    Vector3d targetLocalScale;
+                    com.TryGetData<Vector2d>(out targetPOS, 0);
+                    com.TryGetData<Vector2d>(out targetRotation, 1);
+                    com.TryGetData<Vector3d>(out targetLocalScale, 2);
+
+                    IsFocused = true;
+                    IsBuildMoving = false;
+                    SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
+                }
+                else if (target.Is(DataType.UShort))
+                {
+                    RTSAgent tempTarget;
+                    ushort targetValue = (ushort)target.Value;
+                    if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+                    {
+                        RTSAgent building = (RTSAgent)tempTarget;
+                        if (building && building.GetAbility<Structure>().UnderConstruction())
+                        {
+                            CurrentProject = building;
+                            StartBuildMove();
+                        }
+                    }               
+                }
             }
         }
 
