@@ -388,7 +388,18 @@ namespace RTSLockstep
             Selection selection = GetSelection(com);
             Influence influence = GetInfluencedAgent(com);
 
-            if (selection != null && selection.selectedAgentLocalIDs.Count > 0)
+            // check if command is an influence from AI
+            if (influence.IsNotNull())
+            {
+                ushort influencedAgentID = influence.InfluencedAgentLocalID;
+                if (LocalAgentActive[influencedAgentID])
+                {
+                    var agent = LocalAgents[influencedAgentID];
+                    agent.Execute(com);
+                }
+            }
+            // otherwise it's an input command
+            else if (selection != null && selection.selectedAgentLocalIDs.Count > 0)
             {
                 for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
                 {
@@ -398,15 +409,6 @@ namespace RTSLockstep
                         var agent = LocalAgents[selectedAgentID];
                         agent.Execute(com);
                     }
-                }
-            }
-            else if (influence.IsNotNull())
-            {
-                ushort influencedAgentID = influence.InfluencedAgentLocalID;
-                if (LocalAgentActive[influencedAgentID])
-                {
-                    var agent = LocalAgents[influencedAgentID];
-                    agent.Execute(com);
                 }
             }
         }

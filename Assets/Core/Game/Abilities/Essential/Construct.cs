@@ -393,6 +393,7 @@ namespace RTSLockstep
                     IsBuildMoving = false;
                     SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
                 }
+                // otherwise this is another agent coming to help
                 else if (target.Is(DataType.UShort))
                 {
                     RTSAgent tempTarget;

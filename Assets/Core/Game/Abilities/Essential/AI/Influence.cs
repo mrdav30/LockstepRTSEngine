@@ -16,7 +16,7 @@ namespace RTSLockstep
 
         public ushort InfluencedAgentLocalID;
         private BitArray Header;
-        private readonly byte Data;
+        private readonly FastList<byte> Data = new FastList<byte>();
 
         public Influence() { }
 
@@ -46,7 +46,7 @@ namespace RTSLockstep
             {
                 if (Header.Get(i))
                 {
-                    bufferBites.Add(Data);
+                    bufferBites.Add(Data[i]);
                 }
             }
             return bufferBites.ToArray();
@@ -54,24 +54,35 @@ namespace RTSLockstep
 
         private void Serialize()
         {
-            int headerLength = (InfluencedAgentLocalID + 1 - 1) / 8 + 1;
-            Header = new BitArray(headerLength, false);
+            //   int headerLength = (InfluencedAgentLocalID + 1 - 1) / 8 + 1;
+            //  Header = new BitArray(headerLength, false);
 
+            Data.FastClear();
+            ushort highestID = 0;
+
+            ushort id = InfluencedAgentLocalID;
+            if (InfluencedAgentLocalID > highestID)
+            {
+                highestID = id;
+            }
+
+            int headerLength = (highestID + 1 - 1) / 8 + 1;
+            Header = new BitArray(headerLength, false);
             SerializeID(InfluencedAgentLocalID);
         }
 
         private void SerializeID(ushort id)
         {
-
             bigIndex = (id / 8);
             smallIndex = (id % 8);
 
             Header.Set(bigIndex, true);
+            Data.EnsureCapacity(bigIndex + 1);
+            Data[bigIndex] |= (byte)(1 << smallIndex);
         }
 
         public int Reconstruct(byte[] source, int startIndex)
         {
-
             curIndex = startIndex;
 
             byte headerArraySize = source[curIndex++];

@@ -65,7 +65,6 @@ namespace RTSLockstep
 
         private void Serialize()
         {
-
             Data.FastClear();
             ushort highestID = 0;
             for (int i = 0; i < selectedAgentLocalIDs.Count; i++)
@@ -84,7 +83,6 @@ namespace RTSLockstep
 
         private void SerializeID(ushort id)
         {
-
             bigIndex = (id / 8);
             smallIndex = (id % 8);
 
@@ -95,7 +93,6 @@ namespace RTSLockstep
 
         public int Reconstruct(byte[] source, int startIndex)
         {
-
             curIndex = startIndex;
 
             byte headerArraySize = source[curIndex++];

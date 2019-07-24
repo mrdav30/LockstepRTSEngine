@@ -43,6 +43,7 @@ namespace RTSLockstep
                 Debug.LogError("Interfacer does not exist. Can't generate command.");
                 return null;
             }
+
             Command curCom = null;
             switch (facer.InformationGather)
             {
