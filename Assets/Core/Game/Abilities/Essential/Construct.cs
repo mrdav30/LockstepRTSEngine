@@ -161,7 +161,6 @@ namespace RTSLockstep
                     }
                     Agent.SetState(ConstructingAnimState);
 
-
                     long mag;
                     targetDirection.Normalize(out mag);
                     bool withinTurn = cachedAttack.TrackAttackAngle == false ||
@@ -365,8 +364,8 @@ namespace RTSLockstep
                 Agent.StopCast(this.ID);
 
                 IsBuildMoving = true;
-                //send move command
-                cachedMove.StartMove(CurrentProject.Body.Position);
+                // send move command
+                cachedMove.StartMove(CurrentProject.Body._position);
             }
         }
 

@@ -98,7 +98,8 @@ namespace RTSLockstep
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Harvest);
                             }
-                            else if (Agent.MyAgentType == AgentType.Building && Agent.objectName == Selector.MainSelectedAgent.GetAbility<Harvest>().ResourceStoreName
+                            else if (Agent.MyAgentType == AgentType.Building 
+                                && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().canStoreResources
                                 && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Deposit);

@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ namespace RTSLockstep
         private const int searchRate = LockstepManager.FrameRate / 2;
         public ResourceType HarvestType { get; private set; }
         private RTSAgent resourceTarget;
-        private RTSAgent closestResourceStore;
+        private RTSAgent resourceStorage;
         private long currentLoadAmount = 0;
         private long currentDepositAmount = 0;
 
@@ -19,7 +18,6 @@ namespace RTSLockstep
         private Move cachedMove;
         private Turn cachedTurn;
         private Attack cachedAttack;
-        private WorkerAI cachedAI;
         private LSBody CachedBody { get { return Agent.Body; } }
 
         //Stuff for the logic
@@ -34,7 +32,6 @@ namespace RTSLockstep
         public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
-        public string ResourceStoreName = String.Empty;
         public long CollectionAmount = FixedMath.One;
         public long DepositAmount = FixedMath.One;
         public long Capacity = FixedMath.One;
@@ -64,7 +61,6 @@ namespace RTSLockstep
             cachedTurn = Agent.GetAbility<Turn>();
             cachedMove = Agent.GetAbility<Move>();
             cachedAttack = Agent.GetAbility<Attack>();
-            cachedAI = Agent.GetAbility<WorkerAI>();
 
             cachedMove.onStartMove += HandleStartMove;
 
@@ -254,7 +250,9 @@ namespace RTSLockstep
                 if (windupCount >= Windup)
                 {
                     windupCount = 0;
+                    // begin collecting resources
                     Collect();
+
                     while (this.harvestCount >= _harvestInterval)
                     {
                         //resetting back down after attack is fired
@@ -278,19 +276,22 @@ namespace RTSLockstep
 
         void BehaveWithStorage()
         {
-            closestResourceStore = ClosestResourceStore(ResourceStoreName);
-            if (!closestResourceStore || closestResourceStore.IsActive == false)
+            resourceStorage = ClosestResourceStore();
+            if (!resourceStorage
+                || resourceStorage.GetAbility<Structure>() && resourceStorage.GetAbility<Structure>().UnderConstruction())
             {
-                //Target's lifecycle has ended
+                // can't find clostest resource store
+                // send command to stop harvesting...
+                StopHarvesting(true);
                 return;
             }
 
             if (!IsWindingUp)
             {
-                Vector2d targetDirection = closestResourceStore.Body._position - CachedBody._position;
+                Vector2d targetDirection = resourceStorage.Body._position - CachedBody._position;
                 long fastMag = targetDirection.FastMagnitude();
 
-                if (CheckRange(closestResourceStore.Body))
+                if (CheckRange(resourceStorage.Body))
                 {
                     if (!inRange)
                     {
@@ -328,23 +329,23 @@ namespace RTSLockstep
                     cachedMove.PauseCollisionStop();
                     if (cachedMove.IsMoving == false)
                     {
-                        cachedMove.StartMove(closestResourceStore.Body._position);
+                        cachedMove.StartMove(resourceStorage.Body._position);
                         CachedBody.Priority = basePriority;
                     }
                     else
                     {
                         if (inRange)
                         {
-                            cachedMove.Destination = closestResourceStore.Body.Position;
+                            cachedMove.Destination = resourceStorage.Body.Position;
                         }
                         else
                         {
                             if (repathTimer.AdvanceFrame())
                             {
-                                if (closestResourceStore.Body.PositionChangedBuffer &&
-                                    closestResourceStore.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                if (resourceStorage.Body.PositionChangedBuffer &&
+                                    resourceStorage.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
                                 {
-                                    cachedMove.StartMove(closestResourceStore.Body._position);
+                                    cachedMove.StartMove(resourceStorage.Body._position);
                                     //So units don't sync up and path on the same frame
                                     repathTimer.AdvanceFrames(repathRandom);
                                 }
@@ -400,17 +401,13 @@ namespace RTSLockstep
                 collect = Capacity - currentLoadAmount;
             }
 
-            if (resourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
-            {
-                cachedAI.DecideWhatToDo();
-            }
-            else
+            if (!resourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
             {
                 resourceTarget.GetAbility<ResourceDeposit>().Remove(collect);
             }
             currentLoadAmount += collect;
 
-            if (currentLoadAmount >= Capacity)
+            if (IsLoadAtCapacity())
             {
                 IsHarvesting = false;
                 IsEmptying = true;
@@ -443,12 +440,7 @@ namespace RTSLockstep
                     IsHarvesting = true;
                     IsHarvestMoving = true;
                 }
-                else
-                {
-                    cachedAI.DecideWhatToDo();
-                }
             }
-
         }
 
         bool CheckRange(LSBody targetBody)
@@ -525,63 +517,41 @@ namespace RTSLockstep
 
         public void StartHarvest(RTSAgent resource)
         {
-            if (resource != Agent && resource != null)
-            {
-                Agent.Tag = AgentTag.Harvester;
-                //if (audioElement != null)
-                //{
-                //    audioElement.Play(startHarvestSound);
-                //}
-                resourceTarget = resource;
-                ResourceType resourceType = resource.GetAbility<ResourceDeposit>().ResourceType;
-                // we can only collect one resource at a time, other resources are lost
-                if (resourceType == ResourceType.Unknown || resourceType != HarvestType)
-                {
-                    HarvestType = resourceType;
-                    currentLoadAmount = 0;
-                }
-                IsHarvesting = true;
-                IsCasting = true;
-                IsEmptying = false;
+            resourceTarget = resource;
+            ResourceType resourceType = resourceTarget.GetAbility<ResourceDeposit>().ResourceType;
 
-                if (!CheckRange(resourceTarget.Body))
-                {
-                    StartHarvestMove(resourceTarget.Body._position);
-                }
+            // we can only collect one resource at a time, other resources are lost
+            if (resourceType == ResourceType.Unknown || resourceType != HarvestType)
+            {
+                HarvestType = resourceType;
+                currentLoadAmount = 0;
+            }
+
+            IsHarvesting = true;
+            IsCasting = true;
+            IsEmptying = false;
+
+            if (!CheckRange(resourceTarget.Body))
+            {
+                MoveToDestination(resourceTarget.Body._position);
             }
         }
 
-        public virtual void StartHarvestMove(Vector2d destination)
+        public void TargetStorage(RTSAgent storage)
         {
-            Agent.StopCast(this.ID);
+            resourceStorage = storage;
 
-            IsHarvestMoving = true;
-            //send move command
-            cachedMove.StartMove(destination);
-        }
+            IsHarvesting = false;
+            IsCasting = true;
+            IsEmptying = true;
 
-        public void StartDeposit(RTSAgent resourceStore)
-        {
-            if (resourceStore != Agent && resourceStore != null)
+            if (!CheckRange(resourceStorage.Body))
             {
-                Agent.Tag = AgentTag.Harvester;
-                //if (audioElement != null)
-                //{
-                //    audioElement.Play(startHarvestSound);
-                //}
-
-                IsHarvesting = false;
-                IsCasting = true;
-                IsEmptying = true;
-
-                if (!CheckRange(resourceStore.Body))
-                {
-                    StartDepositMove(resourceStore.Body._position);
-                }
+                MoveToDestination(resourceStorage.Body._position);
             }
         }
 
-        public virtual void StartDepositMove(Vector2d destination)
+        public virtual void MoveToDestination(Vector2d destination)
         {
             Agent.StopCast(this.ID);
 
@@ -595,26 +565,29 @@ namespace RTSLockstep
             DefaultData target;
             if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
             {
-                IsFocused = true;
-                IsHarvestMoving = false;
                 RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
+
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                 {
-                    if (tempTarget)
+                    if (tempTarget != Agent)
                     {
+                        IsFocused = true;
+                        IsHarvestMoving = false;
+                        Agent.Tag = AgentTag.Harvester;
+
                         if (tempTarget.MyAgentType == AgentType.Resource && !tempTarget.GetAbility<ResourceDeposit>().IsEmpty())
                         {
-                            StartHarvest(tempTarget as RTSAgent);
+                            StartHarvest(tempTarget);
                         }
-                        else if (tempTarget.MyAgentType == AgentType.Building && (tempTarget as RTSAgent).objectName == ResourceStoreName && currentLoadAmount > 0)
+                        else if (tempTarget.MyAgentType == AgentType.Building && currentLoadAmount > 0)
                         {
-                            StartDeposit(tempTarget as RTSAgent);
+                            TargetStorage(tempTarget);
                         }
                     }
                     else
                     {
-                        StopHarvesting();
+                        StopHarvesting(true);
                     }
                 }
                 else
@@ -629,21 +602,29 @@ namespace RTSLockstep
             StopHarvesting(true);
         }
 
-        private RTSAgent ClosestResourceStore(string resourceStoreName)
+        private RTSAgent ClosestResourceStore()
         {
             //change list to fastarray
             List<RTSAgent> playerBuildings = new List<RTSAgent>();
             // use RTS influencer?
             foreach (RTSAgent child in Agent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
             {
-                if (child.objectName == resourceStoreName)
+                if (child.GetAbility<Structure>()
+                    && child.GetAbility<Structure>().canStoreResources
+                    && !child.GetAbility<Structure>().UnderConstruction())
                 {
                     playerBuildings.Add(child);
                 }
             }
-            RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, transform.position) as RTSAgent;
-
-            return nearestObject;
+            if (playerBuildings.Count > 0)
+            {
+                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, transform.position) as RTSAgent;
+                return nearestObject;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void SetResourceTarget(RTSAgent value)
@@ -654,6 +635,18 @@ namespace RTSLockstep
         public long GetCurrentLoad()
         {
             return this.currentLoadAmount;
+        }
+
+        public bool IsLoadAtCapacity()
+        {
+            if (currentLoadAmount >= Capacity)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         protected override void OnSaveDetails(JsonWriter writer)

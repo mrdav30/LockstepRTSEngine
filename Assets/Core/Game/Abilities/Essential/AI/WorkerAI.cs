@@ -46,7 +46,9 @@ namespace RTSLockstep
         public override void DecideWhatToDo()
         {
             base.DecideWhatToDo();
-            if (Agent.Tag == AgentTag.Harvester && !cachedHarvest.IsFocused)
+            if (Agent.Tag == AgentTag.Harvester
+                && !cachedHarvest.IsFocused
+                && !cachedHarvest.IsLoadAtCapacity())
             {
                 InfluenceHarvest();
             }
@@ -56,20 +58,47 @@ namespace RTSLockstep
             }
         }
 
+        protected override Func<RTSAgent, bool> AgentConditional
+        {
+            get
+            {
+                Func<RTSAgent, bool> agentConditional = null;
+
+                if (Agent.Tag == AgentTag.Harvester
+                    && !cachedHarvest.IsLoadAtCapacity())
+                {
+                    agentConditional = (other) =>
+                    {
+                        ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
+                        return resourceDeposit != null && !resourceDeposit.IsEmpty() && other.IsActive;
+                    };
+
+                }
+                else if (Agent.Tag == AgentTag.Builder)
+                {
+                    agentConditional = (other) =>
+                    {
+                        Structure structure = other.GetAbility<Structure>();
+                        return structure != null && structure.UnderConstruction() && other.IsActive;
+                    };
+                }
+                return agentConditional;
+            }
+        }
+
         private void InfluenceHarvest()
         {
             if (nearbyAgent)
             {
                 ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
-                // only harvest resources the worker is assigned to
-                if (closestResource
-                    && closestResource.ResourceType == cachedHarvest.HarvestType)
+
+                if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType)
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
                     harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                    harvestCom.ControllerID = Agent.Controller.ControllerID;
 
+                    harvestCom.ControllerID = Agent.Controller.ControllerID;
                     harvestCom.Add<Influence>(new Influence(Agent));
 
                     CommandManager.SendCommand(harvestCom);
@@ -101,32 +130,6 @@ namespace RTSLockstep
             else
             {
                 cachedConstruct.SetCurrentProject(null);
-            }
-        }
-
-        protected override Func<RTSAgent, bool> AgentConditional
-        {
-            get
-            {
-                Func<RTSAgent, bool> agentConditional = null;
-
-                if (Agent.Tag == AgentTag.Harvester)
-                {
-                    agentConditional = (other) =>
-                    {
-                        ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
-                        return resourceDeposit != null && !resourceDeposit.IsEmpty() && other.IsActive;
-                    };
-                }
-                else if (Agent.Tag == AgentTag.Builder)
-                {
-                    agentConditional = (other) =>
-                    {
-                        Structure structure = other.GetAbility<Structure>();
-                        return structure != null && structure.UnderConstruction() && other.IsActive;
-                    };
-                }
-                return agentConditional;
             }
         }
 

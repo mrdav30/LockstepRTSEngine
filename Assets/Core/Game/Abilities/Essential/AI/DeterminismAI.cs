@@ -16,11 +16,13 @@ namespace RTSLockstep
         protected Move cachedMove;
         protected Turn cachedTurn;
 
-        //we want to restrict how many decisions are made to help with game performance
+        // default scan range, overriden by cached attack sight
+        protected long scanRange = 5;
+        // we want to restrict how many decisions are made to help with game performance
         protected const int SearchRate = LockstepManager.FrameRate / 2;
         protected int searchCount;
 
-        //convert to fast list...
+        // convert to fast list...
         protected List<RTSAgent> nearbyObjects;
         protected RTSAgent nearbyAgent;
 
@@ -42,6 +44,11 @@ namespace RTSLockstep
             cachedTurn = Agent.GetAbility<Turn>();
 
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
+
+            if (cachedAttack)
+            {
+                scanRange = cachedAttack.Sight;
+            }
         }
 
         protected override void OnVisualize()
@@ -96,25 +103,7 @@ namespace RTSLockstep
         {
             //determine what should be done by the agent at the current point in time
             //need sight from attack ability to be able to scan...
-            if (cachedAttack)
-            {
-                nearbyAgent = DoScan();
-            }
-        }
-
-        public virtual void InfluenceAttack()
-        {
-            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
-            {
-                // send attack command
-                Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
-                attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                attackCom.ControllerID = Agent.Controller.ControllerID;
-
-                attackCom.Add<Influence>(new Influence(Agent));
-
-                CommandManager.SendCommand(attackCom);
-            }
+            nearbyAgent = DoScan();
         }
 
         protected virtual Func<RTSAgent, bool> AgentConditional
@@ -130,17 +119,37 @@ namespace RTSLockstep
         {
             Func<RTSAgent, bool> agentConditional = AgentConditional;
 
-            RTSAgent agent = InfluenceManager.Scan(
-                                this.cachedBody.Position,
-                                this.cachedAttack.Sight,
-                                agentConditional,
-                                (bite) =>
-                                {
-                                    return ((this.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
-                                }
-                            );
+            RTSAgent agent = null;
+
+            if (agentConditional.IsNotNull())
+            {
+                agent = InfluenceManager.Scan(
+                     this.cachedBody.Position,
+                     scanRange,
+                     agentConditional,
+                     (bite) =>
+                     {
+                         return ((this.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
+                     }
+                 );
+            }
 
             return agent;
+        }
+
+        public virtual void InfluenceAttack()
+        {
+            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
+            {
+                // send attack command
+                Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
+                attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                attackCom.ControllerID = Agent.Controller.ControllerID;
+
+                attackCom.Add<Influence>(new Influence(Agent));
+
+                CommandManager.SendCommand(attackCom);
+            }
         }
 
         protected virtual bool AgentValid(RTSAgent agent)

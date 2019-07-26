@@ -642,12 +642,12 @@ namespace RTSLockstep
                 if (IsMoving)
                 {
                     //If the other mover is moving to a similar point
-                    if (otherMover.MyMovementGroupID == MyMovementGroupID 
+                    if (otherMover.MyMovementGroupID == MyMovementGroupID
                         || otherMover.targetPos.FastDistance(this.targetPos) <= (closingDistance * closingDistance))
                     {
                         if (otherMover.IsMoving == false)
                         {
-                            if (otherMover.Arrived 
+                            if (otherMover.Arrived
                                 && otherMover.StoppedTime > MinimumOtherStopTime)
                             {
                                 Arrive();
@@ -655,9 +655,9 @@ namespace RTSLockstep
                         }
                         else
                         {
-                            if (hasPath 
-                                && otherMover.hasPath 
-                                && otherMover.pathIndex > 0 
+                            if (hasPath
+                                && otherMover.hasPath
+                                && otherMover.pathIndex > 0
                                 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < closingDistance.Mul(closingDistance))
                             {
                                 if (this.distance < this.closingDistance)

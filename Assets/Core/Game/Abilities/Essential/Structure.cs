@@ -10,6 +10,7 @@ namespace RTSLockstep
     {
         public bool provisioner;
         public int provisionAmount;
+        public bool canStoreResources;
         public GameObject tempStructure;
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
