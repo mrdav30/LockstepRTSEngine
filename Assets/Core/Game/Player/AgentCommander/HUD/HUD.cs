@@ -296,7 +296,8 @@ public class HUD : MonoBehaviour
         string selectionName = "";
 
         RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
-        selectionName = selectedAgent.GetComponent<RTSAgent>().objectName;
+        selectionName = selectedAgent.GetComponent<RTSAgent>().AgentDescription;
+
         if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
         {
             // reset slider value if the selected object has changed

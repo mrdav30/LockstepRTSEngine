@@ -10,6 +10,7 @@ namespace RTSLockstep.Data
             base._name = name;
             base._description = description;
         }
+
         public AgentDataItem()
         {
 
@@ -26,6 +27,11 @@ namespace RTSLockstep.Data
                 }
             }
             return null;
+        }
+
+        public String GetAgentDescription()
+        {
+            return _description;
         }
 
         public Texture2D GetAgentIcon()
@@ -54,7 +60,10 @@ namespace RTSLockstep.Data
             if (lastPrefab != Prefab)
             {
                 if (string.IsNullOrEmpty(Name))
+                {
                     this._name = Prefab.name;
+                }
+
                 lastPrefab = Prefab;
             }
         }

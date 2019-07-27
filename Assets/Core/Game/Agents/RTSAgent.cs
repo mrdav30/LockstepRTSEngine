@@ -38,6 +38,8 @@ namespace RTSLockstep
         private Transform _visualCenter;
         public Transform VisualCenter { get { return _visualCenter; } }
         public string objectName;
+        [HideInInspector]
+        public string AgentDescription;
         public Texture2D destroyImage;
         [SerializeField]
         public ResourceCost resourceCost = new ResourceCost
@@ -204,6 +206,7 @@ namespace RTSLockstep
             _setupAbilitys.FastClear();
 
             MyAgentCode = interfacer.Name;
+            AgentDescription = interfacer.GetAgentDescription();
             Data = interfacer;
             SpawnVersion = 1;
             CheckCasting = true;
