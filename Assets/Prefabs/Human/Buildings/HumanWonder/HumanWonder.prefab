@@ -113,7 +113,6 @@ GameObject:
   - component: {fileID: 4176247825277596}
   - component: {fileID: 114962212148504410}
   - component: {fileID: 114519868393284004}
-  - component: {fileID: 114007906596325890}
   - component: {fileID: 114893750937795170}
   - component: {fileID: 114346096031951970}
   - component: {fileID: 114888478853728010}
@@ -479,17 +478,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114007906596325890
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1788796594848350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c3e17636be9820419ae7c07de02b4ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114261812185127650
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -614,6 +602,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provisioner: 0
   provisionAmount: 0
+  canStoreResources: 0
+  tempStructure: {fileID: 0}
 --- !u!114 &114962212148504410
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -635,6 +625,7 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 4176247825277596}
   objectName: HumanWonder
+  AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:

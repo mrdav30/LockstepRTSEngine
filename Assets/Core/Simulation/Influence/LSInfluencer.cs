@@ -1,39 +1,55 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RTSLockstep
 {
     public class LSInfluencer
     {
         #region Static Helpers
-
         static RTSAgent tempAgent;
         static GridNode tempNode;
-
         #endregion
 
         #region Collection Helper
-
         [NonSerialized]
         public int bucketIndex = -1;
-
         #endregion
 
         #region ScanNode Helper
-
         public int NodeTicket;
-
         #endregion
 
         public GridNode LocatedNode { get; private set; }
-
         public LSBody Body { get; private set; }
-
         public RTSAgent Agent { get; private set; }
+
+        // convert to fast array
+        private List<DeterminismAI> AgentAI = new List<DeterminismAI>();
 
         public void Setup(RTSAgent agent)
         {
             Agent = agent;
             Body = agent.Body;
+
+            if(Agent.GetAbility<Attack>())
+            {
+                AgentAI.Add(new OffensiveAI());
+            }
+
+            if(Agent.GetAbility<Harvest>() || Agent.GetAbility<Construct>())
+            {
+                AgentAI.Add(new WorkerAI());
+            }
+
+            if (Agent.GetAbility<Structure>())
+            {
+                AgentAI.Add(new StructureAI());
+            }
+
+            foreach(var AI in AgentAI)
+            {
+                AI.OnSetup(this);
+            }
         }
 
         public void Initialize()
@@ -41,6 +57,11 @@ namespace RTSLockstep
             LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
 
             LocatedNode.Add(this);
+
+            foreach (var AI in AgentAI)
+            {
+                AI.OnInitialize();
+            }
         }
 
         public void Simulate()
@@ -63,6 +84,14 @@ namespace RTSLockstep
 
                     tempNode.Add(this);
                     LocatedNode = tempNode;
+                }
+            }
+
+            if (!ReplayManager.IsPlayingBack)
+            {
+                foreach (var AI in AgentAI)
+                {
+                    AI.OnSimulate();
                 }
             }
         }

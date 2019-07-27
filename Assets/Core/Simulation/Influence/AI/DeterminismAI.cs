@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace RTSLockstep
 {
-    public class DeterminismAI : Ability
+    public class DeterminismAI
     {
+        public LSInfluencer cachedInfluencer { get; private set; }
         public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
         protected bool canAttack;
@@ -29,19 +30,20 @@ namespace RTSLockstep
         #region Serialized Values (Further description in properties)
         #endregion
 
-        protected override void OnSetup()
+        public virtual void OnSetup(LSInfluencer influencer)
         {
-            base.OnSetup();
+            cachedInfluencer = influencer;
+
             CachedAgentValid = this.AgentValid;
         }
 
-        protected override void OnInitialize()
+        public virtual void OnInitialize()
         {
-            cachedBody = Agent.Body;
-            cachedHealth = Agent.GetAbility<Health>();
-            cachedAttack = Agent.GetAbility<Attack>();
-            cachedMove = Agent.GetAbility<Move>();
-            cachedTurn = Agent.GetAbility<Turn>();
+            cachedBody = cachedInfluencer.Agent.Body;
+            cachedHealth = cachedInfluencer.Agent.GetAbility<Health>();
+            cachedAttack = cachedInfluencer.Agent.GetAbility<Attack>();
+            cachedMove = cachedInfluencer.Agent.GetAbility<Move>();
+            cachedTurn = cachedInfluencer.Agent.GetAbility<Turn>();
 
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
 
@@ -51,9 +53,9 @@ namespace RTSLockstep
             }
         }
 
-        protected override void OnVisualize()
+        public virtual void OnSimulate()
         {
-            if (!ReplayManager.IsPlayingBack && ShouldMakeDecision())
+            if (ShouldMakeDecision())
             {
                 DecideWhatToDo();
             }
@@ -66,7 +68,7 @@ namespace RTSLockstep
         */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedAttack && (cachedAttack.IsCasting))
+            if (cachedInfluencer.Agent.IsCasting)
             {
                 return false;
             }
@@ -91,12 +93,6 @@ namespace RTSLockstep
                 searchCount -= 1;
                 return false;
             }
-        }
-
-        public virtual bool CanAttack()
-        {
-            //default behaviour needs to be overidden by children
-            return false;
         }
 
         public virtual void DecideWhatToDo()
@@ -129,7 +125,7 @@ namespace RTSLockstep
                      agentConditional,
                      (bite) =>
                      {
-                         return ((this.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
+                         return ((cachedInfluencer.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
                      }
                  );
             }
@@ -137,35 +133,18 @@ namespace RTSLockstep
             return agent;
         }
 
-        public virtual void InfluenceAttack()
-        {
-            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
-            {
-                // send attack command
-                Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
-                attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                attackCom.ControllerID = Agent.Controller.ControllerID;
-
-                attackCom.Add<Influence>(new Influence(Agent));
-
-                CommandManager.SendCommand(attackCom);
-            }
-        }
-
         protected virtual bool AgentValid(RTSAgent agent)
         {
             return true;
         }
 
-        protected override void OnSaveDetails(JsonWriter writer)
+        public virtual void OnSaveDetails(JsonWriter writer)
         {
-            base.SaveDetails(writer);
             SaveManager.WriteInt(writer, "SearchCount", searchCount);
         }
 
-        protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
+        public virtual void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
         {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
                 case "SearchCount":

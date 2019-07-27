@@ -96,7 +96,10 @@ namespace RTSLockstep
             get
             {
                 if (Stunned)
+                {
                     return true;
+                }
+
                 return abilityManager.CheckCasting();
             }
         }

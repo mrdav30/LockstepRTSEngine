@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Data;
 using System;
 
 namespace RTSLockstep
@@ -8,13 +9,13 @@ namespace RTSLockstep
         #region Serialized Values (Further description in properties)
         #endregion
 
-        protected override void OnInitialize()
+        public override void OnInitialize()
         {
             base.OnInitialize();
-            cachedAttack = Agent.GetAbility<Attack>();
+            cachedAttack = cachedInfluencer.Agent.GetAbility<Attack>();
         }
 
-        public override bool CanAttack()
+        private bool CanAttack()
         {
             if (cachedAttack)
             {
@@ -31,8 +32,13 @@ namespace RTSLockstep
 
         public override void DecideWhatToDo()
         {
+            //determine what should be done by the agent at the current point in time
+            //need sight from attack ability to be able to scan...
             base.DecideWhatToDo();
-            InfluenceAttack();
+            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
+            {
+                InfluenceAttack();
+            }
         }
 
         //TODO: Consolidate the checks in LSInfluencer
@@ -47,7 +53,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
+                        return cachedInfluencer.Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
                     };
                 }
                 else
@@ -55,7 +61,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
+                        return cachedInfluencer.Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
                     };
                 }
 
@@ -63,12 +69,24 @@ namespace RTSLockstep
             }
         }
 
-        protected override void OnSaveDetails(JsonWriter writer)
+        public virtual void InfluenceAttack()
         {
-            base.SaveDetails(writer);
+            // send attack command
+            Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
+            attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+            attackCom.ControllerID = cachedInfluencer.Agent.Controller.ControllerID;
+
+            attackCom.Add<Influence>(new Influence(cachedInfluencer.Agent));
+
+            CommandManager.SendCommand(attackCom);
         }
 
-        protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
+        public override void OnSaveDetails(JsonWriter writer)
+        {
+            base.OnSaveDetails(writer);
+        }
+
+        public override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
         {
             base.HandleLoadedProperty(reader, propertyName, readValue);
 

@@ -388,7 +388,6 @@ namespace RTSLockstep
                     com.TryGetData<Vector2d>(out targetRotation, 1);
                     com.TryGetData<Vector3d>(out targetLocalScale, 2);
 
-                    IsFocused = true;
                     IsBuildMoving = false;
                     SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
                 }

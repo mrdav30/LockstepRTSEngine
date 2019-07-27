@@ -832,7 +832,6 @@ GameObject:
   - component: {fileID: 4000010907238942}
   - component: {fileID: 114061601890469220}
   - component: {fileID: 114614306233172148}
-  - component: {fileID: 114952414954639992}
   - component: {fileID: 114663279844443730}
   - component: {fileID: 114951773368346060}
   - component: {fileID: 114588237757547290}
@@ -1752,6 +1751,7 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 0}
   objectName: RockWarrior
+  AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
@@ -1951,17 +1951,6 @@ MonoBehaviour:
   _turnRate:
     x: 65024
     y: 8171
---- !u!114 &114952414954639992
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000013931707134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 345c7828092748447b3958442e1ff48a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!137 &137000010749321264
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

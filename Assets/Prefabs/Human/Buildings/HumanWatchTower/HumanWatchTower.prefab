@@ -104,7 +104,6 @@ GameObject:
   - component: {fileID: 4116631394849956}
   - component: {fileID: 114113914783969338}
   - component: {fileID: 114285022901893476}
-  - component: {fileID: 114052383781174080}
   - component: {fileID: 114249994713392150}
   - component: {fileID: 114584152629258208}
   - component: {fileID: 114994551942518704}
@@ -515,17 +514,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1724289562733284}
   m_Mesh: {fileID: 4300000, guid: 60d492234cdf43f4185aa9b0c6c7a929, type: 3}
---- !u!114 &114052383781174080
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1667462521772482}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c3e17636be9820419ae7c07de02b4ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114113914783969338
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -547,6 +535,7 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 4116631394849956}
   objectName: HumanWatchTower
+  AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
@@ -600,10 +589,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provisioner: 0
   provisionAmount: 0
+  canStoreResources: 0
   tempStructure: {fileID: 1496648592488480, guid: 6da9b120afaf44f46bf1caabe2983881,
     type: 2}
-  _buildSizeLow: 0
-  _buildSizeHigh: 0
 --- !u!114 &114279839518768826
 MonoBehaviour:
   m_ObjectHideFlags: 1
