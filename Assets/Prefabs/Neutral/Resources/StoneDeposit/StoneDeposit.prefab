@@ -121,7 +121,7 @@ Transform:
   m_GameObject: {fileID: 1244894659910424}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 4488702193757374}
   m_RootOrder: 2
@@ -151,7 +151,7 @@ Transform:
   m_GameObject: {fileID: 1052491548656512}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4488702193757374}
   m_RootOrder: 0
@@ -164,7 +164,7 @@ Transform:
   m_GameObject: {fileID: 1350680308405444}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 4488702193757374}
   m_RootOrder: 1
@@ -184,7 +184,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: e20e26d497f3a9540873785ae0490a6d, type: 2}
+  - {fileID: 2100000, guid: eae26481f91539c4bbafb6852b0a327d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -210,7 +210,7 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1826706035303098}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -219,7 +219,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: e20e26d497f3a9540873785ae0490a6d, type: 2}
+  - {fileID: 2100000, guid: eae26481f91539c4bbafb6852b0a327d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -254,7 +254,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: e20e26d497f3a9540873785ae0490a6d, type: 2}
+  - {fileID: 2100000, guid: eae26481f91539c4bbafb6852b0a327d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -289,7 +289,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: e20e26d497f3a9540873785ae0490a6d, type: 2}
+  - {fileID: 2100000, guid: eae26481f91539c4bbafb6852b0a327d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -315,28 +315,28 @@ MeshFilter:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1350680308405444}
-  m_Mesh: {fileID: 4300000, guid: 2eb9f3337c0b6f8478b791c6c7a21940, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 1ad7d4fcdd8b66e49b6f6f52523ee2ca, type: 3}
 --- !u!33 &33573229056990690
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1244894659910424}
-  m_Mesh: {fileID: 4300000, guid: 2eb9f3337c0b6f8478b791c6c7a21940, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 1ad7d4fcdd8b66e49b6f6f52523ee2ca, type: 3}
 --- !u!33 &33836144744892952
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1052491548656512}
-  m_Mesh: {fileID: 4300000, guid: 2eb9f3337c0b6f8478b791c6c7a21940, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 1ad7d4fcdd8b66e49b6f6f52523ee2ca, type: 3}
 --- !u!33 &33846831796253678
 MeshFilter:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1826706035303098}
-  m_Mesh: {fileID: 4300000, guid: 2eb9f3337c0b6f8478b791c6c7a21940, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 1ad7d4fcdd8b66e49b6f6f52523ee2ca, type: 3}
 --- !u!114 &114075044497011668
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -399,13 +399,13 @@ MonoBehaviour:
     _shape: 1
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 32768
-    _halfHeight: 32768
-    _radius: 294912
+    _halfWidth: 163840
+    _halfHeight: 163840
+    _radius: 196608
     _immovable: 1
     _basePriority: 0
     _vertices: []
-    _height: 245760
+    _height: 163840
     _positionalTransform: {fileID: 4488702193757374}
     _rotationalTransform: {fileID: 4488702193757374}
 --- !u!114 &114722574255462212
@@ -429,6 +429,7 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 4488702193757374}
   objectName: StoneDeposit
+  AgentDescription: 
   destroyImage: {fileID: 0}
   resourceCost:
     reorderableList:

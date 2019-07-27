@@ -60,10 +60,6 @@ MonoBehaviour:
     _description: Barracks
     _icon: {fileID: 21300000, guid: 1065bd2316b281646a2889ce57357a2a, type: 3}
     _prefab: {fileID: 1197058999540568, guid: 33d97bd711c9d9b48a1c66f464a30a80, type: 2}
-  - _name: JungleGreenPine_XL
-    _description: Green Pine
-    _icon: {fileID: 0}
-    _prefab: {fileID: 1355823693922466, guid: 8d46db17eb07485439ed5f72a4913ab7, type: 2}
   - _name: HumanWoodWallPillar
     _description: Wood Wall
     _icon: {fileID: 21300000, guid: aed9e13a31f26784cb5ec89319eba1d1, type: 3}
@@ -76,6 +72,22 @@ MonoBehaviour:
     _description: Warrior
     _icon: {fileID: 0}
     _prefab: {fileID: 1000013931707134, guid: 8f46609a7e6441847825dd7c238301f7, type: 2}
+  - _name: BoboTree_1_Spring
+    _description: Bobo Tree
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1150336541744332, guid: c62b7cba81c4e8b43bee9227d5190f4f, type: 2}
+  - _name: BoboTree_2_Spring
+    _description: Bobo Tree
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1882760685014170, guid: 97674815232ef6543a62978d810e87a8, type: 2}
+  - _name: BoboTree_3_Spring
+    _description: Bobo Tree
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1327561376388394, guid: da812d005c2c46f4ca18be383b381fcd, type: 2}
+  - _name: BoboTree_4_Spring
+    _description: Bobo Tree
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1770353392784764, guid: 1bf0d6935618d8747b374385d915360b, type: 2}
   _worldObjectData:
   - _name: Sun
     _description: 

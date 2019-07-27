@@ -9,6 +9,7 @@
         Ranged,
         Convoy,
         Wall,
-        AttackStructure
+        AttackStructure,
+        Tree
     }
 }
