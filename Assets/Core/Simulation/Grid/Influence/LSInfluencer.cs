@@ -1,6 +1,4 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
 
 namespace RTSLockstep
 {
@@ -47,18 +45,22 @@ namespace RTSLockstep
 
         public void Simulate()
         {
-
             if (Body.PositionChangedBuffer)
             {
                 tempNode = GridManager.GetNode(Body._position.x, Body._position.y);
 
                 if (tempNode.IsNull())
+                {
                     return;
-				
+                }
+
                 if (System.Object.ReferenceEquals(tempNode, LocatedNode) == false)
                 {
                     if (LocatedNode != null)
+                    {
                         LocatedNode.Remove(this);
+                    }
+
                     tempNode.Add(this);
                     LocatedNode = tempNode;
                 }
@@ -73,8 +75,5 @@ namespace RTSLockstep
                 LocatedNode = null;
             }
         }
-
     }
-
-
 }

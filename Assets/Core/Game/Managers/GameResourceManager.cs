@@ -1,9 +1,7 @@
-﻿using System.Collections;
+﻿using FastCollections;
+using RTSLockstep.Data;
 using System.Collections.Generic;
 using UnityEngine;
-using RTSLockstep;
-using RTSLockstep.Data;
-using FastCollections;
 
 namespace RTSLockstep
 {
@@ -17,8 +15,8 @@ namespace RTSLockstep
         public static float MinCameraHeight { get { return 10; } }
         public static float MaxCameraHeight { get { return 40; } }
         public static Vector3d InvalidPosition { get { return _invalidPosition; } }
-        public static GUISkin SelectBoxSkin { get { return _selectBoxSkin;  } }
-        public static Bounds InvalidBounds { get { return _invalidBounds;  } }
+        public static GUISkin SelectBoxSkin { get { return _selectBoxSkin; } }
+        public static Bounds InvalidBounds { get { return _invalidBounds; } }
         public static int HarvestSpeed { get { return 1; } }
         public static int BuildSpeed { get { return 1; } }  // used to make sure that all buildings update their progress for building Units at the same rate
         public static Texture2D HealthyTexture { get { return _healthyTexture; } }
@@ -40,7 +38,7 @@ namespace RTSLockstep
         private static GUISkin _selectBoxSkin;
         private static Vector3d _invalidPosition = new Vector3d(-99999, -99999, -99999);
         private static Bounds _invalidBounds = new Bounds(new Vector3(-99999, -99999, -99999), new Vector3(0, 0, 0));
-      //  private static GameObjectList gameObjectList;
+        //  private static GameObjectList gameObjectList;
         private static Texture2D _healthyTexture, _damagedTexture, _criticalTexture;
         private static Material _allowedMaterial, _notAllowedMaterial;
         private static Dictionary<ResourceType, Texture2D> _resourceHealthBarTextures;
@@ -63,7 +61,7 @@ namespace RTSLockstep
         //public static readonly Dictionary<string, IAvatarData> AvatarCodeInterfacerMap = new Dictionary<string, IAvatarData>();
         public static IAvatarData[] AvatarData;
         public static Texture2D[] Avatars;
-       // public static string[] AvatarCodes;
+        // public static string[] AvatarCodes;
 
         #endregion
 
@@ -110,7 +108,7 @@ namespace RTSLockstep
                     IWorldObjectData interfacer = WorldObjectData[i];
                     string worldObjectCode = interfacer.Name;
                     WorldObjectCodes[i] = worldObjectCode;
-                    
+
                     WorldObjectCodeInterfacerMap.Add(worldObjectCode, interfacer);
                 }
             }
@@ -131,7 +129,7 @@ namespace RTSLockstep
                     Texture2D avatar = interfacer.GetAvatar();
                     //  AvatarCodes[i] = avatarCode;
                     Avatars[i] = avatar;
-                   // AvatarCodeInterfacerMap.Add(avatarCode, interfacer);
+                    // AvatarCodeInterfacerMap.Add(avatarCode, interfacer);
                 }
             }
             else

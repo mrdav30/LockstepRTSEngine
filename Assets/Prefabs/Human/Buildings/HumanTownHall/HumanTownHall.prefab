@@ -74,6 +74,7 @@ GameObject:
   - component: {fileID: 114819671442987974}
   - component: {fileID: 114180653622063118}
   - component: {fileID: 114039183365371682}
+  - component: {fileID: 114973939356979506}
   - component: {fileID: 114844726585989748}
   - component: {fileID: 114582453884945862}
   - component: {fileID: 114902712059205450}
@@ -2243,7 +2244,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  rallyPointImage: {fileID: 2800000, guid: c6c3f7a569545784780afde54bc6ee25, type: 3}
   spawnIncrement: 2
   _maxSpawnProgress: 25
   _spawnActions:
@@ -2263,6 +2263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provisioner: 1
   provisionAmount: 25
+  canStoreResources: 1
   tempStructure: {fileID: 1617287679801144, guid: 2395c9dbde7c76243be94cfa25b53cc6,
     type: 2}
 --- !u!114 &114326955987627384
@@ -2554,6 +2555,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
+--- !u!114 &114973939356979506
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1061207286704144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6198b508e9be9de4485c6e4ef1c24a4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  rallyPointImage: {fileID: 0}
 --- !u!137 &137143281687109204
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
