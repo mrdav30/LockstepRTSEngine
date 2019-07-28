@@ -19,13 +19,13 @@ public class RTSGameManager : GameManager
         //    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         //}
 
-        //if (GUILayout.Button("Playback"))
-        //{
-        //    LastSave = ReplayManager.SerializeCurrent();
-        //    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        //    ReplayManager.Play(LastSave);
+        if (GUILayout.Button("Playback"))
+        {
+            LastSave = ReplayManager.SerializeCurrent();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            ReplayManager.Play(LastSave);
 
-        //}
+        }
 
     }
     #endregion
