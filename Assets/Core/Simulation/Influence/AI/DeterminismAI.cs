@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
 
@@ -7,18 +6,18 @@ namespace RTSLockstep
 {
     public class DeterminismAI
     {
-        public LSInfluencer cachedInfluencer { get; private set; }
+        public RTSAgent cachedAgent { get; private set; }
         public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
-        protected bool canAttack;
         protected LSBody cachedBody;
         protected Health cachedHealth;
-        protected Attack cachedAttack;
         protected Move cachedMove;
         protected Turn cachedTurn;
 
+        protected AllegianceType _targetAllegiance;
+
         // default scan range, overriden by cached attack sight
-        protected long scanRange = 5;
+        protected long scanRange = FixedMath.One * 50;
         // we want to restrict how many decisions are made to help with game performance
         protected const int SearchRate = LockstepManager.FrameRate / 2;
         protected int searchCount;
@@ -30,27 +29,21 @@ namespace RTSLockstep
         #region Serialized Values (Further description in properties)
         #endregion
 
-        public virtual void OnSetup(LSInfluencer influencer)
+        public virtual void OnSetup(RTSAgent agent)
         {
-            cachedInfluencer = influencer;
+            cachedAgent = agent;
 
             CachedAgentValid = this.AgentValid;
         }
 
         public virtual void OnInitialize()
         {
-            cachedBody = cachedInfluencer.Agent.Body;
-            cachedHealth = cachedInfluencer.Agent.GetAbility<Health>();
-            cachedAttack = cachedInfluencer.Agent.GetAbility<Attack>();
-            cachedMove = cachedInfluencer.Agent.GetAbility<Move>();
-            cachedTurn = cachedInfluencer.Agent.GetAbility<Turn>();
+            cachedBody = cachedAgent.Body;
+            cachedHealth = cachedAgent.GetAbility<Health>();
+            cachedMove = cachedAgent.GetAbility<Move>();
+            cachedTurn = cachedAgent.GetAbility<Turn>();
 
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
-
-            if (cachedAttack)
-            {
-                scanRange = cachedAttack.Sight;
-            }
         }
 
         public virtual void OnSimulate()
@@ -68,11 +61,7 @@ namespace RTSLockstep
         */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedInfluencer.Agent.IsCasting)
-            {
-                return false;
-            }
-            else if (cachedMove && cachedMove.IsMoving)
+            if (cachedMove && cachedMove.IsMoving)
             {
                 searchCount -= 8;
                 return false;
@@ -98,7 +87,6 @@ namespace RTSLockstep
         public virtual void DecideWhatToDo()
         {
             //determine what should be done by the agent at the current point in time
-            //need sight from attack ability to be able to scan...
             nearbyAgent = DoScan();
         }
 
@@ -125,7 +113,7 @@ namespace RTSLockstep
                      agentConditional,
                      (bite) =>
                      {
-                         return ((cachedInfluencer.Agent.Controller.GetAllegiance(bite) & this.cachedAttack.TargetAllegiance) != 0);
+                         return ((cachedAgent.Controller.GetAllegiance(bite) & _targetAllegiance) != 0);
                      }
                  );
             }

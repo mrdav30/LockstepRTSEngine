@@ -76,9 +76,7 @@ namespace RTSLockstep
             {
                 for (int y = yMin; y <= yMax; y++)
                 {
-                    ScanNode tempNode = GridManager.GetScanNode(
-                                            x,
-                                            y);
+                    ScanNode tempNode = GridManager.GetScanNode(x,y);
 
                     if (tempNode.IsNotNull())
                     {
@@ -104,9 +102,6 @@ namespace RTSLockstep
                                             {
                                                 output.Add(tempAgent);
                                             }
-                                        }
-                                        else
-                                        {
                                         }
                                     }
                                 }

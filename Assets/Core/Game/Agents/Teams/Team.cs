@@ -29,7 +29,9 @@ namespace RTSLockstep
 			for (int i = 0; i < TeamManager.Teams.Count; i++) {
 				Team team = TeamManager.Teams[i];
 				if (team != this)
-                    this.SetAllegiance(team,AllegianceType.Neutral);
+                {
+                    this.SetAllegiance(team, AllegianceType.Neutral);
+                }
 			}
 			TeamManager.UpdateDiplomacy (this);
 
