@@ -609,7 +609,14 @@ namespace RTSLockstep
             {
                 var other = InstanceManagers[i];
                 other.SetAllegiance(newCont, other.DefaultAllegiance);
-                newCont.SetAllegiance(other, newCont.DefaultAllegiance);
+                if (other.DefaultAllegiance == AllegianceType.Neutral)
+                {
+                    newCont.SetAllegiance(other, AllegianceType.Neutral);
+                }
+                else
+                {
+                    newCont.SetAllegiance(other, newCont.DefaultAllegiance);
+                }
             }
         }
 
