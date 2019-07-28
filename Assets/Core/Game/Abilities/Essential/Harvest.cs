@@ -163,7 +163,9 @@ namespace RTSLockstep
 
         void BehaveWithResource()
         {
-            if (!resourceTarget || resourceTarget.IsActive == false)
+            if (!resourceTarget
+                || resourceTarget.IsActive == false
+                || resourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
             {
                 //Target's lifecycle has ended
                 StopHarvesting();
@@ -405,6 +407,7 @@ namespace RTSLockstep
             {
                 resourceTarget.GetAbility<ResourceDeposit>().Remove(collect);
             }
+
             currentLoadAmount += collect;
 
             if (IsLoadAtCapacity())

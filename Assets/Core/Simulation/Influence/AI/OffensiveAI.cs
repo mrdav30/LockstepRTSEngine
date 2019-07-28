@@ -6,13 +6,22 @@ namespace RTSLockstep
 {
     public class OffensiveAI : DeterminismAI
     {
+        protected Attack cachedAttack;
+
         #region Serialized Values (Further description in properties)
         #endregion
 
         public override void OnInitialize()
         {
             base.OnInitialize();
-            cachedAttack = cachedInfluencer.Agent.GetAbility<Attack>();
+            _targetAllegiance = AllegianceType.Enemy;
+
+            cachedAttack = cachedAgent.GetAbility<Attack>();
+
+            if (cachedAttack)
+            {
+                scanRange = cachedAttack.Sight;
+            }
         }
 
         private bool CanAttack()
@@ -29,6 +38,20 @@ namespace RTSLockstep
 
             return false;
         }
+
+
+
+        public override bool ShouldMakeDecision()
+        {
+            if (cachedAgent.IsCasting)
+            {
+                searchCount -= 1;
+                return false;
+            }
+
+            return base.ShouldMakeDecision();
+        }
+
 
         public override void DecideWhatToDo()
         {
@@ -53,7 +76,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return cachedInfluencer.Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
+                        return cachedAgent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
                     };
                 }
                 else
@@ -61,7 +84,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return cachedInfluencer.Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
+                        return cachedAgent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
                     };
                 }
 
@@ -74,9 +97,9 @@ namespace RTSLockstep
             // send attack command
             Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
             attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-            attackCom.ControllerID = cachedInfluencer.Agent.Controller.ControllerID;
+            attackCom.ControllerID = cachedAgent.Controller.ControllerID;
 
-            attackCom.Add<Influence>(new Influence(cachedInfluencer.Agent));
+            attackCom.Add<Influence>(new Influence(cachedAgent));
 
             CommandManager.SendCommand(attackCom);
         }

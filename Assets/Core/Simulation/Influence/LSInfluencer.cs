@@ -36,19 +36,19 @@ namespace RTSLockstep
                 AgentAI.Add(new OffensiveAI());
             }
 
-            if(Agent.GetAbility<Harvest>() || Agent.GetAbility<Construct>())
+            if(Agent.GetAbility<Harvest>())
             {
-                AgentAI.Add(new WorkerAI());
+                AgentAI.Add(new HarvesterAI());
             }
 
-            if (Agent.GetAbility<Structure>())
+            if (Agent.GetAbility<Construct>())
             {
-                AgentAI.Add(new StructureAI());
+                AgentAI.Add(new ConstructorAI());
             }
 
             foreach(var AI in AgentAI)
             {
-                AI.OnSetup(this);
+                AI.OnSetup(agent);
             }
         }
 

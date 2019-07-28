@@ -59,12 +59,6 @@ namespace RTSLockstep
             cachedMove.onStartMove += HandleStartMove;
 
             basePriority = CachedBody.Priority;
-
-            // if agent doesn't have tag, set as builder by default
-            if (Agent.Tag == AgentTag.None)
-            {
-                Agent.Tag = AgentTag.Builder;
-            }
         }
 
         private void HandleStartMove()
