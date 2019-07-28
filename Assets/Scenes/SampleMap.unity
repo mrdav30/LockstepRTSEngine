@@ -412,6 +412,24 @@ MonoBehaviour:
     Position:
       x: 196608
       y: 589824
+  - AgentCode: RockWarrior
+    Count: 1
+    ControllerCode: Hostile
+    Position:
+      x: 3276800
+      y: 3276800
+  - AgentCode: HumanTownHall
+    Count: 1
+    ControllerCode: Player 2
+    Position:
+      x: 5570560
+      y: 24248320
+  - AgentCode: HumanWorker
+    Count: 1
+    ControllerCode: Player 2
+    Position:
+      x: 5242880
+      y: 23920640
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:
@@ -819,110 +837,11 @@ MonoBehaviour:
   _environmentBodies: []
   _environmentObjects: []
   _environmentAgents:
-  - AgentCode: Tree_7
-    Agent: {fileID: 1517242816}
-    Position:
-      x: -1450139
-      y: -854548
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_5
-    Agent: {fileID: 1420608079}
-    Position:
-      x: -1757675
-      y: -1172439
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_3
-    Agent: {fileID: 870528819}
-    Position:
-      x: -882829
-      y: -1174637
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_3
-    Agent: {fileID: 1487972366}
-    Position:
-      x: -1891618
-      y: -1530389
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
   - AgentCode: Tree_1
     Agent: {fileID: 353533393}
     Position:
       x: -1096529
       y: -961552
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_2
-    Agent: {fileID: 1559891210}
-    Position:
-      x: -1053723
-      y: -1298671
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_6
-    Agent: {fileID: 1612692447}
-    Position:
-      x: -1344077
-      y: -1333823
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_4
-    Agent: {fileID: 1341011076}
-    Position:
-      x: -885107
-      y: -1438477
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_1
-    Agent: {fileID: 1172978696}
-    Position:
-      x: -1836755
-      y: -2200759
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_3
-    Agent: {fileID: 1507783917}
-    Position:
-      x: -1217003
-      y: -1756364
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_1
-    Agent: {fileID: 735636489}
-    Position:
-      x: -1192755
-      y: -2122055
-      z: 0
-    Rotation:
-      x: 65536
-      y: 0
-  - AgentCode: Tree_2
-    Agent: {fileID: 2136453886}
-    Position:
-      x: -966656
-      y: -1826488
       z: 0
     Rotation:
       x: 65536
@@ -954,6 +873,15 @@ MonoBehaviour:
     Rotation:
       x: 65536
       y: 0
+  - AgentCode: Tree_1
+    Agent: {fileID: 735636489}
+    Position:
+      x: -1192755
+      y: -2122055
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
   - AgentCode: CrystalDeposit
     Agent: {fileID: 795742624}
     Position:
@@ -963,11 +891,92 @@ MonoBehaviour:
     Rotation:
       x: 65536
       y: 0
+  - AgentCode: Tree_3
+    Agent: {fileID: 870528819}
+    Position:
+      x: -882829
+      y: -1174637
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_1
+    Agent: {fileID: 1172978696}
+    Position:
+      x: -1836755
+      y: -2200759
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_4
+    Agent: {fileID: 1341011076}
+    Position:
+      x: -885107
+      y: -1438477
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
   - AgentCode: GoldDeposit
     Agent: {fileID: 1391691925}
     Position:
       x: -511180
       y: -3126067
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_5
+    Agent: {fileID: 1420608079}
+    Position:
+      x: -1757675
+      y: -1172439
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_3
+    Agent: {fileID: 1487972366}
+    Position:
+      x: -1891618
+      y: -1530389
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_3
+    Agent: {fileID: 1507783917}
+    Position:
+      x: -1217003
+      y: -1756364
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_7
+    Agent: {fileID: 1517242816}
+    Position:
+      x: -1450139
+      y: -854548
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_2
+    Agent: {fileID: 1559891210}
+    Position:
+      x: -1053723
+      y: -1298671
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_6
+    Agent: {fileID: 1612692447}
+    Position:
+      x: -1344077
+      y: -1333823
       z: 0
     Rotation:
       x: 65536
@@ -995,6 +1004,15 @@ MonoBehaviour:
     Position:
       x: -897843
       y: -2791833
+      z: 0
+    Rotation:
+      x: 65536
+      y: 0
+  - AgentCode: Tree_2
+    Agent: {fileID: 2136453886}
+    Position:
+      x: -966656
+      y: -1826488
       z: 0
     Rotation:
       x: 65536
@@ -1641,12 +1659,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1bf0d6935618d8747b374385d915360b, type: 3}
---- !u!4 &1469691721 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4266578872893848, guid: 1bf0d6935618d8747b374385d915360b,
-    type: 3}
-  m_PrefabInstance: {fileID: 1469691720}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1469784787 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4936176028545174, guid: 128830cd048d508489d67e66eb42a2f1,
@@ -2213,11 +2225,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5368592068559070184, guid: cbeab0a54f76aa849b1823b7858224ce,
-        type: 3}
-      propertyPath: _visualCenter
-      value: 
-      objectReference: {fileID: 1469691721}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cbeab0a54f76aa849b1823b7858224ce, type: 3}
 --- !u!1001 &4964586001153066622
@@ -2287,11 +2294,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6284473608699475178, guid: a05c993d1dce51645bce6991749dd006,
-        type: 3}
-      propertyPath: _visualCenter
-      value: 
-      objectReference: {fileID: 1469691721}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a05c993d1dce51645bce6991749dd006, type: 3}
 --- !u!1001 &7161831553928086036
