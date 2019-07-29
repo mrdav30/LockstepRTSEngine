@@ -1895,7 +1895,7 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfHeight: 32768
-    _radius: 180395
+    _radius: 196608
     _immovable: 0
     _basePriority: 0
     _vertices: []

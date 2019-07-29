@@ -406,11 +406,11 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfHeight: 32768
-    _radius: 65536
+    _radius: 98304
     _immovable: 0
     _basePriority: 0
     _vertices: []
-    _height: 196608
+    _height: 229376
     _positionalTransform: {fileID: 4916245628546948}
     _rotationalTransform: {fileID: 4916245628546948}
 --- !u!114 &114958002785914002
