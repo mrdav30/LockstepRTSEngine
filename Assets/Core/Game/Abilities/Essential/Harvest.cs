@@ -284,7 +284,7 @@ namespace RTSLockstep
             {
                 // can't find clostest resource store
                 // send command to stop harvesting...
-                StopHarvesting(true);
+                StopHarvesting();
                 return;
             }
 
@@ -477,6 +477,7 @@ namespace RTSLockstep
             }
         }
 
+        // send complete command to stop harvesting cycle, i.e. a move command issued by player
         public void StopHarvesting(bool complete = false)
         {
             inRange = false;
@@ -507,9 +508,14 @@ namespace RTSLockstep
             IsHarvesting = false;
             IsEmptying = false;
 
-            if (currentLoadAmount <= 0)
-            {
+            //if (currentLoadAmount <= 0)
+            //{
                 IsCasting = false;
+           // }
+
+            if (complete)
+            {
+                Agent.Tag = AgentTag.None;
             }
         }
 
@@ -568,6 +574,10 @@ namespace RTSLockstep
             DefaultData target;
             if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
             {
+                IsFocused = true;
+                IsHarvestMoving = false;
+                Agent.Tag = AgentTag.Harvester;
+
                 RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
 
@@ -575,9 +585,6 @@ namespace RTSLockstep
                 {
                     if (tempTarget != Agent)
                     {
-                        IsFocused = true;
-                        IsHarvestMoving = false;
-                        Agent.Tag = AgentTag.Harvester;
 
                         if (tempTarget.MyAgentType == AgentType.Resource && !tempTarget.GetAbility<ResourceDeposit>().IsEmpty())
                         {

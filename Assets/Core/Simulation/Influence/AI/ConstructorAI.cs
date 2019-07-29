@@ -67,21 +67,6 @@ namespace RTSLockstep
                     CommandManager.SendCommand(constructCom);
                 }
             }
-            else
-            {
-                cachedConstruct.SetCurrentProject(null);
-            }
-        }
-
-        public override void OnSaveDetails(JsonWriter writer)
-        {
-            base.OnSaveDetails(writer);
-        }
-
-        public override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
-        {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
-
         }
     }
 }

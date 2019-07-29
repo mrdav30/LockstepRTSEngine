@@ -61,7 +61,12 @@ namespace RTSLockstep
         */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedMove && cachedMove.IsMoving)
+            if (cachedAgent.IsCasting)
+            {
+                searchCount = -1;
+                return false;
+            }
+            else if (cachedMove && cachedMove.IsMoving)
             {
                 searchCount -= 8;
                 return false;

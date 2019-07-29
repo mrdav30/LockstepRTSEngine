@@ -15,6 +15,8 @@ namespace RTSLockstep
 
         public RTSAgent Target { get; private set; }
 
+        public virtual bool IsOffensive { get { return _isOffensive; } }
+
         public virtual string ProjCode { get { return _projectileCode; } }
 
         public virtual long Range { get { return _range + RangeModifier; } }
@@ -73,6 +75,8 @@ namespace RTSLockstep
         //Offset of projectile
 
         #region Serialized Values (Further description in properties)
+        [SerializeField]
+        protected bool _isOffensive;
         [SerializeField, DataCode("Projectiles")]
         protected string _projectileCode;
         [FixedNumber, SerializeField]

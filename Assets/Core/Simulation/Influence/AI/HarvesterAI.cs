@@ -14,15 +14,13 @@ namespace RTSLockstep
         public override void OnInitialize()
         {
             base.OnInitialize();
-            _targetAllegiance = AllegianceType.Neutral;
             cachedHarvest = cachedAgent.GetAbility<Harvest>();
         }
 
         public override bool ShouldMakeDecision()
         {
             if (cachedAgent.Tag != AgentTag.Harvester
-                || (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying)
-                || cachedHarvest.IsLoadAtCapacity())
+                || (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying))
             {
                 searchCount -= 1;
                 return false;
@@ -41,12 +39,26 @@ namespace RTSLockstep
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = (other) =>
+                Func<RTSAgent, bool> agentConditional = null;
+
+                if (cachedAgent.GetAbility<Harvest>().IsLoadAtCapacity())
+                {
+                    _targetAllegiance = AllegianceType.Friendly;
+                    agentConditional = (other) =>
+                    {
+                        Structure structure = other.GetAbility<Structure>();
+                        return structure != null && !structure.UnderConstruction();
+                    };
+                }
+                else
+                {
+                    _targetAllegiance = AllegianceType.Neutral;
+                    agentConditional = (other) =>
                     {
                         ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
                         return resourceDeposit != null && !resourceDeposit.IsEmpty() && other.IsActive;
                     };
-
+                }
 
                 return agentConditional;
             }
@@ -57,8 +69,10 @@ namespace RTSLockstep
             if (nearbyAgent)
             {
                 ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
+                Structure closestResourceStore = nearbyAgent.GetAbility<Structure>();
 
-                if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType)
+                if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType
+                    || closestResourceStore && nearbyAgent.GetAbility<Structure>().canStoreResources)
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
@@ -70,21 +84,6 @@ namespace RTSLockstep
                     CommandManager.SendCommand(harvestCom);
                 }
             }
-            else
-            {
-                cachedHarvest.SetResourceTarget(null);
-            }
-        }
-
-        public override void OnSaveDetails(JsonWriter writer)
-        {
-            base.OnSaveDetails(writer);
-        }
-
-        public override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
-        {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
-
         }
     }
 }

@@ -31,7 +31,7 @@ namespace RTSLockstep
             Agent = agent;
             Body = agent.Body;
 
-            if(Agent.GetAbility<Attack>())
+            if(Agent.GetAbility<Attack>() && Agent.GetAbility<Attack>().IsOffensive)
             {
                 AgentAI.Add(new OffensiveAI());
             }

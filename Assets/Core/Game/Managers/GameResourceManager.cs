@@ -19,8 +19,9 @@ namespace RTSLockstep
         public static Vector3d InvalidPosition { get { return _invalidPosition; } }
         public static GUISkin SelectBoxSkin { get { return _selectBoxSkin; } }
         public static Bounds InvalidBounds { get { return _invalidBounds; } }
-        public static int HarvestSpeed { get { return 1; } }
-        public static int BuildSpeed { get { return 1; } }  // used to make sure that all buildings update their progress for building Units at the same rate
+        // used to make sure that all buildings update their progress for building Units at the same rate
+        //public static int GlobalHarvestSpeed { get { return 1; } }
+        //public static int GlobalBuildSpeed { get { return 1; } }
         public static Texture2D HealthyTexture { get { return _healthyTexture; } }
         public static Texture2D DamagedTexture { get { return _damagedTexture; } }
         public static Texture2D CriticalTexture { get { return _criticalTexture; } }
