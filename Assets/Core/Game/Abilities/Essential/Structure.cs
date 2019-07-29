@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -10,7 +11,8 @@ namespace RTSLockstep
     {
         public bool provisioner;
         public int provisionAmount;
-        public bool canStoreResources;
+        [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
+        private ResourceType[] _resourceStorage;
         public GameObject tempStructure;
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
@@ -18,7 +20,6 @@ namespace RTSLockstep
         /// <value>The size of the build.</value>
         public int BuildSizeLow { get; set; }
         public int BuildSizeHigh { get; set; }
-
 
         public Coordinate GridPosition { get; set; }
         /// <summary>
@@ -69,7 +70,7 @@ namespace RTSLockstep
 
         public void StartConstruction()
         {
-           // Agent.Body.CalculateBounds();
+            // Agent.Body.CalculateBounds();
             _needsBuilding = true;
             IsCasting = true;
             cachedHealth.HealthAmount = 0;
@@ -104,6 +105,26 @@ namespace RTSLockstep
         public int GetUpgradeLevel()
         {
             return this.upgradeLevel;
+        }
+
+        public bool CanStoreResources(ResourceType resourceType)
+        {
+
+            if (_resourceStorage.Length > 0)
+            {
+                for (int i = 0; i < _resourceStorage.Length; i++)
+                {
+                    if (_resourceStorage[i] == resourceType)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+
         }
 
         public void SetGridPosition(Vector2d pos)

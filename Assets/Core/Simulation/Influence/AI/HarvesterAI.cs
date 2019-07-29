@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using RTSLockstep.Data;
+﻿using RTSLockstep.Data;
 using System;
 
 namespace RTSLockstep
@@ -25,6 +24,13 @@ namespace RTSLockstep
                 searchCount -= 1;
                 return false;
             }
+            else if (searchCount <= 0
+                && cachedHarvest.LoadAtCapacity())
+            {
+                searchCount = SearchRate;
+                //we are not doing anything at the moment
+                return true;
+            }
 
             return base.ShouldMakeDecision();
         }
@@ -41,7 +47,7 @@ namespace RTSLockstep
             {
                 Func<RTSAgent, bool> agentConditional = null;
 
-                if (cachedAgent.GetAbility<Harvest>().IsLoadAtCapacity())
+                if (cachedAgent.GetAbility<Harvest>().LoadAtCapacity())
                 {
                     _targetAllegiance = AllegianceType.Friendly;
                     agentConditional = (other) =>
@@ -72,7 +78,7 @@ namespace RTSLockstep
                 Structure closestResourceStore = nearbyAgent.GetAbility<Structure>();
 
                 if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType
-                    || closestResourceStore && nearbyAgent.GetAbility<Structure>().canStoreResources)
+                    || closestResourceStore && nearbyAgent.GetAbility<Structure>().CanStoreResources(cachedAgent.GetAbility<Harvest>().HarvestType))
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);

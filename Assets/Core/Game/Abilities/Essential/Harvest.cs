@@ -47,12 +47,15 @@ namespace RTSLockstep
         [Lockstep(true)]
         public bool IsWindingUp { get; set; }
 
-        long windupCount;
+        private long windupCount;
+
+        [HideInInspector]
+        public AnimState HarvestingAnimState, MovingAnimState, IdlingAnimState;
 
         #region variables for quick fix for repathing to target's new position
-        const long repathDistance = FixedMath.One * 2;
-        FrameTimer repathTimer = new FrameTimer();
-        const int repathInterval = LockstepManager.FrameRate * 2;
+        private const long repathDistance = FixedMath.One * 2;
+        private FrameTimer repathTimer = new FrameTimer();
+        private const int repathInterval = LockstepManager.FrameRate * 2;
         private int repathRandom = 0;
         #endregion
 
@@ -410,7 +413,7 @@ namespace RTSLockstep
 
             currentLoadAmount += collect;
 
-            if (IsLoadAtCapacity())
+            if (LoadAtCapacity())
             {
                 IsHarvesting = false;
                 IsEmptying = true;
@@ -457,9 +460,6 @@ namespace RTSLockstep
             return fastMag <= fastRangeToTarget;
         }
 
-        [HideInInspector]
-        public AnimState HarvestingAnimState, MovingAnimState, IdlingAnimState;
-
         protected void SetAnimState()
         {
             switch (HarvestType)
@@ -501,20 +501,16 @@ namespace RTSLockstep
                 }
             }
 
-            //  ResourceDeposit = null;
+            resourceTarget = null;
             CachedBody.Priority = basePriority;
 
             //  IsCasting = false;
             IsHarvesting = false;
             IsEmptying = false;
 
-            //if (currentLoadAmount <= 0)
-            //{
-                IsCasting = false;
-           // }
-
             if (complete)
             {
+                IsCasting = false;
                 Agent.Tag = AgentTag.None;
             }
         }
@@ -623,7 +619,7 @@ namespace RTSLockstep
             foreach (RTSAgent child in Agent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
             {
                 if (child.GetAbility<Structure>()
-                    && child.GetAbility<Structure>().canStoreResources
+                    && child.GetAbility<Structure>().CanStoreResources(HarvestType)
                     && !child.GetAbility<Structure>().UnderConstruction())
                 {
                     playerBuildings.Add(child);
@@ -650,7 +646,7 @@ namespace RTSLockstep
             return this.currentLoadAmount;
         }
 
-        public bool IsLoadAtCapacity()
+        public bool LoadAtCapacity()
         {
             if (currentLoadAmount >= Capacity)
             {
