@@ -12,8 +12,7 @@ namespace RTSLockstep
 {
     public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
-        private bool isCasting;
-        bool IsFirstFrame = true;
+        private bool IsFirstFrame = true;
 
         private RTSAgent _agent;
 
@@ -45,6 +44,7 @@ namespace RTSLockstep
 
         public LSVariableContainer VariableContainer { get { return _variableContainer; } }
 
+        private bool isCasting;
         public bool IsCasting
         {
             get
@@ -67,6 +67,31 @@ namespace RTSLockstep
                 }
             }
         }
+
+        private bool isFocused;
+        public bool IsFocused
+        {
+            get
+            {
+                return isFocused;
+            }
+            protected set
+            {
+                if (value != isFocused)
+                {
+                    if (value == true)
+                    {
+                        Agent.CheckFocus = false;
+                    }
+                    else
+                    {
+                        Agent.CheckFocus = true;
+                    }
+                    isFocused = value;
+                }
+            }
+        }
+
         protected bool loadedSavedValues = false;
 
         internal void Setup(RTSAgent agent, int id)

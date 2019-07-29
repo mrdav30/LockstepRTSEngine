@@ -43,6 +43,7 @@ namespace RTSLockstep
                 resourceQuarter.GetComponent<Renderer>().enabled = false;
                 if (resourceEmpty.GetComponent<Renderer>().enabled == false)
                     resourceEmpty.GetComponent<Renderer>().enabled = true;
+                // Resource is empty, delete object
                 Agent.Die();
                 return;
             }

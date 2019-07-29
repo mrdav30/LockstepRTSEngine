@@ -104,6 +104,20 @@ namespace RTSLockstep
             }
         }
 
+        public bool CheckFocus { get; set; }
+        public bool IsFocused
+        {
+            get
+            {
+                if (Stunned)
+                {
+                    return false;
+                }
+
+                return abilityManager.CheckFocus();
+            }
+        }
+
         private bool _stunned;
         public bool Stunned
         {

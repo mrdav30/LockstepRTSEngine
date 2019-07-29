@@ -29,7 +29,6 @@ namespace RTSLockstep
         public bool IsHarvestMoving { get; private set; }
         public bool IsHarvesting { get; private set; }
         public bool IsEmptying { get; private set; }
-        public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
         public long CollectionAmount = FixedMath.One;
@@ -482,9 +481,17 @@ namespace RTSLockstep
         {
             inRange = false;
             IsFocused = false;
+            IsHarvesting = false;
+            IsEmptying = false;
+            IsCasting = false;
+
+            CachedBody.Priority = basePriority;
+
             if (complete)
             {
                 IsHarvestMoving = false;
+                //    resourceTarget = null;
+                Agent.Tag = AgentTag.None;
             }
             else
             {

@@ -132,8 +132,6 @@ namespace RTSLockstep
 
         public bool IsAttackMoving { get; private set; }
 
-        private bool isFocused;
-
         private int loadedTargetId = -1;
 
         protected override void OnSetup()
@@ -182,7 +180,7 @@ namespace RTSLockstep
             Target = null;
             IsAttackMoving = false;
             inRange = false;
-            isFocused = false;
+            IsFocused = false;
             CycleCount = 0;
             this.Destination = Vector2d.zero;
             repathTimer.Reset(repathInterval);
@@ -271,124 +269,125 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopEngage();
-                return;
             }
-
-            if (!IsWindingUp)
+            else
             {
-                Vector2d targetDirection = Target.Body._position - cachedBody._position;
-                long fastMag = targetDirection.FastMagnitude();
-
-                //TODO: Optimize this instead of recalculating magnitude multiple times
-                if (CheckRange())
+                if (!IsWindingUp)
                 {
-                    if (!inRange)
+                    Vector2d targetDirection = Target.Body._position - cachedBody._position;
+                    long fastMag = targetDirection.FastMagnitude();
+
+                    //TODO: Optimize this instead of recalculating magnitude multiple times
+                    if (CheckRange())
                     {
-                        if (CanMove)
+                        if (!inRange)
                         {
-                            cachedMove.StopMove();
+                            if (CanMove)
+                            {
+                                cachedMove.StopMove();
+                            }
+
+                            inRange = true;
+                        }
+                        Agent.SetState(EngagingAnimState);
+
+                        long mag;
+                        targetDirection.Normalize(out mag);
+                        bool withinTurn = TrackAttackAngle == false ||
+                                          (fastMag != 0 &&
+                                          cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                        bool needTurn = mag != 0 && !withinTurn;
+                        if (needTurn)
+                        {
+                            if (CanTurn)
+                            {
+                                cachedTurn.StartTurnDirection(targetDirection);
+                            }
+                        }
+                        else
+                        {
+                            if (attackCount >= AttackInterval)
+                            {
+                                StartWindup();
+                            }
                         }
 
-                        inRange = true;
-                    }
-                    Agent.SetState(EngagingAnimState);
-
-                    long mag;
-                    targetDirection.Normalize(out mag);
-                    bool withinTurn = TrackAttackAngle == false ||
-                                      (fastMag != 0 &&
-                                      cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                      && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
-                    bool needTurn = mag != 0 && !withinTurn;
-                    if (needTurn)
-                    {
-                        if (CanTurn)
-                        {
-                            cachedTurn.StartTurnDirection(targetDirection);
-                        }
                     }
                     else
                     {
-                        if (attackCount >= AttackInterval)
+                        if (CanMove)
                         {
-                            StartWindup();
+                            cachedMove.PauseAutoStop();
+                            cachedMove.PauseCollisionStop();
+                            if (cachedMove.IsMoving == false)
+                            {
+                                cachedMove.StartMove(Target.Body._position);
+                                cachedBody.Priority = basePriority;
+                            }
+                            else
+                            {
+                                if (inRange)
+                                {
+                                    cachedMove.Destination = Target.Body.Position;
+                                }
+                                else
+                                {
+                                    if (repathTimer.AdvanceFrame())
+                                    {
+                                        if (Target.Body.PositionChangedBuffer &&
+                                            Target.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                        {
+                                            cachedMove.StartMove(Target.Body._position);
+                                            //So units don't sync up and path on the same frame
+                                            repathTimer.AdvanceFrames(repathRandom);
+                                        }
+                                    }
+                                }
+                            }
                         }
+
+                        if (inRange == true)
+                        {
+                            inRange = false;
+                        }
+
+                    }
+                }
+
+                if (IsWindingUp)
+                {
+                    //TODO: Do we need AgentConditional checks here?
+                    windupCount += LockstepManager.DeltaTime;
+                    if (CanTurn)
+                    {
+                        Vector2d targetVector = Target.Body._position - cachedBody._position;
+                        cachedTurn.StartTurnVector(targetVector);
+                    }
+                    if (windupCount >= Windup)
+                    {
+                        windupCount = 0;
+                        Fire();
+                        while (this.attackCount >= AttackInterval)
+                        {
+                            //resetting back down after attack is fired
+                            this.attackCount -= (this.AttackInterval);
+                        }
+                        this.attackCount += Windup;
+                        IsWindingUp = false;
                     }
 
                 }
                 else
                 {
-                    if (CanMove)
-                    {
-                        cachedMove.PauseAutoStop();
-                        cachedMove.PauseCollisionStop();
-                        if (cachedMove.IsMoving == false)
-                        {
-                            cachedMove.StartMove(Target.Body._position);
-                            cachedBody.Priority = basePriority;
-                        }
-                        else
-                        {
-                            if (inRange)
-                            {
-                                cachedMove.Destination = Target.Body.Position;
-                            }
-                            else
-                            {
-                                if (repathTimer.AdvanceFrame())
-                                {
-                                    if (Target.Body.PositionChangedBuffer &&
-                                        Target.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
-                                    {
-                                        cachedMove.StartMove(Target.Body._position);
-                                        //So units don't sync up and path on the same frame
-                                        repathTimer.AdvanceFrames(repathRandom);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (inRange == true)
-                    {
-                        inRange = false;
-                    }
-
-                }
-            }
-
-            if (IsWindingUp)
-            {
-                //TODO: Do we need AgentConditional checks here?
-                windupCount += LockstepManager.DeltaTime;
-                if (CanTurn)
-                {
-                    Vector2d targetVector = Target.Body._position - cachedBody._position;
-                    cachedTurn.StartTurnVector(targetVector);
-                }
-                if (windupCount >= Windup)
-                {
                     windupCount = 0;
-                    Fire();
-                    while (this.attackCount >= AttackInterval)
-                    {
-                        //resetting back down after attack is fired
-                        this.attackCount -= (this.AttackInterval);
-                    }
-                    this.attackCount += Windup;
-                    IsWindingUp = false;
                 }
 
-            }
-            else
-            {
-                windupCount = 0;
-            }
-
-            if (CanMove && inRange)
-            {
-                cachedMove.PauseAutoStop();
-                cachedMove.PauseCollisionStop();
+                if (CanMove && inRange)
+                {
+                    cachedMove.PauseAutoStop();
+                    cachedMove.PauseCollisionStop();
+                }
             }
         }
 
@@ -577,7 +576,7 @@ namespace RTSLockstep
         {
             inRange = false;
             IsWindingUp = false;
-            isFocused = false;
+            IsFocused = false;
             if (complete)
             {
                 IsAttackMoving = false;
@@ -633,7 +632,7 @@ namespace RTSLockstep
                     cachedMove.StartMove(position);
             }
             IsAttackMoving = true;
-            isFocused = false;
+            IsFocused = false;
         }
 
         protected override void OnExecute(Command com)
@@ -646,7 +645,7 @@ namespace RTSLockstep
             }
             else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
             {
-                isFocused = true;
+                IsFocused = true;
                 IsAttackMoving = false;
                 RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
@@ -721,7 +720,7 @@ namespace RTSLockstep
                 SaveManager.WriteInt(writer, "TargetID", Target.GlobalID);
             }
 
-            SaveManager.WriteBoolean(writer, "Focused", isFocused);
+            SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
             SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
@@ -746,7 +745,7 @@ namespace RTSLockstep
                     loadedTargetId = (int)(System.Int64)readValue;
                     break;
                 case "Focused":
-                    isFocused = (bool)readValue;
+                    IsFocused = (bool)readValue;
                     break;
                 case "InRange":
                     inRange = (bool)readValue;

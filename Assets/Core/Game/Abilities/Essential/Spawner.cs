@@ -17,7 +17,6 @@ namespace RTSLockstep
         //Stuff for the logic
         private int basePriority;
         private long spawnCount;
-        public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
         [SerializeField]
@@ -122,7 +121,6 @@ namespace RTSLockstep
 
         protected void BehaveWithBuildQueue()
         {
-
             if (!IsWindingUp)
             {
                 if (spawnCount >= _spawnInterval)

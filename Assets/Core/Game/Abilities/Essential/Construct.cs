@@ -17,7 +17,6 @@ namespace RTSLockstep
         private RTSAgent CurrentProject;
         public bool IsBuildMoving { get; private set; }
         public bool IsBuilding { get; private set; }
-        public bool IsFocused { get; private set; }
 
         //Stuff for the logic
         private bool inRange;
@@ -137,106 +136,107 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopBuilding();
-                return;
             }
-
-            Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
-            long fastMag = targetDirection.FastMagnitude();
-
-            if (!IsWindingUp)
+            else
             {
-                if (CheckRange())
-                {
-                    IsBuildMoving = false;
-                    if (!inRange)
-                    {
-                        cachedMove.StopMove();
-                        inRange = true;
-                    }
-                    Agent.SetState(ConstructingAnimState);
+                Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
+                long fastMag = targetDirection.FastMagnitude();
 
-                    long mag;
-                    targetDirection.Normalize(out mag);
-                    bool withinTurn = cachedAttack.TrackAttackAngle == false ||
-                                      (fastMag != 0 &&
-                                      CachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                      && CachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
-                    bool needTurn = mag != 0 && !withinTurn;
-                    if (needTurn)
+                if (!IsWindingUp)
+                {
+                    if (CheckRange())
                     {
-                        cachedTurn.StartTurnDirection(targetDirection);
+                        IsBuildMoving = false;
+                        if (!inRange)
+                        {
+                            cachedMove.StopMove();
+                            inRange = true;
+                        }
+                        Agent.SetState(ConstructingAnimState);
+
+                        long mag;
+                        targetDirection.Normalize(out mag);
+                        bool withinTurn = cachedAttack.TrackAttackAngle == false ||
+                                          (fastMag != 0 &&
+                                          CachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && CachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+                        bool needTurn = mag != 0 && !withinTurn;
+                        if (needTurn)
+                        {
+                            cachedTurn.StartTurnDirection(targetDirection);
+                        }
+                        else
+                        {
+                            if (constructCount >= _constructInterval)
+                            {
+                                StartWindup();
+                            }
+                        }
                     }
                     else
                     {
-                        if (constructCount >= _constructInterval)
+                        cachedMove.PauseAutoStop();
+                        cachedMove.PauseCollisionStop();
+                        if (cachedMove.IsMoving == false)
                         {
-                            StartWindup();
+                            cachedMove.StartMove(CurrentProject.Body._position);
+                            CachedBody.Priority = basePriority;
                         }
+                        else
+                        {
+                            if (inRange)
+                            {
+                                cachedMove.Destination = CurrentProject.Body.Position;
+                            }
+                            else
+                            {
+                                if (repathTimer.AdvanceFrame())
+                                {
+                                    if (CurrentProject.Body.PositionChangedBuffer &&
+                                        CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                    {
+                                        cachedMove.StartMove(CurrentProject.Body._position);
+                                        //So units don't sync up and path on the same frame
+                                        repathTimer.AdvanceFrames(repathRandom);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (inRange == true)
+                        {
+                            inRange = false;
+                        }
+                    }
+                }
+
+                if (IsWindingUp)
+                {
+                    //TODO: Do we need AgentConditional checks here?
+                    windupCount += LockstepManager.DeltaTime;
+                    if (windupCount >= Windup)
+                    {
+                        windupCount = 0;
+                        Build();
+                        while (this.constructCount >= _constructInterval)
+                        {
+                            //resetting back down after attack is fired
+                            this.constructCount -= (this._constructInterval);
+                        }
+                        this.constructCount += Windup;
+                        IsWindingUp = false;
                     }
                 }
                 else
                 {
+                    windupCount = 0;
+                }
+
+                if (inRange)
+                {
                     cachedMove.PauseAutoStop();
                     cachedMove.PauseCollisionStop();
-                    if (cachedMove.IsMoving == false)
-                    {
-                        cachedMove.StartMove(CurrentProject.Body._position);
-                        CachedBody.Priority = basePriority;
-                    }
-                    else
-                    {
-                        if (inRange)
-                        {
-                            cachedMove.Destination = CurrentProject.Body.Position;
-                        }
-                        else
-                        {
-                            if (repathTimer.AdvanceFrame())
-                            {
-                                if (CurrentProject.Body.PositionChangedBuffer &&
-                                    CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
-                                {
-                                    cachedMove.StartMove(CurrentProject.Body._position);
-                                    //So units don't sync up and path on the same frame
-                                    repathTimer.AdvanceFrames(repathRandom);
-                                }
-                            }
-                        }
-                    }
-
-                    if (inRange == true)
-                    {
-                        inRange = false;
-                    }
                 }
-            }
-
-            if (IsWindingUp)
-            {
-                //TODO: Do we need AgentConditional checks here?
-                windupCount += LockstepManager.DeltaTime;
-                if (windupCount >= Windup)
-                {
-                    windupCount = 0;
-                    Build();
-                    while (this.constructCount >= _constructInterval)
-                    {
-                        //resetting back down after attack is fired
-                        this.constructCount -= (this._constructInterval);
-                    }
-                    this.constructCount += Windup;
-                    IsWindingUp = false;
-                }
-            }
-            else
-            {
-                windupCount = 0;
-            }
-
-            if (inRange)
-            {
-                cachedMove.PauseAutoStop();
-                cachedMove.PauseCollisionStop();
             }
         }
 
@@ -315,9 +315,16 @@ namespace RTSLockstep
         {
             inRange = false;
             IsFocused = false;
+            IsBuilding = false;
+            IsCasting = false;
+
+            CurrentProject = null;
+            CachedBody.Priority = basePriority;
+
             if (complete)
             {
                 IsBuildMoving = false;
+                Agent.Tag = AgentTag.None;
             }
             else
             {
@@ -332,17 +339,6 @@ namespace RTSLockstep
                         cachedMove.StopMove();
                     }
                 }
-            }
-
-            CurrentProject = null;
-            CachedBody.Priority = basePriority;
-
-            IsBuilding = false;
-
-            if (complete)
-            {
-                IsCasting = false;
-                Agent.Tag = AgentTag.None;
             }
         }
 
@@ -397,20 +393,20 @@ namespace RTSLockstep
                     ushort targetValue = (ushort)target.Value;
                     if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                     {
-                        RTSAgent building = (RTSAgent)tempTarget;
+                        RTSAgent building = tempTarget;
                         if (building && building.GetAbility<Structure>().UnderConstruction())
                         {
                             CurrentProject = building;
                             StartBuildMove();
                         }
-                    }               
+                    }
                 }
             }
         }
 
         protected sealed override void OnStopCast()
         {
-            if(Agent.Tag == AgentTag.Builder)
+            if (Agent.Tag == AgentTag.Builder)
             {
                 StopBuilding(true);
             }
