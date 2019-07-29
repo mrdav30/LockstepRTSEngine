@@ -337,8 +337,13 @@ namespace RTSLockstep
             CurrentProject = null;
             CachedBody.Priority = basePriority;
 
-            IsCasting = false;
             IsBuilding = false;
+
+            if (complete)
+            {
+                IsCasting = false;
+                Agent.Tag = AgentTag.None;
+            }
         }
 
         protected override void OnDeactivate()
@@ -367,11 +372,12 @@ namespace RTSLockstep
         {
             DefaultData target;
 
-            com.TryGetData<DefaultData>(out target);
-            if (target != null)
+            if (com.TryGetData<DefaultData>(out target))
             {
                 IsFocused = true;
                 IsBuildMoving = false;
+                Agent.Tag = AgentTag.Builder;
+
                 // construction hasn't started yet, only a name reference given
                 if (target.Is(DataType.String))
                 {
@@ -382,7 +388,6 @@ namespace RTSLockstep
                     com.TryGetData<Vector2d>(out targetRotation, 1);
                     com.TryGetData<Vector3d>(out targetLocalScale, 2);
 
-                    IsBuildMoving = false;
                     SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
                 }
                 // otherwise this is another agent coming to help
@@ -405,7 +410,10 @@ namespace RTSLockstep
 
         protected sealed override void OnStopCast()
         {
-            StopBuilding(true);
+            if(Agent.Tag == AgentTag.Builder)
+            {
+                StopBuilding(true);
+            }
         }
 
         public String[] GetBuildActions()

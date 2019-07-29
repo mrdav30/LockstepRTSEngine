@@ -609,7 +609,10 @@ namespace RTSLockstep
 
         protected sealed override void OnStopCast()
         {
-            StopHarvesting(true);
+            if(Agent.Tag == AgentTag.Harvester)
+            {
+                StopHarvesting(true);
+            }
         }
 
         private RTSAgent ClosestResourceStore()
