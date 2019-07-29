@@ -4,11 +4,12 @@ using UnityEngine;
 namespace RTSLockstep
 {
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(UnityLSBody))]
     public class DynamicBlocker : Ability
     {
-        static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
-        FastList<GridNode> LastCoordinates = new FastList<GridNode>();
-        LSBody CachedBody;
+        private static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
+        private FastList<GridNode> LastCoordinates = new FastList<GridNode>();
+        private LSBody CachedBody;
 
         protected override void OnSetup()
         {
