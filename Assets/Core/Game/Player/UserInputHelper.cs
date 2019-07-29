@@ -57,10 +57,6 @@ public class UserInputHelper : BehaviourHelper
     public static event Action OnSingleRightTapDown;
     public static event Action OnDoubleLeftTapDown;
 
-    //camera rotate speed
-    public float SpeedH = 5f;
-    public float SpeedV = 5f;
-
     //Defines the maximum time between two taps to make it double tap
     private static float tapThreshold = 0.25f;
     private static float tapTimer = 0.0f;
@@ -104,6 +100,10 @@ public class UserInputHelper : BehaviourHelper
         }
 
         Setted = true;
+
+        // set to starting camera angels
+        yaw = GUIManager.MainCam.transform.eulerAngles.y;
+        pitch = GUIManager.MainCam.transform.eulerAngles.x;
     }
 
     protected override void OnInitialize()
@@ -168,7 +168,20 @@ public class UserInputHelper : BehaviourHelper
             bool mouseOverHud = PlayerManager.MainController.GetCommanderHUD()._mouseOverHud;
             if (!mouseOverHud)
             {
-                RotateCamera();
+                // detect rotation amount if no agents selected & Right mouse button is down
+                if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1)
+                    || Input.GetMouseButton(1) && Input.GetKeyDown(KeyCode.LeftAlt))
+                {
+                    // lock the cursor to prevent movement during rotation
+                    Cursor.lockState = CursorLockMode.Locked;
+
+                    RotateCamera();
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                }
+
                 MouseHover();
 
                 if (Input.GetMouseButtonDown(0))
@@ -176,8 +189,7 @@ public class UserInputHelper : BehaviourHelper
                     if (Time.time < tapTimer + tapThreshold)
                     {
                         // left double click action
-                        if (OnDoubleLeftTapDown != null) { OnDoubleLeftTapDown(); }
-                        tap = false;
+                        OnDoubleLeftTapDown?.Invoke(); tap = false;
                         return;
                     }
 
@@ -188,12 +200,12 @@ public class UserInputHelper : BehaviourHelper
                 else if (Input.GetMouseButtonDown(1))
                 {
                     HandleSingleRightClick();
-                    if (OnSingleRightTapDown != null) { OnSingleRightTapDown(); }
+                    OnSingleRightTapDown?.Invoke();
                 }
                 else if (Input.GetMouseButtonUp(0))
                 {
                     _isDragging = false;
-                    if (OnLeftTapUp != null) { OnLeftTapUp(); }
+                    OnLeftTapUp?.Invoke();
                 }
 
                 if (tap == true && Time.time > tapTimer + tapThreshold)
@@ -213,7 +225,7 @@ public class UserInputHelper : BehaviourHelper
                     {
                         // left click action
                         HandleSingleLeftClick();
-                        if (OnSingleLeftTapDown != null) { OnSingleLeftTapDown(); }
+                        OnSingleLeftTapDown?.Invoke();
                     }
                 }
 
@@ -344,26 +356,21 @@ public class UserInputHelper : BehaviourHelper
     private void RotateCamera()
     {
         Vector3 origin = GUIManager.MainCam.transform.eulerAngles;
-        Vector3 destination = origin;
 
-        // detect rotation amount if no agents selected & Right mouse button is down
-        if (PlayerManager.MainController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1)
-            || Input.GetMouseButton(1) && Input.GetKeyDown(KeyCode.LeftAlt))
-        {
-            destination.x -= Input.GetAxis("Mouse Y") * GameResourceManager.RotateAmount;
-            destination.y += Input.GetAxis("Mouse X") * GameResourceManager.RotateAmount;
+        float rotateAmountH = Input.GetAxis("Mouse X") * GameResourceManager.RotateSpeedH;
+        float rotateAmountV = Input.GetAxis("Mouse Y") * GameResourceManager.RotateSpeedV;
 
-            yaw += Input.GetAxis("Mouse X") * SpeedH;
-            pitch -= Input.GetAxis("Mouse Y") * SpeedV;
-            pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
-        }
+        yaw += rotateAmountH;
+        pitch -= rotateAmountV;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+
+        Vector3 destination = new Vector3(pitch, yaw, 0f);
 
         // if a change in position is detected, perform necessary update
         if (destination != origin)
         {
             GUIManager.MainCam.transform.eulerAngles = new Vector3(pitch, yaw, 0f);
         }
-
     }
 
     private void HandleSingleLeftClick()

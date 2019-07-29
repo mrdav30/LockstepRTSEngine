@@ -10,8 +10,10 @@ namespace RTSLockstep
         #region properties
         public static int ScrollWidth { get { return 15; } }
         public static float ScrollSpeed { get { return 25; } }
-        public static float RotateAmount { get { return 10; } }
-        public static float RotateSpeed { get { return 100; } }
+        //camera rotate speed
+        public static float RotateSpeedH { get { return 5f; } }
+        public static float RotateSpeedV { get { return 5f; } }
+        // limit away from ground movement to be between a minimum and maximum distance
         public static float MinCameraHeight { get { return 10; } }
         public static float MaxCameraHeight { get { return 40; } }
         public static Vector3d InvalidPosition { get { return _invalidPosition; } }
