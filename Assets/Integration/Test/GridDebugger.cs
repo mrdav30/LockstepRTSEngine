@@ -4,21 +4,27 @@ namespace RTSLockstep
 {
     public class GridDebugger : MonoBehaviour
     {
-        public bool Show;
         //Show the grid debugging?
-        public GridType LeGridType;
+        public bool Show;
         //type of grid to show... can be changed in runtime. Possibilities: Construct grid, LOS grid
-        public float LeHeight;
+        public GridType LeGridType;
         //Height of the grid
+        //Size of each shown grid node
+        public float LeHeight;
         [Range(.1f, .9f)]
         public float NodeSize = .4f;
-        //Size of each shown grid node
+
+        public enum GridType
+        {
+            Building,
+            Pathfinding
+        }
+
+        private Vector3 nodeScale;
 
         void OnDrawGizmos()
         {
-            if (Application.isPlaying == false)
-                return;
-            if (Show)
+            if (Application.isPlaying && Show)
             {
                 nodeScale = new Vector3(NodeSize, NodeSize, NodeSize);
                 //Switch for which grid to show
@@ -34,7 +40,6 @@ namespace RTSLockstep
             }
         }
 
-        private Vector3 nodeScale;
         void DrawBuilding()
         {
             int length = BuildGridAPI.MainBuildGrid.GridLength;
@@ -51,7 +56,7 @@ namespace RTSLockstep
                     {
                         Gizmos.color = Color.green;
                     }
-                    Gizmos.DrawCube(BuildGridAPI.ToWorldPos(new Coordinate(i, j)).ToVector3(), nodeScale);
+                    Gizmos.DrawCube(BuildGridAPI.ToWorldPos(new Coordinate(i, j)).ToVector3(LeHeight), nodeScale);
                 }
             }
         }
@@ -65,25 +70,24 @@ namespace RTSLockstep
                 //Color depends on whether or not the node is walkable
                 //Red = Unwalkable, Green = Walkable
                 if (node.Unwalkable)
+                {
                     Gizmos.color = Color.red;
+                }
                 else
+                {
                     Gizmos.color = Color.green; //I'm part colorblind... grey doesn't work very well with red
+                }
+
                 Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
 
+#if UNITY_EDITOR
                 if (node.ClearanceSource != GridNode.DEFAULT_SOURCE)
                 {
-#if UNITY_EDITOR
                     UnityEditor.Handles.color = Color.red;
                     UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());
-#endif
                 }
+#endif
             }
         }
-    }
-
-    public enum GridType
-    {
-        Building,
-        Pathfinding
     }
 }

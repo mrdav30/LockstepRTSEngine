@@ -10,8 +10,81 @@ namespace RTSLockstep
 {
     public class GridNode
     {
-        #region Constructor
+        #region Properties
+        #region Collection Helpers
+        public uint HeapVersion;
+        public uint ClosedHeapVersion;
+        public uint HeapIndex;
 
+        /// <summary>
+        /// TODO: Maybe it will be more efficient for memory to not cache this?
+        /// </summary>
+        public uint GridVersion;
+        #endregion
+
+        #region CombinePath
+        //This is the system used for groups of pathfinding queries to the same destination
+        //If query 2 finds its way onto a node on the first query, it will use the rest of the first query
+        public ulong CombinePathVersion;
+        #endregion
+
+        public GridNode[] NeighborNodes = new GridNode[8];
+        public Vector2d WorldPos;
+
+        public static int HeuristicTargetX;
+        public static int HeuristicTargetY;
+
+        public int ScanX { get { return LinkedScanNode.X; } }
+        public int ScanY { get { return LinkedScanNode.Y; } }
+        public ScanNode LinkedScanNode;
+
+        #region Pathfinding Variables
+        public int gridX;
+        public int gridY;
+        public uint gridIndex;
+
+        public int gCost;
+        public int hCost;
+        public int fCost;
+        public GridNode parent;
+        public GridNode combineTrailNode;
+
+        public const byte DEFAULT_DEGREE = byte.MaxValue;
+        public const byte DEFAULT_SOURCE = byte.MaxValue;
+
+        private byte _obstacleCount;
+        public byte ObstacleCount { get { return _obstacleCount; } }
+
+        public bool Unwalkable
+        {
+            get
+            {
+                return _obstacleCount > 0;
+            }
+        }
+
+        private byte _clearanceSource;
+        internal byte ClearanceSource { get { return _clearanceSource; } }
+        /// <summary>
+        /// How many connections until the closest unwalkable node.
+        /// If a big unit stands directly on this node, it won't be able to fit if the degree is too low.
+        /// </summary>
+        private byte _clearanceDegree;
+        public byte ClearanceDegree { get { return _clearanceDegree; } }
+        #endregion
+
+        private static int CachedUnpassableCheckSize;
+        private static int _i;
+
+        private GridNode _node;
+
+        private static int dstX;
+        private static int dstY;
+
+        private static int i, j, checkX, checkY, leIndex;
+        #endregion
+
+        #region Constructor
         static GridNode()
         {
             /*for (i = -1; i <= 1; i++) {
@@ -41,7 +114,6 @@ namespace RTSLockstep
             gridIndex = GridManager.GetGridIndex(gridX, gridY);
             WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
             WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
-
         }
 
         public void Initialize()
@@ -63,85 +135,24 @@ namespace RTSLockstep
             this.CombinePathVersion = 0;
             this._obstacleCount = 0;
         }
-
         #endregion
-
-        #region
-
-        static int _i;
-
-        #endregion
-
-        #region Collection Helpers
-
-        public uint HeapVersion;
-        public uint ClosedHeapVersion;
-        public uint HeapIndex;
-
-        /// <summary>
-        /// TODO: Maybe it will be more efficient for memory to not cache this?
-        /// </summary>
-        public uint GridVersion;
-
-        #endregion
-
 
         #region Pathfinding
-
-        public int gridX;
-        public int gridY;
-        public uint gridIndex;
-
-        public int gCost;
-        public int hCost;
-        public int fCost;
-        public GridNode parent;
-        public GridNode combineTrailNode;
-        private byte _obstacleCount;
-
-        public byte ObstacleCount
-        {
-            get
-            {
-
-                return _obstacleCount;
-            }
-        }
-
-
-        public bool Unwalkable
-        {
-            get
-            {
-                return _obstacleCount > 0;
-            }
-        }
-
-        private byte _clearanceSource;
-        internal byte ClearanceSource { get { return _clearanceSource; } }
-        private byte _clearanceDegree;
-        /// <summary>
-        /// How many connections until the closest unwalkable node.
-        /// If a big unit stands directly on this node, it won't be able to fit if the degree is too low.
-        /// </summary>
-
-        public byte ClearanceDegree { get { return _clearanceDegree; } }
         public byte GetClearanceDegree()
         {
             CheckUpdateValues();
             return _clearanceDegree;
         }
 
-        void CheckUpdateValues()
+        private void CheckUpdateValues()
         {
             if (GridVersion != GridManager.GridVersion)
             {
                 UpdateValues();
             }
         }
-        public const byte DEFAULT_DEGREE = byte.MaxValue;
-        public const byte DEFAULT_SOURCE = byte.MaxValue;
-        void UpdateClearance()
+
+        private void UpdateClearance()
         {
             if (Unwalkable)
             {
@@ -192,21 +203,13 @@ namespace RTSLockstep
             }
         }
 
-        void UpdateValues()
+        private void UpdateValues()
         {
             GridVersion = GridManager.GridVersion;
 
             //fast enough to just do it
             UpdateClearance();
-
         }
-
-        #region CombinePath
-        //This is the system used for groups of pathfinding queries to the same destination
-        //If query 2 finds its way onto a node on the first query, it will use the rest of the first query
-        public ulong CombinePathVersion;
-        #endregion
-        static int CachedUnpassableCheckSize;
 
         internal static void PrepareUnpassableCheck(int size)
         {
@@ -223,7 +226,7 @@ namespace RTSLockstep
              //If there's an unwalkable within the size's number of connections, the unit cannot pass
                 return GetClearanceDegree() < CachedUnpassableCheckSize;
             }
-            return Unwalkable;
+            //return Unwalkable;
         }
 
         public void AddObstacle()
@@ -248,14 +251,6 @@ namespace RTSLockstep
             GridManager.NotifyGridChanged();
         }
 
-
-        GridNode _node;
-
-
-
-        public GridNode[] NeighborNodes = new GridNode[8];
-        public Vector2d WorldPos;
-
         private void GenerateNeighbors()
         {
             //0-3 = sides, 4-7 = diagonals
@@ -277,7 +272,9 @@ namespace RTSLockstep
                 for (j = -1; j <= 1; j++)
                 {
                     if (i == 0 && j == 0) //Don't do anything for the same node
+                    {
                         continue;
+                    }
                     checkY = gridY + j;
                     if (GridManager.ValidateCoordinates(checkX, checkY))
                     {
@@ -290,7 +287,9 @@ namespace RTSLockstep
                                 neighborIndex = diagonalIndex++;
                             }
                             else
+                            {
                                 continue;
+                            }
                         }
                         else
                         {
@@ -301,19 +300,10 @@ namespace RTSLockstep
                     }
                 }
             }
-
-
         }
-
-        static int dstX;
-        static int dstY;
-        public static int HeuristicTargetX;
-        public static int HeuristicTargetY;
 
         public void CalculateHeuristic()
         {
-
-
 #if true
             //manhattan
             if (gridX > HeuristicTargetX)
@@ -355,18 +345,9 @@ namespace RTSLockstep
             fCost = gCost + hCost;
 
         }
-
         #endregion
 
-
         #region Influence
-
-        public int ScanX { get { return LinkedScanNode.X; } }
-
-        public int ScanY { get { return LinkedScanNode.Y; } }
-
-        public ScanNode LinkedScanNode;
-
         public void Add(LSInfluencer influencer)
         {
             LinkedScanNode.Add(influencer);
@@ -376,10 +357,7 @@ namespace RTSLockstep
         {
             LinkedScanNode.Remove(influencer);
         }
-
         #endregion
-
-        static int i, j, checkX, checkY, leIndex;
 
         public override int GetHashCode()
         {
