@@ -7,6 +7,7 @@ namespace RTSLockstep
     [UnityEngine.DisallowMultipleComponent]
     public class Construct : ActiveAbility
     {
+        #region Properties
         private const int searchRate = LockstepManager.FrameRate / 2;
         private long currentAmountBuilt = 0;
         private long fastRangeToTarget;
@@ -49,6 +50,7 @@ namespace RTSLockstep
         private const int repathInterval = LockstepManager.FrameRate * 2;
         private int repathRandom = 0;
         #endregion
+        #endregion Properties
 
         protected override void OnSetup()
         {
@@ -275,8 +277,15 @@ namespace RTSLockstep
             if (agentCode != null)
             {
                 RTSAgent newBuilding = Agent.Controller.CreateAgent(agentCode, targetPOS, targetRotation) as RTSAgent;
+                if (newBuilding.Tag == AgentTag.Wall)
+                {
+                    newBuilding.transform.localScale = targetLocalScale.ToVector3();
+                    newBuilding.GetAbility<Structure>().IsOverlay = true;
+                }
+                newBuilding.GetAbility<Structure>().BuildSizeLow = (newBuilding.Body.HalfWidth.CeilToInt() * 2);
+                newBuilding.GetAbility<Structure>().BuildSizeHigh = (newBuilding.Body.HalfLength.CeilToInt() * 2);
 
-                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body.Position))
+                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body._position))
                 {
                     Agent.GetCommander().CachedResourceManager.RemoveResources(newBuilding);
                     newBuilding.SetState(AnimState.Building);
@@ -286,16 +295,6 @@ namespace RTSLockstep
 
                     newBuilding.gameObject.name = agentCode;
                     newBuilding.transform.parent = ConstructionHandler.OrganizerStructures.transform;
-
-                    if (newBuilding.Tag == AgentTag.Wall)
-                    {
-                        newBuilding.transform.localScale = targetLocalScale.ToVector3();
-                        newBuilding.GetAbility<Structure>().IsOverlay = true;
-                    }
-
-                    newBuilding.Body.CalculateBounds();
-                    newBuilding.GetAbility<Structure>().BuildSizeLow = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.x);
-                    newBuilding.GetAbility<Structure>().BuildSizeHigh = (int)Math.Ceiling(newBuilding.Body.GetSelectionBounds().size.z);
 
                     newBuilding.GetAbility<Structure>().StartConstruction();
 
@@ -328,16 +327,13 @@ namespace RTSLockstep
             }
             else
             {
-                if (IsBuildMoving)
+                if (IsBuildMoving && this.CurrentProject)
                 {
                     cachedMove.StartMove(this.CurrentProject.Body.Position);
                 }
-                else
+                else if (!inRange)
                 {
-                    if (CurrentProject != null && inRange == false)
-                    {
-                        cachedMove.StopMove();
-                    }
+                    cachedMove.StopMove();
                 }
             }
         }
@@ -415,11 +411,6 @@ namespace RTSLockstep
         public String[] GetBuildActions()
         {
             return this._buildActions;
-        }
-
-        public void SetCurrentProject(RTSAgent agent)
-        {
-            CurrentProject = agent;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)

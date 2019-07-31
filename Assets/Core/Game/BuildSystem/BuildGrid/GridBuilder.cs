@@ -1,6 +1,5 @@
 ﻿using RTSLockstep;
 using System.Collections.Generic;
-using UnityEngine;
 
 public static class GridBuilder
 {
@@ -40,8 +39,14 @@ public static class GridBuilder
     {
         SetTarget(buildable);
         StartPlace();
-        UpdatePlace(newPos);
-        return EndPlace();
+        if (UpdatePlace(newPos))
+        {
+            return EndPlace();
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private static void StartPlace()
@@ -87,7 +92,10 @@ public static class GridBuilder
     /// <param name="newPos">New position.</param>
     public static bool UpdateMove(Vector2d newPos)
     {
-        if (IsMovingBuilding == false) throw new System.Exception("Building move must be started before being updated");
+        if (IsMovingBuilding == false)
+        {
+            throw new System.Exception("Building move must be started before being updated");
+        }
         return UpdatePlace(newPos);
     }
 
