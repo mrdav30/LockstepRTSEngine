@@ -24,22 +24,6 @@ namespace RTSLockstep
             cachedStructure = Agent.GetAbility<Structure>();
         }
 
-        protected override void OnInitialize()
-        {
-            if (Agent.Body.GetSelectionBounds() == null)
-            {
-                Agent.Body.CalculateBounds();
-            }
-        }
-
-        protected override void OnVisualize()
-        {
-            if (Agent && Agent.IsVisible && UserInputHelper.GUIManager.CameraChanged)
-            {
-                Agent.Body.CalculateBounds();
-            }
-        }
-
         protected override void doGUI()
         {
             if (Agent && !GameResourceManager.MenuOpen)
@@ -118,7 +102,10 @@ namespace RTSLockstep
         private void DrawSelection()
         {
             GUI.skin = GameResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
+
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
+
             // Draw the selection box around the currently selected object, within the bounds of the playing area
             GUI.BeginGroup(Agent.GetPlayerArea());
             DrawSelectionBox(selectBox);
@@ -185,7 +172,8 @@ namespace RTSLockstep
         private void DrawBuildProgress()
         {
             GUI.skin = GameResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), Agent.GetPlayerArea());
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
             GUI.BeginGroup(Agent.GetPlayerArea());
             CalculateCurrentHealth(0.5f, 0.99f);

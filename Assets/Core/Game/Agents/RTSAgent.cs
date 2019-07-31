@@ -230,7 +230,9 @@ namespace RTSLockstep
 
             Influencer = new LSInfluencer();
             if (_visualCenter == null)
+            {
                 _visualCenter = CachedTransform;
+            }
 
             if (Animator.IsNotNull())
             {
@@ -588,16 +590,10 @@ namespace RTSLockstep
                 }
                 else if (reader.TokenType == JsonToken.EndObject)
                 {
-                    //loaded position invalidates the selection bounds so they must be recalculated
-                    Body.SetSelectionBounds(GameResourceManager.InvalidBounds);
-                    Body.CalculateBounds();
                     loadedSavedValues = true;
                     return;
                 }
             }
-            //loaded position invalidates the selection bounds so they must be recalculated
-            Body.SetSelectionBounds(GameResourceManager.InvalidBounds);
-            Body.CalculateBounds();
             loadedSavedValues = true;
         }
         #endregion

@@ -610,17 +610,17 @@ MonoBehaviour:
       x: 0
       y: 0
     _preventCulling: 0
-    RealPoints: []
-    Edges: []
-    EdgeNorms: []
     ImmovableCollisionDirection:
       x: 0
       y: 0
+    RealPoints: []
+    Edges: []
+    EdgeNorms: []
     _shape: 2
     _isTrigger: 0
     _layer: 0
     _halfWidth: 196608
-    _halfHeight: 196608
+    _halfLength: 196608
     _radius: 262144
     _immovable: 1
     _basePriority: 0

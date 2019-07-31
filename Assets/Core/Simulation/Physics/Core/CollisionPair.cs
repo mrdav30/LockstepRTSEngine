@@ -588,7 +588,7 @@ namespace RTSLockstep
 			if ((xAbs <= circle.Radius && yAbs <= circle.Radius)) {
 				Vector2d corner;
 				corner.x = xMore ? box.Position.x + box.HalfWidth : box.Position.x - box.HalfWidth;
-				corner.y = yMore ? box.Position.y + box.HalfHeight : box.Position.y - box.HalfHeight;
+				corner.y = yMore ? box.Position.y + box.HalfLength : box.Position.y - box.HalfLength;
 				Vector2d dir = circle.Position - corner;
 				dir.Normalize ();
 

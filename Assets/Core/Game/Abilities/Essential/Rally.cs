@@ -80,8 +80,8 @@ namespace RTSLockstep
 
         public void SetSpawnPoint()
         {
-            long spawnX = (long)(Agent.Body.GetSelectionBounds().center.x + transform.forward.x * Agent.Body.GetSelectionBounds().extents.x + transform.forward.x * 10);
-            long spawnZ = (long)(Agent.Body.GetSelectionBounds().center.z + transform.forward.z * Agent.Body.GetSelectionBounds().extents.z + transform.forward.z * 10);
+            long spawnX = (long)(Agent.Body.XMin.CeilToInt() + transform.forward.x * Agent.Body.XMax.CeilToInt() + transform.forward.x * 20);
+            long spawnZ = (long)(Agent.Body.YMin.CeilToInt() + transform.forward.z * Agent.Body.YMax.CeilToInt() + transform.forward.z * 20);
             spawnPoint = new Vector3(spawnX, 0, spawnZ);
             rallyPoint = spawnPoint;
         }

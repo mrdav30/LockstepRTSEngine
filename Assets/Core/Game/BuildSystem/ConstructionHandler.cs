@@ -98,15 +98,17 @@ public static class ConstructionHandler
                 {
                     if (buildingTemplate.Tag == AgentTag.Wall)
                     {
+                        // walls require a little help since they are click and drag
                         _constructingWall = true;
                         tempStructure.GetComponent<TempStructure>().IsOverlay = true;
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
                     }
 
                     //get size based on the mesh renderer attached to the empty GO
-                    Vector3 objectSize = Vector3.Scale(tempStructure.GetComponent<TempStructure>().EmptyGO.transform.localScale, tempStructure.GetComponent<TempStructure>().EmptyGO.GetComponentInChildren<MeshRenderer>().bounds.size);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(objectSize.x);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (int)Math.Ceiling(objectSize.z);
+                    Bounds tempStructureBounds = WorkManager.CalculateBounds(tempStructure.gameObject, tempStructure.transform.position);
+
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(tempStructureBounds.size.x);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (int)Math.Ceiling(tempStructureBounds.size.z);
 
                     tempConstructor = constructingAgent;
 
@@ -202,8 +204,7 @@ public static class ConstructionHandler
             GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
 
             //if we're not building a wall, add the tempstructure to the build queue
-            if (!_constructingWall
-                && _buildQueue.Count == 0)
+            if (!_constructingWall && _buildQueue.Count == 0)
             {
                 tempStructure.gameObject.name = tempStructure.GetComponent<TempStructure>().EmptyGO.name;
                 SetConstructionQueue(tempStructure);

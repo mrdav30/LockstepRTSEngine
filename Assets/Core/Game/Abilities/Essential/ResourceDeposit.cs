@@ -47,7 +47,6 @@ namespace RTSLockstep
                 Agent.Die();
                 return;
             }
-            Agent.Body.CalculateBounds();
         }
 
         public void Remove(long amount)

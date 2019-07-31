@@ -87,28 +87,6 @@ namespace RTSLockstep
             }
         }
 
-        // no longer needed?
-        //public static List<RTSAgent> FindNearbyObjects(Vector3 position, float range)
-        //{
-        //    Collider[] hitColliders = Physics.OverlapSphere(position, range);
-        //    HashSet<int> nearbyObjectIds = new HashSet<int>();
-        //    List<RTSAgent> nearbyObjects = new List<RTSAgent>();
-        //    for (int i = 0; i < hitColliders.Length; i++)
-        //    {
-        //        Transform parent = hitColliders[i].transform.parent;
-        //        if (parent)
-        //        {
-        //            RTSAgent parentObject = parent.GetComponent<RTSAgent>();
-        //            if (parentObject && !nearbyObjectIds.Contains(parentObject.GlobalID))
-        //            {
-        //                nearbyObjectIds.Add(parentObject.GlobalID);
-        //                nearbyObjects.Add(parentObject);
-        //            }
-        //        }
-        //    }
-        //    return nearbyObjects;
-        //}
-
         //currently used by harvest ability, switch to influence?
         public static RTSAgent FindNearestWorldObjectInListToPosition(List<RTSAgent> objects, Vector3 position)
         {
@@ -130,6 +108,17 @@ namespace RTSLockstep
             }
 
             return nearestObject;
+        }
+
+        public static Bounds CalculateBounds(GameObject obj, Vector3 position)
+        {
+            Bounds rendererBounds = new Bounds(position, Vector3.zero);
+            foreach (Renderer r in obj.GetComponentsInChildren<Renderer>())
+            {
+                rendererBounds.Encapsulate(r.bounds);
+            }
+
+            return rendererBounds;
         }
 
         //This extension method gets a copy of a component on an existing game object:
