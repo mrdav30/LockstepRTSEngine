@@ -1,6 +1,5 @@
 ﻿using RTSLockstep;
 using RTSLockstep.Data;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,7 +49,8 @@ public static class ConstructionHandler
                 Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
                 _validPlacement = GridBuilder.UpdateMove(pos);
 
-                if (_validPlacement)
+                if (_validPlacement && 
+                    SelectionManager.MousedAgent.IsNull())
                 {
                     SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                 }
@@ -82,8 +82,7 @@ public static class ConstructionHandler
         Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
 
-        if (buildingTemplate.MyAgentType == AgentType.Building
-            && buildingTemplate.GetComponent<Structure>())
+        if (buildingTemplate.MyAgentType == AgentType.Building && buildingTemplate.GetComponent<Structure>())
         {
             // check that the Player has the resources available before allowing them to create a new structure
             if (!_cachedCommander.CachedResourceManager.CheckResources(buildingTemplate))
@@ -92,10 +91,12 @@ public static class ConstructionHandler
             }
             else
             {
-                tempStructure = UnityEngine.Object.Instantiate(buildingTemplate.GetComponent<Structure>().tempStructure, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-
-                if (tempStructure.GetComponent<TempStructure>())
+                tempStructure = Object.Instantiate(buildingTemplate.gameObject, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+                if (tempStructure)
                 {
+                    tempStructure.gameObject.name = buildingTemplate.objectName;
+                    tempStructure.AddComponent<TempStructure>();
+
                     if (buildingTemplate.Tag == AgentTag.Wall)
                     {
                         // walls require a little help since they are click and drag
@@ -104,21 +105,14 @@ public static class ConstructionHandler
                         tempStructure.GetComponent<WallPositioningHelper>().Setup();
                     }
 
-                    //get size based on the mesh renderer attached to the empty GO
-                    Bounds tempStructureBounds = WorkManager.CalculateBounds(tempStructure.gameObject, tempStructure.transform.position);
-
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (int)Math.Ceiling(tempStructureBounds.size.x);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (int)Math.Ceiling(tempStructureBounds.size.z);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfWidth.CeilToInt() * 2);
+                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfLength.CeilToInt() * 2);
 
                     tempConstructor = constructingAgent;
 
                     _findingPlacement = true;
                     SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
-                }
-                else
-                {
-                    UnityEngine.Object.Destroy(tempStructure);
                 }
             }
         }
@@ -164,8 +158,7 @@ public static class ConstructionHandler
     public static void FindStructureLocation()
     {
         Vector3 newLocation = RTSInterfacing.GetWorldPos3(Input.mousePosition);
-        if (RTSInterfacing.HitPointIsGround(Input.mousePosition)
-            && lastLocation != newLocation)
+        if (RTSInterfacing.HitPointIsGround(Input.mousePosition) && lastLocation != newLocation)
         {
             lastLocation = newLocation;
 
@@ -178,19 +171,6 @@ public static class ConstructionHandler
         }
     }
 
-    public static bool CanPlaceStructure()
-    {
-        PlacementResult canPlace = GridBuilder.EndMove();
-        if (canPlace == PlacementResult.Placed)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     public static void SetConstructionQueue(GameObject buildingProject)
     {
         _buildQueue.Enqueue(buildingProject);
@@ -198,23 +178,23 @@ public static class ConstructionHandler
 
     public static void ProcessConstructionQueue()
     {
-        if (CanPlaceStructure())
+     //   if (GridBuilder.CanPlace())
+        if(_validPlacement)
         {
             // remove temporary structure from grid
-            GridBuilder.Unbuild(tempStructure.GetComponent<TempStructure>());
+            GridBuilder.Reset();
 
             //if we're not building a wall, add the tempstructure to the build queue
             if (!_constructingWall && _buildQueue.Count == 0)
             {
-                tempStructure.gameObject.name = tempStructure.GetComponent<TempStructure>().EmptyGO.name;
                 SetConstructionQueue(tempStructure);
             }
 
+            //temp structure no longer required
+            Object.Destroy(tempStructure.gameObject);
+
             _findingPlacement = false;
             _constructingWall = false;
-
-            //temp structure no longer required
-            UnityEngine.Object.Destroy(tempStructure.gameObject);
 
             int ndx = 0;
             while (_buildQueue.Count > 0)
@@ -223,9 +203,6 @@ public static class ConstructionHandler
                 Vector2d qBuildPoint = new Vector2d(qStructure.transform.localPosition.x, qStructure.transform.localPosition.z);
                 Vector2d qRotationPoint = new Vector2d(qStructure.transform.localRotation.w, qStructure.transform.localRotation.y);
                 Vector3d qLocalScale = new Vector3d(qStructure.transform.localScale);
-
-                //queue object no longer required
-                UnityEngine.Object.Destroy(qStructure.gameObject);
 
                 if (ndx == 0)
                 {

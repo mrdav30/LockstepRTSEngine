@@ -306,6 +306,7 @@ namespace RTSLockstep
                 else
                 {
                     Debug.Log("Couldn't place building!");
+                    newBuilding.Die();
                 }
             }
         }

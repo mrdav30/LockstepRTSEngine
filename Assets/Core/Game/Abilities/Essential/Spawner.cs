@@ -70,7 +70,7 @@ namespace RTSLockstep
             {
                 IsCasting = true;
                 Agent.SetState(AnimState.Working);
-                BehaveWithBuildQueue();
+                BehaveWithSpawnQueue();
             }
             else
             {
@@ -119,7 +119,7 @@ namespace RTSLockstep
             }
         }
 
-        protected void BehaveWithBuildQueue()
+        protected void BehaveWithSpawnQueue()
         {
             if (!IsWindingUp)
             {

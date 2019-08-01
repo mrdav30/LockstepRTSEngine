@@ -13,7 +13,6 @@ namespace RTSLockstep
         public int provisionAmount;
         [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
         private ResourceType[] _resourceStorage;
-        public GameObject tempStructure;
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
         /// </summary>

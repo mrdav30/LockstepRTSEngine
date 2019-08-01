@@ -34,7 +34,11 @@ namespace RTSLockstep
                         DrawPathfinding();
                         break;
                     case GridType.Building:
-                        DrawBuilding();
+                        if (BuildGridAPI.MainBuildGrid.IsNotNull())
+                        {
+                            DrawBuilding();
+                        }
+
                         break;
                 }
             }

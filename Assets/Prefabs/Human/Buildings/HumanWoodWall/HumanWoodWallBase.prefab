@@ -232,8 +232,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EmptyGO: {fileID: 1830645847949502}
-  PillarPrefab: {fileID: 1830645847949502}
-  WallPrefab: {fileID: 1217730045509884}
+  EmptyPillarGO: {fileID: 1292614385033484, guid: 34052d5328a416249b8ccc42278bc079,
+    type: 3}
+  EmptyWallSegmentGO: {fileID: 1442506107234032, guid: cda6769975c749048b581c54cd10f1c8,
+    type: 3}
 --- !u!114 &114296914064970424
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -89,7 +89,7 @@ public class WallPositioningHelper : MonoBehaviour
         // create initial pole
         if (!_startSnapped)
         {
-            _startPillar = Instantiate(GetComponentInParent<TempStructure>().PillarPrefab, startPos, Quaternion.identity) as GameObject;
+            _startPillar = Instantiate(GetComponentInParent<TempStructure>().EmptyPillarGO, startPos, Quaternion.identity) as GameObject;
             _startPillar.transform.parent = ConstructionHandler.OrganizerStructures;
         }
         else
@@ -98,7 +98,7 @@ public class WallPositioningHelper : MonoBehaviour
             _startPillar = Instantiate(closestPillar);
         }
 
-        _startPillar.gameObject.name = GetComponentInParent<TempStructure>().PillarPrefab.gameObject.name;
+        _startPillar.gameObject.name = GetComponentInParent<TempStructure>().EmptyPillarGO.gameObject.name;
         _pillarPrefabs.Add(_startPillar);
 
         _lastPillar = _startPillar;
@@ -210,8 +210,8 @@ public class WallPositioningHelper : MonoBehaviour
 
     private void CreateWallPillar(Vector3 _currentPos)
     {
-        GameObject newPillar = Instantiate(GetComponentInParent<TempStructure>().PillarPrefab, _currentPos, Quaternion.identity);
-        newPillar.gameObject.name = GetComponentInParent<TempStructure>().PillarPrefab.gameObject.name;
+        GameObject newPillar = Instantiate(GetComponentInParent<TempStructure>().EmptyPillarGO, _currentPos, Quaternion.identity);
+        newPillar.gameObject.name = GetComponentInParent<TempStructure>().EmptyPillarGO.gameObject.name;
         newPillar.transform.LookAt(_lastPillar.transform);
         _pillarPrefabs.Add(newPillar);
         newPillar.transform.parent = ConstructionHandler.OrganizerStructures;
@@ -225,8 +225,8 @@ public class WallPositioningHelper : MonoBehaviour
         {
             Vector3 middle = 0.5f * (_currentPos + _lastPillar.transform.position);
 
-            GameObject newWall = Instantiate(GetComponentInParent<TempStructure>().WallPrefab, middle, Quaternion.identity);
-            newWall.gameObject.name = GetComponentInParent<TempStructure>().WallPrefab.gameObject.name;
+            GameObject newWall = Instantiate(GetComponentInParent<TempStructure>().EmptyWallSegmentGO, middle, Quaternion.identity);
+            newWall.gameObject.name = GetComponentInParent<TempStructure>().EmptyWallSegmentGO.gameObject.name;
             newWall.SetActive(true);
             _wallPrefabs.Add(ndx, newWall);
             newWall.transform.parent = ConstructionHandler.OrganizerStructures;

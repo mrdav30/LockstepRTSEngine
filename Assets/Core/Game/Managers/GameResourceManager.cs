@@ -151,7 +151,7 @@ namespace RTSLockstep
         #region Public
         public static IAgentData GetAgentInterfacer(string agentCode)
         {
-            return GameResourceManager.AgentCodeInterfacerMap[agentCode];
+            return AgentCodeInterfacerMap[agentCode];
         }
 
         public static RTSAgent GetAgentTemplate(string agentCode)
@@ -159,7 +159,7 @@ namespace RTSLockstep
             RTSAgent template;
             if (!AgentCodeTemplateMap.TryGetValue(agentCode, out template))
             {
-                template = GameObject.Instantiate(GameResourceManager.GetAgentSource(agentCode));
+                template = Object.Instantiate(GetAgentSource(agentCode));
                 AgentCodeTemplateMap.Add(agentCode, template);
                 template.transform.parent = OrganizerObject.transform;
             }
@@ -201,13 +201,12 @@ namespace RTSLockstep
 
         public static Texture2D GetBuildImage(string name)
         {
-            IAgentData interfacer = GameResourceManager.AgentCodeInterfacerMap[name];
+            IAgentData interfacer = AgentCodeInterfacerMap[name];
             return interfacer.GetAgentIcon();
         }
 
         public static Texture2D[] GetAvatars()
         {
-            //Texture2D[] avatars;
             return Avatars;
         }
 

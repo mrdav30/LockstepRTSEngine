@@ -110,7 +110,7 @@ public static class GridBuilder
         if (EndPlace())
         {
             return PlacementResult.Placed;
-        }
+        } 
 
         if (TargetOriginalValid)
         {
@@ -123,7 +123,6 @@ public static class GridBuilder
         {
             return PlacementResult.Limbo;
         }
-        //return PlacementResult.Returned;
     }
     #endregion
 

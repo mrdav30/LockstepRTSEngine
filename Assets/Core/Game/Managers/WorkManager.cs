@@ -110,6 +110,7 @@ namespace RTSLockstep
             return nearestObject;
         }
 
+        //get size based on the mesh renderer attached to the empty GO since it's not an agent yet...
         public static Bounds CalculateBounds(GameObject obj, Vector3 position)
         {
             Bounds rendererBounds = new Bounds(position, Vector3.zero);
