@@ -414,7 +414,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 1
+      isExpanded: 0
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -429,7 +429,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
+    isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 00000000000000000000000000000000000000000000000000000000
@@ -490,8 +490,7 @@ MonoBehaviour:
   provisioner: 0
   provisionAmount: 0
   _resourceStorage: 
-  tempStructure: {fileID: 1496648592488480, guid: 6da9b120afaf44f46bf1caabe2983881,
-    type: 3}
+  StructureType: 1
 --- !u!114 &114584152629258208
 MonoBehaviour:
   m_ObjectHideFlags: 0

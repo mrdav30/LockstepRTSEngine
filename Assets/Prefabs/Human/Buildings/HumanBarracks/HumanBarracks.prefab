@@ -521,8 +521,7 @@ MonoBehaviour:
   provisioner: 0
   provisionAmount: 0
   _resourceStorage: 
-  tempStructure: {fileID: 1527426487528806, guid: 9f428967f6ce17a4e86373516dc6ee35,
-    type: 3}
+  StructureType: 4
 --- !u!114 &114973044214609618
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,11 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Snap
-  - WallPrefab
-  - WallPillar
   - WallSegment
-  - StartPillar
-  - EndPillar
+  - WallPillar
   layers:
   - Default
   - TransparentFX

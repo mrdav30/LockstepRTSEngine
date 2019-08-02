@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1292614385033484
+--- !u!1 &5530549526402322929
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,13 +8,14 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4714053328235688}
-  - component: {fileID: 114084264562080756}
-  - component: {fileID: 114665303044926388}
-  - component: {fileID: 114143260637748638}
-  - component: {fileID: 114639686320524904}
-  - component: {fileID: 114689216456941692}
-  - component: {fileID: 114768010494631488}
+  - component: {fileID: 6181614929816299083}
+  - component: {fileID: 9050172180886772449}
+  - component: {fileID: 5471687020666200654}
+  - component: {fileID: 242638430047052249}
+  - component: {fileID: 4139659409858952994}
+  - component: {fileID: 5471459949468220228}
+  - component: {fileID: 4358255767055163161}
+  - component: {fileID: 1422794587854036375}
   m_Layer: 11
   m_Name: HumanWoodWallPillar
   m_TagString: WallPillar
@@ -22,28 +23,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4714053328235688
+--- !u!4 &6181614929816299083
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.9, y: 8, z: 0.9}
   m_Children:
-  - {fileID: 4415697169750116}
+  - {fileID: 2284310376607450240}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114084264562080756
+--- !u!114 &9050172180886772449
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
@@ -55,9 +56,9 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
-  Tag: 6
+  Tag: 0
   _selectionRadius: -1
-  _visualCenter: {fileID: 4714053328235688}
+  _visualCenter: {fileID: 6181614929816299083}
   objectName: HumanWoodWallPillar
   AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
@@ -86,14 +87,14 @@ MonoBehaviour:
     isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
-    _values: 00000000000000000000000032000000000000000000000000000000
---- !u!114 &114665303044926388
+    _values: 00000000000000000000000000000000000000000000000000000000
+--- !u!114 &5471687020666200654
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff94a4d3f2f0f8042b26ec6eb7a1fdd0, type: 3}
@@ -122,20 +123,20 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfLength: 32768
-    _radius: 245888
+    _radius: 32768
     _immovable: 1
     _basePriority: 0
     _vertices: []
-    _height: 327680
-    _positionalTransform: {fileID: 4714053328235688}
-    _rotationalTransform: {fileID: 4714053328235688}
---- !u!114 &114143260637748638
+    _height: 294912
+    _positionalTransform: {fileID: 6181614929816299083}
+    _rotationalTransform: {fileID: 6181614929816299083}
+--- !u!114 &242638430047052249
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6188705609e5c904fa7598e381bce66d, type: 3}
@@ -144,15 +145,16 @@ MonoBehaviour:
   provisioner: 0
   provisionAmount: 0
   _resourceStorage: 
-  tempStructure: {fileID: 1578406621253206, guid: 75637d50d9290754483c1162ae71692e,
+  StructureType: 2
+  WallSegmentGO: {fileID: 6754609871906906199, guid: cda6769975c749048b581c54cd10f1c8,
     type: 3}
---- !u!114 &114639686320524904
+--- !u!114 &4139659409858952994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
@@ -160,31 +162,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 6553600
   _currentHealth: 0
---- !u!114 &114689216456941692
+--- !u!114 &5471459949468220228
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114768010494631488
+--- !u!114 &4358255767055163161
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1292614385033484}
+  m_GameObject: {fileID: 5530549526402322929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c3ba75de30de14a9f9bc835c539797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapIndex: 0
+  _bonusHeight: 0
+--- !u!114 &1422794587854036375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1524213206702520
+--- !u!1 &9104357523201359014
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -192,10 +208,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4415697169750116}
-  - component: {fileID: 33118789834452494}
-  - component: {fileID: 23043366153841532}
-  - component: {fileID: 114198207033571582}
+  - component: {fileID: 2284310376607450240}
+  - component: {fileID: 2498241928661005487}
+  - component: {fileID: 2066537403882167324}
   m_Layer: 2
   m_Name: Pole
   m_TagString: WallPillar
@@ -203,35 +218,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4415697169750116
+--- !u!4 &2284310376607450240
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524213206702520}
+  m_GameObject: {fileID: 9104357523201359014}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4714053328235688}
+  m_Father: {fileID: 6181614929816299083}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &33118789834452494
+--- !u!33 &2498241928661005487
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524213206702520}
+  m_GameObject: {fileID: 9104357523201359014}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &23043366153841532
+--- !u!23 &2066537403882167324
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524213206702520}
+  m_GameObject: {fileID: 9104357523201359014}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -262,15 +277,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &114198207033571582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1524213206702520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 507eaf9c84f40f742ae1986d34c0d5a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

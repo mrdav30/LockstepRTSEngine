@@ -1413,17 +1413,17 @@ MonoBehaviour:
       x: 0
       y: 0
     _preventCulling: 0
-    RealPoints: []
-    Edges: []
-    EdgeNorms: []
     ImmovableCollisionDirection:
       x: 0
       y: 0
+    RealPoints: []
+    Edges: []
+    EdgeNorms: []
     _shape: 1
     _isTrigger: 0
     _layer: 0
     _halfWidth: 32768
-    _halfHeight: 32768
+    _halfLength: 32768
     _radius: 98304
     _immovable: 0
     _basePriority: 0

@@ -402,80 +402,74 @@ public class UserInputHelper : BehaviourHelper
 
     private void HandleSingleRightClick()
     {
-        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
-            && Selector.MainSelectedAgent)
+        if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds() 
+            && Selector.MainSelectedAgent
+            && !ConstructionHandler.IsFindingBuildingLocation())
         {
-            if (ConstructionHandler.IsFindingBuildingLocation())
+            if (Selector.MainSelectedAgent
+                && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
             {
-                ConstructionHandler.CancelBuildingPlacement();
-            }
-            else
-            {
-                if (Selector.MainSelectedAgent
-                    && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
+                if (Selector.MainSelectedAgent.GetAbility<Rally>()
+                    && !Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
                 {
-                    if (Selector.MainSelectedAgent.GetAbility<Rally>()
-                        && !Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
+                    if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                     {
-                        if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
-                        {
-                            Selector.MainSelectedAgent.GetAbility<Rally>().SetFlagState(FlagState.SetFlag);
-                            PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
-                            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
-                        }
-                        else
-                        {
-                            Vector2d rallyPoint = RTSInterfacing.GetWorldPosD(Input.mousePosition);
-                            Selector.MainSelectedAgent.GetAbility<Rally>().SetRallyPoint(rallyPoint.ToVector3());
-                        }
-                    }
-
-                    if (RTSInterfacing.MousedAgent.IsNotNull())
-                    {
-                        // if moused agent is a resource, send selected agent to harvest
-                        if (Selector.MainSelectedAgent.GetAbility<Harvest>()
-                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
-                        {
-                            //call harvest command
-                            ProcessInterfacer((QuickHarvest));
-                        }
-                        // moused agent is a building and owned by current player
-                        else if (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
-                            && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
-                        {
-                            // moused agent isn't under construction
-                            if (!RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction())
-                            {
-                                // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
-                                if (Selector.MainSelectedAgent.GetAbility<Harvest>()
-                                    && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
-                                {
-                                    //call harvest command 
-                                    ProcessInterfacer((QuickHarvest));
-                                }
-                            }
-                            // moused agent is still under construction
-                            else if (Selector.MainSelectedAgent.GetAbility<Construct>())
-                            {
-                                //call build command
-                                ProcessInterfacer((QuickBuild));
-                            }
-                        }
-                        else if (Selector.MainSelectedAgent.GetAbility<Attack>()
-                            && !RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController)
-                            && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
-                        {
-                            //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
-                            ProcessInterfacer((QuickTarget));
-                        }
+                        Selector.MainSelectedAgent.GetAbility<Rally>().SetFlagState(FlagState.SetFlag);
+                        PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
+                        PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
                     }
                     else
                     {
-                        // If there is no agent under the mouse or the selected agent doesn't have Attack, send a Move command - right clicking on terrain
-                        // stop casting all abilities
-                       // Selector.MainSelectedAgent.StopCast();
-                        ProcessInterfacer((QuickMove));
+                        Vector2d rallyPoint = RTSInterfacing.GetWorldPosD(Input.mousePosition);
+                        Selector.MainSelectedAgent.GetAbility<Rally>().SetRallyPoint(rallyPoint.ToVector3());
                     }
+                }
+
+                if (RTSInterfacing.MousedAgent.IsNotNull())
+                {
+                    // if moused agent is a resource, send selected agent to harvest
+                    if (Selector.MainSelectedAgent.GetAbility<Harvest>()
+                        && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
+                    {
+                        //call harvest command
+                        ProcessInterfacer((QuickHarvest));
+                    }
+                    // moused agent is a building and owned by current player
+                    else if (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
+                        && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
+                    {
+                        // moused agent isn't under construction
+                        if (!RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction())
+                        {
+                            // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
+                            if (Selector.MainSelectedAgent.GetAbility<Harvest>()
+                                && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
+                            {
+                                //call harvest command 
+                                ProcessInterfacer((QuickHarvest));
+                            }
+                        }
+                        // moused agent is still under construction
+                        else if (Selector.MainSelectedAgent.GetAbility<Construct>())
+                        {
+                            //call build command
+                            ProcessInterfacer((QuickBuild));
+                        }
+                    }
+                    else if (Selector.MainSelectedAgent.GetAbility<Attack>()
+                        && !RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController)
+                        && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
+                    {
+                        //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
+                        ProcessInterfacer((QuickTarget));
+                    }
+                }
+                else
+                {
+                    // If there is no agent under the mouse or the selected agent doesn't have Attack, send a Move command - right clicking on terrain
+                    // stop casting all abilities
+                    // Selector.MainSelectedAgent.StopCast();
+                    ProcessInterfacer((QuickMove));
                 }
             }
         }

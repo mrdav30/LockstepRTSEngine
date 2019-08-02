@@ -643,8 +643,7 @@ MonoBehaviour:
   provisioner: 1
   provisionAmount: 5
   _resourceStorage: 
-  tempStructure: {fileID: 1621033016356584, guid: c3278d35294da04419a98ab1c0bc3a35,
-    type: 3}
+  StructureType: 0
 --- !u!114 &114599597155692210
 MonoBehaviour:
   m_ObjectHideFlags: 0

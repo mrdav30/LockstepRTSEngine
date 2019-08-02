@@ -6,9 +6,10 @@ using UnityEngine;
 public static class ConstructionHandler
 {
     #region Properties
-    private static GameObject tempStructure;
+    private static GameObject tempObject;
+    private static TempStructure tempStructure;
     private static Vector3 lastLocation;
-    private static RTSAgent tempConstructor;
+    private static RTSAgent cachedAgent;
     private static bool _findingPlacement = false;
     private static bool _constructingWall = false;
 
@@ -16,7 +17,6 @@ public static class ConstructionHandler
     private static bool _validPlacement;
     private static Dictionary<string, Material> oldMaterials = new Dictionary<string, Material>();
 
-    private static Queue<GameObject> _buildQueue = new Queue<GameObject>();
     public static Transform OrganizerStructures { get; private set; }
     #endregion
 
@@ -29,7 +29,10 @@ public static class ConstructionHandler
         OrganizerStructures.transform.parent = PlayerManager.MainController.Commander.GetComponentInChildren<RTSAgents>().transform;
         OrganizerStructures.gameObject.name = "OrganizerStructures";
 
+        WallPositioningHelper.Initialize();
+
         UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
+        UserInputHelper.OnSingleRightTapDown += HandleSingleRightClick;
     }
 
     // Update is called once per frame
@@ -41,22 +44,22 @@ public static class ConstructionHandler
             {
                 if (!GridBuilder.IsMovingBuilding)
                 {
-                    GridBuilder.StartMove(tempStructure.GetComponent<TempStructure>());
+                    GridBuilder.StartMove(tempStructure);
                 }
 
                 FindStructureLocation();
 
-                Vector2d pos = new Vector2d(tempStructure.transform.position.x, tempStructure.transform.position.z);
+                Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
                 _validPlacement = GridBuilder.UpdateMove(pos);
 
-                if (_validPlacement && 
+                if (_validPlacement &&
                     SelectionManager.MousedAgent.IsNull())
                 {
-                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
+                    SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
                 }
                 else
                 {
-                    SetTransparentMaterial(tempStructure, GameResourceManager.NotAllowedMaterial);
+                    SetTransparentMaterial(tempObject, GameResourceManager.NotAllowedMaterial);
                 }
             }
         }
@@ -68,12 +71,22 @@ public static class ConstructionHandler
         {
             if (_constructingWall)
             {
-                tempStructure.GetComponent<WallPositioningHelper>().OnLeftClick();
+                WallPositioningHelper.OnLeftClick();
             }
             else
             {
-                ProcessConstructionQueue();
+                // only constructing 1 object, place it in the agents construct queue
+                SetConstructionQueue(tempObject);
+                SendConstructCommand();
             }
+        }
+    }
+
+    private static void HandleSingleRightClick()
+    {
+        if (IsFindingBuildingLocation())
+        {
+            Reset();
         }
     }
 
@@ -91,27 +104,30 @@ public static class ConstructionHandler
             }
             else
             {
-                tempStructure = Object.Instantiate(buildingTemplate.gameObject, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-                if (tempStructure)
+                tempObject = Object.Instantiate(buildingTemplate.gameObject, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+                if (tempObject)
                 {
-                    tempStructure.gameObject.name = buildingTemplate.objectName;
-                    tempStructure.AddComponent<TempStructure>();
+                    _findingPlacement = true;
+                    SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
+                    tempObject.gameObject.name = buildingTemplate.objectName;
 
-                    if (buildingTemplate.Tag == AgentTag.Wall)
+                    tempObject.AddComponent<TempStructure>();
+                    tempStructure = tempObject.GetComponent<TempStructure>();
+                    tempStructure.StructureType = buildingTemplate.GetComponent<Structure>().StructureType;
+
+                    if (tempStructure.GetComponent<TempStructure>().StructureType == StructureType.Wall)
                     {
                         // walls require a little help since they are click and drag
                         _constructingWall = true;
-                        tempStructure.GetComponent<TempStructure>().IsOverlay = true;
-                        tempStructure.GetComponent<WallPositioningHelper>().Setup();
+                        tempStructure.IsOverlay = true;
+                        WallPositioningHelper.Setup();
                     }
 
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfWidth.CeilToInt() * 2);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfLength.CeilToInt() * 2);
+                    tempStructure.BuildSizeLow = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfWidth.CeilToInt() * 2);
+                    tempStructure.BuildSizeHigh = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfLength.CeilToInt() * 2);
 
-                    tempConstructor = constructingAgent;
+                    cachedAgent = constructingAgent;
 
-                    _findingPlacement = true;
-                    SetTransparentMaterial(tempStructure, GameResourceManager.AllowedMaterial);
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                 }
             }
@@ -125,29 +141,28 @@ public static class ConstructionHandler
 
     public static GameObject GetTempStructure()
     {
-        return tempStructure;
+        return tempObject;
     }
 
     //this isn't updating LSBody rotation correctly...
     public static void HandleRotationTap(UserInputKeyMappings direction)
     {
-        if (_findingPlacement
-            && !_constructingWall)
+        if (_findingPlacement && !_constructingWall)
         {
             //  keep track of previous values to update agent's size
-            int prevLow = tempStructure.GetComponent<TempStructure>().BuildSizeLow;
-            int prevhigh = tempStructure.GetComponent<TempStructure>().BuildSizeHigh;
+            int prevLow = tempStructure.BuildSizeLow;
+            int prevhigh = tempStructure.BuildSizeHigh;
             switch (direction)
             {
                 case UserInputKeyMappings.RotateLeftShortCut:
                     tempStructure.transform.Rotate(0, 90, 0);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = prevhigh;
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = prevLow;
+                    tempStructure.BuildSizeLow = prevhigh;
+                    tempStructure.BuildSizeHigh = prevLow;
                     break;
                 case UserInputKeyMappings.RotateRightShortCut:
                     tempStructure.transform.Rotate(0, -90, 0);
-                    tempStructure.GetComponent<TempStructure>().BuildSizeLow = prevhigh;
-                    tempStructure.GetComponent<TempStructure>().BuildSizeHigh = prevLow;
+                    tempStructure.BuildSizeLow = prevhigh;
+                    tempStructure.BuildSizeHigh = prevLow;
                     break;
                 default:
                     break;
@@ -166,58 +181,37 @@ public static class ConstructionHandler
 
             if (_constructingWall)
             {
-                tempStructure.GetComponent<WallPositioningHelper>().Visualize();
+                WallPositioningHelper.Visualize();
             }
         }
     }
 
     public static void SetConstructionQueue(GameObject buildingProject)
     {
-        _buildQueue.Enqueue(buildingProject);
+        QStructure qStructure = new QStructure();
+        qStructure.StructureName = buildingProject.gameObject.name;
+        qStructure.BuildPoint = new Vector2d(buildingProject.transform.localPosition.x, buildingProject.transform.localPosition.z);
+        qStructure.RotationPoint = new Vector2d(buildingProject.transform.localRotation.w, buildingProject.transform.localRotation.y);
+        qStructure.LocalScale = new Vector3d(buildingProject.transform.localScale);
+        qStructure.BuildSizeLow = buildingProject.GetComponent<TempStructure>().BuildSizeLow;
+        qStructure.BuildSizeHigh = buildingProject.GetComponent<TempStructure>().BuildSizeHigh;
+
+        cachedAgent.GetAbility<Construct>().ConstructQueue.Enqueue(qStructure);
     }
 
-    public static void ProcessConstructionQueue()
+    public static void SendConstructCommand()
     {
-     //   if (GridBuilder.CanPlace())
-        if(_validPlacement)
+        //   if (GridBuilder.CanPlace())
+        if (_validPlacement)
         {
-            // remove temporary structure from grid
-            GridBuilder.Reset();
+            //Reset construction handler
+            Reset();
 
-            //if we're not building a wall, add the tempstructure to the build queue
-            if (!_constructingWall && _buildQueue.Count == 0)
-            {
-                SetConstructionQueue(tempStructure);
-            }
+            // send build command
+            Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+            buildCom.Add<DefaultData>(new DefaultData(DataType.String, tempObject.name));
 
-            //temp structure no longer required
-            Object.Destroy(tempStructure.gameObject);
-
-            _findingPlacement = false;
-            _constructingWall = false;
-
-            int ndx = 0;
-            while (_buildQueue.Count > 0)
-            {
-                GameObject qStructure = _buildQueue.Dequeue();
-                Vector2d qBuildPoint = new Vector2d(qStructure.transform.localPosition.x, qStructure.transform.localPosition.z);
-                Vector2d qRotationPoint = new Vector2d(qStructure.transform.localRotation.w, qStructure.transform.localRotation.y);
-                Vector3d qLocalScale = new Vector3d(qStructure.transform.localScale);
-
-                if (ndx == 0)
-                {
-                    // send build command
-                    Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                    buildCom.Add<DefaultData>(new DefaultData(DataType.String, qStructure.gameObject.name));
-                    buildCom.Add<Vector2d>(qBuildPoint);
-                    buildCom.Add<Vector2d>(qRotationPoint);
-                    buildCom.Add<Vector3d>(qLocalScale);
-
-                    UserInputHelper.SendCommand(buildCom);
-                }
-
-                ndx++;
-            }
+            UserInputHelper.SendCommand(buildCom);
         }
         else
         {
@@ -225,18 +219,20 @@ public static class ConstructionHandler
         }
     }
 
-    public static void CancelBuildingPlacement()
+    public static void Reset()
     {
+        _findingPlacement = false;
         if (_constructingWall)
         {
             _constructingWall = false;
-            tempStructure.GetComponent<WallPositioningHelper>().OnRightClick();
+            WallPositioningHelper.Reset();
         }
 
-        _findingPlacement = false;
-        UnityEngine.Object.Destroy(tempStructure.gameObject);
+        //temp structure no longer required
+        Object.Destroy(tempObject);
         tempStructure = null;
-        tempConstructor = null;
+        cachedAgent = null;
+        // remove temporary structure from grid
         GridBuilder.Reset();
     }
 
@@ -244,7 +240,7 @@ public static class ConstructionHandler
     {
         if (_constructingWall)
         {
-            structure.GetComponentInChildren<WallPositioningHelper>().SetTransparentMaterial(material);
+            WallPositioningHelper.SetTransparentMaterial(material);
         }
         else
         {
@@ -255,23 +251,5 @@ public static class ConstructionHandler
                 renderer.material = material;
             }
         }
-    }
-
-    public static GameObject ClosestStructureTo(Vector3 worldPoint, float distance, string searchTag)
-    {
-        GameObject closest = null;
-        float currentDistance = Mathf.Infinity;
-        foreach (Transform child in ConstructionHandler.OrganizerStructures)
-        {
-            if (child.gameObject.tag == searchTag)
-            {
-                currentDistance = Vector3.Distance(worldPoint, child.gameObject.transform.position);
-                if (currentDistance < distance)
-                {
-                    closest = child.gameObject;
-                }
-            }
-        }
-        return closest;
     }
 }

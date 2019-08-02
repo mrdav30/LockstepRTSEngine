@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -42,7 +43,9 @@ namespace RTSLockstep
         [Lockstep(true)]
         public bool IsWindingUp { get; set; }
 
-        long windupCount;
+        private long windupCount;
+
+        public Queue<QStructure> ConstructQueue = new Queue<QStructure>();
 
         #region variables for quick fix for repathing to target's new position
         private const long repathDistance = FixedMath.One * 2;
@@ -112,6 +115,13 @@ namespace RTSLockstep
                 {
                     //charge up attack
                     constructCount += LockstepManager.DeltaTime;
+                }
+
+                // If construction queue not empty and agent not busy, get building
+                if(ConstructQueue.Count > 0 && !IsBuilding)
+                {
+                    QStructure qStructure = ConstructQueue.Dequeue();
+                    SetBuilding(qStructure);
                 }
 
                 if (IsBuilding)
@@ -272,41 +282,51 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetBuilding(string agentCode, Vector2d targetPOS, Vector2d targetRotation, Vector3d targetLocalScale)
+        public void SetBuilding(QStructure qStructure)
         {
-            if (agentCode != null)
+            if (qStructure.IsNotNull())
             {
-                RTSAgent newBuilding = Agent.Controller.CreateAgent(agentCode, targetPOS, targetRotation) as RTSAgent;
-                if (newBuilding.Tag == AgentTag.Wall)
+                RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
+                Structure newStructure = newRTSAgent.GetAbility<Structure>();
+
+                if (newStructure.StructureType == StructureType.Wall)
                 {
-                    newBuilding.transform.localScale = targetLocalScale.ToVector3();
-                    newBuilding.GetAbility<Structure>().IsOverlay = true;
+                    newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
+                    newStructure.IsOverlay = true;
                 }
-                newBuilding.GetAbility<Structure>().BuildSizeLow = (newBuilding.Body.HalfWidth.CeilToInt() * 2);
-                newBuilding.GetAbility<Structure>().BuildSizeHigh = (newBuilding.Body.HalfLength.CeilToInt() * 2);
 
-                if (GridBuilder.Place(newBuilding.GetAbility<Structure>(), newBuilding.Body._position))
+                newStructure.BuildSizeLow = qStructure.BuildSizeLow;
+                newStructure.BuildSizeHigh = qStructure.BuildSizeHigh;
+
+                if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
                 {
-                    Agent.GetCommander().CachedResourceManager.RemoveResources(newBuilding);
-                    newBuilding.SetState(AnimState.Building);
-                    newBuilding.SetPlayingArea(Agent.GetPlayerArea());
-                    newBuilding.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-                    newBuilding.SetCommander(Agent.GetCommander());
+                    Agent.GetCommander().CachedResourceManager.RemoveResources(newRTSAgent);
+                    newRTSAgent.SetState(AnimState.Building);
+                    newRTSAgent.SetPlayingArea(Agent.GetPlayerArea());
+                    newRTSAgent.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+                    newRTSAgent.SetCommander(Agent.GetCommander());
 
-                    newBuilding.gameObject.name = agentCode;
-                    newBuilding.transform.parent = ConstructionHandler.OrganizerStructures.transform;
+                    newRTSAgent.gameObject.name = newRTSAgent.objectName;
+                    if(newStructure.StructureType == StructureType.Wall)
+                    {
+                        newRTSAgent.transform.parent = WallPositioningHelper.OrganizerWalls.transform;
+                    }
+                    else
+                    {
+                        newRTSAgent.transform.parent = ConstructionHandler.OrganizerStructures.transform;
+                    }
 
-                    newBuilding.GetAbility<Structure>().StartConstruction();
+                    newStructure.StartConstruction();
 
                     Agent.Tag = AgentTag.Builder;
 
-                    CurrentProject = newBuilding;
-                    StartBuildMove();
+                    CurrentProject = newRTSAgent;
+                    StartConstructMove();
                 }
                 else
                 {
                     Debug.Log("Couldn't place building!");
-                    newBuilding.Die();
+                    newRTSAgent.Die();
                 }
             }
         }
@@ -325,6 +345,7 @@ namespace RTSLockstep
             {
                 IsBuildMoving = false;
                 Agent.Tag = AgentTag.None;
+                ConstructQueue.Clear();
             }
             else
             {
@@ -344,7 +365,7 @@ namespace RTSLockstep
             StopBuilding(true);
         }
 
-        public virtual void StartBuildMove()
+        public virtual void StartConstructMove()
         {
             IsBuilding = true;
             IsCasting = true;
@@ -372,16 +393,10 @@ namespace RTSLockstep
                 Agent.Tag = AgentTag.Builder;
 
                 // construction hasn't started yet, only a name reference given
-                if (target.Is(DataType.String))
+                if (target.Is(DataType.String) && ConstructQueue.Count > 0)
                 {
-                    Vector2d targetPOS;
-                    Vector2d targetRotation;
-                    Vector3d targetLocalScale;
-                    com.TryGetData<Vector2d>(out targetPOS, 0);
-                    com.TryGetData<Vector2d>(out targetRotation, 1);
-                    com.TryGetData<Vector3d>(out targetLocalScale, 2);
-
-                    SetBuilding((string)target.Value, targetPOS, targetRotation, targetLocalScale);
+                    QStructure qStructure = ConstructQueue.Dequeue();
+                    SetBuilding(qStructure);
                 }
                 // otherwise this is another agent coming to help
                 else if (target.Is(DataType.UShort))
@@ -394,7 +409,7 @@ namespace RTSLockstep
                         if (building && building.GetAbility<Structure>().UnderConstruction())
                         {
                             CurrentProject = building;
-                            StartBuildMove();
+                            StartConstructMove();
                         }
                     }
                 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Assets.Integration.CustomComparison;
+using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
@@ -13,6 +14,13 @@ namespace RTSLockstep
         public int provisionAmount;
         [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
         private ResourceType[] _resourceStorage;
+        public StructureType StructureType;
+        /// <summary>
+        /// Every wall pillar needs a corresponding section of wall to hold up.
+        /// </summary>
+        /// <value>The game object of the wall segement prefab</value>
+        [DrawIf("StructureType", ComparisonType.Equals, StructureType.Wall)]
+        public GameObject WallSegmentGO;
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
         /// </summary>

@@ -4,9 +4,7 @@ using UnityEngine;
 // Component attached to temporary object created for building placement
 public class TempStructure : MonoBehaviour, IBuildable
 {
-    public GameObject EmptyGO;
-    public GameObject EmptyPillarGO;
-    public GameObject EmptyWallSegmentGO;
+    public StructureType StructureType;
 
     /// <summary>
     /// Describes the width and height of the buildable. This value does not change on the buildable.

@@ -6,44 +6,56 @@ using UnityEngine;
 /*
  * Attaches to wall base prefab 
  */
-public class WallPositioningHelper : MonoBehaviour
+
+public static class WallPositioningHelper
 {
+    /// <summary>
+    /// Empty wall prefabs to assist in wall building.
+    /// </summary>
+    /// <value>Empty game objects that contain the meshes for a wall pillar and segment.</value>
+    public static GameObject EmptyWallPillarGO;
+    public static GameObject EmptyWallSegmentGO;
     // distance between pillar to trigger spawning next pillar
     private const int _pillarOffset = 10;
     // distance between last pillar to trigger spawning next wall segment
     private const int _wallSegmentOffset = 1;
     private const int _pillarRangeOffset = 3;
 
-    private Vector3 _currentPos;
-    private bool _isPlacingWall;
+    private static Vector3 _currentPos;
+    private static bool _isPlacingWall = false;
 
-    private GameObject _startPillar;
-    private GameObject _lastPillar;
+    private static GameObject _startPillar;
+    private static GameObject _lastPillar;
 
-    private List<GameObject> _pillarPrefabs;
-    private Dictionary<int, GameObject> _wallPrefabs;
-    private bool _startSnapped;
-    private bool _endSnapped;
+    private static List<GameObject> _pillarPrefabs = new List<GameObject>();
+    private static Dictionary<int, GameObject> _wallPrefabs = new Dictionary<int, GameObject>();
+    private static bool _startSnapped = false;
+    private static bool _endSnapped = false;
 
-    private int _lastWallLength;
+    private static int _lastWallLength = 0;
 
-    public void Setup()
+    public static Transform OrganizerWalls { get; private set; }
+
+    public static void Initialize()
     {
-        _startSnapped = false;
-        _endSnapped = false;
-        _isPlacingWall = false;
-        _pillarPrefabs = new List<GameObject>();
-        _wallPrefabs = new Dictionary<int, GameObject>();
-        _lastWallLength = 0;
+        OrganizerWalls = LSUtility.CreateEmpty().transform;
+        OrganizerWalls.transform.parent = ConstructionHandler.OrganizerStructures;
+        OrganizerWalls.gameObject.name = "OrganizerWalls";
     }
 
-    public void Visualize()
+    public static void Setup()
+    {
+        EmptyWallPillarGO = ConstructionHandler.GetTempStructure();
+        EmptyWallSegmentGO = EmptyWallPillarGO.GetComponent<Structure>().WallSegmentGO;
+    }
+
+    public static void Visualize()
     {
         _currentPos = ConstructionHandler.GetTempStructure().transform.position;
 
         if (!_isPlacingWall)
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, _pillarRangeOffset, "WallPillar");
+            GameObject closestPillar = ClosestPillar(_currentPos, _pillarRangeOffset);
             if (closestPillar.IsNotNull())
             {
                 ConstructionHandler.GetTempStructure().transform.position = closestPillar.transform.position;
@@ -62,7 +74,7 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    public void OnLeftClick()
+    public static void OnLeftClick()
     {
         if (_isPlacingWall)
         {
@@ -74,31 +86,25 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    public void OnRightClick()
-    {
-        if (_isPlacingWall)
-        {
-            ClearTemporaryWalls();
-        }
-    }
-
-    private void CreateStartPillar()
+    private static void CreateStartPillar()
     {
         Vector3 startPos = ConstructionHandler.GetTempStructure().transform.position;
 
         // create initial pole
         if (!_startSnapped)
         {
-            _startPillar = Instantiate(GetComponentInParent<TempStructure>().EmptyPillarGO, startPos, Quaternion.identity) as GameObject;
-            _startPillar.transform.parent = ConstructionHandler.OrganizerStructures;
+            _startPillar = UnityEngine.Object.Instantiate(EmptyWallPillarGO, startPos, Quaternion.identity) as GameObject;
+            _startPillar.transform.parent = OrganizerWalls;
         }
         else
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(startPos, _pillarRangeOffset, "WallPillar");
-            _startPillar = Instantiate(closestPillar);
+            GameObject closestPillar = ClosestPillar(startPos, _pillarRangeOffset);
+            _startPillar = UnityEngine.Object.Instantiate(closestPillar);
         }
 
-        _startPillar.gameObject.name = GetComponentInParent<TempStructure>().EmptyPillarGO.gameObject.name;
+        _startPillar.AddComponent<TempStructure>();
+
+        _startPillar.gameObject.name = EmptyWallPillarGO.gameObject.name;
         _pillarPrefabs.Add(_startPillar);
 
         _lastPillar = _startPillar;
@@ -106,11 +112,10 @@ public class WallPositioningHelper : MonoBehaviour
         _isPlacingWall = true;
     }
 
-    private void SetWall()
+    private static void SetWall()
     {
         //check if last pole was ever set
-        if (!_endSnapped
-            && _pillarPrefabs.Count == _wallPrefabs.Count)
+        if (!_endSnapped && _pillarPrefabs.Count == _wallPrefabs.Count)
         {
             Vector3 endPos = ConstructionHandler.GetTempStructure().transform.position;
             CreateWallPillar(endPos);
@@ -132,12 +137,10 @@ public class WallPositioningHelper : MonoBehaviour
             }
         }
 
-        ClearTemporaryWalls();
-
-        ConstructionHandler.ProcessConstructionQueue();
+        ConstructionHandler.SendConstructCommand();
     }
 
-    private void UpdateWall()
+    private static void UpdateWall()
     {
         if (_pillarPrefabs.Count > 0)
         {
@@ -150,7 +153,7 @@ public class WallPositioningHelper : MonoBehaviour
 
         if (_lastPillar.IsNotNull())
         {
-            GameObject closestPillar = ConstructionHandler.ClosestStructureTo(_currentPos, _pillarRangeOffset, "WallPillar");
+            GameObject closestPillar = ClosestPillar(_currentPos, _pillarRangeOffset);
 
             if (closestPillar.IsNotNull())
             {
@@ -208,16 +211,17 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    private void CreateWallPillar(Vector3 _currentPos)
+    private static void CreateWallPillar(Vector3 _currentPos)
     {
-        GameObject newPillar = Instantiate(GetComponentInParent<TempStructure>().EmptyPillarGO, _currentPos, Quaternion.identity);
-        newPillar.gameObject.name = GetComponentInParent<TempStructure>().EmptyPillarGO.gameObject.name;
+        GameObject newPillar = UnityEngine.Object.Instantiate(EmptyWallPillarGO, _currentPos, Quaternion.identity);
+        newPillar.AddComponent<TempStructure>();
+        newPillar.gameObject.name = EmptyWallPillarGO.gameObject.name;
         newPillar.transform.LookAt(_lastPillar.transform);
         _pillarPrefabs.Add(newPillar);
-        newPillar.transform.parent = ConstructionHandler.OrganizerStructures;
+        newPillar.transform.parent = OrganizerWalls;
     }
 
-    private void CreateWallSegment(Vector3 _currentPos)
+    private static void CreateWallSegment(Vector3 _currentPos)
     {
         int ndx = _pillarPrefabs.IndexOf(_lastPillar);
         //only create wall segment if dictionary doesn't contain pillar index
@@ -225,15 +229,16 @@ public class WallPositioningHelper : MonoBehaviour
         {
             Vector3 middle = 0.5f * (_currentPos + _lastPillar.transform.position);
 
-            GameObject newWall = Instantiate(GetComponentInParent<TempStructure>().EmptyWallSegmentGO, middle, Quaternion.identity);
-            newWall.gameObject.name = GetComponentInParent<TempStructure>().EmptyWallSegmentGO.gameObject.name;
+            GameObject newWall = UnityEngine.Object.Instantiate(EmptyWallSegmentGO, middle, Quaternion.identity);
+            newWall.AddComponent<TempStructure>();
+            newWall.gameObject.name = EmptyWallSegmentGO.gameObject.name;
             newWall.SetActive(true);
             _wallPrefabs.Add(ndx, newWall);
-            newWall.transform.parent = ConstructionHandler.OrganizerStructures;
+            newWall.transform.parent = OrganizerWalls;
         }
     }
 
-    private void RemoveLastWallSegment()
+    private static void RemoveLastWallSegment()
     {
         if (_pillarPrefabs.Count > 0)
         {
@@ -241,14 +246,14 @@ public class WallPositioningHelper : MonoBehaviour
             //don't remove first pillar!
             if (ndx > 0)
             {
-                Destroy(_pillarPrefabs[ndx].gameObject);
+                UnityEngine.Object.Destroy(_pillarPrefabs[ndx].gameObject);
                 _pillarPrefabs.RemoveAt(ndx);
                 if (_wallPrefabs.Count > 0)
                 {
                     GameObject wallSegement;
                     if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
                     {
-                        Destroy(wallSegement.gameObject);
+                        UnityEngine.Object.Destroy(wallSegement.gameObject);
                         _wallPrefabs.Remove(ndx);
                     }
                 }
@@ -256,7 +261,7 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    private void AdjustWallSegments()
+    private static void AdjustWallSegments()
     {
         _startPillar.transform.LookAt(ConstructionHandler.GetTempStructure().transform);
         ConstructionHandler.GetTempStructure().transform.LookAt(_startPillar.transform.position);
@@ -304,7 +309,7 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    public void SetTransparentMaterial(Material material)
+    public static void SetTransparentMaterial(Material material)
     {
         if (_pillarPrefabs.Count > 0)
         {
@@ -335,28 +340,56 @@ public class WallPositioningHelper : MonoBehaviour
         }
     }
 
-    private void ClearTemporaryWalls()
+    private static void ClearTemporaryWalls()
     {
         _startSnapped = false;
         _endSnapped = false;
         _isPlacingWall = false;
 
-
-
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
-            Destroy(_pillarPrefabs[i].gameObject);
+            UnityEngine.Object.Destroy(_pillarPrefabs[i].gameObject);
             if (_wallPrefabs.Count > 0)
             {
                 int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
                 GameObject wallSegement;
                 if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
                 {
-                    Destroy(wallSegement.gameObject);
+                    UnityEngine.Object.Destroy(wallSegement.gameObject);
                 }
             }
         }
         _pillarPrefabs.Clear();
         _wallPrefabs.Clear();
+    }
+
+    public static GameObject ClosestPillar(Vector3 worldPoint, float distance)
+    {
+        GameObject closest = null;
+        float currentDistance = Mathf.Infinity;
+        foreach (Transform child in OrganizerWalls)
+        {
+            currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody._position.ToVector3());
+            if (currentDistance < distance)
+            {
+                closest = child.gameObject;
+            }
+        }
+        return closest;
+    }
+
+    public static void Reset()
+    {
+        ClearTemporaryWalls();
+
+        EmptyWallPillarGO = null;
+        EmptyWallSegmentGO = null;
+
+        _startSnapped = false;
+        _endSnapped = false;
+        _isPlacingWall = false;
+        _pillarPrefabs = new List<GameObject>();
+        _wallPrefabs = new Dictionary<int, GameObject>();
+        _lastWallLength = 0;
     }
 }

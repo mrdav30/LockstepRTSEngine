@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1442506107234032
+--- !u!1 &6754609871906906199
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,13 +8,14 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4593936647011130}
-  - component: {fileID: 114913672116680586}
-  - component: {fileID: 114653234355268730}
-  - component: {fileID: 114186987340042542}
-  - component: {fileID: 114044420032757560}
-  - component: {fileID: 114425325656869004}
-  - component: {fileID: 114168435182015338}
+  - component: {fileID: 7579997167105947725}
+  - component: {fileID: 2016454307140657965}
+  - component: {fileID: 4570811006304116491}
+  - component: {fileID: 4194013975892204290}
+  - component: {fileID: 3016354350036366436}
+  - component: {fileID: 3825574529060809207}
+  - component: {fileID: 6537317269125093331}
+  - component: {fileID: 7409490820694846983}
   m_Layer: 11
   m_Name: HumanWoodWallSegment
   m_TagString: WallSegment
@@ -22,28 +23,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4593936647011130
+--- !u!4 &7579997167105947725
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 7.75, z: 9.1}
   m_Children:
-  - {fileID: 4244015015690164}
+  - {fileID: 7406366410536477363}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114913672116680586
+--- !u!114 &2016454307140657965
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0684b7c0b75662f4795e87a35199eadb, type: 3}
@@ -55,9 +56,9 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
-  Tag: 6
+  Tag: 0
   _selectionRadius: -1
-  _visualCenter: {fileID: 4593936647011130}
+  _visualCenter: {fileID: 7579997167105947725}
   objectName: HumanWoodWallSegment
   AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
@@ -86,14 +87,14 @@ MonoBehaviour:
     isExpanded: 0
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
-    _values: 00000000000000000000000032000000000000000000000000000000
---- !u!114 &114653234355268730
+    _values: 00000000000000000000000000000000000000000000000000000000
+--- !u!114 &4570811006304116491
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff94a4d3f2f0f8042b26ec6eb7a1fdd0, type: 3}
@@ -122,20 +123,20 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfLength: 294912
-    _radius: 245888
+    _radius: 32768
     _immovable: 1
     _basePriority: 0
     _vertices: []
     _height: 294912
-    _positionalTransform: {fileID: 4593936647011130}
-    _rotationalTransform: {fileID: 4593936647011130}
---- !u!114 &114186987340042542
+    _positionalTransform: {fileID: 7579997167105947725}
+    _rotationalTransform: {fileID: 7579997167105947725}
+--- !u!114 &4194013975892204290
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6188705609e5c904fa7598e381bce66d, type: 3}
@@ -144,15 +145,15 @@ MonoBehaviour:
   provisioner: 0
   provisionAmount: 0
   _resourceStorage: 
-  tempStructure: {fileID: 1578406621253206, guid: 75637d50d9290754483c1162ae71692e,
-    type: 3}
---- !u!114 &114044420032757560
+  StructureType: 2
+  WallSegmentGO: {fileID: 0}
+--- !u!114 &3016354350036366436
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
@@ -160,31 +161,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 6553600
   _currentHealth: 0
---- !u!114 &114425325656869004
+--- !u!114 &3825574529060809207
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114168435182015338
+--- !u!114 &6537317269125093331
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442506107234032}
+  m_GameObject: {fileID: 6754609871906906199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c3ba75de30de14a9f9bc835c539797, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapIndex: 0
+  _bonusHeight: 0
+--- !u!114 &7409490820694846983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6754609871906906199}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1686174086830480
+--- !u!1 &7091876777724344593
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -192,10 +207,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4244015015690164}
-  - component: {fileID: 33687107826688398}
-  - component: {fileID: 23681320731040660}
-  - component: {fileID: 114625896093516010}
+  - component: {fileID: 7406366410536477363}
+  - component: {fileID: 6473101603080305497}
+  - component: {fileID: 7873398168245511573}
   m_Layer: 2
   m_Name: Wall
   m_TagString: WallSegment
@@ -203,35 +217,35 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4244015015690164
+--- !u!4 &7406366410536477363
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686174086830480}
+  m_GameObject: {fileID: 7091876777724344593}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 4593936647011130}
+  m_Father: {fileID: 7579997167105947725}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &33687107826688398
+--- !u!33 &6473101603080305497
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686174086830480}
+  m_GameObject: {fileID: 7091876777724344593}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &23681320731040660
+--- !u!23 &7873398168245511573
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686174086830480}
+  m_GameObject: {fileID: 7091876777724344593}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -262,15 +276,3 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &114625896093516010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1686174086830480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 507eaf9c84f40f742ae1986d34c0d5a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

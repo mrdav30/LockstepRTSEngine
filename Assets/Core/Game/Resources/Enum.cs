@@ -1,6 +1,24 @@
 ﻿namespace RTSLockstep
 {
-    public enum CursorState 
+    public enum AgentTag
+    {
+        None,
+        Builder,
+        Harvester,
+        Infantry,
+        Ranged,
+        Convoy,
+        Environment
+    }
+
+    public enum AgentType
+    {
+        Unit,
+        Building,
+        Resource
+    }
+
+    public enum CursorState
     {
         Pointer,
         Select,
@@ -17,7 +35,7 @@
 
     public enum ResourceType
     {
-        Gold, 
+        Gold,
         Provision,
         Ore,
         Crystal,
@@ -25,6 +43,16 @@
         Wood,
         Food,
         Unknown
+    }
+
+    // Used to determine influence on structure
+    public enum StructureType
+    {
+        None,
+        Defensive,
+        Wall,
+        Blocker,
+        SpawnAndResearch
     }
 
     public enum WorkerRole
@@ -46,8 +74,8 @@
         Highlighted,
         None
     }
-	
-	public enum AnimState
+
+    public enum AnimState
     {
         Idling,
         IdlingWood,
