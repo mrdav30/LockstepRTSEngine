@@ -45,7 +45,7 @@ namespace RTSLockstep
 
         private long windupCount;
 
-        public Queue<QStructure> ConstructQueue = new Queue<QStructure>();
+        private Queue<QStructure> ConstructQueue = new Queue<QStructure>();
 
         #region variables for quick fix for repathing to target's new position
         private const long repathDistance = FixedMath.One * 2;
@@ -118,10 +118,9 @@ namespace RTSLockstep
                 }
 
                 // If construction queue not empty and agent not busy, get building
-                if(ConstructQueue.Count > 0 && !IsBuilding)
+                if (ConstructQueue.Count > 0 && !IsBuilding)
                 {
-                    QStructure qStructure = ConstructQueue.Dequeue();
-                    SetBuilding(qStructure);
+                    SetConstruction();
                 }
 
                 if (IsBuilding)
@@ -282,8 +281,9 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetBuilding(QStructure qStructure)
+        public void SetConstruction() //QStructure qStructure
         {
+            QStructure qStructure = ConstructQueue.Dequeue();
             if (qStructure.IsNotNull())
             {
                 RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
@@ -295,8 +295,11 @@ namespace RTSLockstep
                     newStructure.IsOverlay = true;
                 }
 
-                newStructure.BuildSizeLow = qStructure.BuildSizeLow;
-                newStructure.BuildSizeHigh = qStructure.BuildSizeHigh;
+                newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;
+                newRTSAgent.Body.HalfLength = qStructure.HalfLength;
+
+                newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
+                newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
 
                 if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
                 {
@@ -307,7 +310,7 @@ namespace RTSLockstep
                     newRTSAgent.SetCommander(Agent.GetCommander());
 
                     newRTSAgent.gameObject.name = newRTSAgent.objectName;
-                    if(newStructure.StructureType == StructureType.Wall)
+                    if (newStructure.StructureType == StructureType.Wall)
                     {
                         newRTSAgent.transform.parent = WallPositioningHelper.OrganizerWalls.transform;
                     }
@@ -384,32 +387,40 @@ namespace RTSLockstep
 
         protected override void OnExecute(Command com)
         {
-            DefaultData target;
-
-            if (com.TryGetData<DefaultData>(out target))
+            //first check if queue command
+            QueueStructure qStructure;
+            if (com.TryGetData(out qStructure))
             {
-                IsFocused = true;
-                IsBuildMoving = false;
-                Agent.Tag = AgentTag.Builder;
+                ConstructQueue.Enqueue(qStructure.Value);
+            }
+            else
+            {
+                DefaultData target;
+                if (com.TryGetData(out target))
+                {
+                    IsFocused = true;
+                    IsBuildMoving = false;
+                    Agent.Tag = AgentTag.Builder;
 
-                // construction hasn't started yet, only a name reference given
-                if (target.Is(DataType.String) && ConstructQueue.Count > 0)
-                {
-                    QStructure qStructure = ConstructQueue.Dequeue();
-                    SetBuilding(qStructure);
-                }
-                // otherwise this is another agent coming to help
-                else if (target.Is(DataType.UShort))
-                {
-                    RTSAgent tempTarget;
-                    ushort targetValue = (ushort)target.Value;
-                    if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+                    // construction hasn't started yet, only a true flag given
+                    if (target.Is(DataType.Bool) && (bool)target.Value && ConstructQueue.Count > 0)
                     {
-                        RTSAgent building = tempTarget;
-                        if (building && building.GetAbility<Structure>().UnderConstruction())
+                        SetConstruction();
+                    }
+                    // otherwise this is another agent coming to help
+                    // should have been sent local id of target
+                    else if (target.Is(DataType.UShort))
+                    {
+                        RTSAgent tempTarget;
+                        ushort targetValue = (ushort)target.Value;
+                        if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                         {
-                            CurrentProject = building;
-                            StartConstructMove();
+                            RTSAgent building = tempTarget;
+                            if (building && building.GetAbility<Structure>().UnderConstruction())
+                            {
+                                CurrentProject = building;
+                                StartConstructMove();
+                            }
                         }
                     }
                 }

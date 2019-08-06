@@ -477,6 +477,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _internalBody:
+    _preventCulling: 0
     _position:
       x: 0
       y: 0
@@ -487,7 +488,6 @@ MonoBehaviour:
     _velocity:
       x: 0
       y: 0
-    _preventCulling: 0
     ImmovableCollisionDirection:
       x: 0
       y: 0
@@ -504,8 +504,8 @@ MonoBehaviour:
     _basePriority: 0
     _vertices: []
     _height: 524288
-    _positionalTransform: {fileID: 4452996533959122}
-    _rotationalTransform: {fileID: 4452996533959122}
+    _positionalTransform: {fileID: 0}
+    _rotationalTransform: {fileID: 0}
 --- !u!114 &114719505328788896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,6 +522,7 @@ MonoBehaviour:
   provisionAmount: 0
   _resourceStorage: 
   StructureType: 4
+  WallSegmentGO: {fileID: 0}
 --- !u!114 &114973044214609618
 MonoBehaviour:
   m_ObjectHideFlags: 0

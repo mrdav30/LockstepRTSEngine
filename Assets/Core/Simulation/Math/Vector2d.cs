@@ -1,6 +1,5 @@
-using UnityEngine;
-using System.Collections; using FastCollections;
 using System;
+using UnityEngine;
 
 
 namespace RTSLockstep
@@ -86,15 +85,18 @@ namespace RTSLockstep
         {
             temp1 = (this.x * this.x + this.y * this.y);
             if (temp1 == 0)
+            {
                 return 0;
+            }
+
             temp1 >>= FixedMath.SHIFT_AMOUNT;
             return FixedMath.Sqrt(temp1);
         }
 
-		/// <summary>
-		/// Unnormalized square magnitude used for comparisons.
-		/// </summary>
-		/// <returns>The magnitude.</returns>
+        /// <summary>
+        /// Unnormalized square magnitude used for comparisons.
+        /// </summary>
+        /// <returns>The magnitude.</returns>
         public long FastMagnitude()
         {
             return this.x * this.x + this.y * this.y;
@@ -336,195 +338,195 @@ namespace RTSLockstep
         /// </summary>
         /// <returns></returns>
 		public bool NotZero()
-		{
-			return x.MoreThanEpsilon() || y.MoreThanEpsilon();
-		}
+        {
+            return x.MoreThanEpsilon() || y.MoreThanEpsilon();
+        }
 
-		#endregion
+        #endregion
 
-		#region Static Math
+        #region Static Math
 
-		public static readonly Vector2d defaultRotation = new Vector2d(1,0);
-		public static readonly Vector2d up = new Vector2d(0, 1);
-		public static readonly Vector2d right = new Vector2d(1, 0);
-		public static readonly Vector2d down = new Vector2d(0, -1);
-		public static readonly Vector2d left = new Vector2d(-1, 0);
-		public static readonly Vector2d one = new Vector2d(1, 1);
-		public static readonly Vector2d negative = new Vector2d(-1, -1);
-		public static readonly Vector2d zero = new Vector2d(0, 0);
+        public static readonly Vector2d defaultRotation = new Vector2d(1, 0);
+        public static readonly Vector2d up = new Vector2d(0, 1);
+        public static readonly Vector2d right = new Vector2d(1, 0);
+        public static readonly Vector2d down = new Vector2d(0, -1);
+        public static readonly Vector2d left = new Vector2d(-1, 0);
+        public static readonly Vector2d one = new Vector2d(1, 1);
+        public static readonly Vector2d negative = new Vector2d(-1, -1);
+        public static readonly Vector2d zero = new Vector2d(0, 0);
 
-		public static readonly Vector2d radian0 = new Vector2d(1, 0);
-		public static readonly Vector2d radian1 = new Vector2d(0, 1);
-		public static readonly Vector2d radian2 = new Vector2d(-1, 0);
-		public static readonly Vector2d radian3 = new Vector2d(0, -1);
+        public static readonly Vector2d radian0 = new Vector2d(1, 0);
+        public static readonly Vector2d radian1 = new Vector2d(0, 1);
+        public static readonly Vector2d radian2 = new Vector2d(-1, 0);
+        public static readonly Vector2d radian3 = new Vector2d(0, -1);
 
-		public static long Dot(long v1x, long v1y, long v2x, long v2y)
-		{
-			return (v1x * v2x + v1y * v2y) >> FixedMath.SHIFT_AMOUNT;
-		}
+        public static long Dot(long v1x, long v1y, long v2x, long v2y)
+        {
+            return (v1x * v2x + v1y * v2y) >> FixedMath.SHIFT_AMOUNT;
+        }
 
-		public static long Cross(long v1x, long v1y, long v2x, long v2y)
-		{
-			return (v1x * v2y - v1y * v2x) >> FixedMath.SHIFT_AMOUNT;
-		}
+        public static long Cross(long v1x, long v1y, long v2x, long v2y)
+        {
+            return (v1x * v2y - v1y * v2x) >> FixedMath.SHIFT_AMOUNT;
+        }
 
-		/// <summary>
-		/// Note: Not deterministic. Use only for serialization and sending in Commands.
-		/// </summary>
-		/// <returns>The from angle.</returns>
-		/// <param name="angleRadians">Angle.</param>
-		public static Vector2d CreateRotation(double angleRadians)
-		{
-			return new Vector2d(Math.Cos(angleRadians), Math.Sin(angleRadians));
-		}
+        /// <summary>
+        /// Note: Not deterministic. Use only for serialization and sending in Commands.
+        /// </summary>
+        /// <returns>The from angle.</returns>
+        /// <param name="angleRadians">Angle.</param>
+        public static Vector2d CreateRotation(double angleRadians)
+        {
+            return new Vector2d(Math.Cos(angleRadians), Math.Sin(angleRadians));
+        }
 
-		public static Vector2d CreateRotation(float angleRadians)
-		{
-			return CreateRotation((double)angleRadians);
-		}
+        public static Vector2d CreateRotation(float angleRadians)
+        {
+            return CreateRotation((double)angleRadians);
+        }
 
-		/// <summary>
-		/// Deterministic!
-		/// </summary>
-		/// <returns>The rotation.</returns>
-		/// <param name="angle">Angle.</param>
-		public static Vector2d CreateRotation(long angle)
-		{
-			return new Vector2d(FixedMath.Trig.Cos(angle), FixedMath.Trig.Sin(angle));
-		}
+        /// <summary>
+        /// Deterministic!
+        /// </summary>
+        /// <returns>The rotation.</returns>
+        /// <param name="angle">Angle.</param>
+        public static Vector2d CreateRotation(long angle)
+        {
+            return new Vector2d(FixedMath.Trig.Cos(angle), FixedMath.Trig.Sin(angle));
+        }
 
-		public Vector2d ToDirection()
-		{
-			return new Vector2d(y, x);
-		}
+        public Vector2d ToDirection()
+        {
+            return new Vector2d(y, x);
+        }
 
-		public Vector2d ToRotation()
-		{
-			return new Vector2d(y, x);
-		}
+        public Vector2d ToRotation()
+        {
+            return new Vector2d(y, x);
+        }
 
-		#endregion
+        #endregion
 
-		#region Convert
+        #region Convert
 
-		public override string ToString()
-		{
-			return (
-			        "(" +
-			        Math.Round(FixedMath.ToDouble(this.x), 2, MidpointRounding.AwayFromZero).ToString() +
-			        ", " +
-			        Math.Round(FixedMath.ToDouble(this.y), 2, MidpointRounding.AwayFromZero) +
-			        ")"
-			);
-		}
+        public override string ToString()
+        {
+            return (
+                    "(" +
+                    Math.Round(FixedMath.ToDouble(this.x), 2, MidpointRounding.AwayFromZero).ToString() +
+                    ", " +
+                    Math.Round(FixedMath.ToDouble(this.y), 2, MidpointRounding.AwayFromZero) +
+                    ")"
+            );
+        }
 
-		public Vector2 ToVector2()
-		{
-			return new Vector2(
-				(float)FixedMath.ToDouble(this.x),
-				(float)FixedMath.ToDouble(this.y)
-			);
-		}
+        public Vector2 ToVector2()
+        {
+            return new Vector2(
+                (float)FixedMath.ToDouble(this.x),
+                (float)FixedMath.ToDouble(this.y)
+            );
+        }
 
-		public Vector3d ToVector3d(long z = 0)
-		{
-			return new Vector3d(x, y, z);
-		}
+        public Vector3d ToVector3d(long z = 0)
+        {
+            return new Vector3d(x, y, z);
+        }
 
-		public Vector3 ToVector3(float z = 0f)
-		{
-			return new Vector3((float)FixedMath.ToDouble(this.x), z, (float)FixedMath.ToDouble(this.y));
-		}
+        public Vector3 ToVector3(float z = 0f)
+        {
+            return new Vector3((float)FixedMath.ToDouble(this.x), z, (float)FixedMath.ToDouble(this.y));
+        }
 
 
 
-		#endregion
+        #endregion
 
-		public override bool Equals(object obj)
-		{
-			if (obj is Vector2d)
-			{
-				return (Vector2d)obj == this;
-			}
-			return false;
-		}
+        public override bool Equals(object obj)
+        {
+            if (obj is Vector2d)
+            {
+                return (Vector2d)obj == this;
+            }
+            return false;
+        }
 
-		#region Operators
+        #region Operators
 
-		public static Vector2d operator +(Vector2d v1, Vector2d v2)
-		{
-			return new Vector2d(v1.x + v2.x, v1.y + v2.y);
-		}
+        public static Vector2d operator +(Vector2d v1, Vector2d v2)
+        {
+            return new Vector2d(v1.x + v2.x, v1.y + v2.y);
+        }
 
-		public static Vector2d operator -(Vector2d v1, Vector2d v2)
-		{
-			return new Vector2d(v1.x - v2.x, v1.y - v2.y);
-		}
+        public static Vector2d operator -(Vector2d v1, Vector2d v2)
+        {
+            return new Vector2d(v1.x - v2.x, v1.y - v2.y);
+        }
 
-		public static Vector2d operator *(Vector2d v1, long mag)
-		{
-			return new Vector2d((v1.x * mag) >> FixedMath.SHIFT_AMOUNT, (v1.y * mag) >> FixedMath.SHIFT_AMOUNT);
-		}
+        public static Vector2d operator *(Vector2d v1, long mag)
+        {
+            return new Vector2d((v1.x * mag) >> FixedMath.SHIFT_AMOUNT, (v1.y * mag) >> FixedMath.SHIFT_AMOUNT);
+        }
 
-		public static Vector2d operator *(Vector2d v1, int mag)
-		{
-			return new Vector2d((v1.x * mag), (v1.y * mag));
-		}
+        public static Vector2d operator *(Vector2d v1, int mag)
+        {
+            return new Vector2d((v1.x * mag), (v1.y * mag));
+        }
 
-		public static Vector2d operator /(Vector2d v1, long div)
-		{
-			return new Vector2d(((v1.x << FixedMath.SHIFT_AMOUNT) / div), (v1.y << FixedMath.SHIFT_AMOUNT) / div);
-		}
+        public static Vector2d operator /(Vector2d v1, long div)
+        {
+            return new Vector2d(((v1.x << FixedMath.SHIFT_AMOUNT) / div), (v1.y << FixedMath.SHIFT_AMOUNT) / div);
+        }
 
-		public static Vector2d operator /(Vector2d v1, int div)
-		{
-			return new Vector2d((v1.x / div), v1.y / div);
-		}
+        public static Vector2d operator /(Vector2d v1, int div)
+        {
+            return new Vector2d((v1.x / div), v1.y / div);
+        }
 
-		public static Vector2d operator >>(Vector2d v1, int shift)
-		{
-			return new Vector2d(v1.x >> shift, v1.y >> shift);
-		}
+        public static Vector2d operator >>(Vector2d v1, int shift)
+        {
+            return new Vector2d(v1.x >> shift, v1.y >> shift);
+        }
 
-		public static bool operator ==(Vector2d v1, Vector2d v2)
-		{
-			return v1.x == v2.x && v1.y == v2.y;
-		}
+        public static bool operator ==(Vector2d v1, Vector2d v2)
+        {
+            return v1.x == v2.x && v1.y == v2.y;
+        }
 
-		public static bool operator !=(Vector2d v1, Vector2d v2)
-		{
-			return v1.x != v2.x || v1.y != v2.y;
-		}
+        public static bool operator !=(Vector2d v1, Vector2d v2)
+        {
+            return v1.x != v2.x || v1.y != v2.y;
+        }
 
-		#endregion
+        #endregion
 
-		public long GetLongHashCode()
-		{
-			return x * 31 + y * 7;
-		}
+        public long GetLongHashCode()
+        {
+            return x * 31 + y * 7;
+        }
 
-		public int GetStateHash()
-		{
-			return (int)(GetLongHashCode() % int.MaxValue);
-		}
+        public int GetStateHash()
+        {
+            return (int)(GetLongHashCode() % int.MaxValue);
+        }
 
-		public override int GetHashCode()
-		{
-			return this.GetStateHash();
-		}
+        public override int GetHashCode()
+        {
+            return this.GetStateHash();
+        }
 
-		public void Write(Writer writer)
-		{
-			writer.Write(this.x);
-			writer.Write(this.y);
-		}
+        public void Write(Writer writer)
+        {
+            writer.Write(this.x);
+            writer.Write(this.y);
+        }
 
-		public void Read(Reader reader)
-		{
-			this.x = reader.ReadLong();
-			this.y = reader.ReadLong();
-		}
-	}
+        public void Read(Reader reader)
+        {
+            this.x = reader.ReadLong();
+            this.y = reader.ReadLong();
+        }
+    }
 
 
 }

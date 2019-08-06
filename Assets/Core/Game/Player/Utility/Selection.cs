@@ -70,7 +70,10 @@ namespace RTSLockstep
             for (int i = 0; i < selectedAgentLocalIDs.Count; i++)
             {
                 ushort id = selectedAgentLocalIDs[i];
-                if (id > highestID) highestID = id;
+                if (id > highestID)
+                {
+                    highestID = id;
+                }
             }
             int headerLength = (highestID + 1 - 1) / 8 + 1;
             Header = new BitArray(headerLength, false);

@@ -27,7 +27,7 @@ namespace RTSLockstep
             RegisterDefaults();
         }
 
-        static void RegisterDefaults()
+        private static void RegisterDefaults()
         {
             //			#if UNITY_IOS
             Register<DefaultData>();
@@ -37,6 +37,7 @@ namespace RTSLockstep
             Register<Influence>();
             Register<Vector2d>();
             Register<Vector3d>();
+            Register<QueueStructure>();
             //			#else
             //				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
             //				{

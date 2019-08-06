@@ -259,7 +259,10 @@ namespace RTSLockstep
         public static void BoxAgent(RTSAgent agent)
         {
             if (ReferenceEquals(agent, null))
+            {
                 return;
+            }
+
             SelectedAgents.Add(agent);
             agent.IsHighlighted = true;
         }

@@ -7,7 +7,8 @@ public static class ConstructionHandler
 {
     #region Properties
     private static GameObject tempObject;
-    private static TempStructure tempStructure;
+    private static Structure tempStructure;
+    private static LSBody tempStructureBody;
     private static Vector3 lastLocation;
     private static RTSAgent cachedAgent;
     private static bool _findingPlacement = false;
@@ -76,8 +77,15 @@ public static class ConstructionHandler
             else
             {
                 // only constructing 1 object, place it in the agents construct queue
-                SetConstructionQueue(tempObject);
-                SendConstructCommand();
+                if (_validPlacement)
+                {
+                    SetConstructionQueue(tempObject);
+                    SendConstructCommand();
+                }
+                else
+                {
+                    Debug.Log("Invalid end placement!");
+                }
             }
         }
     }
@@ -109,13 +117,10 @@ public static class ConstructionHandler
                 {
                     _findingPlacement = true;
                     SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
-                    tempObject.gameObject.name = buildingTemplate.objectName;
+                    tempObject.gameObject.name = buildingName;
 
-                    tempObject.AddComponent<TempStructure>();
-                    tempStructure = tempObject.GetComponent<TempStructure>();
-                    tempStructure.StructureType = buildingTemplate.GetComponent<Structure>().StructureType;
-
-                    if (tempStructure.GetComponent<TempStructure>().StructureType == StructureType.Wall)
+                    tempStructure = tempObject.GetComponent<Structure>();
+                    if (tempStructure.StructureType == StructureType.Wall)
                     {
                         // walls require a little help since they are click and drag
                         _constructingWall = true;
@@ -123,8 +128,11 @@ public static class ConstructionHandler
                         WallPositioningHelper.Setup();
                     }
 
-                    tempStructure.BuildSizeLow = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfWidth.CeilToInt() * 2);
-                    tempStructure.BuildSizeHigh = (buildingTemplate.GetComponent<UnityLSBody>().InternalBody.HalfLength.CeilToInt() * 2);
+                    tempStructureBody = tempObject.GetComponent<UnityLSBody>().InternalBody;
+
+                    // structure size is 2 times the size of halfwidth & halfheight
+                    tempStructure.BuildSizeLow = (tempStructureBody.HalfWidth.CeilToInt() * 2);
+                    tempStructure.BuildSizeHigh = (tempStructureBody.HalfLength.CeilToInt() * 2);
 
                     cachedAgent = constructingAgent;
 
@@ -139,7 +147,7 @@ public static class ConstructionHandler
         return _constructingWall || _findingPlacement;
     }
 
-    public static GameObject GetTempStructure()
+    public static GameObject GetTempStructureGO()
     {
         return tempObject;
     }
@@ -150,24 +158,31 @@ public static class ConstructionHandler
         if (_findingPlacement && !_constructingWall)
         {
             //  keep track of previous values to update agent's size
-            int prevLow = tempStructure.BuildSizeLow;
-            int prevhigh = tempStructure.BuildSizeHigh;
+            long prevWidth = tempStructureBody.HalfWidth;
+            long prevLength = tempStructureBody.HalfLength;
+
             switch (direction)
             {
                 case UserInputKeyMappings.RotateLeftShortCut:
                     tempStructure.transform.Rotate(0, 90, 0);
-                    tempStructure.BuildSizeLow = prevhigh;
-                    tempStructure.BuildSizeHigh = prevLow;
+                    AdjustStructureSize(prevLength, prevWidth);
                     break;
                 case UserInputKeyMappings.RotateRightShortCut:
                     tempStructure.transform.Rotate(0, -90, 0);
-                    tempStructure.BuildSizeLow = prevhigh;
-                    tempStructure.BuildSizeHigh = prevLow;
+                    AdjustStructureSize(prevLength, prevWidth);
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    public static void AdjustStructureSize(long newWidth, long newLength)
+    {
+        tempStructureBody.HalfWidth = newWidth;
+        tempStructureBody.HalfLength = newLength;
+        tempStructure.BuildSizeLow = (tempStructureBody.HalfWidth.CeilToInt() * 2);
+        tempStructure.BuildSizeHigh = (tempStructureBody.HalfLength.CeilToInt() * 2);
     }
 
     public static void FindStructureLocation()
@@ -186,37 +201,33 @@ public static class ConstructionHandler
         }
     }
 
-    public static void SetConstructionQueue(GameObject buildingProject)
+    public static void SetConstructionQueue(GameObject buildingProject, long adjustHalfWidth = 0, long adjustHalfLength = 0)
     {
         QStructure qStructure = new QStructure();
         qStructure.StructureName = buildingProject.gameObject.name;
         qStructure.BuildPoint = new Vector2d(buildingProject.transform.localPosition.x, buildingProject.transform.localPosition.z);
         qStructure.RotationPoint = new Vector2d(buildingProject.transform.localRotation.w, buildingProject.transform.localRotation.y);
         qStructure.LocalScale = new Vector3d(buildingProject.transform.localScale);
-        qStructure.BuildSizeLow = buildingProject.GetComponent<TempStructure>().BuildSizeLow;
-        qStructure.BuildSizeHigh = buildingProject.GetComponent<TempStructure>().BuildSizeHigh;
 
-        cachedAgent.GetAbility<Construct>().ConstructQueue.Enqueue(qStructure);
+        qStructure.HalfWidth = adjustHalfWidth > 0 ? adjustHalfWidth : tempStructureBody.HalfWidth;
+        qStructure.HalfLength = adjustHalfLength > 0 ? adjustHalfLength : tempStructureBody.HalfLength;
+
+        Command queueCommand = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+        queueCommand.Add(new QueueStructure(qStructure));
+
+        UserInputHelper.SendCommand(queueCommand);
     }
 
     public static void SendConstructCommand()
     {
-        //   if (GridBuilder.CanPlace())
-        if (_validPlacement)
-        {
-            //Reset construction handler
-            Reset();
+        //Reset construction handler
+        Reset();
 
-            // send build command
-            Command buildCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-            buildCom.Add<DefaultData>(new DefaultData(DataType.String, tempObject.name));
+        // send construct command
+        Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+        constructCom.Add(new DefaultData(DataType.Bool, true));
 
-            UserInputHelper.SendCommand(buildCom);
-        }
-        else
-        {
-            Debug.Log("Invalid end placement!");
-        }
+        UserInputHelper.SendCommand(constructCom);
     }
 
     public static void Reset()
@@ -231,6 +242,7 @@ public static class ConstructionHandler
         //temp structure no longer required
         Object.Destroy(tempObject);
         tempStructure = null;
+        tempStructureBody = null;
         cachedAgent = null;
         // remove temporary structure from grid
         GridBuilder.Reset();

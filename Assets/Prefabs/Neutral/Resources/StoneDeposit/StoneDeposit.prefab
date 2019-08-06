@@ -334,6 +334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _internalBody:
+    _preventCulling: 0
     _position:
       x: 0
       y: 0
@@ -344,19 +345,18 @@ MonoBehaviour:
     _velocity:
       x: 0
       y: 0
-    _preventCulling: 0
-    RealPoints: []
-    Edges: []
-    EdgeNorms: []
     ImmovableCollisionDirection:
       x: 0
       y: 0
+    RealPoints: []
+    Edges: []
+    EdgeNorms: []
     _shape: 1
     _isTrigger: 0
     _layer: 0
     _halfWidth: 163840
-    _halfHeight: 163840
-    _radius: 131072
+    _halfLength: 32768
+    _radius: 114688
     _immovable: 1
     _basePriority: 0
     _vertices: []

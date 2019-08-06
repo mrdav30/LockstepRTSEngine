@@ -82,10 +82,10 @@ namespace RTSLockstep
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
-                    harvestCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                    harvestCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
 
                     harvestCom.ControllerID = cachedAgent.Controller.ControllerID;
-                    harvestCom.Add<Influence>(new Influence(cachedAgent));
+                    harvestCom.Add(new Influence(cachedAgent));
 
                     CommandManager.SendCommand(harvestCom);
                 }

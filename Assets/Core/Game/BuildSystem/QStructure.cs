@@ -7,7 +7,7 @@
         public Vector2d RotationPoint { get; set; }
         public Vector3d LocalScale { get; set; }
 
-        public int BuildSizeLow { get; set; }
-        public int BuildSizeHigh { get; set; }
+        public long HalfWidth { get; set; }
+        public long HalfLength { get; set; }
     }
 }

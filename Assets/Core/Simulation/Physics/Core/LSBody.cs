@@ -15,15 +15,6 @@ namespace RTSLockstep
     public partial class LSBody
     {
         #region Core deterministic variables
-        [SerializeField] //For inspector debugging
-        internal Vector2d _position;
-        [SerializeField]
-        internal Vector2d _rotation = Vector2d.up;
-        [SerializeField, FixedNumber]
-        internal long _heightPos;
-        [SerializeField]
-        public Vector2d _velocity;
-
         //TODO: Account for teleports when culling.
         /// <summary>
         /// Used to prevent distance culling for very large objects.
@@ -55,7 +46,8 @@ namespace RTSLockstep
 
         [Lockstep]
         public bool PositionChanged { get; set; }
-
+        [SerializeField] //For inspector debugging
+        internal Vector2d _position;
         [Lockstep]
         public Vector2d Position
         {
@@ -85,6 +77,8 @@ namespace RTSLockstep
                 _rotationChanged = value;
             }
         }
+        [SerializeField]
+        internal Vector2d _rotation = Vector2d.up;
         [Lockstep]
         public Vector2d Rotation
         {
@@ -98,8 +92,11 @@ namespace RTSLockstep
                 this.RotationChanged = true;
             }
         }
+
         [Lockstep]
         public bool HeightPosChanged { get; set; }
+        [SerializeField, FixedNumber]
+        internal long _heightPos;
         [Lockstep]
         public long HeightPos
         {
@@ -110,12 +107,15 @@ namespace RTSLockstep
                 this.HeightPosChanged = true;
             }
         }
+
         [Lockstep]
         public bool VelocityChanged { get; set; }
         /// <summary>
         /// Units per second the unit is moving.
         /// </summary>
         /// <value>The velocity.</value>
+        [SerializeField]
+        public Vector2d _velocity;
         [Lockstep]
         public Vector2d Velocity
         {
@@ -231,37 +231,59 @@ namespace RTSLockstep
 
         [SerializeField]
         protected ColliderType _shape = ColliderType.None;
-
         public ColliderType Shape { get { return _shape; } }
 
         [SerializeField]
         private bool _isTrigger;
-
         public bool IsTrigger { get { return _isTrigger; } }
 
         [SerializeField]
         private int _layer;
-
         public int Layer { get { return _layer; } }
 
+        [Lockstep]
+        public bool WidthChanged { get; set; }
         [SerializeField, FixedNumber]
         private long _halfWidth = FixedMath.Half;
-
-        public long HalfWidth { get { return _halfWidth; } }
-
+        [HideInInspector]
+        public long HalfWidth
+        {
+            get { return _halfWidth; }
+            set
+            {
+                _halfWidth = value;
+                this.WidthChanged = true;
+            }
+        }
+        [Lockstep]
+        public bool LengthChanged { get; set; }
         [SerializeField, FixedNumber]
-        public long _halfLength = FixedMath.Half;
-
-        public long HalfLength { get { return _halfLength; } }
+        private long _halfLength = FixedMath.Half;
+        [HideInInspector]
+        public long HalfLength
+        {
+            get { return _halfLength; }
+            set
+            {
+                _halfLength = value;
+                this.LengthChanged = true;
+            }
+        }
 
         [SerializeField, FixedNumber]
         protected long _radius = FixedMath.Half;
-
         /// <summary>
         /// Gets the bounding circle radius.
         /// </summary>
         /// <value>The radius.</value>
-        public long Radius { get { return _radius; } }
+        public long Radius
+        {
+            get { return _radius; }
+            set
+            {
+                _radius = value;
+            }
+        }
 
         [SerializeField]
         protected bool _immovable;
@@ -269,37 +291,27 @@ namespace RTSLockstep
         {
             return _immovable;
         }
-
         public bool Immovable { get; private set; }
 
         [SerializeField]
         private int _basePriority;
-
         public int BasePriority { get { return _basePriority; } }
 
         [SerializeField]
         private Vector2d[] _vertices;
-
         public Vector2d[] Vertices { get { return _vertices; } }
 
         [SerializeField, FixedNumber]
         private long _height = FixedMath.One;
-
         public long Height { get { return _height; } }
-
 
         [SerializeField]
         private Transform _positionalTransform;
-
         public Transform PositionalTransform { get; set; }
-
 
         [SerializeField]
         private Transform _rotationalTransform;
-
         public Transform RotationalTransform { get; set; }
-
-
         #endregion
 
         #region Runtime Values
@@ -479,7 +491,10 @@ namespace RTSLockstep
         private void AddChild(LSBody child)
         {
             if (Children == null)
+            {
                 Children = new FastBucket<LSBody>();
+            }
+
             Children.Add(child);
         }
 
@@ -668,9 +683,14 @@ namespace RTSLockstep
                 }
                 //PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
                 if (CanSetVisualPosition)
+                {
                     PositionalTransform.position = Vector3.Lerp(lastVisualPos, VisualPosition, (float)PhysicsManager.ExpectedAccumulation);
+                }
+
                 if (CanSetvisualRotation)
+                {
                     RotationalTransform.rotation = Quaternion.Slerp(lastvisualRotationation, visualRotation, (float)PhysicsManager.ExpectedAccumulation);
+                }
             }
         }
 
@@ -851,12 +871,13 @@ namespace RTSLockstep
                     long maxDistance = this.Radius + FixedMath.Half;
                     maxDistance *= maxDistance;
                     if ((this._position - position).FastMagnitude() > maxDistance)
+                    {
                         return false;
+                    }
                     goto case ColliderType.AABox;
                 case ColliderType.AABox:
                     return position.x + FixedMath.Half > this.XMin && position.x - FixedMath.Half < this.XMax
                     && position.y + FixedMath.Half > this.YMin && position.y - FixedMath.Half < this.YMax;
-                //break;
                 case ColliderType.Polygon:
                     for (int i = this.EdgeNorms.Length - 1; i >= 0; i--)
                     {
@@ -874,13 +895,10 @@ namespace RTSLockstep
                         }
                     }
                     return true;
-                    //break;
             }
-
 
             return false;
         }
-
 
         internal void Reset()
         {
@@ -928,15 +946,18 @@ namespace RTSLockstep
                 {
                     case ColliderType.Circle:
                         return this.Radius * 2;
-                    //break;
                     case ColliderType.AABox:
                         if (this.HalfWidth > this.HalfLength)
+                        {
                             return HalfWidth * 2;
+                        }
                         else
+                        {
                             return HalfLength * 2;
-                        //break;
+                        }
+                    default:
+                        return 0;
                 }
-                return 0;
             }
         }
 

@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 6754609871906906199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 7.75, z: 9.1}
+  m_LocalScale: {x: 1, y: 8, z: 10}
   m_Children:
   - {fileID: 7406366410536477363}
   m_Father: {fileID: 0}
@@ -101,6 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _internalBody:
+    _preventCulling: 0
     _position:
       x: 0
       y: 0
@@ -111,7 +112,6 @@ MonoBehaviour:
     _velocity:
       x: 0
       y: 0
-    _preventCulling: 0
     ImmovableCollisionDirection:
       x: 0
       y: 0
@@ -122,14 +122,22 @@ MonoBehaviour:
     _isTrigger: 0
     _layer: 0
     _halfWidth: 32768
-    _halfLength: 294912
-    _radius: 32768
+    _halfLength: 327680
+    _radius: 327680
     _immovable: 1
     _basePriority: 0
-    _vertices: []
+    _vertices:
+    - x: -32768
+      y: -327680
+    - x: -32768
+      y: 327680
+    - x: 32768
+      y: 327680
+    - x: 32768
+      y: -327680
     _height: 294912
-    _positionalTransform: {fileID: 7579997167105947725}
-    _rotationalTransform: {fileID: 7579997167105947725}
+    _positionalTransform: {fileID: 0}
+    _rotationalTransform: {fileID: 0}
 --- !u!114 &4194013975892204290
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -54,9 +54,6 @@ namespace RTSLockstep
 
         private void Serialize()
         {
-            //   int headerLength = (InfluencedAgentLocalID + 1 - 1) / 8 + 1;
-            //  Header = new BitArray(headerLength, false);
-
             Data.FastClear();
             ushort highestID = 0;
 
