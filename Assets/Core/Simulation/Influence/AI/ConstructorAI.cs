@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using RTSLockstep.Data;
+﻿using RTSLockstep.Data;
 using System;
 
 namespace RTSLockstep
@@ -20,9 +19,9 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.Tag != AgentTag.Builder 
+            if (cachedAgent.Tag != AgentTag.Builder
                 || cachedConstruct.IsBuilding
-                || cachedConstruct.ConstructQueue.Count > 0)
+                || cachedConstruct.HasStructuresQueued())
             {
                 searchCount -= 1;
                 return false;

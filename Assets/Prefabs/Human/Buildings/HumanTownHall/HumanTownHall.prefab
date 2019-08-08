@@ -368,8 +368,8 @@ MonoBehaviour:
     _basePriority: 0
     _vertices: []
     _height: 655360
-    _positionalTransform: {fileID: 0}
-    _rotationalTransform: {fileID: 0}
+    _positionalTransform: {fileID: 4116143295185150}
+    _rotationalTransform: {fileID: 4116143295185150}
 --- !u!114 &114180653622063118
 MonoBehaviour:
   m_ObjectHideFlags: 0

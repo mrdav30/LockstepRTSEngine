@@ -521,7 +521,7 @@ namespace RTSLockstep
 
         public bool IsOwnedBy(AgentController owner)
         {
-            if (Controller.Equals(owner))
+            if (Controller.IsNotNull() && Controller.Equals(owner))
             {
                 return true;
             }

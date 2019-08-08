@@ -1,6 +1,5 @@
 ﻿using Assets.Integration.CustomComparison;
 using Newtonsoft.Json;
-using System;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -36,7 +35,8 @@ namespace RTSLockstep
         public bool IsMoving { get; set; }
         public bool IsOverlay { get; set; }
 
-        private bool _needsBuilding;
+        private bool _needsConstruction;
+        private bool _constructionStarted;
         private bool _needsRepair;
         private bool _provisioned;
         private int upgradeLevel;
@@ -53,14 +53,14 @@ namespace RTSLockstep
 
         protected override void OnInitialize()
         {
-            _needsBuilding = false;
+            _needsConstruction = false;
             _needsRepair = false;
             _provisioned = false;
         }
 
         protected override void OnSimulate()
         {
-            if (!_needsBuilding && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
+            if (!_needsConstruction && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
             {
                 _needsRepair = true;
             }
@@ -75,10 +75,9 @@ namespace RTSLockstep
             }
         }
 
-        public void StartConstruction()
+        public void AwaitConstruction()
         {
-            // Agent.Body.CalculateBounds();
-            _needsBuilding = true;
+            _needsConstruction = true;
             IsCasting = true;
             cachedHealth.HealthAmount = 0;
             if (cachedRally)
@@ -89,16 +88,21 @@ namespace RTSLockstep
 
         public bool UnderConstruction()
         {
-            return this._needsBuilding;
+            return this._needsConstruction;
         }
 
         public void Construct(long amount)
         {
+            //if (!_constructionStarted)
+            //{
+            //    _constructionStarted = true;
+            //    ConstructionHandler.RestoreMaterial(Agent.gameObject);
+            //}
             cachedHealth.HealthAmount += amount;
             if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
             {
                 cachedHealth.HealthAmount = cachedHealth.BaseHealth;
-                _needsBuilding = false;
+                _needsConstruction = false;
                 IsCasting = false;
                 Agent.SetTeamColor();
                 if (provisioner && !_provisioned)
@@ -146,14 +150,16 @@ namespace RTSLockstep
             {
                 Agent.GetCommander().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
+
+            GridBuilder.Unbuild(this);
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            SaveManager.WriteBoolean(writer, "NeedsBuilding", _needsBuilding);
+            SaveManager.WriteBoolean(writer, "NeedsBuilding", _needsConstruction);
             SaveManager.WriteBoolean(writer, "NeedsRepair", _needsRepair);
-            if (_needsBuilding)
+            if (_needsConstruction)
             {
                 SaveManager.WriteRect(writer, "PlayingArea", Agent.GetPlayerArea());
             }
@@ -165,7 +171,7 @@ namespace RTSLockstep
             switch (propertyName)
             {
                 case "NeedsBuilding":
-                    _needsBuilding = (bool)readValue;
+                    _needsConstruction = (bool)readValue;
                     break;
                 case "NeedsRepair":
                     _needsRepair = (bool)readValue;

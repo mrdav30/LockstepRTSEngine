@@ -247,6 +247,8 @@ public static class WallPositioningHelper
     {
         GameObject newPillar = UnityEngine.Object.Instantiate(tempWallPillarGO, _currentPos, Quaternion.identity);
         newPillar.gameObject.name = tempWallPillarGO.gameObject.name;
+        ConstructionHandler.SetTransparentMaterial(newPillar, GameResourceManager.AllowedMaterial);
+
         if (_lastPillar)
         {
             newPillar.transform.LookAt(_lastPillar.transform);
@@ -268,10 +270,10 @@ public static class WallPositioningHelper
             Vector3 middle = 0.5f * (_currentPos + _lastPillar.transform.position);
 
             GameObject newWall = UnityEngine.Object.Instantiate(tempWallSegmentGO, middle, Quaternion.identity);
+            newWall.gameObject.name = tempWallSegmentGO.gameObject.name;
+            ConstructionHandler.SetTransparentMaterial(newWall, GameResourceManager.AllowedMaterial);
 
             _originalWallLength = (long)newWall.transform.localScale.z;
-
-            newWall.gameObject.name = tempWallSegmentGO.gameObject.name;
             newWall.SetActive(true);
             _wallPrefabs.Add(ndx, newWall);
             newWall.transform.parent = OrganizerWalls;
@@ -345,37 +347,6 @@ public static class WallPositioningHelper
                 }
 
                 adjustBasePole = _pillarPrefabs[i];
-            }
-        }
-    }
-
-    public static void SetTransparentMaterial(Material material)
-    {
-        if (_pillarPrefabs.Count > 0)
-        {
-            List<Renderer> renderers = new List<Renderer>();
-
-            for (int i = 0; i < _pillarPrefabs.Count; i++)
-            {
-                if (!(_startSnapped && i == 0))
-                {
-                    renderers.Add(_pillarPrefabs[i].GetComponentInChildren<Renderer>());
-
-                    if (_wallPrefabs.Count > 0)
-                    {
-                        int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
-                        GameObject wallSegement;
-                        if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
-                        {
-                            renderers.Add(wallSegement.GetComponentInChildren<Renderer>());
-                        }
-                    }
-
-                    foreach (Renderer renderer in renderers)
-                    {
-                        renderer.material = material;
-                    }
-                }
             }
         }
     }

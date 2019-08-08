@@ -94,7 +94,8 @@ public static class ConstructionHandler
     {
         if (IsFindingBuildingLocation())
         {
-            Reset();
+            // send false to clear agent's construct queue
+            SendConstructCommand(false);
         }
     }
 
@@ -218,14 +219,14 @@ public static class ConstructionHandler
         UserInputHelper.SendCommand(queueCommand);
     }
 
-    public static void SendConstructCommand()
+    public static void SendConstructCommand(bool startConstruction = true)
     {
         //Reset construction handler
         Reset();
 
         // send construct command
         Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-        constructCom.Add(new DefaultData(DataType.Bool, true));
+        constructCom.Add(new DefaultData(DataType.Bool, startConstruction));
 
         UserInputHelper.SendCommand(constructCom);
     }
@@ -248,19 +249,33 @@ public static class ConstructionHandler
         GridBuilder.Reset();
     }
 
-    private static void SetTransparentMaterial(GameObject structure, Material material)
+    public static void SetTransparentMaterial(GameObject structure, Material material, bool storeMaterial = false)
     {
-        if (_constructingWall)
-        {
-            WallPositioningHelper.SetTransparentMaterial(material);
-        }
-        else
-        {
-            Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
+        Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
 
-            foreach (Renderer renderer in renderers)
+        foreach (Renderer renderer in renderers)
+        {
+            if (storeMaterial)
             {
-                renderer.material = material;
+                if (!oldMaterials.ContainsKey(renderer.name))
+                {
+                    oldMaterials.Add(renderer.name, renderer.material);
+                }
+            }
+
+            renderer.material = material;
+        }
+    }
+
+    public static void RestoreMaterial(GameObject structure)
+    {
+        Renderer[] renderers = structure.GetComponentsInChildren<Renderer>();
+
+        foreach (Renderer renderer in renderers)
+        {
+            if (oldMaterials.ContainsKey(renderer.name))
+            {
+                renderer.material = oldMaterials[renderer.name];
             }
         }
     }

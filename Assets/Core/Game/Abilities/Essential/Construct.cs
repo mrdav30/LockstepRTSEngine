@@ -281,13 +281,15 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetConstruction() //QStructure qStructure
+        public void SetConstruction()
         {
             QStructure qStructure = ConstructQueue.Dequeue();
             if (qStructure.IsNotNull())
             {
                 RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
                 Structure newStructure = newRTSAgent.GetAbility<Structure>();
+
+            //    ConstructionHandler.SetTransparentMaterial(newRTSAgent.gameObject, GameResourceManager.AllowedMaterial, true);
 
                 if (newStructure.StructureType == StructureType.Wall)
                 {
@@ -310,16 +312,10 @@ namespace RTSLockstep
                     newRTSAgent.SetCommander(Agent.GetCommander());
 
                     newRTSAgent.gameObject.name = newRTSAgent.objectName;
-                    if (newStructure.StructureType == StructureType.Wall)
-                    {
-                        newRTSAgent.transform.parent = WallPositioningHelper.OrganizerWalls.transform;
-                    }
-                    else
-                    {
-                        newRTSAgent.transform.parent = ConstructionHandler.OrganizerStructures.transform;
-                    }
+                    newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform 
+                        : ConstructionHandler.OrganizerStructures.transform;
 
-                    newStructure.StartConstruction();
+                    newStructure.AwaitConstruction();
 
                     Agent.Tag = AgentTag.Builder;
 
@@ -402,10 +398,17 @@ namespace RTSLockstep
                     IsBuildMoving = false;
                     Agent.Tag = AgentTag.Builder;
 
-                    // construction hasn't started yet, only a true flag given
-                    if (target.Is(DataType.Bool) && (bool)target.Value && ConstructQueue.Count > 0)
+                    // construction hasn't started yet, only a bool given 
+                    if (target.Is(DataType.Bool) && ConstructQueue.Count > 0)
                     {
-                        SetConstruction();
+                        if ((bool)target.Value)
+                        {
+                            SetConstruction();
+                        }
+                        else
+                        {
+                            ConstructQueue.Clear();
+                        }
                     }
                     // otherwise this is another agent coming to help
                     // should have been sent local id of target
@@ -438,6 +441,11 @@ namespace RTSLockstep
         public String[] GetBuildActions()
         {
             return this._buildActions;
+        }
+
+        public bool HasStructuresQueued()
+        {
+            return ConstructQueue.Count > 0;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
