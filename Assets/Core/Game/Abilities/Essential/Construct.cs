@@ -165,6 +165,13 @@ namespace RTSLockstep
                         }
                         Agent.SetState(ConstructingAnimState);
 
+                        if (!CurrentProject.GetAbility<Structure>().ConstructionStarted)
+                        {
+                            CurrentProject.GetAbility<Structure>().ConstructionStarted = true;
+                            // Restore material
+                            ConstructionHandler.RestoreMaterial(CurrentProject.gameObject);
+                        }
+
                         long mag;
                         targetDirection.Normalize(out mag);
                         bool withinTurn = cachedAttack.TrackAttackAngle == false ||
@@ -318,6 +325,10 @@ namespace RTSLockstep
                     Agent.Tag = AgentTag.Builder;
 
                     CurrentProject = newRTSAgent;
+
+                    // Set to transparent material until constructor is in range to start
+                    ConstructionHandler.SetTransparentMaterial(CurrentProject.gameObject, GameResourceManager.AllowedMaterial, true);
+
                     StartConstructMove();
                 }
                 else
