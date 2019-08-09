@@ -134,14 +134,13 @@ public static class WallPositioningHelper
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
             // ignore first entry if start pillar was snapped, don't want to construct twice!
-            if (!(_startSnapped && i == 0))
+            if (!(_startSnapped && i == 0) && _pillarPrefabs[i].GetComponent<Structure>().ValidPlacement)
             {
                 ConstructionHandler.SetConstructionQueue(_pillarPrefabs[i]);
             }
 
-        //    int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
             GameObject wallSegement;
-            if (_wallPrefabs.TryGetValue(i, out wallSegement))
+            if (_wallPrefabs.TryGetValue(i, out wallSegement) && wallSegement.GetComponent<Structure>().ValidPlacement)
             {
                 long adjustHalfWidth = 0;
                 long adjustHalfLength = 0;
@@ -321,6 +320,20 @@ public static class WallPositioningHelper
                     _pillarPrefabs[i].transform.rotation = _startPillar.transform.rotation;
                 }
 
+                Vector2d posPillar = new Vector2d(_pillarPrefabs[i].transform.position.x, _pillarPrefabs[i].transform.position.z);
+                Coordinate coorPillar = BuildGridAPI.ToGridPos(posPillar);
+                _pillarPrefabs[i].GetComponent<Structure>().GridPosition = coorPillar;
+                _pillarPrefabs[i].GetComponent<Structure>().ValidPlacement = BuildGridAPI.CanBuild(coorPillar, _pillarPrefabs[i].GetComponent<Structure>());
+
+                if (_pillarPrefabs[i].GetComponent<Structure>().ValidPlacement)
+                {
+                    ConstructionHandler.SetTransparentMaterial(_pillarPrefabs[i], GameResourceManager.AllowedMaterial);
+                }
+                else
+                {
+                    ConstructionHandler.SetTransparentMaterial(_pillarPrefabs[i], GameResourceManager.NotAllowedMaterial);
+                }
+
                 if (_wallPrefabs.Count > 0)
                 {
                     int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
@@ -343,6 +356,20 @@ public static class WallPositioningHelper
 
                         Vector3 middle = 0.5f * (_pillarPrefabs[i].transform.position + nextPillar.transform.position);
                         wallSegement.transform.position = middle;
+
+                        Vector2d posSegment = new Vector2d(wallSegement.transform.position.x, wallSegement.transform.position.z);
+                        Coordinate coorSegment = BuildGridAPI.ToGridPos(posSegment);
+                        wallSegement.GetComponent<Structure>().GridPosition = coorSegment;
+                        wallSegement.GetComponent<Structure>().ValidPlacement = BuildGridAPI.CanBuild(coorSegment, wallSegement.GetComponent<Structure>());
+
+                        if (wallSegement.GetComponent<Structure>().ValidPlacement)
+                        {
+                            ConstructionHandler.SetTransparentMaterial(wallSegement, GameResourceManager.AllowedMaterial);
+                        }
+                        else
+                        {
+                            ConstructionHandler.SetTransparentMaterial(wallSegement, GameResourceManager.NotAllowedMaterial);
+                        }
                     }
                 }
 

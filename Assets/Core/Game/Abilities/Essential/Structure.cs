@@ -35,6 +35,7 @@ namespace RTSLockstep
         public bool IsMoving { get; set; }
         public bool IsOverlay { get; set; }
 
+        public bool ValidPlacement { get; set; }
         public bool ConstructionStarted { get; set; }
         public bool NeedsConstruction { get; private set; }
         private bool _needsRepair;

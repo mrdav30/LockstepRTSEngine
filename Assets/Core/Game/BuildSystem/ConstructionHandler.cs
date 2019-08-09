@@ -15,7 +15,6 @@ public static class ConstructionHandler
     private static bool _constructingWall = false;
 
     private static AgentCommander _cachedCommander;
-    private static bool _validPlacement;
     private static Dictionary<string, Material> oldMaterials = new Dictionary<string, Material>();
 
     public static Transform OrganizerStructures { get; private set; }
@@ -50,17 +49,21 @@ public static class ConstructionHandler
 
                 FindStructureLocation();
 
-                Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
-                _validPlacement = GridBuilder.UpdateMove(pos);
 
-                if (_validPlacement &&
-                    SelectionManager.MousedAgent.IsNull())
+                Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
+                tempStructure.ValidPlacement = GridBuilder.UpdateMove(pos);
+
+                if (!_constructingWall)
                 {
-                    SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
-                }
-                else
-                {
-                    SetTransparentMaterial(tempObject, GameResourceManager.NotAllowedMaterial);
+                    if (tempStructure.ValidPlacement &&
+                        SelectionManager.MousedAgent.IsNull())
+                    {
+                        SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
+                    }
+                    else
+                    {
+                        SetTransparentMaterial(tempObject, GameResourceManager.NotAllowedMaterial);
+                    }
                 }
             }
         }
@@ -77,7 +80,7 @@ public static class ConstructionHandler
             else
             {
                 // only constructing 1 object, place it in the agents construct queue
-                if (_validPlacement)
+                if (tempStructure.ValidPlacement)
                 {
                     SetConstructionQueue(tempObject);
                     SendConstructCommand();
