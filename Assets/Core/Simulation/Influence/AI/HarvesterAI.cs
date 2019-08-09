@@ -53,7 +53,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Structure structure = other.GetAbility<Structure>();
-                        return structure != null && !structure.UnderConstruction();
+                        return structure != null && !structure.NeedsConstruction;
                     };
                 }
                 else

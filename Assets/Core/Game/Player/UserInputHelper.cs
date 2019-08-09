@@ -410,7 +410,7 @@ public class UserInputHelper : BehaviourHelper
                 && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
             {
                 if (Selector.MainSelectedAgent.GetAbility<Rally>()
-                    && !Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
+                    && !Selector.MainSelectedAgent.GetAbility<Structure>().NeedsConstruction)
                 {
                     if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                     {
@@ -439,7 +439,7 @@ public class UserInputHelper : BehaviourHelper
                         && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
                         // moused agent isn't under construction
-                        if (!RTSInterfacing.MousedAgent.GetAbility<Structure>().UnderConstruction())
+                        if (!RTSInterfacing.MousedAgent.GetAbility<Structure>().NeedsConstruction)
                         {
                             // if moused agent is a harvester resource deposit, call harvest command to initiate deposit
                             if (Selector.MainSelectedAgent.GetAbility<Harvest>()

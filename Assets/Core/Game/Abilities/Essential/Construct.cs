@@ -65,16 +65,6 @@ namespace RTSLockstep
             basePriority = CachedBody.Priority;
         }
 
-        private void HandleStartMove()
-        {
-            currentAmountBuilt = 0;
-
-            if (!IsBuildMoving && IsBuilding)
-            {
-                StopBuilding();
-            }
-        }
-
         protected override void OnInitialize()
         {
             basePriority = Agent.Body.Priority;
@@ -120,7 +110,7 @@ namespace RTSLockstep
                 // If construction queue not empty and agent not busy, get building
                 if (ConstructQueue.Count > 0 && !IsBuilding)
                 {
-                    SetConstruction();
+                    SetStructure();
                 }
 
                 if (IsBuilding)
@@ -135,18 +125,28 @@ namespace RTSLockstep
             }
         }
 
-        void StartWindup()
+        private void HandleStartMove()
+        {
+            currentAmountBuilt = 0;
+
+            if (!IsBuildMoving && IsBuilding)
+            {
+                StopConstruction();
+            }
+        }
+
+        private void StartWindup()
         {
             windupCount = 0;
             IsWindingUp = true;
         }
 
-        void BehaveWithTarget()
+        private void BehaveWithTarget()
         {
-            if (CurrentProject && (CurrentProject.IsActive == false || !CurrentProject.GetAbility<Structure>().UnderConstruction()))
+            if (CurrentProject && (CurrentProject.IsActive == false || !CurrentProject.GetAbility<Structure>().NeedsConstruction))
             {
                 //Target's lifecycle has ended
-                StopBuilding();
+                StopConstruction();
             }
             else
             {
@@ -251,24 +251,24 @@ namespace RTSLockstep
             }
         }
 
-        void Build()
+        private void Build()
         {
             cachedMove.StopMove();
             CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
             CurrentProject.GetAbility<Structure>().Construct(constructAmount);
 
-            if (!CurrentProject.GetAbility<Structure>().UnderConstruction())
+            if (!CurrentProject.GetAbility<Structure>().NeedsConstruction)
             {
                 //if (audioElement != null)
                 //{
                 //    audioElement.Play(finishedJobSound);
                 //}
-                StopBuilding();
+                StopConstruction();
             }
         }
 
-        bool CheckRange()
+        private bool CheckRange()
         {
             Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
             long fastMag = targetDirection.FastMagnitude();
@@ -281,15 +281,13 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetConstruction()
+        public void SetStructure()
         {
             QStructure qStructure = ConstructQueue.Dequeue();
             if (qStructure.IsNotNull())
             {
                 RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
                 Structure newStructure = newRTSAgent.GetAbility<Structure>();
-
-            //    ConstructionHandler.SetTransparentMaterial(newRTSAgent.gameObject, GameResourceManager.AllowedMaterial, true);
 
                 if (newStructure.StructureType == StructureType.Wall)
                 {
@@ -330,7 +328,7 @@ namespace RTSLockstep
             }
         }
 
-        public void StopBuilding(bool complete = false)
+        public void StopConstruction(bool complete = false)
         {
             inRange = false;
             IsFocused = false;
@@ -361,7 +359,7 @@ namespace RTSLockstep
 
         protected override void OnDeactivate()
         {
-            StopBuilding(true);
+            StopConstruction(true);
         }
 
         public virtual void StartConstructMove()
@@ -403,7 +401,7 @@ namespace RTSLockstep
                     {
                         if ((bool)target.Value)
                         {
-                            SetConstruction();
+                            SetStructure();
                         }
                         else
                         {
@@ -419,7 +417,7 @@ namespace RTSLockstep
                         if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
                         {
                             RTSAgent building = tempTarget;
-                            if (building && building.GetAbility<Structure>().UnderConstruction())
+                            if (building && building.GetAbility<Structure>().NeedsConstruction)
                             {
                                 CurrentProject = building;
                                 StartConstructMove();
@@ -434,7 +432,7 @@ namespace RTSLockstep
         {
             if (Agent.Tag == AgentTag.Builder)
             {
-                StopBuilding(true);
+                StopConstruction(true);
             }
         }
 

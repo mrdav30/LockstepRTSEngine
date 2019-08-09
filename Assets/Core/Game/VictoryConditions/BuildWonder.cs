@@ -16,7 +16,7 @@ public class BuildWonder : VictoryCondition
         {
             if (agent.GetAbility<Wonder>())
             {
-                return commander && !commander.IsDead() && agent && !agent.GetAbility<Structure>().UnderConstruction();
+                return commander && !commander.IsDead() && agent && !agent.GetAbility<Structure>().NeedsConstruction;
             }
         }
         return false;

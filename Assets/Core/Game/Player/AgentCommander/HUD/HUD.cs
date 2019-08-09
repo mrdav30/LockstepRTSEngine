@@ -286,7 +286,7 @@ public class HUD : MonoBehaviour
     #region Private
     private void DrawOrdersBar()
     {
-        if (Selector.MainSelectedAgent.GetAbility<Structure>() && Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
+        if (Selector.MainSelectedAgent.GetAbility<Structure>() && Selector.MainSelectedAgent.GetAbility<Structure>().NeedsConstruction)
         {
             return;
         }
@@ -561,7 +561,7 @@ public class HUD : MonoBehaviour
                             ConstructionHandler.CreateStructure(actions[i], agent, agent.GetPlayerArea());
                         }
                         else if (agent.MyAgentType == AgentType.Building 
-                            && !agent.GetAbility<Structure>().UnderConstruction()
+                            && !agent.GetAbility<Structure>().NeedsConstruction
                             && agent.GetAbility<Spawner>())
                         {
                             // send spawn command

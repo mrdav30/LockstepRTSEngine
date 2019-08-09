@@ -44,7 +44,7 @@ namespace RTSLockstep
                 Func<RTSAgent, bool> agentConditional = agentConditional = (other) =>
                     {
                         Structure structure = other.GetAbility<Structure>();
-                        return structure != null && structure.UnderConstruction() && other.IsActive;
+                        return structure != null && structure.NeedsConstruction && other.IsActive;
                     };
 
                 return agentConditional;

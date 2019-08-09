@@ -32,7 +32,7 @@ namespace RTSLockstep
                 {
                     DrawSelection();
                 }
-                if (cachedStructure && cachedStructure.UnderConstruction())
+                if (cachedStructure && cachedStructure.NeedsConstruction)
                 {
                     DrawBuildProgress();
                 }

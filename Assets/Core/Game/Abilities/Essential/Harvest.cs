@@ -622,7 +622,7 @@ namespace RTSLockstep
             {
                 if (child.GetAbility<Structure>()
                     && child.GetAbility<Structure>().CanStoreResources(HarvestType)
-                    && !child.GetAbility<Structure>().UnderConstruction())
+                    && !child.GetAbility<Structure>().NeedsConstruction)
                 {
                     playerBuildings.Add(child);
                 }
