@@ -173,8 +173,8 @@ namespace RTSLockstep
         public bool IsVisible
         {
             //get { return cachedRenderer == null || (cachedRenderer.enabled && cachedRenderer.isVisible); }
-          //  get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
-          get
+            //  get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
+            get
             {
                 Vector3 screenPoint = UserInputHelper.GUIManager.MainCam.WorldToViewportPoint(Body.VisualPosition);
                 if (screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1)
@@ -252,7 +252,8 @@ namespace RTSLockstep
 
         public virtual void Initialize(
          Vector2d position = default(Vector2d),
-         Vector2d rotation = default(Vector2d))
+         Vector2d rotation = default(Vector2d)
+            )
         {
             IsActive = true;
             CheckCasting = true;

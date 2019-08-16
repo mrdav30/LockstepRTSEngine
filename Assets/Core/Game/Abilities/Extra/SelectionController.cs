@@ -31,10 +31,10 @@ namespace RTSLockstep
                 if (Agent.IsSelected && Agent.IsVisible)
                 {
                     DrawSelection();
-                }
-                if (cachedStructure && cachedStructure.NeedsConstruction)
-                {
-                    DrawBuildProgress();
+                    if (cachedStructure && cachedStructure.NeedsConstruction)
+                    {
+                        DrawBuildProgress();
+                    }
                 }
             }
         }

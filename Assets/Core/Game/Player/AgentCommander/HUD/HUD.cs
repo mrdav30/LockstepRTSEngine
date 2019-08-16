@@ -286,22 +286,19 @@ public class HUD : MonoBehaviour
     #region Private
     private void DrawOrdersBar()
     {
-        if (Selector.MainSelectedAgent.GetAbility<Structure>() && Selector.MainSelectedAgent.GetAbility<Structure>().NeedsConstruction)
-        {
-            return;
-        }
+        RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
+
         GUI.skin = ordersSkin;
         GUI.BeginGroup(new Rect(Screen.width - ORDERS_BAR_WIDTH - BUILD_IMAGE_WIDTH, RESOURCE_BAR_HEIGHT, ORDERS_BAR_WIDTH + BUILD_IMAGE_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT));
         GUI.Box(new Rect(BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH, 0, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT), "");
         string selectionName = "";
 
-        RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
         selectionName = selectedAgent.GetComponent<RTSAgent>().AgentDescription;
 
         if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
         {
             // reset slider value if the selected object has changed
-            if (lastSelection && lastSelection != Selector.MainSelectedAgent)
+            if (lastSelection && lastSelection != selectedAgent)
             {
                 sliderValue = 0.0f;
             }
@@ -309,7 +306,7 @@ public class HUD : MonoBehaviour
             {
                 DrawActions(selectedAgent.GetAbility<Construct>().GetBuildActions());
             }
-            else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>())
+            else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>() && !selectedAgent.GetAbility<Structure>().NeedsConstruction)
             {
                 DrawActions(selectedAgent.GetAbility<Spawner>().GetSpawnActions());
             }
@@ -374,7 +371,7 @@ public class HUD : MonoBehaviour
             agent.Die();
         }
 
-        if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint())
+        if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
         {
             leftPos += width + BUTTON_SPACING;
             if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Rally>().rallyPointImage))
