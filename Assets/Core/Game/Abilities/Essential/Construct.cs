@@ -110,7 +110,7 @@ namespace RTSLockstep
                 // If construction queue not empty and agent not busy, get building
                 if (ConstructQueue.Count > 0 && !IsBuilding)
                 {
-                    SetStructure();
+                    SetConstructQueue();
                 }
 
                 if (IsBuilding)
@@ -288,53 +288,55 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetStructure()
+        public void SetConstructQueue()
         {
-            QStructure qStructure = ConstructQueue.Dequeue();
-            if (qStructure.IsNotNull())
+            while (ConstructQueue.Count > 0)
             {
-                RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
-                Structure newStructure = newRTSAgent.GetAbility<Structure>();
-
-                if (newStructure.StructureType == StructureType.Wall)
+                QStructure qStructure = ConstructQueue.Dequeue();
+                if (qStructure.IsNotNull())
                 {
-                    newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
-                    newStructure.IsOverlay = true;
-                }
+                    RTSAgent newRTSAgent = Agent.Controller.CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
+                    Structure newStructure = newRTSAgent.GetAbility<Structure>();
 
-                newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;
-                newRTSAgent.Body.HalfLength = qStructure.HalfLength;
+                    if (newStructure.StructureType == StructureType.Wall)
+                    {
+                        newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
+                        newStructure.IsOverlay = true;
+                    }
 
-                newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
-                newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
+                    newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;
+                    newRTSAgent.Body.HalfLength = qStructure.HalfLength;
 
-                if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
-                {
-                    Agent.GetCommander().CachedResourceManager.RemoveResources(newRTSAgent);
-                    newRTSAgent.SetState(AnimState.Building);
-                    newRTSAgent.SetPlayingArea(Agent.GetPlayerArea());
-                    newRTSAgent.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
-                    newRTSAgent.SetCommander(Agent.GetCommander());
+                    newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
+                    newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
 
-                    newRTSAgent.gameObject.name = newRTSAgent.objectName;
-                    newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform 
-                        : ConstructionHandler.OrganizerStructures.transform;
+                    if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
+                    {
+                        Agent.GetCommander().CachedResourceManager.RemoveResources(newRTSAgent);
+                        newRTSAgent.SetState(AnimState.Building);
+                        newRTSAgent.SetPlayingArea(Agent.GetPlayerArea());
+                        newRTSAgent.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
+                        newRTSAgent.SetCommander(Agent.GetCommander());
 
-                    newStructure.AwaitConstruction();
+                        newRTSAgent.gameObject.name = newRTSAgent.objectName;
+                        newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
+                            : ConstructionHandler.OrganizerStructures.transform;
 
-                    Agent.Tag = AgentTag.Builder;
+                        newStructure.AwaitConstruction();
+                        // Set to transparent material until constructor is in range to start
+                        ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
 
-                    CurrentProject = newRTSAgent;
-
-                    // Set to transparent material until constructor is in range to start
-                    ConstructionHandler.SetTransparentMaterial(CurrentProject.gameObject, GameResourceManager.AllowedMaterial, true);
-
-                    StartConstructMove();
-                }
-                else
-                {
-                    Debug.Log("Couldn't place building!");
-                    newRTSAgent.Die();
+                        if (CurrentProject.IsNull())
+                        {
+                            CurrentProject = newRTSAgent;
+                            StartConstructMove();
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Couldn't place building!");
+                        newRTSAgent.Die();
+                    }
                 }
             }
         }
@@ -412,7 +414,7 @@ namespace RTSLockstep
                     {
                         if ((bool)target.Value)
                         {
-                            SetStructure();
+                            SetConstructQueue();
                         }
                         else
                         {

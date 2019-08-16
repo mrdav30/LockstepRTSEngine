@@ -49,12 +49,11 @@ public static class ConstructionHandler
 
                 FindStructureLocation();
 
-
-                Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
-                tempStructure.ValidPlacement = GridBuilder.UpdateMove(pos);
-
                 if (!_constructingWall)
                 {
+                    Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
+                    tempStructure.ValidPlacement = GridBuilder.UpdateMove(pos);
+
                     if (tempStructure.ValidPlacement &&
                         SelectionManager.MousedAgent.IsNull())
                     {

@@ -90,6 +90,14 @@ public static class WallPositioningHelper
     {
         if (_isPlacingWall)
         {
+            //check if last pole was ever set
+            if (!_endSnapped && _pillarPrefabs.Count == _wallPrefabs.Count)
+            {
+                Vector3 endPos = tempWallPillarGO.transform.position;
+                CreateWallPillar(endPos, true);
+            }
+            //Perform one final adjustment
+            AdjustWallSegments();
             SetWall();
         }
         else
@@ -124,13 +132,6 @@ public static class WallPositioningHelper
 
     private static void SetWall()
     {
-        //check if last pole was ever set
-        if (!_endSnapped && _pillarPrefabs.Count == _wallPrefabs.Count)
-        {
-            Vector3 endPos = tempWallPillarGO.transform.position;
-            CreateWallPillar(endPos);
-        }
-
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
             // ignore first entry if start pillar was snapped, don't want to construct twice!
@@ -139,33 +140,36 @@ public static class WallPositioningHelper
                 ConstructionHandler.SetConstructionQueue(_pillarPrefabs[i]);
             }
 
-            GameObject wallSegement;
-            if (_wallPrefabs.TryGetValue(i, out wallSegement) && wallSegement.GetComponent<Structure>().ValidPlacement)
+            if(_startPillar != _lastPillar)
             {
-                long adjustHalfWidth = 0;
-                long adjustHalfLength = 0;
-
-                long currentHalfWidth = tempWallSegmentBody.HalfWidth;
-                long currentHalfLength = tempWallSegmentBody.HalfLength;
-
-                if (_originalWallLength != wallSegement.transform.localScale.z)
+                GameObject wallSegement;
+                if (_wallPrefabs.TryGetValue(i, out wallSegement) && wallSegement.GetComponent<Structure>().ValidPlacement)
                 {
-                    currentHalfLength = (long)wallSegement.transform.localScale.z * FixedMath.Half;
+                    long adjustHalfWidth = 0;
+                    long adjustHalfLength = 0;
+
+                    long currentHalfWidth = tempWallSegmentBody.HalfWidth;
+                    long currentHalfLength = tempWallSegmentBody.HalfLength;
+
+                    if (_originalWallLength != wallSegement.transform.localScale.z)
+                    {
+                        currentHalfLength = (long)wallSegement.transform.localScale.z * FixedMath.Half;
+                    }
+
+                    adjustHalfWidth = currentHalfWidth;
+                    adjustHalfLength = currentHalfLength;
+                    float currentRotation = wallSegement.transform.localEulerAngles.y;
+
+                    // if segment has rotated past 45 degree angle, need to rotate length & width
+                    if (currentRotation >= 45 && currentRotation <= 135
+                        || currentRotation >= 225 && currentRotation <= 315)
+                    {
+                        adjustHalfWidth = currentHalfLength;
+                        adjustHalfLength = currentHalfWidth;
+                    }
+
+                    ConstructionHandler.SetConstructionQueue(wallSegement, adjustHalfWidth, adjustHalfLength);
                 }
-
-                adjustHalfWidth = currentHalfWidth;
-                adjustHalfLength = currentHalfLength;
-                float currentRotation = wallSegement.transform.localEulerAngles.y;
-
-                // if segment has rotated past 45 degree angle, need to rotate length & width
-                if (currentRotation >= 45 && currentRotation <= 135
-                    || currentRotation >= 225 && currentRotation <= 315)
-                {
-                    adjustHalfWidth = currentHalfLength;
-                    adjustHalfLength = currentHalfWidth;
-                }
-
-                ConstructionHandler.SetConstructionQueue(wallSegement, adjustHalfWidth, adjustHalfLength);
             }
         }
 
@@ -242,7 +246,7 @@ public static class WallPositioningHelper
         }
     }
 
-    private static void CreateWallPillar(Vector3 _currentPos)
+    private static void CreateWallPillar(Vector3 _currentPos, bool isLast = false)
     {
         GameObject newPillar = UnityEngine.Object.Instantiate(tempWallPillarGO, _currentPos, Quaternion.identity);
         newPillar.gameObject.name = tempWallPillarGO.gameObject.name;
@@ -258,6 +262,11 @@ public static class WallPositioningHelper
         }
         _pillarPrefabs.Add(newPillar);
         newPillar.transform.parent = OrganizerWalls;
+
+        if (isLast)
+        {
+            _lastPillar = newPillar;
+        }
     }
 
     private static void CreateWallSegment(Vector3 _currentPos)
