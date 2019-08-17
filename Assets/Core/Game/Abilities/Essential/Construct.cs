@@ -163,7 +163,7 @@ namespace RTSLockstep
                             cachedMove.StopMove();
                             inRange = true;
                         }
-                        Agent.SetState(ConstructingAnimState);
+                        Agent.Animator.SetState(ConstructingAnimState);
 
                         if (!CurrentProject.GetAbility<Structure>().ConstructionStarted)
                         {
@@ -313,9 +313,8 @@ namespace RTSLockstep
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
                     {
                         Agent.GetCommander().CachedResourceManager.RemoveResources(newRTSAgent);
-                        newRTSAgent.SetState(AnimState.Building);
+
                         newRTSAgent.SetPlayingArea(Agent.GetPlayerArea());
-                        newRTSAgent.GetAbility<Health>().HealthAmount = FixedMath.Create(0);
                         newRTSAgent.SetCommander(Agent.GetCommander());
 
                         newRTSAgent.gameObject.name = newRTSAgent.objectName;

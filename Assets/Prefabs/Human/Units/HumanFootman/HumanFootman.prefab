@@ -384,6 +384,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _internalBody:
+    _preventCulling: 0
     _position:
       x: 0
       y: 0
@@ -394,18 +395,17 @@ MonoBehaviour:
     _velocity:
       x: 0
       y: 0
-    _preventCulling: 0
-    RealPoints: []
-    Edges: []
-    EdgeNorms: []
     ImmovableCollisionDirection:
       x: 0
       y: 0
+    RealPoints: []
+    Edges: []
+    EdgeNorms: []
     _shape: 1
     _isTrigger: 0
     _layer: 0
     _halfWidth: 32768
-    _halfHeight: 32768
+    _halfLength: 32768
     _radius: 98304
     _immovable: 0
     _basePriority: 0
@@ -517,7 +517,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1588637964981362}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10ab47e8be691884ea9e3dc0b8a53e50, type: 3}
+  m_Script: {fileID: 11500000, guid: 98fc48ededc345d44aae37a9f634442e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   currentAnimState: 0
@@ -525,7 +525,7 @@ MonoBehaviour:
   moving: Moving
   engaging: Engaging
   specialEngaging: specialEngaging
-  dying: Idling
+  dying: Dying
   fire: fire
   specialFire: specialFire
   specialAttack: specialAttack
@@ -533,11 +533,13 @@ MonoBehaviour:
   attackSound: {fileID: 0}
   selectSound: {fileID: 0}
   useWeaponSound: {fileID: 0}
+  finishedJobSound: {fileID: 0}
+  driveSound: {fileID: 0}
+  moveSound: {fileID: 0}
   attackVolume: 1
   selectVolume: 1
   useWeaponVolume: 1
-  driveSound: {fileID: 0}
-  moveSound: {fileID: 0}
+  finishedJobVolume: 1
   driveVolume: 0.5
   moveVolume: 1
 --- !u!95 &95585489092668588

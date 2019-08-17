@@ -165,7 +165,9 @@ namespace RTSLockstep
                 {
                     isHighlighted = value;
                     if (OnHighlightedChange != null && IsActive)
+                    {
                         OnHighlightedChange();
+                    }
                 }
             }
         }
@@ -306,9 +308,9 @@ namespace RTSLockstep
 
             abilityManager.Simulate();
 
-            if (IsCasting == false)
+            if (Animator.IsNotNull() && IsCasting == false)
             {
-                SetState(AnimState.Idling);
+                Animator.SetIdleState();
             }
         }
 
@@ -399,24 +401,35 @@ namespace RTSLockstep
             AgentController.DestroyAgent(this, immediate);
             if (Animator.IsNotNull())
             {
-                SetState(AnimState.Dying);
-
-                // Animator.Visualize(); // TODO: Now call in LockstepManager.LateVisualize ()
+                Animator.SetDyingState();
+                Animator.Visualize(); // TODO: Now call in LockstepManager.LateVisualize ()
             }
         }
 
+        /// <summary>
+        /// Do not call this to destroy the agent. Use AgentController.DestroyAgent().
+        /// </summary>
+        /// <param name="Immediate"></param>
         internal void Deactivate(bool Immediate = false)
         {
             if (IsActive == false)
+            {
                 Debug.Log("NOASER");
+            }
+
             if (OnDeactivate != null)
+            {
                 this.OnDeactivate(this);
+            }
+
             _Deactivate();
 
             if (Immediate == false)
             {
                 if (Animator.IsNotNull())
-                    Animator.Play(AnimState.Dying);
+                {
+                    Animator.SetDyingState();
+                }
 
                 poolCoroutine = CoroutineManager.StartCoroutine(PoolDelayer());
             }
@@ -453,14 +466,6 @@ namespace RTSLockstep
             AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
             AgentController.CompleteLife(this);
-        }
-
-        public void SetState(AnimState animState)
-        {
-            if (Animator.IsNotNull())
-            {
-                Animator.CurrentAnimState = animState;
-            }
         }
 
         public void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)

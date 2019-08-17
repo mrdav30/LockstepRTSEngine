@@ -184,10 +184,10 @@ namespace RTSLockstep
                             _clearanceDegree = (byte)(source.ClearanceDegree + 1);
                         }
                     }
-                    //This method isn't always 100% accurate but after several updates, it will have a better picture of the map
-                    //Clarification: _clearanceSource is the source of a blockage. 
+                    // This method isn't always 100% accurate but after several updates, it will have a better picture of the map
+                    // Clarification: _clearanceSource is the source of a blockage. 
                     // It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
-                    //TODO: Test this thoroughly and visualize
+                    // TODO: Test this thoroughly and visualize
                     for (int i = 7; i >= 0; i--)
                     {
                         CheckNeighbor(NeighborNodes[i]);

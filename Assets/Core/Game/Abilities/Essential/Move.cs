@@ -599,7 +599,7 @@ namespace RTSLockstep
             StoppedTime = 0;
             Arrived = false;
 
-            Agent.SetState(AnimState.Moving);
+            Agent.Animator.SetState(AnimState.Moving);
 
             //For now, use old next-best-node system when size requires consideration
             viableDestination = this.GridSize <= 1 ?

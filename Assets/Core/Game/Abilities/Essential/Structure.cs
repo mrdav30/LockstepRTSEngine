@@ -80,7 +80,8 @@ namespace RTSLockstep
         {
             NeedsConstruction = true;
             IsCasting = true;
-            cachedHealth.HealthAmount = 0;
+            cachedHealth.HealthAmount = FixedMath.Create(0);
+
             if (cachedRally)
             {
                 cachedRally.SetSpawnPoint();
@@ -91,6 +92,11 @@ namespace RTSLockstep
         {
             if (NeedsConstruction && !ConstructionStarted)
             {
+                if (Agent.Animator.IsNotNull())
+                {
+                    Agent.Animator.SetState(AnimState.Building);
+                }
+
                 ConstructionStarted = true;
                 ConstructionHandler.RestoreMaterial(Agent.gameObject);
             }

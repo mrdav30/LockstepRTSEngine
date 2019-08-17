@@ -289,7 +289,7 @@ namespace RTSLockstep
 
                             inRange = true;
                         }
-                        Agent.SetState(EngagingAnimState);
+                        Agent.Animator.SetState(EngagingAnimState);
 
                         long mag;
                         targetDirection.Normalize(out mag);

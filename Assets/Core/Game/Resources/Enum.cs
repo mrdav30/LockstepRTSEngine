@@ -77,6 +77,7 @@
 
     public enum AnimState
     {
+        None,
         Idling,
         IdlingWood,
         IdlingOre,

@@ -73,11 +73,11 @@ namespace RTSLockstep
         {
             if (currentLoadAmount > 0)
             {
-                Agent.SetState(MovingAnimState);
+                Agent.Animator.SetState(MovingAnimState);
             }
             else
             {
-                Agent.SetState(AnimState.Moving);
+                Agent.Animator.SetState(AnimState.Moving);
             }
         }
 
@@ -147,11 +147,11 @@ namespace RTSLockstep
                 {
                     if (currentLoadAmount > 0)
                     {
-                        Agent.SetState(IdlingAnimState);
+                        Agent.Animator.SetIdleState(IdlingAnimState);
                     }
                     else if (!cachedAttack.Target)
                     {
-                        Agent.SetState(AnimState.Idling);
+                        Agent.Animator.SetIdleState(AnimState.Idling);
                     }
                 }
             }
@@ -189,7 +189,7 @@ namespace RTSLockstep
                             cachedMove.StopMove();
                             inRange = true;
                         }
-                        Agent.SetState(HarvestingAnimState);
+                        Agent.Animator.SetState(HarvestingAnimState);
 
                         long mag;
                         targetDirection.Normalize(out mag);
@@ -286,7 +286,7 @@ namespace RTSLockstep
             {
                 // can't find clostest resource store
                 // send command to stop harvesting...
-                StopHarvesting();
+                StopHarvesting(true);
             }
             else
             {
@@ -302,7 +302,7 @@ namespace RTSLockstep
                             cachedMove.StopMove();
                             inRange = true;
                         }
-                        Agent.SetState(IdlingAnimState);
+                        Agent.Animator.SetIdleState(IdlingAnimState);
                         //if (audioElement != null && Time.timeScale > 0)
                         //{
                         //    audioElement.Play(emptyHarvestSound);

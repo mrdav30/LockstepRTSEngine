@@ -1,73 +1,68 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System;
+using UnityEngine;
 
 namespace RTSLockstep
 {
-    public class LSAnimator : LSAnimatorBase
+    public class GenericUnitAnimator: LSAnimatorBase
     {
-        [SerializeField]
+        [Space(10f), SerializeField]
         protected string idling = "idling";
         [SerializeField]
         protected string moving = "moving";
         [SerializeField]
         protected string engaging = "engaging";
         [SerializeField]
-        private string specialEngaging = "specialEngaging";
+        protected string specialEngaging = "specialEngaging";
         [SerializeField]
         protected string dying = "dying";
         [Space(10f), SerializeField]
-        private string fire = "fire";
+        protected string fire = "fire";
         [SerializeField]
-        private string specialFire = "specialFire";
+        protected string specialFire = "specialFire";
         [SerializeField]
-        private string specialAttack = "specialAttack";
+        protected string specialAttack = "specialAttack";
         [SerializeField]
-        private string extra = "extra";
-        //sounds that accompany animations
+        protected string extra = "extra";
+
+        [Header("Sounds that accompany animations")]
         [Space(10f), SerializeField]
-        private AudioClip attackSound;
+        protected AudioClip attackSound;
         [SerializeField]
-        private AudioClip selectSound;
+        protected AudioClip selectSound;
         [SerializeField]
-        private AudioClip useWeaponSound;
+        protected AudioClip useWeaponSound;
         [SerializeField]
-        private float attackVolume = 1.0f, selectVolume = 1.0f, useWeaponVolume = 1.0f;
+        protected AudioClip finishedJobSound;
         [SerializeField]
-        private AudioClip driveSound, moveSound;
-        [SerializeField]
-        private float driveVolume = 0.5f, moveVolume = 1.0f;
+        protected AudioClip driveSound, moveSound;
 
-        private AnimationClip idlingClip;
-        private AnimationClip movingClip;
-        private AnimationClip engagingClip;
-        private AnimationClip dyingClip;
-        private AnimationClip specialEngagingClip;
+        [Space(10f), SerializeField]
+        protected float attackVolume = 1.0f;
+        [SerializeField]
+        protected float selectVolume = 1.0f;
+        [SerializeField]
+        protected float useWeaponVolume = 1.0f;
+        [SerializeField]
+        protected float finishedJobVolume = 1.0f;
+        [SerializeField]
+        protected float driveVolume = 0.5f;
+        [SerializeField]
+        protected float moveVolume = 1.0f;
 
-        private AnimationClip fireClip;
-        private AnimationClip specialFireClip;
-        private AnimationClip specialAttackClip;
-        private AnimationClip extraClip;
+        protected AnimationClip idlingClip;
+        protected AnimationClip movingClip;
+        protected AnimationClip engagingClip;
+        protected AnimationClip dyingClip;
+        protected AnimationClip specialEngagingClip;
 
-        protected Animator animator;
-        protected const float fadeLength = .5f;
-
-        public override void Setup()
-        {
-            base.Setup();
-        }
+        protected AnimationClip fireClip;
+        protected AnimationClip specialFireClip;
+        protected AnimationClip specialAttackClip;
+        protected AnimationClip extraClip;
 
         public override void Initialize()
         {
-            base.Initialize();
-            // update to you more modern Animator component
-            // Animation will become depreciated soon
-            animator = GetComponent<Animator>();
-            if (animator == null)
-            {
-                animator = this.GetComponentInChildren<Animator>();
-            }
             if (CanAnimate = (animator != null))
             {
                 AnimationClip[] agentAnimations = animator.runtimeAnimatorController.animationClips;
@@ -114,56 +109,43 @@ namespace RTSLockstep
                     }
                 }
             }
+
             Play(AnimState.Idling);
         }
 
-        public override void Play(AnimState state, bool baseAnimate = true)
+        protected override string GetImpulseName(AnimImpulse impulse)
         {
-            base.Play(state);
-            if (CanAnimate && baseAnimate)
+            switch (impulse)
             {
-                AnimationClip clip = GetStateClip(state);
-                if (clip.IsNotNull())
-                {
-                    animator.CrossFade(clip.name, fadeLength);
-                }
+                case AnimImpulse.Fire:
+                    return fire;
+                case AnimImpulse.SpecialFire:
+                    return specialFire;
+                case AnimImpulse.SpecialAttack:
+                    return specialAttack;
+                case AnimImpulse.Extra:
+                    return extra;
             }
+            return idling;
         }
 
-        public override void Play(AnimImpulse impulse, int rate = 0)
+        protected override AnimationClip GetImpulseClip(AnimImpulse impulse)
         {
-            base.Play(impulse, rate);
-
-            if (CanAnimate)
+            switch (impulse)
             {
-                AnimationClip clip = GetImpulseClip(impulse);
-                if (clip.IsNotNull())
-                {
-                    //animator.Blend(clip.name,.8f,fadeLength);
-                    animator.Play(clip.name);
-                }
-            }
-        }
-
-        protected virtual AnimationClip GetStateClip(AnimState state)
-        {
-            switch (state)
-            {
-                case AnimState.Moving:
-                    return movingClip;
-                case AnimState.Idling:
-                    return idlingClip;
-                case AnimState.Engaging:
-                    return engagingClip;
-                case AnimState.Dying:
-                    return dyingClip;
-                case AnimState.SpecialEngaging:
-                    return this.specialEngagingClip;
+                case AnimImpulse.Fire:
+                    return fireClip;
+                case AnimImpulse.SpecialFire:
+                    return specialFireClip;
+                case AnimImpulse.SpecialAttack:
+                    return specialAttackClip;
+                case AnimImpulse.Extra:
+                    return extraClip;
             }
             return idlingClip;
         }
 
-        public virtual string GetStateName(AnimState state)
+        protected override string GetStateName(AnimState state)
         {
             switch (state)
             {
@@ -181,34 +163,20 @@ namespace RTSLockstep
             return idling;
         }
 
-        public string GetImpulseName(AnimImpulse impulse)
+        protected override AnimationClip GetStateClip(AnimState state)
         {
-            switch (impulse)
+            switch (state)
             {
-                case AnimImpulse.Fire:
-                    return fire;
-                case AnimImpulse.SpecialFire:
-                    return specialFire;
-                case AnimImpulse.SpecialAttack:
-                    return specialAttack;
-                case AnimImpulse.Extra:
-                    return extra;
-            }
-            return idling;
-        }
-
-        private AnimationClip GetImpulseClip(AnimImpulse impulse)
-        {
-            switch (impulse)
-            {
-                case AnimImpulse.Fire:
-                    return fireClip;
-                case AnimImpulse.SpecialFire:
-                    return specialFireClip;
-                case AnimImpulse.SpecialAttack:
-                    return specialAttackClip;
-                case AnimImpulse.Extra:
-                    return extraClip;
+                case AnimState.Moving:
+                    return movingClip;
+                case AnimState.Idling:
+                    return idlingClip;
+                case AnimState.Engaging:
+                    return engagingClip;
+                case AnimState.Dying:
+                    return dyingClip;
+                case AnimState.SpecialEngaging:
+                    return this.specialEngagingClip;
             }
             return idlingClip;
         }
@@ -218,6 +186,7 @@ namespace RTSLockstep
             base.InitialiseAudio();
             List<AudioClip> sounds = new List<AudioClip>();
             List<float> volumes = new List<float>();
+
             if (attackVolume < 0.0f)
             {
                 attackVolume = 0.0f;
@@ -228,6 +197,7 @@ namespace RTSLockstep
             }
             sounds.Add(attackSound);
             volumes.Add(attackVolume);
+
             if (selectVolume < 0.0f)
             {
                 selectVolume = 0.0f;
@@ -238,6 +208,7 @@ namespace RTSLockstep
             }
             sounds.Add(selectSound);
             volumes.Add(selectVolume);
+
             if (useWeaponVolume < 0.0f)
             {
                 useWeaponVolume = 0.0f;
@@ -248,6 +219,7 @@ namespace RTSLockstep
             }
             sounds.Add(useWeaponSound);
             volumes.Add(useWeaponVolume);
+
             if (driveVolume < 0.0f)
             {
                 driveVolume = 0.0f;
@@ -258,6 +230,7 @@ namespace RTSLockstep
             }
             volumes.Add(driveVolume);
             sounds.Add(driveSound);
+
             if (moveVolume < 0.0f)
             {
                 moveVolume = 0.0f;
@@ -268,6 +241,18 @@ namespace RTSLockstep
             }
             sounds.Add(moveSound);
             volumes.Add(moveVolume);
+
+            if (finishedJobVolume < 0.0f)
+            {
+                finishedJobVolume = 0.0f;
+            }
+            if (finishedJobVolume > 1.0f)
+            {
+                finishedJobVolume = 1.0f;
+            }
+            sounds.Add(finishedJobSound);
+            volumes.Add(finishedJobVolume);
+
             audioElement.Add(sounds, volumes);
         }
     }

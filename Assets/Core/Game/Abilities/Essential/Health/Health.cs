@@ -146,13 +146,11 @@ namespace RTSLockstep
             if (Agent.IsActive)
             {
                 if (onDie != null)
-                    this.onDie(this, this.LastAttacker);
-                AgentController.DestroyAgent(Agent);
-                if (Agent.Animator.IsNotNull())
                 {
-                    Agent.SetState(AnimState.Dying);
-                    Agent.Animator.Visualize();
+                    this.onDie(this, this.LastAttacker);
                 }
+
+                Agent.Die();
             }
         }
 

@@ -563,6 +563,7 @@ MonoBehaviour:
     - Working_Upgrade_1
     - Working_Upgrade_2
     - Worker_Upgrade_3
+  engaging: engaging
   dying:
     reorderableList:
       canAdd: 1
@@ -570,7 +571,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 0
+      isExpanded: 1
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -585,7 +586,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 0
+    isExpanded: 1
     _keyValues: 01000000020000000300000004000000
     _keys: 01000000020000000300000004000000
     _values:
@@ -593,13 +594,6 @@ MonoBehaviour:
     - Dying_Upgrade_1
     - Dying_Upgrade_2
     - Dying_Upgrade_3
-  engaging: engaging
-  attackSound: {fileID: 0}
-  selectSound: {fileID: 0}
-  useWeaponSound: {fileID: 0}
-  attackVolume: 1
-  selectVolume: 1
-  useWeaponVolume: 1
   finishedJobSound: {fileID: 0}
   finishedJobVolume: 1
 --- !u!95 &95505682122902318

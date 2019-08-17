@@ -69,7 +69,7 @@ namespace RTSLockstep
             if (spawnQueue.Count > 0)
             {
                 IsCasting = true;
-                Agent.SetState(AnimState.Working);
+                Agent.Animator.SetState(AnimState.Working);
                 BehaveWithSpawnQueue();
             }
             else

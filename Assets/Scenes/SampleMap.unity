@@ -399,7 +399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Spawns:
   - AgentCode: HumanWorker
-    Count: 3
+    Count: 1
     ControllerCode: Player 1
     Position:
       x: 0

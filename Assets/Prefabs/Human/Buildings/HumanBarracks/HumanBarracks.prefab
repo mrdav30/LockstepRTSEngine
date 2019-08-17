@@ -389,7 +389,7 @@ GameObject:
   - component: {fileID: 114101414404568314}
   - component: {fileID: 114686156804767258}
   - component: {fileID: 114958349450188848}
-  - component: {fileID: 114474203312825904}
+  - component: {fileID: 6267072611934218586}
   - component: {fileID: 95563551641728878}
   - component: {fileID: 114759572138077454}
   m_Layer: 0
@@ -596,7 +596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &114474203312825904
+--- !u!114 &6267072611934218586
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -699,6 +699,7 @@ MonoBehaviour:
     - Working_Upgrade_1
     - Working_Upgrade_2
     - Working_Upgrade_3
+  engaging: engaging
   dying:
     reorderableList:
       canAdd: 1
@@ -729,13 +730,6 @@ MonoBehaviour:
     - Dying_Upgrade_1
     - Dying_Upgrade_2
     - Dying_Upgrade_3
-  engaging: engaging
-  attackSound: {fileID: 0}
-  selectSound: {fileID: 0}
-  useWeaponSound: {fileID: 0}
-  attackVolume: 1
-  selectVolume: 1
-  useWeaponVolume: 1
   finishedJobSound: {fileID: 0}
   finishedJobVolume: 1
 --- !u!95 &95563551641728878

@@ -107,7 +107,7 @@ namespace RTSLockstep
             DefaultMessageRaiser.LateSetup();
             if (onSetup != null)
             {
-               onSetup();
+                onSetup();
             }
         }
 
