@@ -44,8 +44,6 @@ namespace RTSLockstep
         private AnimationClip engagingOreClip;
         private AnimationClip constructingClip;
 
-        private AnimState _prevIdleState;
-
         public override void Initialize()
         {
             base.Initialize();

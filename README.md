@@ -1,7 +1,7 @@
 Lockstep RTS Engine
 ------------------------
 
-**Latest build on Unity version: 2019.1.12f**
+**Latest build on Unity version: 2019.2.1f1**
 
 The Lockstep RTS Engine (LRE) is an engine designed for 3d RTS games with lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LRE is integrated with Unity, but can be abstracted away.
 
