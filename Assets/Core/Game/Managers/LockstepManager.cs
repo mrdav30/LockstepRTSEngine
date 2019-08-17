@@ -17,318 +17,331 @@ using RTSLockstep.NetworkHelpers;
  * ------------
  * Setup: Called once per run for setting up any values
  * Initialize: Called once per instance. On managers, called in new game. On agents, called when unpooled.
+ * GameStart: Called when game first starts.
+ * Execute: called when Commands are received.
  * Simulate: Called once every simulation frame. 
  * Visualize: Called once every rendering/commander interfacing frame
  * Deactivate: Called upon deactivation. On managers, called when game is ended. On agents, called when pooled.
  */
 
-using RTSLockstep.UI;
 using UnityEngine;
-
-//using RTSLockstep.Integration;
 using RTSLockstep.Data;
 using System;
 
-using FastCollections;
-using RTSLockstep;
-
 namespace RTSLockstep
 {
-	//TODO: Set up default functions to implement LSManager
-	public static class  LockstepManager
-	{
-		public const int FrameRate = 32;
-		public const int InfluenceResolution = 2;
-		public const long DeltaTime = FixedMath.One / FrameRate;
-		public const float DeltaTimeF = DeltaTime / FixedMath.OneF;
+    //TODO: Set up default functions to implement LSManager
+    public static class LockstepManager
+    {
+        public const int FrameRate = 32;
+        public const int InfluenceResolution = 2;
+        public const long DeltaTime = FixedMath.One / FrameRate;
+        public const float DeltaTimeF = DeltaTime / FixedMath.OneF;
 
-		private static int InfluenceCount;
+        private static int InfluenceCount;
 
-		public static int InfluenceFrameCount { get; private set; }
+        public static int InfluenceFrameCount { get; private set; }
 
-		/// <summary>
-		/// Number of frames that have passed. FrameCount/FrameRate = duration of game session in seconds.
-		/// </summary>
-		/// <value>The frame count.</value>
-		public static int FrameCount { get; private set; }
+        /// <summary>
+        /// Number of frames that have passed. FrameCount/FrameRate = duration of game session in seconds.
+        /// </summary>
+        /// <value>The frame count.</value>
+        public static int FrameCount { get; private set; }
 
-		public static bool GameStarted { get; private set; }
+        public static bool GameStarted { get; private set; }
 
-		public static bool Loaded { get; private set; }
+        public static bool Loaded { get; private set; }
 
-		//for testing purposes
-		public static bool PoolingEnabled = true;
+        //for testing purposes
+        public static bool PoolingEnabled = true;
 
-		public static event Action onSetup;
-		public static event Action onInitialize;
+        public static event Action onSetup;
+        public static event Action onInitialize;
 
-		public static int PauseCount { get; private set; }
+        public static int PauseCount { get; private set; }
 
-		public static bool IsPaused { get { return PauseCount > 0; } }
+        public static bool IsPaused { get { return PauseCount > 0; } }
 
-		public static NetworkHelper MainNetworkHelper;
+        public static NetworkHelper MainNetworkHelper;
 
-		public static void Pause ()
-		{
-			PauseCount++;
-		}
+        public static void Pause()
+        {
+            PauseCount++;
+        }
 
-		public static void Unpause ()
-		{
-			PauseCount--;
-		}
+        public static void Unpause()
+        {
+            PauseCount--;
+        }
 
-//		public static void Reset ()
-//		{
-//			LockstepManager.Deactivate ();
-//			GameObject.Instantiate (MainGameManager.gameObject);
-//		}
+        public static void Reset()
+        {
+            LockstepManager.Deactivate();
+        }
 
-		internal static void Setup()
-		{
-			DefaultMessageRaiser.EarlySetup ();
+        internal static void Setup()
+        {
+            DefaultMessageRaiser.EarlySetup();
 
-			LSDatabaseManager.Setup ();
-			Command.Setup ();
+            LSDatabaseManager.Setup();
+            Command.Setup();
 
-			GridManager.Setup ();
-			InputCodeManager.Setup ();
-			AbilityDataItem.Setup ();
+            GridManager.Setup();
 
-            ResourceManager.Setup();
-			//AgentController.Setup ();
+            InputCodeManager.Setup();
+            AbilityDataItem.Setup();
 
-			ProjectileManager.Setup ();
-			EffectManager.Setup ();
+            GameResourceManager.Setup();
+            //AgentController.Setup ();
 
-			PhysicsManager.Setup ();
-			ClientManager.Setup ();
+            ProjectileManager.Setup();
+            EffectManager.Setup();
 
-			Time.fixedDeltaTime = DeltaTimeF;
-			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
+            PhysicsManager.Setup();
+            ClientManager.Setup();
 
-
-			DefaultMessageRaiser.LateSetup ();
-			if (onSetup != null)
-				onSetup ();
+            Time.fixedDeltaTime = DeltaTimeF;
+            Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 
 
-		}
+            DefaultMessageRaiser.LateSetup();
+            if (onSetup != null)
+            {
+                onSetup();
+            }
+        }
 
-		private static long _playRate = FixedMath.One;
-		public static long PlayRate
-		{
-			get
-			{
-				return _playRate;
-			}
-			set
-			{
-				if (value != _playRate)
-				{
-					_playRate = value;
-					Time.timeScale = PlayRate.ToFloat();
-					//Time.fixedDeltaTime = BaseDeltaTime / _playRate.ToFloat();
-				}
-			}
-		}
+        private static long _playRate = FixedMath.One;
+        public static long PlayRate
+        {
+            get
+            {
+                return _playRate;
+            }
+            set
+            {
+                if (value != _playRate)
+                {
+                    _playRate = value;
+                    Time.timeScale = PlayRate.ToFloat();
+                    //Time.fixedDeltaTime = BaseDeltaTime / _playRate.ToFloat();
+                }
+            }
+        }
 
-		public static float FloatPlayRate
-		{
-			get { return _playRate.ToFloat(); }
-			set
-			{
-				PlayRate = FixedMath.Create(value);
-			}
-		}
+        public static float FloatPlayRate
+        {
+            get { return _playRate.ToFloat(); }
+            set
+            {
+                PlayRate = FixedMath.Create(value);
+            }
+        }
 
-		internal static void Initialize (ILockstepEventsHandler[] helpers, NetworkHelper networkHelper)
-		{
-			PlayRate = FixedMath.One;
-			//PauseCount = 0;
+        internal static void Initialize(ILockstepEventsHandler[] helpers, NetworkHelper networkHelper)
+        {
+            PlayRate = FixedMath.One;
+            //PauseCount = 0;
 
-			if (!Loaded) {
-				Setup ();
-				Loaded = true;
-			}
+            if (!Loaded)
+            {
+                Setup();
+                Loaded = true;
+            }
+
+            DefaultMessageRaiser.EarlyInitialize();
+
+            LSDatabaseManager.Initialize();
+            LSUtility.Initialize(1);
+            InfluenceCount = 0;
+            Time.timeScale = 1f;
+
+            Stalled = true;
+
+            FrameCount = 0;
+            InfluenceFrameCount = 0;
+            MainNetworkHelper = networkHelper;
+
+            AgentController.Initialize();
+
+            ClientManager.Initialize(MainNetworkHelper);
+
+            BehaviourHelperManager.Initialize(helpers);
+
+            GridManager.Initialize();
+
+            CoroutineManager.Initialize();
+            FrameManager.Initialize();
+
+            CommandManager.Initialize();
 
 
+            PhysicsManager.Initialize();
+            PlayerManager.Initialize();
 
-			DefaultMessageRaiser.EarlyInitialize ();
+            //   GridBuilder.Initialize();
 
-			LSDatabaseManager.Initialize ();
-			LSUtility.Initialize (1);
-			InfluenceCount = 0;
-			Time.timeScale = 1f;
+            //Initialized in UserInputHelper
+            //	SelectionManager.Initialize ();
+            InfluenceManager.Initialize();
+            ProjectileManager.Initialize();
 
-			Stalled = true;
+            DefaultMessageRaiser.LateInitialize();
+            BehaviourHelperManager.LateInitialize();
+            if (onInitialize != null)
+                onInitialize();
+        }
 
-			FrameCount = 0;
-			InfluenceFrameCount = 0;
-			MainNetworkHelper = networkHelper;
-			AgentController.Initialize ();
-			ClientManager.Initialize (MainNetworkHelper);
+        static bool Stalled;
 
-			BehaviourHelperManager.Initialize (helpers);
+        internal static void Simulate()
+        {
+            MainNetworkHelper.Simulate();
+            DefaultMessageRaiser.EarlySimulate();
+            if (InfluenceCount == 0)
+            {
+                InfluenceSimulate();
+                InfluenceCount = InfluenceResolution - 1;
+                if (FrameManager.CanAdvanceFrame == false)
+                {
+                    Stalled = true;
+                    return;
+                }
+                Stalled = false;
 
-			GridManager.Initialize ();
+                FrameManager.Simulate();
+                InfluenceFrameCount++;
+            }
+            else
+            {
+                InfluenceCount--;
+            }
+            if (Stalled || IsPaused)
+            {
+                return;
+            }
 
+            if (FrameCount == 0)
+            {
+                GameStart();
+            }
+            BehaviourHelperManager.Simulate();
+            AgentController.Simulate();
+            PhysicsManager.Simulate();
+            CoroutineManager.Simulate();
+            InfluenceManager.Simulate();
+            ProjectileManager.Simulate();
 
-			CoroutineManager.Initialize ();
-			FrameManager.Initialize ();
+            LateSimulate();
+            FrameCount++;
 
-			CommandManager.Initialize ();
+        }
 
+        //Called on the first frame of the game
+        private static void GameStart()
+        {
+            BehaviourHelperManager.GameStart();
+            GameStarted = true;
+        }
 
-			PhysicsManager.Initialize ();
-			PlayerManager.Initialize ();
-			SelectionManager.Initialize ();
-			InfluenceManager.Initialize ();
-			ProjectileManager.Initialize ();
+        private static void LateSimulate()
+        {
+            BehaviourHelperManager.LateSimulate();
+            AgentController.LateSimulate();
+            PhysicsManager.LateSimulate();
+            DefaultMessageRaiser.LateSimulate();
+        }
 
-			DefaultMessageRaiser.LateInitialize ();
-			BehaviourHelperManager.LateInitialize ();
-			if (onInitialize != null)
-				onInitialize ();
-		}
+        internal static void InfluenceSimulate()
+        {
+            PlayerManager.Simulate();
+            CommandManager.Simulate();
+            ClientManager.Simulate();
+        }
 
-		static bool Stalled;
+        internal static void Execute(Command com)
+        {
+            if (!GameStarted)
+            {
+                Debug.LogError("BOOM");
+                return;
+            }
+            if (com.ControllerID != byte.MaxValue)
+            {
+                AgentController cont = AgentController.InstanceManagers[com.ControllerID];
+                cont.Execute(com);
+            }
+            else
+            {
+                BehaviourHelperManager.Execute(com);
+            }
 
-		internal static void Simulate ()
-		{
-			MainNetworkHelper.Simulate ();
-			DefaultMessageRaiser.EarlySimulate ();
-			if (InfluenceCount == 0) {
-				InfluenceSimulate ();
-				InfluenceCount = InfluenceResolution - 1;
-				if (FrameManager.CanAdvanceFrame == false) {
-					Stalled = true;
-					return;
-				}
-				Stalled = false;
+            DefaultMessageRaiser.Execute(com);
 
-				FrameManager.Simulate ();
-				InfluenceFrameCount++;
-			} else {
-				InfluenceCount--;
-			}
-			if (Stalled || IsPaused) {
-				return;
-			}
+        }
 
-			if (FrameCount == 0) {
-				GameStart ();
-			}
-			BehaviourHelperManager.Simulate ();
-			AgentController.Simulate ();
-			PhysicsManager.Simulate ();
-			CoroutineManager.Simulate ();
-			InfluenceManager.Simulate ();
-			ProjectileManager.Simulate ();
+        internal static void Visualize()
+        {
+            if (!GameStarted)
+                return;
+            DefaultMessageRaiser.EarlyVisualize();
+            PlayerManager.Visualize();
+            BehaviourHelperManager.Visualize();
+            AgentController.Visualize();
+            ProjectileManager.Visualize();
+            EffectManager.Visualize();
+            CommandManager.Visualize();
+            PhysicsManager.Visualize();
+        }
 
-			LateSimulate ();
-			FrameCount++;
+        internal static void LateVisualize()
+        {
+            DefaultMessageRaiser.LateVisualize();
+            AgentController.LateVisualize();
+            PhysicsManager.LateVisualize();
+            BehaviourHelperManager.LateVisualize();
+        }
 
-		}
+        internal static void Deactivate()
+        {
+            DefaultMessageRaiser.EarlyDeactivate();
 
-		//Called on the first frame of the game
-		private static void GameStart ()
-		{
-			BehaviourHelperManager.GameStart ();
-			GameStarted = true;
-		}
+            if (GameStarted == false)
+            {
+                return;
+            }
 
-		private static void LateSimulate ()
-		{
-			BehaviourHelperManager.LateSimulate ();
-			AgentController.LateSimulate ();
-			PhysicsManager.LateSimulate ();
-			DefaultMessageRaiser.LateSimulate ();
-		}
+            Selector.Clear();
+            AgentController.Deactivate();
+            BehaviourHelperManager.Deactivate();
+            ProjectileManager.Deactivate();
+            EffectManager.Deactivate();
+            ClientManager.Deactivate();
 
-		internal static void InfluenceSimulate ()
-		{
-			PlayerManager.Simulate ();
-			CommandManager.Simulate ();
-			ClientManager.Simulate ();
-		}
+            ClientManager.Quit();
+            PhysicsManager.Deactivate();
+            GameStarted = false;
+            LSServer.Deactivate();
+            DefaultMessageRaiser.LateDeactivate();
+            CoroutineManager.Deactivate();
 
-		internal static void Execute (Command com)
-		{
-			if (!GameStarted) {
-				Debug.LogError ("BOOM");
-				return;
-			}
-			if (com.ControllerID != byte.MaxValue) {
-				AgentController cont = AgentController.InstanceManagers [com.ControllerID];
-				cont.Execute (com);
-			} else {
-				BehaviourHelperManager.Execute (com);
-			}
+            DefaultMessageRaiser.Reset();
+        }
 
-			DefaultMessageRaiser.Execute (com);
+        public static void Quit()
+        {
+            ClientManager.Quit();
+        }
 
-		}
-
-		internal static void Visualize ()
-		{
-			if (!GameStarted)
-				return;
-			DefaultMessageRaiser.EarlyVisualize ();
-			PlayerManager.Visualize ();
-			BehaviourHelperManager.Visualize ();
-			AgentController.Visualize ();
-			ProjectileManager.Visualize ();
-			EffectManager.Visualize ();
-			CommandManager.Visualize();
-			PhysicsManager.Visualize ();
-		}
-
-		internal static void LateVisualize ()
-		{
-			DefaultMessageRaiser.LateVisualize ();
-			AgentController.LateVisualize();
-			PhysicsManager.LateVisualize();
-			BehaviourHelperManager.LateVisualize();
-		}
-
-		internal static void Deactivate ()
-		{
-			DefaultMessageRaiser.EarlyDeactivate ();
-
-			if (GameStarted == false)
-				return;
-			Selector.Clear ();
-			AgentController.Deactivate ();
-			BehaviourHelperManager.Deactivate ();
-			ProjectileManager.Deactivate ();
-			EffectManager.Deactivate ();
-			ClientManager.Deactivate ();
-
-			ClientManager.Quit ();
-			PhysicsManager.Deactivate ();
-			GameStarted = false;
-			LSServer.Deactivate ();
-			DefaultMessageRaiser.LateDeactivate ();
-			CoroutineManager.Deactivate();
-
-			DefaultMessageRaiser.Reset ();
-		}
-
-		public static void Quit ()
-		{
-			ClientManager.Quit ();
-		}
-
-		public static int GetStateHash ()
-		{
-			int hash = LSUtility.PeekRandom (int.MaxValue);
-			hash += 1;
-			hash ^= AgentController.GetStateHash ();
-			hash += 1;
-			hash ^= ProjectileManager.GetStateHash ();
-			hash += 1;
-			return hash;
-		}
-	}
+        public static int GetStateHash()
+        {
+            int hash = LSUtility.PeekRandom(int.MaxValue);
+            hash += 1;
+            hash ^= AgentController.GetStateHash();
+            hash += 1;
+            hash ^= ProjectileManager.GetStateHash();
+            hash += 1;
+            return hash;
+        }
+    }
 }

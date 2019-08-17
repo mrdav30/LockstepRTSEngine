@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Snap
+  - WallSegment
+  - WallPillar
   layers:
   - Default
   - TransparentFX
@@ -16,7 +19,7 @@ TagManager:
   - PostProcessing
   - Ground
   - Resources
-  - 
+  - Wall
   - 
   - 
   - 

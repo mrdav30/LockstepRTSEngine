@@ -1,8 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using FastCollections;
-using System.Collections.Generic;
-using RTSLockstep.UI;
+﻿using FastCollections;
+using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace RTSLockstep
@@ -17,7 +15,7 @@ namespace RTSLockstep
 
         public static bool IsGathering { get; set; }
 
-        public static LSAgent MousedAgent { get; private set; }
+        public static RTSAgent MousedAgent { get; private set; }
 
         public static Vector2 MousePosition;
         public static Vector2 MouseWorldPosition;
@@ -29,31 +27,33 @@ namespace RTSLockstep
         public static Vector2 Box_BottomRight;
         public static bool Boxing;
         private static float BoxingTime;
-
-        private static bool _checkBoxDistance;
-        private static bool CheckBoxDistance { get { return _checkBoxDistance; } }
-
+        private static bool CheckBoxDistance { get; set; }
         private const float MinBoxSqrDist = 4;
-        private static Camera mainCamera;
-        private static Camera MainCamera { get { return mainCamera; } }
 
-        static Vector2 agentPos;
-        static readonly FastSorter<LSAgent> bufferBoxedAgents = new FastSorter<LSAgent>(
-                                                                    ((source, other) => source.BoxPriority - other.BoxPriority)
-                                                                );
-        static readonly FastList<LSAgent> BoxedAgents = new FastList<LSAgent>();
+        private static Vector2 agentPos;
+        private static readonly FastSorter<RTSAgent> bufferSelectedAgents = new FastSorter<RTSAgent>(((source, other) => source.BoxPriority - other.BoxPriority));
+        private static readonly FastList<RTSAgent> SelectedAgents = new FastList<RTSAgent>();
+
+        private static RTSAgent curAgent;
+        private static RaycastHit hit;
+        private static Ray ray;
+        private static Vector2 Point;
+        private static Vector2 Edge;
+        private static Vector2 dif;
+
+        public static bool _selectionLocked { get; private set; }
 
         public static void Initialize()
         {
-            mainCamera = Camera.main;
             ClearSelection();
+            UserInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
+            UserInputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
+            UserInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
+            _selectionLocked = true;
         }
-
-        public static bool CanClearSelection;
 
         public static void Update()
         {
-
             MousePosition = Input.mousePosition;
             MouseWorldPosition = RTSInterfacing.GetWorldPos(MousePosition);
             GetMousedAgent();
@@ -107,7 +107,7 @@ namespace RTSLockstep
                     //int lecount = 0;
                     if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
                     {
-                        bufferBoxedAgents.Clear();
+                        bufferSelectedAgents.Clear();
                         for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                         {
                             var agentController = PlayerManager.GetAgentController(i);
@@ -118,13 +118,13 @@ namespace RTSLockstep
                                     curAgent = agentController.LocalAgents[j];
                                     if (curAgent.CanSelect)
                                     {
+                                        //always add mousedagent
                                         if (curAgent.RefEquals(MousedAgent))
                                         {
-                                            bufferBoxedAgents.Add(curAgent);
+                                            bufferSelectedAgents.Add(curAgent);
                                         }
-                                        else
+                                        else if (curAgent.IsOwnedBy(PlayerManager.MainController))
                                         {
-
                                             agentPos = curAgent.Position2;
                                             Edge = Box_TopRight - Box_TopLeft;
                                             Point = agentPos - Box_TopLeft;
@@ -142,7 +142,7 @@ namespace RTSLockstep
                                                         Point = agentPos - Box_BottomLeft;
                                                         if (DotEdge() < 0)
                                                         {
-                                                            bufferBoxedAgents.Add(curAgent);
+                                                            bufferSelectedAgents.Add(curAgent);
                                                             continue;
                                                         }
                                                     }
@@ -150,58 +150,102 @@ namespace RTSLockstep
                                             }
                                         }
                                     }
-
                                 }
                             }
                         }
-                        bufferBoxable.FastClear();
-                        //bool noneBoxable = true;
-                        if (bufferBoxedAgents.Count > 0)
+
+                        if (bufferSelectedAgents.Count > 0)
                         {
-                            int peakBoxPriority = bufferBoxedAgents.PeekMax().BoxPriority;
-                            while (bufferBoxedAgents.Count > 0)
+                            int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                            while (bufferSelectedAgents.Count > 0)
                             {
-                                LSAgent agent = bufferBoxedAgents.PopMax();
+                                RTSAgent agent = bufferSelectedAgents.PopMax();
                                 if (agent.BoxPriority < peakBoxPriority)
+                                {
                                     break;
+                                }
                                 BoxAgent(agent);
                             }
                         }
-
                     }
                     else
                     {
                         BoxAgent(MousedAgent);
                     }
                 }
+
                 if (Input.GetMouseButtonUp(0))
                 {
-
-                    if (CanClearSelection && !Input.GetKey(KeyCode.LeftShift))
+                    if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                     {
                         ClearSelection();
                     }
+
                     if (IsGathering == false)
                     {
-                        SelectBoxedAgents();
+                        SelectSelectedAgents();
                     }
 
                     Boxing = false;
                 }
-
             }
-            else
+        }
+
+        // do left click things
+        public static void HandleSingleLeftClick()
+        {
+            QuickSelect();
+        }
+
+        // do left click hold things
+        public static void HandleLeftClickHoldDown()
+        {
+            CheckBoxDistance = true;
+            StartBoxing(MousePosition);
+        }
+
+        // do double click things
+        public static void HandleDoubleLeftClickDown()
+        {
+            Boxing = false;
+            if (MousedAgent)
             {
-
-                if (IsGathering == false && Input.GetMouseButton(0))
+                bufferSelectedAgents.Clear();
+                for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                 {
-                    _checkBoxDistance = true;
-                    StartBoxing(MousePosition);
-
+                    var agentController = PlayerManager.GetAgentController(i);
+                    for (int j = 0; j < AgentController.MaxAgents; j++)
+                    {
+                        if (agentController.LocalAgentActive[j])
+                        {
+                            curAgent = agentController.LocalAgents[j];
+                            if (curAgent.CanSelect)
+                            {
+                                if (curAgent.IsVisible
+                                    && curAgent.objectName == MousedAgent.objectName
+                                    && curAgent.IsOwnedBy(PlayerManager.MainController))
+                                {
+                                    bufferSelectedAgents.Add(curAgent);
+                                }
+                            }
+                        }
+                    }
                 }
 
-            }
+                if (bufferSelectedAgents.Count > 0)
+                {
+                    int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                    while (bufferSelectedAgents.Count > 0)
+                    {
+                        RTSAgent agent = bufferSelectedAgents.PopMax();
+                        if (agent.BoxPriority < peakBoxPriority)
+                            break;
+                        BoxAgent(agent);
+                    }
 
+                    SelectSelectedAgents();
+                }
+            }
         }
 
         public static void StartBoxing(Vector2 boxStart)
@@ -212,14 +256,25 @@ namespace RTSLockstep
             BoxEnd = MousePosition;
         }
 
+        public static void BoxAgent(RTSAgent agent)
+        {
+            if (ReferenceEquals(agent, null))
+            {
+                return;
+            }
+
+            SelectedAgents.Add(agent);
+            agent.IsHighlighted = true;
+        }
+
         public static void QuickSelect()
         {
-            if (CanClearSelection)
+            if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
                 ClearSelection();
             SelectAgent(MousedAgent);
         }
 
-        public static void SelectAgent(LSAgent agent)
+        public static void SelectAgent(RTSAgent agent)
         {
 
             if (agent.IsNotNull())
@@ -228,7 +283,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void UnselectAgent(LSAgent agent)
+        public static void UnselectAgent(RTSAgent agent)
         {
             if (agent.IsNotNull())
             {
@@ -236,26 +291,16 @@ namespace RTSLockstep
             }
         }
 
-        public static void BoxAgent(LSAgent agent)
-        {
-            if (System.Object.ReferenceEquals(agent, null))
-                return;
-            BoxedAgents.Add(agent);
-            agent.IsHighlighted = true;
-        }
-
-        static readonly FastList<LSAgent> bufferBoxable = new FastList<LSAgent>();
-
-        private static void CullBoxedAgents()
+        private static void CullSelectedAgents()
         {
 
         }
 
-        private static void SelectBoxedAgents()
+        private static void SelectSelectedAgents()
         {
-            for (int i = 0; i < BoxedAgents.Count; i++)
+            for (int i = 0; i < SelectedAgents.Count; i++)
             {
-                SelectAgent(BoxedAgents.innerArray[i]);
+                SelectAgent(SelectedAgents.innerArray[i]);
             }
         }
 
@@ -264,13 +309,25 @@ namespace RTSLockstep
             Selector.Clear();
         }
 
+        public static void SetSelectionLock(bool lockState)
+        {
+            if (lockState)
+            {
+                _selectionLocked = true;
+            }
+            else
+            {
+                _selectionLocked = false;
+            }
+        }
+
         public static void ClearBox()
         {
-            for (int i = 0; i < BoxedAgents.Count; i++)
+            for (int i = 0; i < SelectedAgents.Count; i++)
             {
-                BoxedAgents.innerArray[i].IsHighlighted = false;
+                SelectedAgents.innerArray[i].IsHighlighted = false;
             }
-            BoxedAgents.FastClear();
+            SelectedAgents.FastClear();
         }
 
         public static void DrawRealWorldBox()
@@ -294,18 +351,10 @@ namespace RTSLockstep
             }
         }
 
-        static LSAgent curAgent;
-        static RaycastHit hit;
-        static Ray ray;
-        static Vector2 Point;
-        static Vector2 Edge;
-
         public static float DotEdge()
         {
             return Point.x * -Edge.y + Point.y * Edge.x;
         }
-
-        static Vector2 dif;
 
         private static void GetMousedAgent()
         {
@@ -322,7 +371,7 @@ namespace RTSLockstep
 
         }
 
-        private static void MouseOver(LSAgent agent)
+        private static void MouseOver(RTSAgent agent)
         {
             if (MousedAgent.RefEquals(agent))
             {

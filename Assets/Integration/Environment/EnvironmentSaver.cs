@@ -1,35 +1,46 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace RTSLockstep
 {
     public abstract class EnvironmentSaver : MonoBehaviour
     {
-        public void Save() {
-            OnSave ();
-
-		}
-        protected virtual void OnSave () {
-
+        public void Save()
+        {
+            OnSave();
         }
-        public void EarlyApply () {
-            OnEarlyApply ();
-        }
-        protected virtual void OnEarlyApply () {
+
+        protected virtual void OnSave()
+        {
 
         }
-        public void Apply ()
+
+        public void EarlyApply()
+        {
+            OnEarlyApply();
+        }
+
+        protected virtual void OnEarlyApply()
+        {
+
+        }
+
+        public void Apply()
         {
             OnApply();
         }
-        protected virtual void OnApply ()
+
+        protected virtual void OnApply()
         {
 
         }
-        public void LateApply () {
+
+        public void LateApply()
+        {
             this.OnLateApply();
         }
-        protected virtual void OnLateApply () {
+
+        protected virtual void OnLateApply()
+        {
 
         }
     }

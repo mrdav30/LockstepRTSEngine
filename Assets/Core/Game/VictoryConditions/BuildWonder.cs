@@ -1,11 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using RTSLockstep;
-using RTSLockstep;
+﻿using RTSLockstep;
 
 public class BuildWonder : VictoryCondition
 {
-
     public override string GetDescription()
     {
         return "Building Wonder";
@@ -20,7 +16,7 @@ public class BuildWonder : VictoryCondition
         {
             if (agent.GetAbility<Wonder>())
             {
-                return commander && !commander.IsDead() && agent && !agent.GetAbility<Structure>().UnderConstruction();
+                return commander && !commander.IsDead() && agent && !agent.GetAbility<Structure>().NeedsConstruction;
             }
         }
         return false;

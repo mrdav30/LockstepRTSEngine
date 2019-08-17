@@ -5,7 +5,8 @@ namespace RTSLockstep.Data
 {
     public interface IAgentData : INamedData
     {
-        LSAgent GetAgent();
+        RTSAgent GetAgent();
+        string GetAgentDescription();
         Texture2D GetAgentIcon();
     }
 }

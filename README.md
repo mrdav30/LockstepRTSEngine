@@ -1,5 +1,8 @@
 Lockstep RTS Engine
 ------------------------
+
+**Latest build on Unity version: 2019.2.1f1**
+
 The Lockstep RTS Engine (LRE) is an engine designed for 3d RTS games with lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LRE is integrated with Unity, but can be abstracted away.
 
 Special thanks to John Pan (https://github.com/SnpM) for the hard work and dedication he put into his Lockstep Framework (https://github.com/SnpM/LockstepFramework). Also to Elgar Storm for the amazing tutorial he created for developing an RTS game (http://www.stormtek.geek.nz/rts_tutorial/part1.php).
@@ -68,6 +71,5 @@ Currently, only movement with crowd behaviors is implemented. If you'd like to c
 Example Scene Requires:
 ---------
 
-- [Rocks Pack](https://assetstore.unity.com/packages/3d/environments/rock-boulders-2452) - For rocks
 - [Post Processing Stack](https://assetstore.unity.com/packages/essentials/post-processing-stack-83912)
 - [Legacy Image Effects](https://assetstore.unity.com/packages/essentials/legacy-image-effects-83913)

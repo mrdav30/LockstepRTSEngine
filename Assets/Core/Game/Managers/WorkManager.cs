@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -8,30 +9,7 @@ namespace RTSLockstep
 {
     public static class WorkManager
     {
-        //public static GameObject FindHitObject(Vector3 origin)
-        //{
-        //    Ray ray = Camera.main.ScreenPointToRay(origin);
-        //    RaycastHit hit;
-        //    if (Physics.Raycast(ray, out hit))
-        //    {
-        //        return hit.collider.gameObject;
-
-        //    }
-        //    return null;
-        //}
-
-        //public static Vector3 FindHitPoint(Vector3 origin)
-        //{
-        //    Ray ray = Camera.main.ScreenPointToRay(origin);
-        //    RaycastHit hit;
-        //    if (Physics.Raycast(ray, out hit))
-        //    {
-        //        return hit.point;
-        //    }
-        //    return ResourceManager.InvalidPosition;
-        //}
-
-        //not needed
+        //no longer needed?
         public static Rect CalculateSelectionBox(Bounds selectionBounds, Rect playingArea)
         {
             //shorthand for the coordinates of the centre of the selection bounds
@@ -78,7 +56,7 @@ namespace RTSLockstep
                 case "Gold":
                     return ResourceType.Gold;
                 case "Army":
-                    return ResourceType.Army;
+                    return ResourceType.Provision;
                 case "Ore":
                     return ResourceType.Ore;
                 case "Crystal":
@@ -109,27 +87,7 @@ namespace RTSLockstep
             }
         }
 
-        public static List<RTSAgent> FindNearbyObjects(Vector3 position, float range)
-        {
-            Collider[] hitColliders = Physics.OverlapSphere(position, range);
-            HashSet<int> nearbyObjectIds = new HashSet<int>();
-            List<RTSAgent> nearbyObjects = new List<RTSAgent>();
-            for (int i = 0; i < hitColliders.Length; i++)
-            {
-                Transform parent = hitColliders[i].transform.parent;
-                if (parent)
-                {
-                    RTSAgent parentObject = parent.GetComponent<RTSAgent>();
-                    if (parentObject && !nearbyObjectIds.Contains(parentObject.GlobalID))
-                    {
-                        nearbyObjectIds.Add(parentObject.GlobalID);
-                        nearbyObjects.Add(parentObject);
-                    }
-                }
-            }
-            return nearbyObjects;
-        }
-
+        //currently used by harvest ability, switch to influence?
         public static RTSAgent FindNearestWorldObjectInListToPosition(List<RTSAgent> objects, Vector3 position)
         {
             if (objects == null || objects.Count == 0)
@@ -150,6 +108,49 @@ namespace RTSLockstep
             }
 
             return nearestObject;
+        }
+
+        //get size based on the mesh renderer attached to the empty GO since it's not an agent yet...
+        public static Bounds CalculateBounds(GameObject obj, Vector3 position)
+        {
+            Bounds rendererBounds = new Bounds(position, Vector3.zero);
+            foreach (Renderer r in obj.GetComponentsInChildren<Renderer>())
+            {
+                rendererBounds.Encapsulate(r.bounds);
+            }
+
+            return rendererBounds;
+        }
+
+        //This extension method gets a copy of a component on an existing game object:
+        public static T AddComponent<T>(this GameObject go, T toAdd) where T : Component
+        {
+            return go.AddComponent<T>().GetCopyOf(toAdd) as T;
+        }
+
+        public static T GetCopyOf<T>(this Component comp, T other) where T : Component
+        {
+            Type type = comp.GetType();
+            if (type != other.GetType()) return null; // type mis-match
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.DeclaredOnly;
+            PropertyInfo[] pinfos = type.GetProperties(flags);
+            foreach (var pinfo in pinfos)
+            {
+                if (pinfo.CanWrite)
+                {
+                    try
+                    {
+                        pinfo.SetValue(comp, pinfo.GetValue(other, null), null);
+                    }
+                    catch { } // In case of NotImplementedException being thrown. For some reason specifying that exception didn't seem to catch it, so I didn't catch anything specific.
+                }
+            }
+            FieldInfo[] finfos = type.GetFields(flags);
+            foreach (var finfo in finfos)
+            {
+                finfo.SetValue(comp, finfo.GetValue(other));
+            }
+            return comp as T;
         }
     }
 }

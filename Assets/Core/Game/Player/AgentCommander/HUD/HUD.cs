@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using RTSLockstep;
+﻿using RTSLockstep;
 using RTSLockstep.Data;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class HUD : MonoBehaviour
 {
@@ -21,19 +21,23 @@ public class HUD : MonoBehaviour
     public Texture2D rallyPointCursor;
     public Texture2D healthy, damaged, critical;
     public Texture2D[] resourceHealthBars;
+    public Material notAllowedMaterial, allowedMaterial;
     public GUISkin playerDetailsSkin;
     public AudioClip clickSound;
     public float clickVolume = 1.0f;
 
     private AgentCommander cachedCommander;
+    private bool _cursorLocked;
+    public bool _mouseOverHud { get; private set; }
     private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40;
     private const int SELECTION_NAME_HEIGHT = 15;
     private CursorState activeCursorState;
     private int currentFrame = 0;
-    private Dictionary<ResourceType, long> resourceValues, resourceLimits;
+    private Dictionary<ResourceType, long> resourceValues;
+    private Dictionary<ResourceType, long> resourceLimits;
     private const int ICON_WIDTH = 32, ICON_HEIGHT = 32, TEXT_WIDTH = 128, TEXT_HEIGHT = 32;
     private static Dictionary<ResourceType, Texture2D> resourceImages;
-    private LSAgent lastSelection;
+    private RTSAgent lastSelection;
     private float sliderValue;
     private const int BUILD_IMAGE_WIDTH = 64, BUILD_IMAGE_HEIGHT = 64;
     private int buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
@@ -46,12 +50,11 @@ public class HUD : MonoBehaviour
 
     #region MonoBehavior
     // Use this for initialization
-    private void Start()
+    public void Setup()
     {
-        cachedCommander = transform.GetComponentInParent<AgentCommander>();
+        cachedCommander = GetComponentInParent<AgentCommander>();
         if (cachedCommander && cachedCommander.human)
         {
-            //    agentController = PlayerManager.GetAgentController(cachedCommander.playerIndex);
             resourceValues = new Dictionary<ResourceType, long>();
             resourceLimits = new Dictionary<ResourceType, long>();
             resourceImages = new Dictionary<ResourceType, Texture2D>();
@@ -90,9 +93,9 @@ public class HUD : MonoBehaviour
                         resourceLimits.Add(ResourceType.Food, 0);
                         break;
                     case "Army":
-                        resourceImages.Add(ResourceType.Army, resources[i]);
-                        resourceValues.Add(ResourceType.Army, 0);
-                        resourceLimits.Add(ResourceType.Army, 0);
+                        resourceImages.Add(ResourceType.Provision, resources[i]);
+                        resourceValues.Add(ResourceType.Provision, 0);
+                        resourceLimits.Add(ResourceType.Provision, 0);
                         break;
                     default: break;
                 }
@@ -124,8 +127,9 @@ public class HUD : MonoBehaviour
                     default: break;
                 }
             }
-            ResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
-            ResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
+            GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
+            GameResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
+            GameResourceManager.StoreConstructionMaterials(allowedMaterial, notAllowedMaterial);
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
             SetCursorState(CursorState.Select);
 
@@ -137,13 +141,21 @@ public class HUD : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    private void OnGUI()
+    public void Visualize()
     {
-        if (cachedCommander && cachedCommander.human && cachedCommander == PlayerManager.MainController.Commander)
+        _mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
+    }
+
+    // Update is called once per frame
+    public void doGUI()
+    {
+        if (cachedCommander 
+            && cachedCommander.human 
+            && PlayerManager.MainController.IsNotNull()
+            && cachedCommander == PlayerManager.MainController.Commander)
         {
             DrawPlayerDetails();
-            if (!ResourceManager.MenuOpen)
+            if (!GameResourceManager.MenuOpen)
             {
                 if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
                 {
@@ -188,6 +200,11 @@ public class HUD : MonoBehaviour
 
     public void SetCursorState(CursorState newState)
     {
+        if (_cursorLocked)
+        {
+            return;
+        }
+
         if (activeCursorState != newState)
         {
             previousCursorState = activeCursorState;
@@ -237,42 +254,51 @@ public class HUD : MonoBehaviour
         }
     }
 
+    public void SetCursorLock(bool lockState)
+    {
+        if (lockState)
+        {
+            _cursorLocked = true;
+        }
+        else
+        {
+            _cursorLocked = false;
+        }
+    }
+
     public void SetResourceValues(Dictionary<ResourceType, long> resourceValues, Dictionary<ResourceType, long> resourceLimits)
     {
         this.resourceValues = resourceValues;
         this.resourceLimits = resourceLimits;
     }
 
-    public CursorState GetPreviousCursorState()
-    {
-        return previousCursorState;
-    }
-
     public CursorState GetCursorState()
     {
         return activeCursorState;
+    }
+
+    public bool GetCursorLockState()
+    {
+        return _cursorLocked;
     }
     #endregion
 
     #region Private
     private void DrawOrdersBar()
     {
-        if (Selector.MainSelectedAgent.GetAbility<Structure>() && Selector.MainSelectedAgent.GetAbility<Structure>().UnderConstruction())
-        {
-            return;
-        }
+        RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
+
         GUI.skin = ordersSkin;
         GUI.BeginGroup(new Rect(Screen.width - ORDERS_BAR_WIDTH - BUILD_IMAGE_WIDTH, RESOURCE_BAR_HEIGHT, ORDERS_BAR_WIDTH + BUILD_IMAGE_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT));
         GUI.Box(new Rect(BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH, 0, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT), "");
         string selectionName = "";
 
-        RTSAgent selectedAgent = Selector.MainSelectedAgent as RTSAgent;
-        selectionName = selectedAgent.GetComponent<RTSAgent>().objectName;
-        if (selectedAgent.IsOwnedBy(cachedCommander.CachedController))
-        {
+        selectionName = selectedAgent.GetComponent<RTSAgent>().AgentDescription;
 
+        if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
+        {
             // reset slider value if the selected object has changed
-            if (lastSelection && lastSelection != Selector.MainSelectedAgent)
+            if (lastSelection && lastSelection != selectedAgent)
             {
                 sliderValue = 0.0f;
             }
@@ -280,7 +306,7 @@ public class HUD : MonoBehaviour
             {
                 DrawActions(selectedAgent.GetAbility<Construct>().GetBuildActions());
             }
-            else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>())
+            else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>() && !selectedAgent.GetAbility<Structure>().NeedsConstruction)
             {
                 DrawActions(selectedAgent.GetAbility<Spawner>().GetSpawnActions());
             }
@@ -292,7 +318,10 @@ public class HUD : MonoBehaviour
                 {
                     DrawBuildQueue(lastSelection.GetAbility<Spawner>().getBuildQueueValues(), lastSelection.GetAbility<Spawner>().getBuildPercentage());
                 }
-                DrawStandardBuildingOptions(lastSelection as RTSAgent);
+            }
+            if (lastSelection.MyAgentType == AgentType.Building || lastSelection.MyAgentType == AgentType.Unit)
+            {
+                DrawStandardOptions(lastSelection as RTSAgent);
             }
         }
         if (!selectionName.Equals(""))
@@ -310,7 +339,7 @@ public class HUD : MonoBehaviour
         {
             float topPos = i * BUILD_IMAGE_HEIGHT - (i + 1) * BUILD_IMAGE_PADDING;
             Rect buildPos = new Rect(BUILD_IMAGE_PADDING, topPos, BUILD_IMAGE_WIDTH, BUILD_IMAGE_HEIGHT);
-            GUI.DrawTexture(buildPos, ResourceManager.GetBuildImage(buildQueue[i]));
+            GUI.DrawTexture(buildPos, GameResourceManager.GetBuildImage(buildQueue[i]));
             GUI.DrawTexture(buildPos, buildFrame);
             topPos += BUILD_IMAGE_PADDING;
             float width = BUILD_IMAGE_WIDTH - 2 * BUILD_IMAGE_PADDING;
@@ -325,7 +354,7 @@ public class HUD : MonoBehaviour
         }
     }
 
-    private void DrawStandardBuildingOptions(RTSAgent building)
+    private void DrawStandardOptions(RTSAgent agent)
     {
         GUIStyle buttons = new GUIStyle();
         buttons.hover.background = smallButtonHover;
@@ -335,27 +364,29 @@ public class HUD : MonoBehaviour
         int topPos = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
-        if (GUI.Button(new Rect(leftPos, topPos, width, height), building.GetAbility<Structure>().sellImage))
+
+        if (cachedCommander.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
         {
             PlayClick();
-            building.GetAbility<Structure>().Sell();
+            agent.Die();
         }
-        if (building.GetAbility<Spawner>() != null && building.GetAbility<Spawner>().hasSpawnPoint())
+
+        if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
         {
             leftPos += width + BUTTON_SPACING;
-            if (GUI.Button(new Rect(leftPos, topPos, width, height), building.GetAbility<Spawner>().rallyPointImage))
+            if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Rally>().rallyPointImage))
             {
                 PlayClick();
-                if (activeCursorState != CursorState.RallyPoint && previousCursorState != CursorState.RallyPoint)
+                if (activeCursorState != CursorState.RallyPoint)
                 {
-                    building.GetAbility<Spawner>().SetFlagState(FlagState.SettingFlag);
+                    agent.GetAbility<Rally>().SetFlagState(FlagState.SettingFlag);
                     SetCursorState(CursorState.RallyPoint);
+                    SetCursorLock(true);
                 }
                 else
                 {
-                    // dirty hack to ensure toggle between RallyPoint and not works ...
-                    building.GetAbility<Spawner>().SetFlagState(FlagState.FlagSet);
-                    SetCursorState(CursorState.PanRight);
+                    agent.GetAbility<Rally>().SetFlagState(FlagState.FlagSet);
+                    SetCursorLock(false);
                     SetCursorState(CursorState.Select);
                 }
             }
@@ -386,7 +417,7 @@ public class HUD : MonoBehaviour
         DrawResourceIcon(ResourceType.Crystal, iconLeft, textLeft, topPos);
         iconLeft += TEXT_WIDTH;
         textLeft += TEXT_WIDTH;
-        DrawResourceIcon(ResourceType.Army, iconLeft, textLeft, topPos);
+        DrawResourceIcon(ResourceType.Provision, iconLeft, textLeft, topPos);
         int padding = 7;
         int buttonWidth = ORDERS_BAR_WIDTH - 2 * padding - SCROLL_BAR_WIDTH;
         int buttonHeight = RESOURCE_BAR_HEIGHT - 2 * padding;
@@ -421,17 +452,16 @@ public class HUD : MonoBehaviour
 
     private void DrawMouseCursor()
     {
-        bool mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
-
         Cursor.visible = false;
 
-        if (mouseOverHud)
+        // toggle back to pointer if over hud
+        if (_mouseOverHud && !_cursorLocked)
         {
-            SelectionManager.CanClearSelection = false;
+            SelectionManager.SetSelectionLock(true);
             SetCursorState(CursorState.Pointer);
         }
 
-        if (!cachedCommander.CachedBuilderManager.IsFindingBuildingLocation())
+        if (!ConstructionHandler.IsFindingBuildingLocation())
         {
             GUI.skin = mouseCursorSkin;
             GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
@@ -509,7 +539,8 @@ public class HUD : MonoBehaviour
             int column = i % 2;
             int row = i / 2;
             Rect pos = GetButtonPos(row, column);
-            Texture2D action = ResourceManager.GetBuildImage(actions[i]);
+            Texture2D action = GameResourceManager.GetBuildImage(actions[i]);
+
             if (action)
             {
                 //create the button and handle the click of that button
@@ -520,11 +551,15 @@ public class HUD : MonoBehaviour
                     {
                         PlayClick();
 
-                        if (agent.MyAgentType == AgentType.Unit && agent.GetAbility<Construct>())
+                        if (agent.MyAgentType == AgentType.Unit 
+                            && agent.GetAbility<Construct>()
+                            && !ConstructionHandler.IsFindingBuildingLocation())
                         {
-                            cachedCommander.CachedBuilderManager.CreateBuilding(agent, actions[i]);
+                            ConstructionHandler.CreateStructure(actions[i], agent, agent.GetPlayerArea());
                         }
-                        else if (agent.MyAgentType == AgentType.Building && agent.GetAbility<Spawner>())
+                        else if (agent.MyAgentType == AgentType.Building 
+                            && !agent.GetAbility<Structure>().NeedsConstruction
+                            && agent.GetAbility<Spawner>())
                         {
                             // send spawn command
                             Command spawnCom = new Command(AbilityDataItem.FindInterfacer("Spawner").ListenInputID);
@@ -565,18 +600,18 @@ public class HUD : MonoBehaviour
     {
         GUI.skin = playerDetailsSkin;
         GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
-        float height = ResourceManager.TextHeight;
-        float leftPos = ResourceManager.Padding;
-        float topPos = Screen.height - height - ResourceManager.Padding;
-        Texture2D avatar = RTSLockstep.PlayerManager.GetPlayerAvatar();
+        float height = GameResourceManager.TextHeight;
+        float leftPos = GameResourceManager.Padding;
+        float topPos = Screen.height - height - GameResourceManager.Padding;
+        Texture2D avatar = PlayerManager.GetPlayerAvatar();
         if (avatar)
         {
             //we want the texture to be drawn square at all times
             GUI.DrawTexture(new Rect(leftPos, topPos, height, height), avatar);
-            leftPos += height + ResourceManager.Padding;
+            leftPos += height + GameResourceManager.Padding;
         }
         float minWidth = 0, maxWidth = 0;
-        string playerName = RTSLockstep.PlayerManager.GetPlayerName();
+        string playerName = PlayerManager.GetPlayerName();
         playerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(playerName), out minWidth, out maxWidth);
         GUI.Label(new Rect(leftPos, topPos, maxWidth, height), playerName);
         GUI.EndGroup();

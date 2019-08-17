@@ -4,25 +4,25 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-using RTSLockstep.Data;
 using Newtonsoft.Json;
+using RTSLockstep.Data;
 using UnityEngine;
 
 namespace RTSLockstep
 {
     public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
-        private bool isCasting;
+        private bool IsFirstFrame = true;
 
-        private LSAgent _agent;
+        private RTSAgent _agent;
 
-        public LSAgent Agent
+        public RTSAgent Agent
         {
             get
             {
 #if UNITY_EDITOR
                 if (_agent == null)
-                    return GetComponent<LSAgent>();
+                    return GetComponent<RTSAgent>();
 #endif
                 return _agent;
             }
@@ -44,6 +44,7 @@ namespace RTSLockstep
 
         public LSVariableContainer VariableContainer { get { return _variableContainer; } }
 
+        private bool isCasting;
         public bool IsCasting
         {
             get
@@ -66,9 +67,34 @@ namespace RTSLockstep
                 }
             }
         }
+
+        private bool isFocused;
+        public bool IsFocused
+        {
+            get
+            {
+                return isFocused;
+            }
+            protected set
+            {
+                if (value != isFocused)
+                {
+                    if (value == true)
+                    {
+                        Agent.CheckFocus = false;
+                    }
+                    else
+                    {
+                        Agent.CheckFocus = true;
+                    }
+                    isFocused = value;
+                }
+            }
+        }
+
         protected bool loadedSavedValues = false;
 
-        internal void Setup(LSAgent agent, int id)
+        internal void Setup(RTSAgent agent, int id)
         {
             System.Type mainType = this.GetType();
             if (mainType.IsSubclassOf(typeof(ActiveAbility)))
@@ -101,6 +127,7 @@ namespace RTSLockstep
         {
             this.OnLateSetup();
         }
+
         /// <summary>
         /// Override for communicating with other abilities in the setup phase
         /// </summary>
@@ -129,11 +156,11 @@ namespace RTSLockstep
         {
         }
 
-        bool IsFirstFrame = true;
         private void FirstFrame()
         {
             OnFirstFrame();
         }
+
         protected virtual void OnFirstFrame()
         {
 
@@ -196,9 +223,12 @@ namespace RTSLockstep
 
         }
 
-        protected virtual void OnGUI()
+        public void OnGUI()
         {
+            doGUI();
         }
+
+        protected virtual void doGUI() { }
 
         public void BeginCast()
         {

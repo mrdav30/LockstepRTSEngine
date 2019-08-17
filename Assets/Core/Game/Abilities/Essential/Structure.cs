@@ -1,74 +1,118 @@
-﻿using Newtonsoft.Json;
-using RTSLockstep;
+﻿using Assets.Integration.CustomComparison;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace RTSLockstep
 {
-    public class Structure : Ability
+    /*
+     * Essential ability that attaches to any active structure 
+     */
+    public class Structure : Ability, IBuildable
     {
-        public Texture2D sellImage;
+        public bool provisioner;
+        public int provisionAmount;
+        [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
+        private ResourceType[] _resourceStorage;
+        public StructureType StructureType;
+        /// <summary>
+        /// Every wall pillar needs a corresponding section of wall to hold up.
+        /// </summary>
+        /// <value>The game object of the wall segement prefab</value>
+        [DrawIf("StructureType", ComparisonType.Equals, StructureType.Wall)]
+        public GameObject WallSegmentGO;
+        /// <summary>
+        /// Describes the width and height of the buildable. This value does not change on the buildable.
+        /// </summary>
+        /// <value>The size of the build.</value>
+        public int BuildSizeLow { get; set; }
+        public int BuildSizeHigh { get; set; }
 
-        private bool _needsBuilding = false;
-        private bool _needsRepair = false;
+        public Coordinate GridPosition { get; set; }
+        /// <summary>
+        /// Function that relays to the buildable whether or not it's on a valid building spot.
+        /// </summary>
+        public bool IsValidOnGrid { get; set; }
+        public bool IsMoving { get; set; }
+        public bool IsOverlay { get; set; }
+
+        public bool ValidPlacement { get; set; }
+        public bool ConstructionStarted { get; set; }
+        public bool NeedsConstruction { get; private set; }
+        private bool _needsRepair;
+        private bool _provisioned;
+        private int upgradeLevel;
         private Health cachedHealth;
-        private Spawner cachedSpawner;
-        private int upgradeLevel = 1;
+        private Rally cachedRally;
 
         protected override void OnSetup()
         {
             cachedHealth = Agent.GetAbility<Health>();
-            cachedSpawner = Agent.GetAbility<Spawner>();
+            cachedRally = Agent.GetAbility<Rally>();
 
-            if(cachedHealth.HealthAmount == cachedHealth.MaxHealth)
-            {
-                Agent.SetState(AnimState.Idling);
-            }
+            upgradeLevel = 1;
+        }
+
+        protected override void OnInitialize()
+        {
+            NeedsConstruction = false;
+            _needsRepair = false;
+            _provisioned = false;
         }
 
         protected override void OnSimulate()
         {
-            if(!_needsBuilding && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
+            if (!NeedsConstruction && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
             {
                 _needsRepair = true;
             }
-        }
 
-        public void Sell()
-        {
-            if (PlayerManager.MainController.Commander)
+            if (cachedHealth.HealthAmount == cachedHealth.MaxHealth)
             {
-                PlayerManager.MainController.Commander.AddResource(ResourceType.Gold, (Agent as RTSAgent).sellValue);
+                if (provisioner && !_provisioned)
+                {
+                    _provisioned = true;
+                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                }
             }
-            Agent.Die(true);
         }
 
-        public void StartConstruction()
+        public void AwaitConstruction()
         {
-            Agent.Body.CalculateBounds();
-            _needsBuilding = true;
+            NeedsConstruction = true;
             IsCasting = true;
-            cachedHealth.HealthAmount = 0;
-            if (cachedSpawner)
-            {
-                cachedSpawner.SetSpawnPoint();
-            }
-        }
+            cachedHealth.HealthAmount = FixedMath.Create(0);
 
-        public bool UnderConstruction()
-        {
-            return this._needsBuilding;
+            if (cachedRally)
+            {
+                cachedRally.SetSpawnPoint();
+            }
         }
 
         public void Construct(long amount)
         {
+            if (NeedsConstruction && !ConstructionStarted)
+            {
+                if (Agent.Animator.IsNotNull())
+                {
+                    Agent.Animator.SetState(AnimState.Building);
+                }
+
+                ConstructionStarted = true;
+                ConstructionHandler.RestoreMaterial(Agent.gameObject);
+            }
+
             cachedHealth.HealthAmount += amount;
             if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
             {
-              //  Agent.SetState(AnimState.Idling);
                 cachedHealth.HealthAmount = cachedHealth.BaseHealth;
-                _needsBuilding = false;
+                NeedsConstruction = false;
                 IsCasting = false;
-                (Agent as RTSAgent).SetTeamColor();
+                Agent.SetTeamColor();
+                if (provisioner && !_provisioned)
+                {
+                    _provisioned = true;
+                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                }
             }
         }
 
@@ -77,13 +121,50 @@ namespace RTSLockstep
             return this.upgradeLevel;
         }
 
+        public bool CanStoreResources(ResourceType resourceType)
+        {
+
+            if (_resourceStorage.Length > 0)
+            {
+                for (int i = 0; i < _resourceStorage.Length; i++)
+                {
+                    if (_resourceStorage[i] == resourceType)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+
+        }
+
+        public void SetGridPosition(Vector2d pos)
+        {
+            Coordinate coord = new Coordinate(pos.x.ToInt(), pos.y.ToInt());
+            GridPosition = coord;
+        }
+
+        protected override void OnDeactivate()
+        {
+            if (provisioner)
+            {
+                Agent.GetCommander().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+            }
+
+            GridBuilder.Unbuild(this);
+        }
+
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            SaveManager.WriteBoolean(writer, "NeedsBuilding", _needsBuilding);
-            if (_needsBuilding)
+            SaveManager.WriteBoolean(writer, "NeedsBuilding", NeedsConstruction);
+            SaveManager.WriteBoolean(writer, "NeedsRepair", _needsRepair);
+            if (NeedsConstruction)
             {
-                SaveManager.WriteRect(writer, "PlayingArea", (Agent as RTSAgent).GetPlayerArea());
+                SaveManager.WriteRect(writer, "PlayingArea", Agent.GetPlayerArea());
             }
         }
 
@@ -93,10 +174,13 @@ namespace RTSLockstep
             switch (propertyName)
             {
                 case "NeedsBuilding":
-                    _needsBuilding = (bool)readValue;
+                    NeedsConstruction = (bool)readValue;
+                    break;
+                case "NeedsRepair":
+                    _needsRepair = (bool)readValue;
                     break;
                 case "PlayingArea":
-                    (Agent as RTSAgent).SetPlayingArea(LoadManager.LoadRect(reader));
+                    Agent.SetPlayingArea(LoadManager.LoadRect(reader));
                     break;
                 default: break;
             }

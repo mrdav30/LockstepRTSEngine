@@ -120,7 +120,7 @@ namespace RTSLockstep
             }
             else return null;
         }
-        public static LSProjectile Create(string projCode, LSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<LSAgent, bool> agentConditional, Action<LSAgent> hitEffect)
+        public static LSProjectile Create(string projCode, RTSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<RTSAgent, bool> agentConditional, Action<RTSAgent> hitEffect)
         {
             Vector2d relativePos = offset.ToVector2d();
             Vector2d worldPos = relativePos.Rotated(source.Body.Rotation) + source.Body.Position;
@@ -139,7 +139,7 @@ namespace RTSLockstep
             return proj;
         }
 
-        public static LSProjectile Create(string projCode, Vector3d position, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<LSAgent> onHit)
+        public static LSProjectile Create(string projCode, Vector3d position, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<RTSAgent> onHit)
         {
             var curProj = RawCreate(projCode);
 

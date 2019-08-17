@@ -37,7 +37,7 @@ namespace RTSLockstep
 				ConfigData = database.UnitConfigData;
 				for (int i = 0; i < ConfigData.Length; i++) {
 					IUnitConfigDataItem item = ConfigData [i];
-					LSAgent agent = ResourceManager.GetAgentTemplate (item.Target);
+					RTSAgent agent = GameResourceManager.GetAgentTemplate (item.Target);
 					for (int j = 0; j < item.Stats.Length; j++) {
 						Stat stat = item.Stats [j];
 						//todo guard

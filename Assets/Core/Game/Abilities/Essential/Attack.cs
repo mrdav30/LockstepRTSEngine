@@ -1,23 +1,21 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using UnityEngine;
-using RTSLockstep.Data;
-using RTSLockstep;
-using Newtonsoft.Json;
 
 namespace RTSLockstep
 {
     [UnityEngine.DisallowMultipleComponent]
     public class Attack : ActiveAbility
     {
-        private const int SearchRate = (int)(LockstepManager.FrameRate / 2);
         public const long MissModifier = FixedMath.One / 2;
 
-        public bool CanAttack;
         public virtual bool CanMove { get; private set; }
 
         protected bool CanTurn { get; private set; }
 
-        public LSAgent Target { get; private set; }
+        public RTSAgent Target { get; private set; }
+
+        public virtual bool IsOffensive { get { return _isOffensive; } }
 
         public virtual string ProjCode { get { return _projectileCode; } }
 
@@ -47,11 +45,10 @@ namespace RTSLockstep
         public long AttackAngle { get { return _attackAngle; } }
         //The angle in front of the unit that the target must be located in
 
-        protected virtual AllegianceType TargetAllegiance
+        public AllegianceType TargetAllegiance
         { //Allegiance to the target
             get { return this._targetAllegiance; }
         }
-
 
         public virtual Vector3d ProjectileOffset { get { return _projectileOffset; } }
 
@@ -78,6 +75,8 @@ namespace RTSLockstep
         //Offset of projectile
 
         #region Serialized Values (Further description in properties)
+        [SerializeField]
+        protected bool _isOffensive;
         [SerializeField, DataCode("Projectiles")]
         protected string _projectileCode;
         [FixedNumber, SerializeField]
@@ -111,7 +110,6 @@ namespace RTSLockstep
 
         long windupCount;
 
-
         [SerializeField]
         protected bool _increasePriority = true;
 
@@ -130,12 +128,9 @@ namespace RTSLockstep
 
         private int basePriority;
         private uint targetVersion;
-        private int searchCount;
         private long attackCount;
 
         public bool IsAttackMoving { get; private set; }
-
-        private bool isFocused;
 
         private int loadedTargetId = -1;
 
@@ -143,8 +138,11 @@ namespace RTSLockstep
         {
             cachedTurn = Agent.GetAbility<Turn>();
             cachedMove = Agent.GetAbility<Move>();
+
             if (Sight < Range)
+            {
                 _sight = Range + FixedMath.One * 5;
+            }
 
             //fastRange = (Range * Range);
             basePriority = cachedBody.Priority;
@@ -156,7 +154,6 @@ namespace RTSLockstep
             }
 
             CanTurn = cachedTurn.IsNotNull();
-            CachedAgentValid = this.AgentValid;
         }
 
         private void HandleOnArrive()
@@ -179,12 +176,11 @@ namespace RTSLockstep
         protected override void OnInitialize()
         {
             basePriority = Agent.Body.Priority;
-            searchCount = LSUtility.GetRandom(SearchRate) + 1;
             attackCount = 0;
             Target = null;
             IsAttackMoving = false;
             inRange = false;
-            isFocused = false;
+            IsFocused = false;
             CycleCount = 0;
             this.Destination = Vector2d.zero;
             repathTimer.Reset(repathInterval);
@@ -195,12 +191,12 @@ namespace RTSLockstep
             var controller = Agent.Controller;
             CachedOnHit = (target) => OnHit(target, spawnVersion, controller);
 
-            if ((Agent as RTSAgent).GetCommander() && loadedSavedValues && loadedTargetId >= 0)
+            if (Agent.GetCommander() && loadedSavedValues && loadedTargetId >= 0)
             {
-                RTSAgent obj = (Agent as RTSAgent).GetCommander().GetObjectForId(loadedTargetId);
+                RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedTargetId);
                 if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Building)
                 {
-                    Target = (LSAgent)obj;
+                    Target = obj;
                 }
             }
         }
@@ -223,10 +219,6 @@ namespace RTSLockstep
                 if (Target != null)
                 {
                     BehaveWithTarget();
-                }
-                else
-                {
-                    BehaveWithNoTarget();
                 }
             }
 
@@ -277,172 +269,137 @@ namespace RTSLockstep
             {
                 //Target's lifecycle has ended
                 StopEngage();
-                BehaveWithNoTarget();
-                return;
             }
-
-            if (!IsWindingUp)
+            else
             {
-                Vector2d targetDirection = Target.Body._position - cachedBody._position;
-                long fastMag = targetDirection.FastMagnitude();
-
-                //TODO: Optimize this instead of recalculating magnitude multiple times
-                if (CheckRange())
+                if (!IsWindingUp)
                 {
-                    if (!inRange)
-                    {
-                        if (CanMove)
-                            cachedMove.StopMove();
-                        inRange = true;
-                    }
-                    Agent.SetState(EngagingAnimState);
+                    Vector2d targetDirection = Target.Body._position - cachedBody._position;
+                    long fastMag = targetDirection.FastMagnitude();
 
-                    long mag;
-                    targetDirection.Normalize(out mag);
-                    bool withinTurn = TrackAttackAngle == false ||
-                                      (fastMag != 0 &&
-                                      cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                      && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
-                    bool needTurn = mag != 0 && !withinTurn;
-                    if (needTurn)
+                    //TODO: Optimize this instead of recalculating magnitude multiple times
+                    if (CheckRange())
                     {
-                        if (CanTurn)
+                        if (!inRange)
                         {
-                            cachedTurn.StartTurnDirection(targetDirection);
-                        }
-                    }
-                    else
-                    {
-                        if (attackCount >= AttackInterval)
-                        {
-                            StartWindup();
-                        }
-                    }
+                            if (CanMove)
+                            {
+                                cachedMove.StopMove();
+                            }
 
-                }
-                else
-                {
-                    if (CanMove)
-                    {
-                        cachedMove.PauseAutoStop();
-                        cachedMove.PauseCollisionStop();
-                        if (cachedMove.IsMoving == false)
+                            inRange = true;
+                        }
+                        Agent.Animator.SetState(EngagingAnimState);
+
+                        long mag;
+                        targetDirection.Normalize(out mag);
+                        bool withinTurn = TrackAttackAngle == false ||
+                                          (fastMag != 0 &&
+                                          cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                        bool needTurn = mag != 0 && !withinTurn;
+                        if (needTurn)
                         {
-                            cachedMove.StartMove(Target.Body._position);
-                            cachedBody.Priority = basePriority;
+                            if (CanTurn)
+                            {
+                                cachedTurn.StartTurnDirection(targetDirection);
+                            }
                         }
                         else
                         {
-                            if (inRange)
+                            if (attackCount >= AttackInterval)
                             {
-                                cachedMove.Destination = Target.Body.Position;
+                                StartWindup();
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        if (CanMove)
+                        {
+                            cachedMove.PauseAutoStop();
+                            cachedMove.PauseCollisionStop();
+                            if (cachedMove.IsMoving == false)
+                            {
+                                cachedMove.StartMove(Target.Body._position);
+                                cachedBody.Priority = basePriority;
                             }
                             else
                             {
-                                if (repathTimer.AdvanceFrame())
+                                if (inRange)
                                 {
-                                    if (Target.Body.PositionChangedBuffer &&
-                                        Target.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                    cachedMove.Destination = Target.Body.Position;
+                                }
+                                else
+                                {
+                                    if (repathTimer.AdvanceFrame())
                                     {
-                                        cachedMove.StartMove(Target.Body._position);
-                                        //So units don't sync up and path on the same frame
-                                        repathTimer.AdvanceFrames(repathRandom);
+                                        if (Target.Body.PositionChangedBuffer &&
+                                            Target.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                        {
+                                            cachedMove.StartMove(Target.Body._position);
+                                            //So units don't sync up and path on the same frame
+                                            repathTimer.AdvanceFrames(repathRandom);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    if (IsAttackMoving || isFocused == false)
-                    {
-                        searchCount -= 1;
-                        if (searchCount <= 0)
+                        if (inRange == true)
                         {
-                            searchCount = SearchRate;
-                            if (ScanAndEngage())
-                            {
-                            }
-                            else
-                            {
-                            }
+                            inRange = false;
                         }
-                    }
-                    if (inRange == true)
-                    {
-                        inRange = false;
-                    }
 
-                }
-            }
-
-            if (IsWindingUp)
-            {
-                //TODO: Do we need AgentConditional checks here?
-                windupCount += LockstepManager.DeltaTime;
-                if (CanTurn)
-                {
-                    Vector2d targetVector = Target.Body._position - cachedBody._position;
-                    cachedTurn.StartTurnVector(targetVector);
-                }
-                if (windupCount >= Windup)
-                {
-                    windupCount = 0;
-                    Fire();
-                    while (this.attackCount >= AttackInterval)
-                    {
-                        //resetting back down after attack is fired
-                        this.attackCount -= (this.AttackInterval);
                     }
-                    this.attackCount += Windup;
-                    IsWindingUp = false;
                 }
 
-            }
-            else
-            {
-                windupCount = 0;
-            }
-
-            if (CanMove && inRange)
-            {
-                cachedMove.PauseAutoStop();
-                cachedMove.PauseCollisionStop();
-            }
-        }
-
-        void BehaveWithNoTarget()
-        {
-            if (IsAttackMoving || Agent.IsCasting == false)
-            {
-                if (IsAttackMoving)
+                if (IsWindingUp)
                 {
+                    //TODO: Do we need AgentConditional checks here?
+                    windupCount += LockstepManager.DeltaTime;
+                    if (CanTurn)
                     {
-                        searchCount -= 8;
+                        Vector2d targetVector = Target.Body._position - cachedBody._position;
+                        cachedTurn.StartTurnVector(targetVector);
                     }
+                    if (windupCount >= Windup)
+                    {
+                        windupCount = 0;
+                        Fire();
+                        while (this.attackCount >= AttackInterval)
+                        {
+                            //resetting back down after attack is fired
+                            this.attackCount -= (this.AttackInterval);
+                        }
+                        this.attackCount += Windup;
+                        IsWindingUp = false;
+                    }
+
                 }
                 else
                 {
-                    searchCount -= 2;
+                    windupCount = 0;
                 }
-                if (searchCount <= 0)
+
+                if (CanMove && inRange)
                 {
-                    searchCount = SearchRate;
-                    if (ScanAndEngage())
-                    {
-                    }
+                    cachedMove.PauseAutoStop();
+                    cachedMove.PauseCollisionStop();
                 }
             }
         }
 
-        public event Action<LSAgent, bool> ExtraOnHit;
+        public event Action<RTSAgent, bool> ExtraOnHit;
 
-        protected void CallExtraOnHit(LSAgent agent, bool isCurrent)
+        protected void CallExtraOnHit(RTSAgent agent, bool isCurrent)
         {
             if (ExtraOnHit != null)
                 ExtraOnHit(agent, isCurrent);
         }
 
-        protected virtual void OnHit(LSAgent target, uint agentVersion, AgentController controller)
+        protected virtual void OnHit(RTSAgent target, uint agentVersion, AgentController controller)
         {
             //If the shooter died, certain effects or records can't be completed
             bool isCurrent = Agent != null && agentVersion == Agent.SpawnVersion;
@@ -452,7 +409,7 @@ namespace RTSLockstep
             CallExtraOnHit(target, isCurrent);
         }
 
-        private Action<LSAgent> CachedOnHit;
+        private Action<RTSAgent> CachedOnHit;
 
         public void Fire()
         {
@@ -474,7 +431,7 @@ namespace RTSLockstep
 
         public int CycleCount { get; private set; }
 
-        protected virtual void OnFire(LSAgent target)
+        protected virtual void OnFire(RTSAgent target)
         {
             if (this.CycleProjectiles)
             {
@@ -498,7 +455,7 @@ namespace RTSLockstep
 
         }
 
-        public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
+        public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
         {
             LSProjectile proj = (PrepareProjectile(projectileCode, projOffset, target));
             FireProjectile(proj);
@@ -507,7 +464,7 @@ namespace RTSLockstep
 
         public static Attack LastFire;
 
-        public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
+        public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
         {
             LastFire = this;
             LSProjectile currentProjectile = ProjectileManager.Create(
@@ -585,7 +542,7 @@ namespace RTSLockstep
             ProjectileManager.Fire(projectile);
         }
 
-        public void Engage(LSAgent other)
+        public void Engage(RTSAgent other)
         {
             if (other != Agent && other != null)
             {
@@ -602,13 +559,15 @@ namespace RTSLockstep
                     if (!CheckRange())
                     {
                         if (CanMove)
+                        {
                             cachedMove.StartMove(Target.Body.Position);
+                        }
                     }
                 }
             }
         }
 
-        protected virtual void OnEngage(LSAgent target)
+        protected virtual void OnEngage(RTSAgent target)
         {
 
         }
@@ -617,7 +576,7 @@ namespace RTSLockstep
         {
             inRange = false;
             IsWindingUp = false;
-            isFocused = false;
+            IsFocused = false;
             if (complete)
             {
                 IsAttackMoving = false;
@@ -626,13 +585,7 @@ namespace RTSLockstep
             {
                 if (IsAttackMoving)
                 {
-                    if (ScanAndEngage() == false)
-                    {
-                        cachedMove.StartMove(this.Destination);
-                    }
-                    else
-                    {
-                    }
+                    cachedMove.StartMove(this.Destination);
                 }
                 else
                 {
@@ -679,7 +632,7 @@ namespace RTSLockstep
                     cachedMove.StartMove(position);
             }
             IsAttackMoving = true;
-            isFocused = false;
+            IsFocused = false;
         }
 
         protected override void OnExecute(Command com)
@@ -692,14 +645,18 @@ namespace RTSLockstep
             }
             else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
             {
-                isFocused = true;
+                IsFocused = true;
                 IsAttackMoving = false;
-                LSAgent tempTarget;
+                RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
                 if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+                {
                     Engage(tempTarget);
+                }
                 else
+                {
                     Debug.Log("nope");
+                }
             }
         }
 
@@ -715,54 +672,6 @@ namespace RTSLockstep
         void HandleMoveGroupProcessed()
         {
             this.Destination = cachedMove.Destination;
-        }
-
-        private bool ScanAndEngage()
-        {
-            LSAgent agent = DoScan();
-            if (agent == null || agent == Target)
-            {
-                return false;
-            }
-            else
-            {
-                Engage(agent);
-                return true;
-            }
-        }
-
-        protected virtual bool AgentValid(LSAgent agent)
-        {
-            return true;
-        }
-
-        public Func<LSAgent, bool> CachedAgentValid { get; private set; }
-
-        //TODO: Consolidate the checks in LSInfluencer
-        protected Func<LSAgent, bool> AgentConditional
-        {
-            get
-            {
-                Func<LSAgent, bool> agentConditional = null;
-
-                if (this.Damage >= 0)
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
-                    };
-                }
-                else
-                {
-                    agentConditional = (other) =>
-                    {
-                        Health health = other.GetAbility<Health>();
-                        return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
-                    };
-                }
-                return agentConditional;
-            }
         }
 
         protected virtual bool HardAgentConditional()
@@ -783,44 +692,19 @@ namespace RTSLockstep
             return true;
         }
 
-        protected virtual LSAgent DoScan()
-        {
-            Func<LSAgent, bool> agentConditional = AgentConditional;
-
-            LSAgent agent = InfluenceManager.Scan(
-                                this.cachedBody.Position,
-                                this.Sight,
-                                agentConditional,
-                                (bite) =>
-                                {
-                                    return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
-                                }
-                            );
-
-            return agent;
-        }
-
-        public bool ScanWithinRangeAndEngage()
-        {
-            LSAgent agent = this.DoScan();
-            if (agent == null)
-            {
-                return false;
-            }
-            else
-            {
-                Engage(agent);
-                return true;
-            }
-        }
-
 #if UNITY_EDITOR
         void OnDrawGizmos()
         {
             if (Agent == null || Agent.IsActive == false)
+            {
                 return;
+            }
+
             if (Agent.Body == null)
+            {
                 Debug.Log(Agent.gameObject);
+            }
+
             Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : this.transform.position, this.Range.ToFloat());
         }
 #endif
@@ -830,16 +714,15 @@ namespace RTSLockstep
             base.SaveDetails(writer);
             SaveManager.WriteVector2d(writer, "Destination", Destination);
             SaveManager.WriteUInt(writer, "TargetVersion", targetVersion);
-            SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteBoolean(writer, "AttackMoving", IsAttackMoving);
             if (Target)
             {
                 SaveManager.WriteInt(writer, "TargetID", Target.GlobalID);
             }
 
-            SaveManager.WriteBoolean(writer, "Focused", isFocused);
+            SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", inRange);
-            SaveManager.WriteInt(writer, "SearchCount", searchCount);
+            SaveManager.WriteLong(writer, "AttackCount", attackCount);
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
 
@@ -855,9 +738,6 @@ namespace RTSLockstep
                 case "TargetVersion":
                     targetVersion = (uint)readValue;
                     break;
-                case "AttackCount":
-                    attackCount = (long)readValue;
-                    break;
                 case "AttackMoving":
                     IsAttackMoving = (bool)readValue;
                     break;
@@ -865,13 +745,13 @@ namespace RTSLockstep
                     loadedTargetId = (int)(System.Int64)readValue;
                     break;
                 case "Focused":
-                    isFocused = (bool)readValue;
+                    IsFocused = (bool)readValue;
                     break;
                 case "InRange":
                     inRange = (bool)readValue;
                     break;
-                case "SearchCount":
-                    searchCount = (int)readValue;
+                case "AttackCount":
+                    attackCount = (long)readValue;
                     break;
                 case "FastRangeToTarget":
                     fastRangeToTarget = (long)readValue;

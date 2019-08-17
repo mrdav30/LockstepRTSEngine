@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 // long term it would also be good to save the amount of time that has gone by, 
 // so that when a Player loads a game the timer will not be reset

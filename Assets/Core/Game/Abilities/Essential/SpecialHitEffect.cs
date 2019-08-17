@@ -20,11 +20,11 @@ namespace RTSLockstep
 		{
             cachedAtack.ExtraOnHit += ApplyEffect;
 		}
-		protected virtual void ApplyEffect(LSAgent agent, bool isCurrent)
+		protected virtual void ApplyEffect(RTSAgent agent, bool isCurrent)
 		{
 			OnApplyEffect(agent, isCurrent);
 		}
-		protected virtual void OnApplyEffect (LSAgent agent, bool isCurrent)
+		protected virtual void OnApplyEffect (RTSAgent agent, bool isCurrent)
 		{
 		}
 

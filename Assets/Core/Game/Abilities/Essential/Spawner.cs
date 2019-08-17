@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
+using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,20 +9,16 @@ namespace RTSLockstep
     [UnityEngine.DisallowMultipleComponent]
     public class Spawner : ActiveAbility
     {
-        private Vector3d spawnPoint;
-        private Vector3d rallyPoint;
-        private FlagState _flagState;
-        private Queue<string> buildQueue;
+        private Queue<string> spawnQueue;
         private long currentSpawnProgress;
         private LSBody CachedBody { get { return Agent.Body; } }
+        private Rally cachedRally;
 
         //Stuff for the logic
         private int basePriority;
         private long spawnCount;
-        public bool IsFocused { get; private set; }
 
         #region Serialized Values (Further description in properties)
-        public Texture2D rallyPointImage;
         [SerializeField]
         private long spawnIncrement = FixedMath.One;
         [SerializeField]
@@ -43,8 +39,7 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            Agent.onSelectedChange += HandleSelectedChange;
-            buildQueue = new Queue<string>();
+            spawnQueue = new Queue<string>();
 
             basePriority = CachedBody.Priority;
         }
@@ -55,9 +50,7 @@ namespace RTSLockstep
             spawnCount = 0;
             IsFocused = false;
 
-            //caching parameters
-            var spawnVersion = Agent.SpawnVersion;
-            var controller = Agent.Controller;
+            cachedRally = Agent.GetAbility<Rally>();
         }
 
         protected override void OnSimulate()
@@ -73,9 +66,15 @@ namespace RTSLockstep
                 spawnCount += LockstepManager.DeltaTime;
             }
 
-            if (buildQueue.Count > 0)
+            if (spawnQueue.Count > 0)
             {
-                BehaveWithBuildQueue();
+                IsCasting = true;
+                Agent.Animator.SetState(AnimState.Working);
+                BehaveWithSpawnQueue();
+            }
+            else
+            {
+                IsCasting = false;
             }
         }
 
@@ -87,67 +86,41 @@ namespace RTSLockstep
 
         public string[] getBuildQueueValues()
         {
-            string[] values = new string[buildQueue.Count];
+            string[] values = new string[spawnQueue.Count];
             int pos = 0;
-            foreach (string unit in buildQueue)
+            foreach (string unit in spawnQueue)
             {
                 values[pos++] = unit;
             }
             return values;
         }
 
-        public void HandleSelectedChange()
-        {
-            if (Agent.Controller.Commander == PlayerManager.MainController.Commander)
-            {
-                RallyPoint flag = PlayerManager.MainController.Commander.GetComponentInChildren<RallyPoint>();
-                if (Agent.IsSelected)
-                {
-                    if (flag && spawnPoint != ResourceManager.InvalidPosition && rallyPoint != ResourceManager.InvalidPosition)
-                    {
-                        if (_flagState == FlagState.FlagSet)
-                        {
-                            flag.transform.localPosition = rallyPoint.ToVector3();
-                            flag.transform.forward = transform.forward;
-                            flag.Enable();
-                        }
-                        else
-                        {
-                            flag.transform.localPosition = Agent.Body.Position3d.ToVector3();
-                            flag.Disable();
-                        }
-                    }
-                }
-                else
-                {
-                    if (flag)
-                    {
-                        flag.Disable();
-                    }
-                }
-            }
-        }
-
         public float getBuildPercentage()
         {
-            return (float)currentSpawnProgress / (float)_maxSpawnProgress;
+            return currentSpawnProgress / (float)_maxSpawnProgress;
         }
 
         public void CreateUnit(string unitName)
         {
-            GameObject unit = ResourceManager.GetAgentTemplate(unitName).gameObject;
+            GameObject unit = GameResourceManager.GetAgentTemplate(unitName).gameObject;
             RTSAgent unitObject = unit.GetComponent<RTSAgent>();
             // check that the Player has the resources available before allowing them to create a new Unit / Building
-            if (PlayerManager.MainController.Commander && unitObject)
+            if (Agent.GetCommander() && unitObject)
             {
-                PlayerManager.MainController.Commander.RemoveResource(ResourceType.Gold, unitObject.cost);
+                if (Agent.GetCommander().CachedResourceManager.CheckResources(unitObject))
+                {
+                    Agent.GetCommander().CachedResourceManager.RemoveResources(unitObject);
+                    spawnQueue.Enqueue(unitName);
+                }
+                else
+                {
+                //    Debug.Log("not enough resources!");
+                }
             }
-            buildQueue.Enqueue(unitName);
         }
 
-        protected void BehaveWithBuildQueue()
+        protected void BehaveWithSpawnQueue()
         {
-
             if (!IsWindingUp)
             {
                 if (spawnCount >= _spawnInterval)
@@ -163,7 +136,7 @@ namespace RTSLockstep
                 if (windupCount >= Windup)
                 {
                     windupCount = 0;
-                    ProcessBuildQueue();
+                    ProcessSpawnQueue();
                     while (this.spawnCount >= _spawnInterval)
                     {
                         //resetting back down after attack is fired
@@ -179,24 +152,34 @@ namespace RTSLockstep
             }
         }
 
-        protected void ProcessBuildQueue()
+        protected void ProcessSpawnQueue()
         {
             currentSpawnProgress += spawnIncrement;
             if (currentSpawnProgress > _maxSpawnProgress)
             {
-                if (PlayerManager.MainController.Commander)
+                if (Agent.GetCommander())
                 {
                     //if (audioElement != null)
                     //{
                     //    audioElement.Play(finishedJobSound);
                     //}
                     Vector2d spawnOutside = new Vector2d(this.transform.position);
-                    LSAgent agent = PlayerManager.MainController.CreateAgent(buildQueue.Dequeue(), spawnOutside);
-                    RTSAgent newUnit = agent.GetComponent<RTSAgent>();
-                    if (newUnit && spawnPoint != rallyPoint)
+                    RTSAgent agent = Agent.Controller.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
+                    agent.SetProvision(true);
+
+                    if (cachedRally)
                     {
-                        newUnit.GetAbility<Move>().StartMove(rallyPoint.ToVector2d());
+                        if (cachedRally.spawnPoint != cachedRally.rallyPoint)
+                        {                          
+                            Command moveCom = new Command(AbilityDataItem.FindInterfacer("Move").ListenInputID);
+                            moveCom.Add<Vector2d>(new Vector2d(cachedRally.rallyPoint));
+                            moveCom.ControllerID = agent.Controller.ControllerID;
+                            moveCom.Add<Influence>(new Influence(agent));
+
+                            CommandManager.SendCommand(moveCom);
+                        }
                     }
+
                 }
                 currentSpawnProgress = 0;
             }
@@ -207,63 +190,19 @@ namespace RTSLockstep
             get { return AnimState.Spawning; }
         }
 
-        public void SetRallyPoint(Vector3d position)
-        {
-            rallyPoint = position;
-            if (PlayerManager.MainController.Commander && Agent.IsSelected)
-            {
-                RallyPoint flag = PlayerManager.MainController.Commander.GetComponentInChildren<RallyPoint>();
-                if (flag)
-                {
-                    if (!flag.ActiveStatus)
-                    {
-                        flag.Enable();
-                    }
-                    flag.transform.localPosition = rallyPoint.ToVector3();
-                    _flagState = FlagState.FlagSet;
-                }
-            }
-        }
-
-        public void SetSpawnPoint()
-        {
-            long spawnX = (long)(Agent.Body.GetSelectionBounds().center.x + transform.forward.x * Agent.Body.GetSelectionBounds().extents.x + transform.forward.x * 10);
-            long spawnZ = (long)(Agent.Body.GetSelectionBounds().center.z + transform.forward.z * Agent.Body.GetSelectionBounds().extents.z + transform.forward.z * 10);
-            spawnPoint = new Vector3d(spawnX, 0, spawnZ);
-            rallyPoint = spawnPoint;
-        }
-
         protected override void OnExecute(Command com)
         {
             DefaultData action;
-            Vector2d pos;
-            if (com.TryGetData<Vector2d>(out pos))
-            {
-                if (pos.ToVector3d() != ResourceManager.InvalidPosition)
-                {
-                    SetRallyPoint(pos.ToVector3d());
-                }
-            }
-            else if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
+            if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
             {
                 String unit = action.Value.ToString();
                 CreateUnit(unit);
             }
         }
 
-        public bool hasSpawnPoint()
+        public int GetSpawnQueueCount()
         {
-            return spawnPoint != ResourceManager.InvalidPosition && rallyPoint != ResourceManager.InvalidPosition;
-        }
-
-        public FlagState GetFlagState()
-        {
-            return this._flagState;
-        }
-
-        public void SetFlagState(FlagState value)
-        {
-            this._flagState = value;
+            return this.spawnQueue.Count;
         }
 
         public String[] GetSpawnActions()
@@ -274,11 +213,9 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            SaveManager.WriteVector3d(writer, "SpawnPoint", spawnPoint);
-            SaveManager.WriteVector3d(writer, "RallyPoint", rallyPoint);
-            SaveManager.WriteString(writer, "FlagState", _flagState.ToString());
-            SaveManager.WriteFloat(writer, "BuildProgress", currentSpawnProgress);
-            SaveManager.WriteStringArray(writer, "BuildQueue", buildQueue.ToArray());
+            SaveManager.WriteFloat(writer, "SpawnProgress", currentSpawnProgress);
+            SaveManager.WriteLong(writer, "SpawnCount", spawnCount);
+            SaveManager.WriteStringArray(writer, "SpawnQueue", spawnQueue.ToArray());
         }
 
         protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
@@ -286,20 +223,14 @@ namespace RTSLockstep
             base.HandleLoadedProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
-                case "SpawnPoint":
-                    spawnPoint = LoadManager.LoadVector3d(reader);
-                    break;
-                case "RallyPoint":
-                    rallyPoint = LoadManager.LoadVector3d(reader);
-                    break;
-                case "FlagState":
-                    _flagState = WorkManager.GetFlagState((string)readValue);
-                    break;
-                case "BuildProgress":
+                case "SpawnProgress":
                     currentSpawnProgress = (long)readValue;
                     break;
-                case "BuildQueue":
-                    buildQueue = new Queue<string>(LoadManager.LoadStringArray(reader));
+                case "SpawnCount":
+                    spawnCount = (long)readValue;
+                    break;
+                case "SpawnQueue":
+                    spawnQueue = new Queue<string>(LoadManager.LoadStringArray(reader));
                     break;
                 default: break;
             }

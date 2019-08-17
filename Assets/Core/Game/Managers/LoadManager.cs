@@ -372,7 +372,7 @@ namespace RTSLockstep
                 }
                 else if (reader.TokenType == JsonToken.EndObject)
                 {
-                    GameObject sun = (GameObject)GameObject.Instantiate(ResourceManager.GetWorldObject("Sun"), position, rotation);
+                    GameObject sun = (GameObject)GameObject.Instantiate(GameResourceManager.GetWorldObject("Sun"), position, rotation);
                     sun.transform.localScale = scale;
                     sun.name = sun.name.Replace("(Clone)", "").Trim();
                     return;
@@ -410,7 +410,7 @@ namespace RTSLockstep
                 }
                 else if (reader.TokenType == JsonToken.EndObject)
                 {
-                    GameObject ground = (GameObject)GameObject.Instantiate(ResourceManager.GetWorldObject("Ground"), position, rotation);
+                    GameObject ground = (GameObject)GameObject.Instantiate(GameResourceManager.GetWorldObject("Ground"), position, rotation);
                     ground.transform.localScale = scale;
                     ground.name = ground.name.Replace("(Clone)", "").Trim();
                     return;
@@ -501,7 +501,7 @@ namespace RTSLockstep
                 if (reader.TokenType == JsonToken.StartObject)
                 {
                     //need to create via agentcontrollerhelper....
-                    GameObject newObject = (GameObject)GameObject.Instantiate(ResourceManager.GetCommanderObject());
+                    GameObject newObject = (GameObject)GameObject.Instantiate(GameResourceManager.GetCommanderObject());
                     AgentCommander commander = newObject.GetComponent<AgentCommander>();
                     commander.name = commander.name.Replace("(Clone)", "").Trim();
                     commander.LoadDetails(reader);

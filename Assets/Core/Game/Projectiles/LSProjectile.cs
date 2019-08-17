@@ -192,7 +192,7 @@ namespace RTSLockstep
 		public long Speed
 		{ get; set; }
 
-		public LSAgent Target {
+		public RTSAgent Target {
 			get;
 			set;
 		}
@@ -215,7 +215,7 @@ namespace RTSLockstep
 
 		public Vector2d Forward { get; set; }
 
-		private Action<LSAgent> HitEffect { get; set; }
+		private Action<RTSAgent> HitEffect { get; set; }
 
 		public int GetStateHash ()
 		{
@@ -232,14 +232,14 @@ namespace RTSLockstep
 			long num = radius * radius;
 			Scan (center, radius);
 			for (int i = 0; i < ScanOutput.Count; i++) {
-				LSAgent agent = ScanOutput [i];
+				RTSAgent agent = ScanOutput [i];
 				if (agent.Body._position.FastDistance (center.x, center.y) < num) {
 					HitAgent (agent);
 				}
 			}
 		}
 
-		void HitAgent (LSAgent agent)
+		void HitAgent (RTSAgent agent)
 		{
 			if (this.UseEffects && this.AttachEndEffectToTarget) {
 				LSEffect lSEffect = EffectManager.CreateEffect (this.HitFX);
@@ -260,7 +260,7 @@ namespace RTSLockstep
 			long fastRange = radius * radius;
 			Scan (center, radius);
 			for (int i = 0; i < ScanOutput.Count; i++) {
-				LSAgent agent = ScanOutput [i];
+				RTSAgent agent = ScanOutput [i];
 				Vector2d agentPos = agent.Body._position;
 				Vector2d difference = agentPos - center;
 
@@ -294,7 +294,7 @@ namespace RTSLockstep
 		}
 
 
-		static FastList<LSAgent> ScanOutput = new FastList<LSAgent> ();
+		static FastList<RTSAgent> ScanOutput = new FastList<RTSAgent> ();
 
 		private void Scan (Vector2d center, long radius)
 		{
@@ -322,8 +322,8 @@ namespace RTSLockstep
 			if (this.cachedTransform.IsNotNull ()) {
 				this.cachedTransform.parent = null;
 			}
-			if (this.onDeactivate.IsNotNull ()) {
-				this.onDeactivate.Invoke ();
+			if (this.OnDeactivate.IsNotNull ()) {
+				this.OnDeactivate.Invoke ();
 			}
 		}
 
@@ -369,11 +369,11 @@ namespace RTSLockstep
 
 		public Func<byte, bool> BucketConditional { get; private set; }
 
-		public Func<LSAgent, bool> AgentConditional { get; private set; }
+		public Func<RTSAgent, bool> AgentConditional { get; private set; }
 
 		public bool Deterministic { get; private set; }
 
-		internal void Prepare (int id, Vector3d projectilePosition, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<LSAgent> onHit, bool deterministic)
+		internal void Prepare (int id, Vector3d projectilePosition, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<RTSAgent> onHit, bool deterministic)
 		{
 			this.Deterministic = deterministic;
 
@@ -397,7 +397,7 @@ namespace RTSLockstep
 			Forward = Vector2d.up;
 		}
 
-		public void InitializeHoming (LSAgent target)
+		public void InitializeHoming (RTSAgent target)
 		{
 			this.HeightReached = false;
 			this.Target = target;
@@ -711,10 +711,10 @@ namespace RTSLockstep
 		//
 		// Events
 		//
-		public event Action onDeactivate;
+		public event Action OnDeactivate;
 
 		public event Action onHit;
-		public event Action<LSAgent> onHitAgent;
+		public event Action<RTSAgent> onHitAgent;
 
 		public event Action onInitialize;
 

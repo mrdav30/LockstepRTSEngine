@@ -1,6 +1,6 @@
 ﻿using FastCollections;
-using RTSLockstep.Pathfinding;
 using Newtonsoft.Json;
+using RTSLockstep.Pathfinding;
 using System;
 using UnityEngine;
 
@@ -548,7 +548,6 @@ namespace RTSLockstep
 
         }
 
-
         public void StopMove()
         {
             if (IsMoving)
@@ -600,7 +599,7 @@ namespace RTSLockstep
             StoppedTime = 0;
             Arrived = false;
 
-            Agent.SetState(AnimState.Moving);
+            Agent.Animator.SetState(AnimState.Moving);
 
             //For now, use old next-best-node system when size requires consideration
             viableDestination = this.GridSize <= 1 ?
@@ -624,7 +623,7 @@ namespace RTSLockstep
         private readonly int collidedCount;
         private readonly ushort collidedID;
 
-        static LSAgent tempAgent;
+        static RTSAgent tempAgent;
         readonly bool paused;
         private void HandleCollision(LSBody other)
         {
@@ -643,18 +642,23 @@ namespace RTSLockstep
                 if (IsMoving)
                 {
                     //If the other mover is moving to a similar point
-                    if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos.FastDistance(this.targetPos) <= (closingDistance * closingDistance))
+                    if (otherMover.MyMovementGroupID == MyMovementGroupID
+                        || otherMover.targetPos.FastDistance(this.targetPos) <= (closingDistance * closingDistance))
                     {
                         if (otherMover.IsMoving == false)
                         {
-                            if (otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime)
+                            if (otherMover.Arrived
+                                && otherMover.StoppedTime > MinimumOtherStopTime)
                             {
                                 Arrive();
                             }
                         }
                         else
                         {
-                            if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < closingDistance.Mul(closingDistance))
+                            if (hasPath
+                                && otherMover.hasPath
+                                && otherMover.pathIndex > 0
+                                && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < closingDistance.Mul(closingDistance))
                             {
                                 if (this.distance < this.closingDistance)
                                 {

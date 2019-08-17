@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RTSLockstep;
+using UnityEngine;
 
 namespace RotaryHeart.Lib.SerializableDictionary
 {
@@ -16,5 +17,13 @@ namespace RotaryHeart.Lib.SerializableDictionary
         private Material _material;
         [SerializeField]
         private AudioClip _audioClip;
+        [SerializeField]
+        private UserInputKeyMappings _userInputKeyMappings;
+        [SerializeField]
+        private KeyCode _keyCode;
+        [SerializeField]
+        private ResourceType _resourceType;
+        [SerializeField]
+        private StartingResourceInfo _startingResourceInfo;
     }
 }

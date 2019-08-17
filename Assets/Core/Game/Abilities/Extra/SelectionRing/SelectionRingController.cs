@@ -21,8 +21,8 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            Agent.onSelectedChange += HandleSelectedChange;
-            Agent.onHighlightedChange += HandleHighlightedChange;
+            Agent.OnSelectedChange += HandleSelectedChange;
+            Agent.OnHighlightedChange += HandleHighlightedChange;
             RingObject = GameObject.Instantiate(_ringTemplate.gameObject).GetComponent<SelectionRing>();
             Size = (Agent.SelectionRadius + _ringRadiusOffset) * 2;
             RingObject.Setup(Size);

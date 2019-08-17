@@ -10,22 +10,28 @@ namespace RTSLockstep.Data
             base._name = name;
             base._description = description;
         }
+
         public AgentDataItem()
         {
 
         }
 
-        public LSAgent GetAgent()
+        public RTSAgent GetAgent()
         {
             if (this.Prefab != null)
             {
-                LSAgent agent = this.Prefab.GetComponent<LSAgent>();
+                RTSAgent agent = this.Prefab.GetComponent<RTSAgent>();
                 if (agent)
                 {
                     return agent;
                 }
             }
             return null;
+        }
+
+        public String GetAgentDescription()
+        {
+            return _description;
         }
 
         public Texture2D GetAgentIcon()
@@ -39,7 +45,7 @@ namespace RTSLockstep.Data
 
         public int SortDegreeFromAgentType(AgentType agentType)
         {
-            LSAgent agent = GetAgent();
+            RTSAgent agent = GetAgent();
             if (agent == null) return -1;
             if (agentType == agent.MyAgentType) return 1;
             return 0;
@@ -54,7 +60,10 @@ namespace RTSLockstep.Data
             if (lastPrefab != Prefab)
             {
                 if (string.IsNullOrEmpty(Name))
+                {
                     this._name = Prefab.name;
+                }
+
                 lastPrefab = Prefab;
             }
         }

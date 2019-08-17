@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -7,6 +6,7 @@ namespace RTSLockstep
     public class ResourceDeposit : Ability
     {
         public long AmountLeft { get; private set; }
+        private DynamicBlocker cachedBlocker;
 
         #region Serialized Values (Further description in properties)
         public long Capacity;
@@ -22,23 +22,31 @@ namespace RTSLockstep
 
         protected override void OnVisualize()
         {
-            float percentLeft = (float)AmountLeft / (float)Capacity;
+            float percentLeft = AmountLeft / (float)Capacity;
             if (percentLeft <= .5f && percentLeft > .25f)
             {
                 percentLeft = .5f;
                 resourceFull.GetComponent<Renderer>().enabled = false;
+                if (resourceHalf.GetComponent<Renderer>().enabled == false)
+                    resourceHalf.GetComponent<Renderer>().enabled = true;
             }
             else if (percentLeft <= .25f && percentLeft > 0)
             {
                 percentLeft = .25f;
                 resourceHalf.GetComponent<Renderer>().enabled = false;
+                if (resourceQuarter.GetComponent<Renderer>().enabled == false)
+                    resourceQuarter.GetComponent<Renderer>().enabled = true;
             }
             else if (percentLeft <= 0)
             {
                 percentLeft = 0;
                 resourceQuarter.GetComponent<Renderer>().enabled = false;
+                if (resourceEmpty.GetComponent<Renderer>().enabled == false)
+                    resourceEmpty.GetComponent<Renderer>().enabled = true;
+                // Resource is empty, delete object
+                Agent.Die();
+                return;
             }
-            Agent.Body.CalculateBounds();
         }
 
         public void Remove(long amount)

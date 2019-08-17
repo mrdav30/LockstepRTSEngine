@@ -5,13 +5,13 @@ namespace RTSLockstep
 {
 	public static class BoxedAgents
 	{
-		public static LSAgent[] innerArray = new LSAgent[SelectionManager.MaximumSelection];
+		public static RTSAgent[] innerArray = new RTSAgent[SelectionManager.MaximumSelection];
 		public static int BufferCount;
 		public static int Count;
 		public static uint _Version = 1;
 		public static uint _BufferVersion = 1;
 
-		public static void Add (LSAgent agent)
+		public static void Add (RTSAgent agent)
 		{
 			innerArray[Count++] = agent;
 			agent.BoxVersion = _Version;

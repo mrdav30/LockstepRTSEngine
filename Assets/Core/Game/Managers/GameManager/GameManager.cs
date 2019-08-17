@@ -15,7 +15,9 @@ namespace RTSLockstep
 		{
             NetworkHelper networkHelper = gameObject.GetComponent<NetworkHelper>();
 			if (networkHelper == null)
+            {
 				networkHelper = gameObject.AddComponent<DefaultNetworkHelper>();
+            }
 
 			//Currently deterministic but not guaranteed by Unity
 			// may be add as serialized Array as property?  [SerializeField] private BehaviourHelper[] helpers; ?

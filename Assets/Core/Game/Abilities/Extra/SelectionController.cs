@@ -1,5 +1,4 @@
-﻿using RTSLockstep;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -9,53 +8,33 @@ namespace RTSLockstep
         private Harvest cachedHarvest;
         private Spawner cachedSpawner;
         private Structure cachedStructure;
-        private AgentController cachedController;
-        private AgentCommander cachedCommander;
+
         protected Rect selectBox;
         protected GUIStyle healthStyle = new GUIStyle();
         protected float healthPercentage = 1.0f;
 
         protected override void OnSetup()
         {
-            Agent.onSelectedChange += HandleSelectedChange;
-            Agent.onHighlightedChange += HandleHighlightedChange;
+            Agent.OnSelectedChange += HandleSelectedChange;
+            Agent.OnHighlightedChange += HandleHighlightedChange;
 
             cachedHealth = Agent.GetAbility<Health>();
             cachedHarvest = Agent.GetAbility<Harvest>();
             cachedSpawner = Agent.GetAbility<Spawner>();
             cachedStructure = Agent.GetAbility<Structure>();
-
-            cachedController = PlayerManager.MainController;
-            cachedCommander = cachedController.Commander;
         }
 
-        protected override void OnInitialize()
+        protected override void doGUI()
         {
-            if (Agent.Body.GetSelectionBounds() == null)
+            if (Agent && !GameResourceManager.MenuOpen)
             {
-                Agent.Body.CalculateBounds();
-            }
-        }
-
-        protected override void OnVisualize()
-        {
-            if (Agent && UserInputHelper.GUIManager.CameraChanged)
-            {
-                Agent.Body.CalculateBounds();
-            }
-        }
-
-        protected override void OnGUI()
-        {
-            if (Agent && !ResourceManager.MenuOpen)
-            {
-                if (Agent.IsSelected)
+                if (Agent.IsSelected && Agent.IsVisible)
                 {
                     DrawSelection();
-                }
-                if (cachedStructure && cachedStructure.UnderConstruction())
-                {
-                    DrawBuildProgress();
+                    if (cachedStructure && cachedStructure.NeedsConstruction)
+                    {
+                        DrawBuildProgress();
+                    }
                 }
             }
         }
@@ -67,7 +46,7 @@ namespace RTSLockstep
                 return;
             }
 
-            (Agent as RTSAgent).SetPlayingArea(cachedCommander.CachedHud.GetPlayingArea());
+            Agent.SetPlayingArea(Agent.Controller.GetCommanderHUD().GetPlayingArea());
         }
 
         public void HandleHighlightedChange()
@@ -81,53 +60,40 @@ namespace RTSLockstep
             {
                 if (!Agent.IsSelected && Agent.IsHighlighted)
                 {
-                    if ((Agent as RTSAgent).Controller.Commander && (Agent as RTSAgent).Controller.Commander == cachedCommander)
+                    if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
-                        //belongs to current cachedCommander
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Select);
-                    }
-                    else if (Agent.Controller.GetAllegiance(cachedController) != AllegianceType.Friendly && cachedController.SelectedAgents.Count > 0
-                        && Agent.MyAgentType != AgentType.Resource)
-                    {
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Attack);
-                    }
-                    else if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Agent.GetAbility<Attack>() && Agent.GetAbility<Attack>().CanAttack)
-                    {
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Attack);
+                        if (Selector.MainSelectedAgent.Controller.RefEquals(Agent.Controller))
+                        {
+                            //agent belongs to current player
+                            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                        }
+                        else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.MainController.SelectedAgents.Count > 0
+                            && Agent.MyAgentType != AgentType.Resource)
+                        {
+                            if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Selector.MainSelectedAgent.IsActive
+                                && Selector.MainSelectedAgent.GetAbility<Attack>())
+                            {
+                                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Attack);
+                            }
+                        }
+                        else if (Selector.MainSelectedAgent.GetAbility<Harvest>())
+                        {
+                            if (Agent.MyAgentType == AgentType.Resource && !Agent.GetAbility<ResourceDeposit>().IsEmpty())
+                            {
+                                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Harvest);
+                            }
+                            else if (Agent.MyAgentType == AgentType.Building 
+                                && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().CanStoreResources(Selector.MainSelectedAgent.GetAbility<Harvest>().HarvestType)
+                                && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
+                            {
+                                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Deposit);
+                            }
+                        }
                     }
                     else
                     {
-                        cachedCommander.CachedHud.SetCursorState(CursorState.Select);
-                    }
-                }
-                else if (Agent.IsSelected && Agent == Selector.MainSelectedAgent)
-                {
-                    if (!SelectionManager.MousedAgent)
-                    {
-                        if (Agent.MyAgentType == AgentType.Building && cachedSpawner && cachedSpawner.GetFlagState() == FlagState.SettingFlag)
-                        {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.RallyPoint);
-                        }
-                        else if (Agent.GetAbility<Move>() && Agent.GetAbility<Move>().CanMove)
-                        {
-                            cachedCommander.CachedHud.SetCursorState(CursorState.Move);
-                        }
-                    }
-                    else
-                    {
-                        if (cachedHarvest)
-                        {
-                            if (SelectionManager.MousedAgent.MyAgentType == AgentType.Resource
-                                && !SelectionManager.MousedAgent.GetAbility<ResourceDeposit>().IsEmpty())
-                            {
-                                cachedCommander.CachedHud.SetCursorState(CursorState.Harvest);
-                            }
-                            else if (SelectionManager.MousedAgent.MyAgentType == AgentType.Building && (Agent as RTSAgent).objectName == cachedHarvest.ResourceStoreName
-                                && cachedHarvest.GetCurrentLoad() > 0)
-                            {
-                                cachedCommander.CachedHud.SetCursorState(CursorState.Deposit);
-                            }
-                        }
+                        //agent doesn't belong to player
+                        PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
                     }
                 }
             }
@@ -135,10 +101,13 @@ namespace RTSLockstep
 
         private void DrawSelection()
         {
-            GUI.skin = ResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), (Agent as RTSAgent).GetPlayerArea());
+            GUI.skin = GameResourceManager.SelectBoxSkin;
+
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
+
             // Draw the selection box around the currently selected object, within the bounds of the playing area
-            GUI.BeginGroup((Agent as RTSAgent).GetPlayerArea());
+            GUI.BeginGroup(Agent.GetPlayerArea());
             DrawSelectionBox(selectBox);
             GUI.EndGroup();
         }
@@ -153,13 +122,13 @@ namespace RTSLockstep
                 long currentLoad = cachedHarvest.GetCurrentLoad();
                 if (currentLoad > 0)
                 {
-                    float percentFull = (float)currentLoad / (float)cachedHarvest.Capacity;
+                    float percentFull = currentLoad / (float)cachedHarvest.Capacity;
                     float maxHeight = selectBox.height - 4;
                     float height = maxHeight * percentFull;
                     float leftPos = selectBox.x + selectBox.width - 7;
                     float topPos = selectBox.y + 2 + (maxHeight - height);
                     float width = 5;
-                    Texture2D resourceBar = ResourceManager.GetResourceHealthBar(cachedHarvest.HarvestType);
+                    Texture2D resourceBar = GameResourceManager.GetResourceHealthBar(cachedHarvest.HarvestType);
                     if (resourceBar)
                     {
                         GUI.DrawTexture(new Rect(leftPos, topPos, width, height), resourceBar);
@@ -172,25 +141,24 @@ namespace RTSLockstep
         {
             if (Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building)
             {
-                healthPercentage = cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
-                //(float)hitPoints / (float)maxHitPoints;
+                healthPercentage = (float) cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
                 if (healthPercentage > highSplit)
                 {
-                    healthStyle.normal.background = ResourceManager.HealthyTexture;
+                    healthStyle.normal.background = GameResourceManager.HealthyTexture;
                 }
                 else if (healthPercentage > lowSplit)
                 {
-                    healthStyle.normal.background = ResourceManager.DamagedTexture;
+                    healthStyle.normal.background = GameResourceManager.DamagedTexture;
                 }
                 else
                 {
-                    healthStyle.normal.background = ResourceManager.CriticalTexture;
+                    healthStyle.normal.background = GameResourceManager.CriticalTexture;
                 }
             }
             else if (Agent.MyAgentType == AgentType.Resource)
             {
-                healthPercentage = (float)Agent.GetAbility<ResourceDeposit>().AmountLeft / (float)Agent.GetAbility<ResourceDeposit>().Capacity;
-                healthStyle.normal.background = ResourceManager.GetResourceHealthBar(Agent.GetAbility<ResourceDeposit>().ResourceType);
+                healthPercentage = Agent.GetAbility<ResourceDeposit>().AmountLeft / (float)Agent.GetAbility<ResourceDeposit>().Capacity;
+                healthStyle.normal.background = GameResourceManager.GetResourceHealthBar(Agent.GetAbility<ResourceDeposit>().ResourceType);
             }
         }
 
@@ -203,12 +171,13 @@ namespace RTSLockstep
 
         private void DrawBuildProgress()
         {
-            GUI.skin = ResourceManager.SelectBoxSkin;
-            Rect selectBox = WorkManager.CalculateSelectionBox(Agent.Body.GetSelectionBounds(), (Agent as RTSAgent).GetPlayerArea());
+            GUI.skin = GameResourceManager.SelectBoxSkin;
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
-            GUI.BeginGroup((Agent as RTSAgent).GetPlayerArea());
+            GUI.BeginGroup(Agent.GetPlayerArea());
             CalculateCurrentHealth(0.5f, 0.99f);
-            DrawHealthBar(selectBox, "Building ...");
+            DrawHealthBar(selectBox, "Constructing...");
             GUI.EndGroup();
         }
     }

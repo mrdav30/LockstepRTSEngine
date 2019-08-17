@@ -1,12 +1,11 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace RTSLockstep
 {
-    public class WorkerAnimator : LSAnimator
+    public class WorkerAnimator : GenericUnitAnimator
     {
+        [Header("Worker specific animations")]
         [Space(10f), SerializeField]
         private string idlingWood = "idlingWood";
         [SerializeField]
@@ -21,15 +20,21 @@ namespace RTSLockstep
         private string engagingOre = "engagingOre";
         [SerializeField]
         private string constructing = "constructing";
-        //sounds that accompany animations
+
+        [Header("Sounds that accompany worker animations")]
         [Space(10f), SerializeField]
-        private AudioClip finishedJobSound;
+        private AudioClip emptyHarvestSound;
         [SerializeField]
-        private float finishedJobVolume = 1.0f;
+        private AudioClip harvestSound;
         [SerializeField]
-        private AudioClip emptyHarvestSound, harvestSound, startHarvestSound;
+        private AudioClip startHarvestSound;
+
+        [Space(10f), SerializeField]
+        private float emptyHarvestVolume = 0.5f;
         [SerializeField]
-        private float emptyHarvestVolume = 0.5f, harvestVolume = 0.5f, startHarvestVolume = 1.0f;
+        private float harvestVolume = 0.5f;
+        [SerializeField]
+        private float startHarvestVolume = 1.0f;
 
         private AnimationClip idlingWoodClip;
         private AnimationClip idlingOreClip;
@@ -38,11 +43,6 @@ namespace RTSLockstep
         private AnimationClip engagingWoodClip;
         private AnimationClip engagingOreClip;
         private AnimationClip constructingClip;
-
-        public override void Setup()
-        {
-            base.Setup();
-        }
 
         public override void Initialize()
         {
@@ -86,23 +86,6 @@ namespace RTSLockstep
             }
         }
 
-        public override void Play(AnimState state, bool baseAnimate = true)
-        {
-            if (CanAnimate)
-            {
-                AnimationClip clip = GetStateClip(state);
-                if (clip.IsNotNull())
-                {
-                    base.Play(state, false);
-                    animator.CrossFade(clip.name, fadeLength);
-                }
-                else
-                {
-                    base.Play(state, true);
-                }
-            }
-        }
-
         protected override AnimationClip GetStateClip(AnimState state)
         {
             switch (state)
@@ -125,7 +108,7 @@ namespace RTSLockstep
             return base.GetStateClip(state);
         }
 
-        public override string GetStateName(AnimState state)
+        protected override string GetStateName(AnimState state)
         {
             switch (state)
             {
@@ -152,6 +135,7 @@ namespace RTSLockstep
             base.InitialiseAudio();
             List<AudioClip> sounds = new List<AudioClip>();
             List<float> volumes = new List<float>();
+
             if (emptyHarvestVolume < 0.0f)
             {
                 emptyHarvestVolume = 0.0f;
@@ -162,6 +146,7 @@ namespace RTSLockstep
             }
             sounds.Add(emptyHarvestSound);
             volumes.Add(emptyHarvestVolume);
+
             if (harvestVolume < 0.0f)
             {
                 harvestVolume = 0.0f;
@@ -172,6 +157,7 @@ namespace RTSLockstep
             }
             sounds.Add(harvestSound);
             volumes.Add(harvestVolume);
+
             if (startHarvestVolume < 0.0f)
             {
                 startHarvestVolume = 0.0f;
@@ -183,16 +169,6 @@ namespace RTSLockstep
             sounds.Add(startHarvestSound);
             volumes.Add(startHarvestVolume);
 
-            if (finishedJobVolume < 0.0f)
-            {
-                finishedJobVolume = 0.0f;
-            }
-            if (finishedJobVolume > 1.0f)
-            {
-                finishedJobVolume = 1.0f;
-            }
-            sounds.Add(finishedJobSound);
-            volumes.Add(finishedJobVolume);
             audioElement.Add(sounds, volumes);
         }
     }

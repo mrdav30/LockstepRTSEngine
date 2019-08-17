@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep
+﻿namespace RTSLockstep
 {
     public sealed class GridSettings
     {
@@ -13,11 +10,11 @@ namespace RTSLockstep
 
         public long YOffset { get; private set; }
 
-        public bool UseDiagonalConnections {get; private set;}
+        public bool UseDiagonalConnections { get; private set; }
 
         public GridSettings()
         {
-            Init(256, 256, FixedMath.Create(-128), FixedMath.Create(-128), true);
+            Init(500, 500, FixedMath.Create(-100), FixedMath.Create(-100), true);
         }
 
         public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)

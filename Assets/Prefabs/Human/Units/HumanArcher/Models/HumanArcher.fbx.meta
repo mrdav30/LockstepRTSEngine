@@ -108,7 +108,27 @@ ModelImporter:
     7400000: Take 001
     9500000: //RootNode
     13700000: Human Archer5
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #41'
+    second: {fileID: 2100000, guid: b1588b5b7aa51e84c9112c090dd746ce, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #42'
+    second: {fileID: 2100000, guid: 6a30c35cfbccf4f45b91694350cfc2f6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #43'
+    second: {fileID: 2100000, guid: 5c6230aa3b00d654b88a24311b0420ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #45'
+    second: {fileID: 2100000, guid: c3396bbee8c6c004b83a5cff5b0a6867, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

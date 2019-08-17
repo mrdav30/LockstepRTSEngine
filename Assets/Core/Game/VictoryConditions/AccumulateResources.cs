@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using RTSLockstep;
+﻿using RTSLockstep;
 
 public class AccumulateResources : VictoryCondition
 {
-
     public int amount = 1050;
 
     private ResourceType type = ResourceType.Gold;
@@ -16,6 +13,6 @@ public class AccumulateResources : VictoryCondition
 
     public override bool CommanderMeetsConditions(AgentCommander commander)
     {
-        return commander && !commander.IsDead() && commander.GetResourceAmount(type) >= amount;
+        return commander && !commander.IsDead() && commander.CachedResourceManager.GetResourceAmount(type) >= amount;
     }
 } 
