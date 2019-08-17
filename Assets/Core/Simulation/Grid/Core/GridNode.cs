@@ -185,7 +185,8 @@ namespace RTSLockstep
                         }
                     }
                     //This method isn't always 100% accurate but after several updates, it will have a better picture of the map
-                    //Clarification: _clearanceSource is the source of a blockage. It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
+                    //Clarification: _clearanceSource is the source of a blockage. 
+                    // It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
                     //TODO: Test this thoroughly and visualize
                     for (int i = 7; i >= 0; i--)
                     {
@@ -206,7 +207,8 @@ namespace RTSLockstep
                 _clearanceDegree = 1;
                 _clearanceSource = (byte)i;
             }
-            if (neighbor._clearanceDegree < ClearanceDegree)
+            //Cap clearance to 8. Something larger than that won't work very well with pathfinding.
+            if (neighbor._clearanceDegree < ClearanceDegree && neighbor._clearanceDegree < 8)
             {
                 _clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
                 _clearanceSource = (byte)i;
