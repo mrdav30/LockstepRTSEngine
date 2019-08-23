@@ -133,6 +133,12 @@ namespace RTSLockstep
             SetState(state);
         }
 
+        public virtual void SetMovingState(AnimState state = AnimState.None)
+        {
+            state = state != AnimState.None ? state : AnimState.Moving;
+            SetState(state);
+        }
+
 
         public void SetState(AnimState animState)
         {

@@ -75,6 +75,13 @@
         None
     }
 
+    public enum MovementType : long
+    {
+        Group,
+        GroupIndividual,
+        Individual
+    }
+
     public enum AnimState
     {
         None,

@@ -1,177 +1,177 @@
-﻿using UnityEngine;
-using FastCollections;
-namespace RTSLockstep {
-public class MovementGroup
-{       
-    const int MinGroupSize = 2;
-
-    public Vector2d Destination { get; private set; }
-
-    FastList<Move> movers;
-    Vector2d groupDirection;
-    public Vector2d groupPosition;
-
-    public int indexID { get; set; }
-
-    int moversCount;
-    long radius;
-    long averageCollisionSize;
-    bool calculatedBehaviors;
-
-    public void Initialize(Command com)
+﻿using FastCollections;
+namespace RTSLockstep
+{
+    public class MovementGroup
     {
-        Destination = com.GetData<Vector2d> ();;
-        calculatedBehaviors = false;
+        public Vector2d Destination { get; private set; }
+
+        public Vector2d groupPosition;
+
+        public int indexID { get; set; }
+
+        public MovementType movementType { get; private set; }
+
+        private const int MinGroupSize = 2;
+
+        private FastList<Move> movers;
+        private Vector2d groupDirection;
+
+        private int moversCount;
+        private long radius;
+        private long averageCollisionSize;
+        private bool calculatedBehaviors;
+
+        public void Initialize(Command com)
+        {
+            Destination = com.GetData<Vector2d>(); ;
+            calculatedBehaviors = false;
             Selection selection = AgentController.InstanceManagers[com.ControllerID].GetSelection(com);
             movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
-    }
-
-    public void Add(Move mover)
-    {
-        if (mover.MyMovementGroup .IsNotNull())
-        {
-            mover.MyMovementGroup.movers.Remove(mover);
         }
-        mover.MyMovementGroup = this;
-        mover.MyMovementGroupID = indexID;
 
-        movers.Add(mover);
-        moversCount++;
-    }
-
-    public void Remove(Move mover)
-    {
-        moversCount--;
-    }
-
-    public void LocalSimulate()
-    {
-
-    }
-    public void LateSimulate () {
-        if (!calculatedBehaviors)
+        public void Remove(Move mover)
         {
-            CalculateAndExecuteBehaviors();
-            calculatedBehaviors = true;
+            moversCount--;
         }
-        if (movers.Count == 0)
+
+        public void LocalSimulate()
         {
-            Deactivate();
+
         }
-    }
 
-    public MovementType movementType { get; private set; }
-
-    public void CalculateAndExecuteBehaviors()
-    {
-
-        Move mover;
-
-        if (movers.Count >= MinGroupSize)
+        public void LateSimulate()
         {
-            averageCollisionSize = 0;
-            groupPosition = Vector2d.zero;
-            for (int i = 0; i < movers.Count; i++)
+            if (!calculatedBehaviors)
             {
-                mover = movers [i];
-                groupPosition += mover.Position;
-                averageCollisionSize += mover.CollisionSize;
+                CalculateAndExecuteBehaviors();
+                calculatedBehaviors = true;
             }
-
-            groupPosition /= movers.Count;
-            averageCollisionSize /= movers.Count;
-
-            long biggestSqrDistance = 0;
-            for (int i = 0; i < movers.Count; i++)
+            if (movers.Count == 0)
             {
-                long currentSqrDistance = movers [i].Position.SqrDistance(groupPosition.x, groupPosition.y);
-                if (currentSqrDistance > biggestSqrDistance)
+                Deactivate();
+            }
+        }
+
+        public void Add(Move mover)
+        {
+            if (mover.MyMovementGroup.IsNotNull())
+            {
+                mover.MyMovementGroup.movers.Remove(mover);
+            }
+            mover.MyMovementGroup = this;
+            mover.MyMovementGroupID = indexID;
+
+            movers.Add(mover);
+            moversCount++;
+        }
+
+        public void CalculateAndExecuteBehaviors()
+        {
+            Move mover;
+
+            if (movers.Count >= MinGroupSize)
+            {
+                averageCollisionSize = 0;
+                groupPosition = Vector2d.zero;
+                for (int i = 0; i < movers.Count; i++)
                 {
-                    long currentDistance = FixedMath.Sqrt(currentSqrDistance);
-                    /*
-                    DistDif = currentDistance - Radius;
-                    if (DistDif > MaximumDistDif * MoversCount / 128) {
-                        ExecuteGroupIndividualMove ();
-                        return;
-                    }*/
-                    biggestSqrDistance = currentSqrDistance;
-                    radius = currentDistance;
+                    mover = movers[i];
+                    groupPosition += mover.Position;
+                    averageCollisionSize += mover.CollisionSize;
                 }
+
+                groupPosition /= movers.Count;
+                averageCollisionSize /= movers.Count;
+
+                long biggestSqrDistance = 0;
+                for (int i = 0; i < movers.Count; i++)
+                {
+                    long currentSqrDistance = movers[i].Position.SqrDistance(groupPosition.x, groupPosition.y);
+                    if (currentSqrDistance > biggestSqrDistance)
+                    {
+                        long currentDistance = FixedMath.Sqrt(currentSqrDistance);
+                        /*
+                        DistDif = currentDistance - Radius;
+                        if (DistDif > MaximumDistDif * MoversCount / 128) {
+                            ExecuteGroupIndividualMove ();
+                            return;
+                        }*/
+                        biggestSqrDistance = currentSqrDistance;
+                        radius = currentDistance;
+                    }
+                }
+                if (radius == 0)
+                {
+                    ExecuteGroupIndividualMove();
+                    return;
+                }
+                long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
+                long groupSize = radius.Mul(radius);
+
+                if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius * radius))
+                {
+                    ExecuteGroupIndividualMove();
+                    return;
+                }
+                ExecuteGroupMove();
             }
-            if (radius == 0)
+            else
             {
-                ExecuteGroupIndividualMove();
-                return;
+                ExecuteIndividualMove();
             }
-            long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
-            long groupSize = radius.Mul(radius);
+        }
 
-            if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius * radius))
+        public void Deactivate()
+        {
+            Move mover;
+            for (int i = 0; i < movers.Count; i++)
             {
-                ExecuteGroupIndividualMove();
-                return;
+                mover = movers[i];
+                mover.MyMovementGroup = null;
+                mover.MyMovementGroupID = -1;
             }
-            ExecuteGroupMove ();
+            movers.FastClear();
+            MovementGroupHelper.Pool(this);
+            calculatedBehaviors = false;
+            indexID = -1;
+        }
 
-        } else
+        private void ExecuteGroupMove()
         {
-            ExecuteIndividualMove();
-        }
-    }
+            movementType = MovementType.Group;
+            groupDirection = Destination - groupPosition;
 
-    public void Deactivate()
-    {
-        Move mover;
-        for (int i = 0; i < movers.Count; i++)
-        {
-            mover = movers [i];
-            mover.MyMovementGroup = null;
-            mover.MyMovementGroupID = -1;
+            for (int i = 0; i < movers.Count; i++)
+            {
+                Move mover = movers[i];
+                mover.IsFormationMoving = true;
+                mover.StopMultiplier = Move.FormationStop;
+                mover.OnGroupProcessed(mover.Position + groupDirection);
+            }
         }
-        movers.FastClear();
-        MovementGroupHelper.Pool(this);
-        calculatedBehaviors = false;
-        indexID = -1;
-    }
-    void ExecuteGroupMove () {
-        movementType = MovementType.Group;
-        groupDirection = Destination - groupPosition;
 
-        for (int i = 0; i < movers.Count; i++)
+        private void ExecuteIndividualMove()
         {
-            Move mover = movers [i];
-            mover.IsFormationMoving = true;
-            mover.StopMultiplier = Move.FormationStop;
-            mover.OnGroupProcessed(mover.Position + groupDirection);
+            movementType = MovementType.Individual;
+            for (int i = 0; i < movers.Count; i++)
+            {
+                Move mover = movers[i];
+                mover.IsFormationMoving = false;
+                mover.StopMultiplier = Move.DirectStop;
+                mover.OnGroupProcessed(Destination);
+            }
         }
-    }
-    void ExecuteIndividualMove () {
-        movementType = MovementType.Individual;
-        for (int i = 0; i < movers.Count; i++)
-        {
-            Move mover = movers [i];
-            mover.IsFormationMoving = false;
-            mover.StopMultiplier = Move.DirectStop;
-            mover.OnGroupProcessed(Destination);
-        }
-    }
-    void ExecuteGroupIndividualMove()
-    {
-        movementType = MovementType.GroupIndividual;
-        for (int i = 0; i < movers.Count; i++)
-        {
-            Move mover = movers [i];
-            mover.IsFormationMoving = false;
-            mover.StopMultiplier = Move.GroupDirectStop;
-            mover.OnGroupProcessed(Destination);
-        }
-    }
-}
 
-public enum MovementType : long
-{
-    Group,
-    GroupIndividual,
-    Individual
-}
+        private void ExecuteGroupIndividualMove()
+        {
+            movementType = MovementType.GroupIndividual;
+            for (int i = 0; i < movers.Count; i++)
+            {
+                Move mover = movers[i];
+                mover.IsFormationMoving = false;
+                mover.StopMultiplier = Move.GroupDirectStop;
+                mover.OnGroupProcessed(Destination);
+            }
+        }
+    }
 }

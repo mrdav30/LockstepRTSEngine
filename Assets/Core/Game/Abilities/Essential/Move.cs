@@ -12,9 +12,21 @@ namespace RTSLockstep
         public const long FormationStop = FixedMath.One / 4;
         public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 4;
-        private const int MinimumOtherStopTime = LockstepManager.FrameRate / 4;
-        private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
-        private const int StuckRepathTries = 4;
+
+        public long StopMultiplier { get; set; }
+
+        //Has this unit arrived at destination? Default set to false.
+        public bool Arrived { get; private set; }
+
+        //Called when unit arrives at destination
+        public event Action onArrive;
+        public event Action onStartMove;
+        //Called whenever movement is stopped... i.e. to attack
+        public event Action OnStopMove;
+
+        [Lockstep(true)]
+        public bool SlowArrival { get; set; }
+        public Vector2d AveragePosition { get; set; }
 
         public int GridSize { get { return (cachedBody.Radius).CeilToInt(); } }
 
@@ -29,6 +41,12 @@ namespace RTSLockstep
         public bool IsFormationMoving { get; set; }
 
         public bool IsMoving { get; private set; }
+
+        public Command LastCommand;
+
+        private const int MinimumOtherStopTime = LockstepManager.FrameRate / 4;
+        private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
+        private const int StuckRepathTries = 4;
 
         private bool hasPath;
         private bool straightPath;
@@ -53,73 +71,27 @@ namespace RTSLockstep
         [HideInInspector]
         public Vector2d Destination;
 
-        #region Auto stopping
-        public bool GetCanAutoStop()
-        {
-            return AutoStopPauser <= 0;
-        }
-
-        public bool GetCanCollisionStop()
-        {
-            return CollisionStopPauser <= 0;
-        }
-
-        const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
+        #region Auto stopping properites
+        private const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
         private int AutoStopPauser;
-
-        public void PauseAutoStop()
-        {
-            AutoStopPauser = AUTO_STOP_PAUSE_TIME;
-        }
 
         private int StopPauseLayer;
 
         private int CollisionStopPauser;
 
-        public void PauseCollisionStop()
-        {
-            CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
-        }
-
-        //TODO: Improve the naming
-        bool GetLookingForStopPause()
-        {
-            return StopPauseLooker >= 0;
-        }
-
         private int StopPauseLooker;
-        /// <summary>
-        /// Start the search process for collisions/obstructions that are in the same attack group.
-        /// </summary>
-        public void StartLookingForStopPause()
-        {
-            StopPauseLooker = AUTO_STOP_PAUSE_TIME;
-        }
         #endregion
-        public long StopMultiplier { get; set; }
-
-        //Has this unit arrived at destination? Default set to false.
-        public bool Arrived { get; private set; }
-
-        //Called when unit arrives at destination
-        public event Action onArrive;
-        public event Action onStartMove;
-        //Called whenever movement is stopped... i.e. to attack
-        public event Action OnStopMove;
 
         private LSBody cachedBody { get; set; }
         private Turn cachedTurn { get; set; }
 
-        public Vector2d AveragePosition { get; set; }
-
         private long timescaledAcceleration;
         private long timescaledDecceleration;
-        bool decellerating;
+        private bool decellerating;
 
         private Vector2d lastTargetPos;
-        private Vector2d targetDirection;
 
-        private Vector2d waypointDirection { get { return this.targetDirection; } }
+        private Vector2d waypointDirection { get; set; }
 
         private GridNode currentNode;
         private GridNode destinationNode;
@@ -128,12 +100,28 @@ namespace RTSLockstep
         private long closingDistance;
         private long stuckTolerance;
 
-        [Lockstep(true)]
-        public bool SlowArrival
+        private int StuckTime
         {
-            get;
-            set;
+            get { return _stuckTime; }
+            set
+            {
+                _stuckTime = value;
+                if (_stuckTime == 0)
+                {
+                }
+            }
         }
+
+        private int _stuckTime;
+        private int RepathTries;
+        private bool DoPathfind;
+
+        private readonly int collidedCount;
+        private readonly ushort collidedID;
+
+        private static RTSAgent tempAgent;
+        private readonly bool paused;
+        private static Vector2d desiredVelocity;
 
         #region Serialized
         [SerializeField]
@@ -173,7 +161,6 @@ namespace RTSLockstep
 
         protected override void OnInitialize()
         {
-
             myPath.FastClear();
             _pathIndex = 0;
             StoppedTime = 0;
@@ -202,25 +189,238 @@ namespace RTSLockstep
             DoPathfind = false;
         }
 
-        private int StuckTime
+        protected override void OnSimulate()
         {
-            get { return _stuckTime; }
-            set
+            if (CanMove)
             {
-                _stuckTime = value;
-                if (_stuckTime == 0)
+                //TODO: Organize/split this function
+                if (IsMoving)
                 {
+                    if (CanPathfind)
+                    {
+                        if (DoPathfind)
+                        {
+                            DoPathfind = false;
+                            if (viableDestination)
+                            {
+                                if (Pathfinder.GetStartNode(cachedBody.Position, out currentNode))
+                                {
+                                    if (currentNode.DoesEqual(this.destinationNode))
+                                    {
+                                        if (this.RepathTries >= 1)
+                                        {
+                                            this.Arrive();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (straightPath)
+                                        {
+                                            if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
+                                            {
+                                                if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
+                                                        GridSize, GetNodeHash(destinationNode)))
+                                                {
+                                                    hasPath = true;
+                                                    pathIndex = 0;
+                                                }
+                                                else if (IsFormationMoving)
+                                                {
+                                                    StartMove(MyMovementGroup.Destination);
+                                                    IsFormationMoving = false;
+                                                }
+
+                                                straightPath = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
+                                            {
+                                                if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
+                                                        GridSize, GetNodeHash(destinationNode)))
+                                                {
+                                                    hasPath = true;
+                                                    pathIndex = 0;
+                                                }
+                                                else if (IsFormationMoving)
+                                                {
+                                                    StartMove(MyMovementGroup.Destination);
+                                                    IsFormationMoving = false;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                straightPath = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                hasPath = false;
+                                if (IsFormationMoving)
+                                {
+                                    StartMove(MyMovementGroup.Destination);
+                                    IsFormationMoving = false;
+                                }
+                            }
+                        }
+
+                        if (straightPath)
+                        {
+                            targetPos = Destination;
+                        }
+                        else if (hasPath)
+                        {
+                            if (pathIndex >= myPath.Count)
+                            {
+                                targetPos = this.Destination;
+                            }
+                            else
+                            {
+                                targetPos = myPath[pathIndex];
+                            }
+                        }
+                        else
+                        {
+                            targetPos = Destination;
+                        }
+                    }
+                    // agent doesn't have to pathfind
+                    else
+                    {
+                        targetPos = Destination;
+                    }
+
+                    movementDirection = targetPos - cachedBody._position;
+
+                    movementDirection.Normalize(out distance);
+                    if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y)
+                    {
+                        lastTargetPos = targetPos;
+                        waypointDirection = movementDirection;
+                    }
+                    bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
+                    long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
+
+                    long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
+
+                    if (distance > slowDistance || movingToWaypoint)
+                    {
+                        desiredVelocity = (movementDirection);
+                        if (CanTurn)
+                        {
+                            cachedTurn.StartTurnDirection(movementDirection);
+                        }
+                    }
+                    else
+                    {
+                        if (distance < FixedMath.Mul(closingDistance, StopMultiplier))
+                        {
+                            Arrive();
+                            //TODO: Don't skip this frame of slowing down
+                            return;
+                        }
+                        if (distance > closingDistance)
+                        {
+                            if (CanTurn)
+                            {
+                                cachedTurn.StartTurnDirection(movementDirection);
+                            }
+                        }
+                        if (distance <= slowDistance)
+                        {
+                            long closingSpeed = distance.Div(slowDistance);
+                            if (CanTurn)
+                            {
+                                cachedTurn.StartTurnDirection(movementDirection);
+                            }
+
+                            desiredVelocity = movementDirection * closingSpeed;
+                            decellerating = true;
+                            //Reduce occurence of units preventing other units from reaching destination
+                            stuckThreshold *= 4;
+                        }
+                    }
+
+                    //If unit has not moved stuckThreshold in a frame, it's stuck
+                    StuckTime++;
+                    if (GetCanAutoStop())
+                    {
+                        if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold))
+                        {
+                            if (StuckTime > StuckTimeThreshold)
+                            {
+                                if (movingToWaypoint)
+                                {
+                                    this.pathIndex++;
+                                }
+                                else
+                                {
+                                    if (RepathTries < StuckRepathTries)
+                                    {
+                                        DoPathfind = true;
+                                        RepathTries++;
+                                    }
+                                    else
+                                    {
+                                        RepathTries = 0;
+                                        this.Arrive();
+                                    }
+                                }
+                                StuckTime = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (StuckTime > 0)
+                            {
+                                StuckTime -= 1;
+                            }
+
+                            RepathTries = 0;
+                        }
+                    }
+                    if (movingToWaypoint)
+                    {
+                        if ((this.pathIndex >= 0
+                            && distance < closingDistance
+                            && movementDirection.Dot(waypointDirection) < 0)
+                            || distance < FixedMath.Mul(closingDistance, FixedMath.Half))
+                        {
+                            this.pathIndex++;
+                        }
+                    }
+
+                    desiredVelocity *= Speed;
+                    cachedBody._velocity += GetAdjustVector(desiredVelocity);
+
+                    cachedBody.VelocityChanged = true;
                 }
+                // agent is not moving
+                else
+                {
+                    decellerating = true;
+
+                    //Slowin' down
+                    if (cachedBody.VelocityMagnitude > 0)
+                    {
+                        cachedBody.Velocity += GetAdjustVector(Vector2d.zero);
+                    }
+                    StoppedTime++;
+                }
+                decellerating = false;
+
+                AutoStopPauser--;
+                CollisionStopPauser--;
+                StopPauseLooker--;
+                AveragePosition = AveragePosition.Lerped(Agent.Body.Position, FixedMath.One / 2);
             }
         }
 
-        private int _stuckTime;
-
-        private int RepathTries;
-
-        bool DoPathfind;
-
-        uint GetNodeHash(GridNode node)
+        private uint GetNodeHash(GridNode node)
         {
             //TODO: At the moment, the CombinePathVersion is based on the destination... essentially caching the path to the last destination
             //Should this be based on commands instead?
@@ -230,255 +430,43 @@ namespace RTSLockstep
             return ret;
         }
 
-        protected override void OnSimulate()
+        #region Autostopping
+        public bool GetCanAutoStop()
         {
-            if (!CanMove)
-            {
-                return;
-            }
-            //TODO: Organize/split this function
-            if (IsMoving)
-            {
-                if (CanPathfind)
-                {
-                    if (DoPathfind)
-                    {
-                        DoPathfind = false;
-                        if (viableDestination)
-                        {
-                            if (Pathfinder.GetStartNode(cachedBody.Position, out currentNode))
-                            {
-                                if (currentNode.DoesEqual(this.destinationNode))
-                                {
-                                    if (this.RepathTries >= 1)
-                                    {
-                                        this.Arrive();
-                                    }
-                                }
-                                else
-                                {
-                                    if (straightPath)
-                                    {
-                                        if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
-                                        {
-                                            if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-                                                    GridSize, GetNodeHash(destinationNode)))
-                                            {
-                                                hasPath = true;
-                                                pathIndex = 0;
-                                            }
-                                            else
-                                            {
-                                                if (IsFormationMoving)
-                                                {
-                                                    StartMove(MyMovementGroup.Destination);
-                                                    IsFormationMoving = false;
-                                                }
-                                            }
-                                            straightPath = false;
-                                        }
-                                        else
-                                        {
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
-                                        {
-                                            if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-                                                    GridSize, GetNodeHash(destinationNode)))
-                                            {
-                                                hasPath = true;
-                                                pathIndex = 0;
-                                            }
-                                            else
-                                            {
-                                                if (IsFormationMoving)
-                                                {
-                                                    StartMove(MyMovementGroup.Destination);
-                                                    IsFormationMoving = false;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            straightPath = true;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                        else
-                        {
-                            hasPath = false;
-                            if (IsFormationMoving)
-                            {
-                                StartMove(MyMovementGroup.Destination);
-                                IsFormationMoving = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-
-                    }
-
-                    if (straightPath)
-                    {
-                        targetPos = Destination;
-                    }
-                    else if (hasPath)
-                    {
-                        if (pathIndex >= myPath.Count)
-                        {
-                            targetPos = this.Destination;
-                        }
-                        else
-                        {
-                            targetPos = myPath[pathIndex];
-                        }
-                    }
-                    else
-                    {
-                        targetPos = Destination;
-                    }
-                }
-                else
-                {
-                    targetPos = Destination;
-                }
-
-                movementDirection = targetPos - cachedBody._position;
-
-                movementDirection.Normalize(out distance);
-                if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y)
-                {
-                    lastTargetPos = targetPos;
-                    targetDirection = movementDirection;
-                }
-                bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
-                long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
-
-                long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
-
-
-                if (distance > slowDistance || movingToWaypoint)
-                {
-                    desiredVelocity = (movementDirection);
-                    if (CanTurn)
-                        cachedTurn.StartTurnDirection(movementDirection);
-                }
-                else
-                {
-
-                    if (distance < FixedMath.Mul(closingDistance, StopMultiplier))
-                    {
-                        Arrive();
-                        //TODO: Don't skip this frame of slowing down
-                        return;
-                    }
-                    if (distance > closingDistance)
-                    {
-                        if (CanTurn)
-                            cachedTurn.StartTurnDirection(movementDirection);
-                    }
-                    if (distance <= slowDistance)
-                    {
-                        long closingSpeed = distance.Div(slowDistance);
-                        if (CanTurn)
-                            cachedTurn.StartTurnDirection(movementDirection);
-                        desiredVelocity = movementDirection * closingSpeed;
-                        decellerating = true;
-                        //Reduce occurence of units preventing other units from reaching destination
-                        stuckThreshold *= 4;
-                    }
-
-
-                }
-                //If unit has not moved stuckThreshold in a frame, it's stuck
-                StuckTime++;
-                if (GetCanAutoStop())
-                {
-                    if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold))
-                    {
-
-                        if (StuckTime > StuckTimeThreshold)
-                        {
-                            if (movingToWaypoint)
-                            {
-                                this.pathIndex++;
-                            }
-                            else
-                            {
-                                if (RepathTries < StuckRepathTries)
-                                {
-                                    DoPathfind = true;
-                                    RepathTries++;
-                                }
-                                else
-                                {
-                                    RepathTries = 0;
-                                    this.Arrive();
-                                }
-                            }
-                            StuckTime = 0;
-                        }
-                    }
-                    else
-                    {
-                        if (StuckTime > 0)
-                            StuckTime -= 1;
-
-                        RepathTries = 0;
-                    }
-                }
-                if (movingToWaypoint)
-                {
-
-                    if (
-                        (
-                            this.pathIndex >= 0 &&
-                            distance < closingDistance &&
-                            (movementDirection).Dot(waypointDirection) < 0
-                        ) ||
-                        distance < FixedMath.Mul(closingDistance, FixedMath.Half))
-                    {
-                        this.pathIndex++;
-                    }
-                }
-
-                desiredVelocity *= Speed;
-                cachedBody._velocity += GetAdjustVector(desiredVelocity);
-
-                cachedBody.VelocityChanged = true;
-
-
-            }
-            else
-            {
-                decellerating = true;
-
-                //Slowin' down
-                if (cachedBody.VelocityMagnitude > 0)
-                {
-                    cachedBody.Velocity += GetAdjustVector(Vector2d.zero);
-                }
-                StoppedTime++;
-            }
-            decellerating = false;
-
-            AutoStopPauser--;
-            CollisionStopPauser--;
-            StopPauseLooker--;
-            AveragePosition = AveragePosition.Lerped(Agent.Body.Position, FixedMath.One / 2);
-
+            return AutoStopPauser <= 0;
         }
 
-        Vector2d GetAdjustVector(Vector2d desiredVel)
+        public bool GetCanCollisionStop()
+        {
+            return CollisionStopPauser <= 0;
+        }
+
+        public void PauseAutoStop()
+        {
+            AutoStopPauser = AUTO_STOP_PAUSE_TIME;
+        }
+
+        public void PauseCollisionStop()
+        {
+            CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
+        }
+
+        //TODO: Improve the naming
+        private bool GetLookingForStopPause()
+        {
+            return StopPauseLooker >= 0;
+        }
+
+        /// <summary>
+        /// Start the search process for collisions/obstructions that are in the same attack group.
+        /// </summary>
+        public void StartLookingForStopPause()
+        {
+            StopPauseLooker = AUTO_STOP_PAUSE_TIME;
+        }
+        #endregion
+
+        private Vector2d GetAdjustVector(Vector2d desiredVel)
         {
             var adjust = desiredVel - cachedBody._velocity;
             var adjustFastMag = adjust.FastMagnitude();
@@ -496,8 +484,6 @@ namespace RTSLockstep
             return adjust;
         }
 
-        public Command LastCommand;
-
         protected override void OnExecute(Command com)
         {
             LastCommand = com;
@@ -512,16 +498,15 @@ namespace RTSLockstep
             Agent.StopCast(ID);
             IsCasting = true;
             RegisterGroup();
-
         }
 
         public void RegisterGroup(bool moveOnProcessed = true)
         {
             MoveOnGroupProcessed = moveOnProcessed;
             if (MovementGroupHelper.CheckValidAndAlert())
+            {
                 MovementGroupHelper.LastCreatedGroup.Add(this);
-
-
+            }
         }
 
         public void Arrive()
@@ -581,8 +566,8 @@ namespace RTSLockstep
             {
                 this.Destination = destination;
             }
-            if (this.onGroupProcessed != null)
-                this.onGroupProcessed();
+
+            this.onGroupProcessed?.Invoke();
         }
 
         public event Action onGroupProcessed;
@@ -599,7 +584,7 @@ namespace RTSLockstep
             StoppedTime = 0;
             Arrived = false;
 
-            Agent.Animator.SetState(AnimState.Moving);
+            Agent.Animator.SetMovingState(AnimState.Moving);
 
             //For now, use old next-best-node system when size requires consideration
             viableDestination = this.GridSize <= 1 ?
@@ -611,8 +596,7 @@ namespace RTSLockstep
             StuckTime = 0;
             RepathTries = 0;
             IsCasting = true;
-            if (onStartMove != null)
-                onStartMove();
+            onStartMove?.Invoke();
         }
 
         protected override void OnStopCast()
@@ -620,11 +604,6 @@ namespace RTSLockstep
             StopMove();
         }
 
-        private readonly int collidedCount;
-        private readonly ushort collidedID;
-
-        static RTSAgent tempAgent;
-        readonly bool paused;
         private void HandleCollision(LSBody other)
         {
             if (!CanMove)
@@ -685,14 +664,9 @@ namespace RTSLockstep
                             }
                         }
                     }
-                    else
-                    {
-
-                    }
                 }
             }
         }
-        static Vector2d desiredVelocity;
 
 #if UNITY_EDITOR
         public bool DrawPath = true;
@@ -728,7 +702,7 @@ namespace RTSLockstep
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
             SaveManager.WriteBoolean(writer, "Decellerating", decellerating);
             SaveManager.WriteVector2d(writer, "LastTargetPos", lastTargetPos);
-            SaveManager.WriteVector2d(writer, "TargetDirection", targetDirection);
+            SaveManager.WriteVector2d(writer, "TargetDirection", waypointDirection);
             SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
         }
 
@@ -780,7 +754,7 @@ namespace RTSLockstep
                     lastTargetPos = LoadManager.LoadVector2d(reader);
                     break;
                 case "TargetDirection":
-                    targetDirection = LoadManager.LoadVector2d(reader);
+                    waypointDirection = LoadManager.LoadVector2d(reader);
                     break;
                 case "MovementDirection":
                     movementDirection = LoadManager.LoadVector2d(reader);

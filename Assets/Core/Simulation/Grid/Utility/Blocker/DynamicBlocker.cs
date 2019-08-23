@@ -36,12 +36,6 @@ namespace RTSLockstep
             RemoveLastCoordinates();
         }
 
-        public void ForceCoordinateUpdate()
-        {
-            RemoveLastCoordinates();
-            UpdateCoordinates();
-        }
-
         private void RemoveLastCoordinates()
         {
             for (int i = 0; i < LastCoordinates.Count; i++)

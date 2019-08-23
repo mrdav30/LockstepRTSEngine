@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -309,11 +310,6 @@ namespace RTSLockstep
 
                     newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
                     newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
-
-                    if (newRTSAgent.GetAbility<DynamicBlocker>())
-                    {
-                        newRTSAgent.GetAbility<DynamicBlocker>().ForceCoordinateUpdate();
-                    }
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
                     {
