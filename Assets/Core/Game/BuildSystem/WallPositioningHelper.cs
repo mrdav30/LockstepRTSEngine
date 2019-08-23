@@ -1,5 +1,4 @@
-﻿using FastCollections;
-using RTSLockstep;
+﻿using RTSLockstep;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -90,15 +89,7 @@ public static class WallPositioningHelper
     {
         if (_isPlacingWall)
         {
-            //check if last pole was ever set
-            if (!_endSnapped && _pillarPrefabs.Count == _wallPrefabs.Count)
-            {
-                Vector3 endPos = tempWallPillarGO.transform.position;
-                CreateWallPillar(endPos, true);
-            }
-            //Perform one final adjustment
-            AdjustWallSegments();
-            SetWall();
+            SetWallConstructionQueue();
         }
         else
         {
@@ -130,8 +121,17 @@ public static class WallPositioningHelper
         _isPlacingWall = true;
     }
 
-    private static void SetWall()
+    private static void SetWallConstructionQueue()
     {
+        // Add the last pole to the construction queue
+        if (!_endSnapped && _pillarPrefabs.Count == _wallPrefabs.Count)
+        {
+            //Perform one final adjustment
+            //         AdjustWallSegments();
+            Vector3 endPos = tempWallPillarGO.transform.position;
+            CreateWallPillar(endPos, true);
+        }
+
         for (int i = 0; i < _pillarPrefabs.Count; i++)
         {
             // ignore first entry if start pillar was snapped, don't want to construct twice!
@@ -140,7 +140,7 @@ public static class WallPositioningHelper
                 ConstructionHandler.SetConstructionQueue(_pillarPrefabs[i]);
             }
 
-            if(_startPillar != _lastPillar)
+            if (_wallPrefabs.Count >= 0)
             {
                 GameObject wallSegement;
                 if (_wallPrefabs.TryGetValue(i, out wallSegement) && wallSegement.GetComponent<Structure>().ValidPlacement)
@@ -265,6 +265,9 @@ public static class WallPositioningHelper
 
         if (isLast)
         {
+            // we know the placement is valid, otherwise we wouldn't know 
+            // this was the last pillar from left click
+            newPillar.GetComponent<Structure>().ValidPlacement = true;
             _lastPillar = newPillar;
         }
     }

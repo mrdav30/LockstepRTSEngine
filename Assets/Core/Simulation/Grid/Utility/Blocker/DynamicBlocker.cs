@@ -24,8 +24,7 @@ namespace RTSLockstep
 
         protected override void OnLateSimulate()
         {
-            if (this.CachedBody.PositionChangedBuffer
-                || this.CachedBody.RotationChangedBuffer)
+            if (this.CachedBody.PositionChangedBuffer || this.CachedBody.RotationChangedBuffer)
             {
                 RemoveLastCoordinates();
                 UpdateCoordinates();
@@ -35,6 +34,12 @@ namespace RTSLockstep
         protected override void OnDeactivate()
         {
             RemoveLastCoordinates();
+        }
+
+        public void ForceCoordinateUpdate()
+        {
+            RemoveLastCoordinates();
+            UpdateCoordinates();
         }
 
         private void RemoveLastCoordinates()

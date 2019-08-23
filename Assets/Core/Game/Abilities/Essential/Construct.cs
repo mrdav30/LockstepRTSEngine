@@ -110,7 +110,7 @@ namespace RTSLockstep
                 // If construction queue not empty and agent not busy, get building
                 if (ConstructQueue.Count > 0 && !IsBuilding)
                 {
-                    SetConstructQueue();
+                    StartConstructQueue();
                 }
 
                 if (IsBuilding)
@@ -288,7 +288,7 @@ namespace RTSLockstep
             get { return AnimState.Constructing; }
         }
 
-        public void SetConstructQueue()
+        public void StartConstructQueue()
         {
             while (ConstructQueue.Count > 0)
             {
@@ -309,6 +309,11 @@ namespace RTSLockstep
 
                     newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
                     newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
+
+                    if (newRTSAgent.GetAbility<DynamicBlocker>())
+                    {
+                        newRTSAgent.GetAbility<DynamicBlocker>().ForceCoordinateUpdate();
+                    }
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
                     {
@@ -376,6 +381,10 @@ namespace RTSLockstep
 
         public virtual void StartConstructMove()
         {
+            IsFocused = true;
+            IsBuildMoving = false;
+            Agent.Tag = AgentTag.Builder;
+
             IsBuilding = true;
             IsCasting = true;
             fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
@@ -404,19 +413,16 @@ namespace RTSLockstep
                 DefaultData target;
                 if (com.TryGetData(out target))
                 {
-                    IsFocused = true;
-                    IsBuildMoving = false;
-                    Agent.Tag = AgentTag.Builder;
-
                     // construction hasn't started yet, only a bool given 
                     if (target.Is(DataType.Bool) && ConstructQueue.Count > 0)
                     {
                         if ((bool)target.Value)
                         {
-                            SetConstructQueue();
+                            StartConstructQueue();
                         }
                         else
                         {
+                            // An event triggered to clear agents construction queue
                             ConstructQueue.Clear();
                         }
                     }

@@ -49,20 +49,17 @@ public static class ConstructionHandler
 
                 FindStructureLocation();
 
-                if (!_constructingWall)
-                {
-                    Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
-                    tempStructure.ValidPlacement = GridBuilder.UpdateMove(pos);
+                Vector2d pos = new Vector2d(tempObject.transform.position.x, tempObject.transform.position.z);
+                tempStructure.ValidPlacement = GridBuilder.UpdateMove(pos);
 
-                    if (tempStructure.ValidPlacement &&
-                        SelectionManager.MousedAgent.IsNull())
-                    {
-                        SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
-                    }
-                    else
-                    {
-                        SetTransparentMaterial(tempObject, GameResourceManager.NotAllowedMaterial);
-                    }
+                if (tempStructure.ValidPlacement &&
+                    SelectionManager.MousedAgent.IsNull())
+                {
+                    SetTransparentMaterial(tempObject, GameResourceManager.AllowedMaterial);
+                }
+                else
+                {
+                    SetTransparentMaterial(tempObject, GameResourceManager.NotAllowedMaterial);
                 }
             }
         }
@@ -72,23 +69,25 @@ public static class ConstructionHandler
     {
         if (IsFindingBuildingLocation())
         {
-            if (_constructingWall)
+            if (tempStructure.ValidPlacement)
             {
-                WallPositioningHelper.OnLeftClick();
-            }
-            else
-            {
-                // only constructing 1 object, place it in the agents construct queue
-                if (tempStructure.ValidPlacement)
+                if (_constructingWall)
                 {
-                    SetConstructionQueue(tempObject);
-                    SendConstructCommand();
+                    WallPositioningHelper.OnLeftClick();
                 }
                 else
                 {
-                    Debug.Log("Invalid end placement!");
+                    // only constructing 1 object, place it in the agents construct queue
+                    SetConstructionQueue(tempObject);
+                    SendConstructCommand();
+
                 }
             }
+            else
+            {
+                Debug.Log("Invalid end placement!");
+            }
+
         }
     }
 
@@ -226,7 +225,7 @@ public static class ConstructionHandler
         //Reset construction handler
         Reset();
 
-        // send construct command
+        // send construct command for selected agent to start construction queue
         Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
         constructCom.Add(new DefaultData(DataType.Bool, startConstruction));
 
