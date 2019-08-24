@@ -43,7 +43,6 @@ namespace RTSLockstep
         public void UpdateHeight()
         {
             long height = HeightmapSaver.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
-            Debug.Log("updating height: heightset");
             Agent.Body.HeightPos = height;
         }
     }

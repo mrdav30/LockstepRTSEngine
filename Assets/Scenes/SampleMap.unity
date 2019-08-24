@@ -94,8 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
-    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 0
 --- !u!196 &4
@@ -404,6 +404,12 @@ MonoBehaviour:
     Position:
       x: 0
       y: 0
+  - AgentCode: RockWarrior
+    Count: 1
+    ControllerCode: Hostile
+    Position:
+      x: 1638400
+      y: 1638400
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:
@@ -519,31 +525,6 @@ PrefabInstance:
     - target: {fileID: 4669544497093498, guid: 9f9dbfa5103b9a7489e4b0758e47e27f, type: 3}
       propertyPath: m_RootOrder
       value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114680489691796294, guid: 9f9dbfa5103b9a7489e4b0758e47e27f,
-        type: 3}
-      propertyPath: _internalBody._radius
-      value: 210380
-      objectReference: {fileID: 0}
-    - target: {fileID: 114680489691796294, guid: 9f9dbfa5103b9a7489e4b0758e47e27f,
-        type: 3}
-      propertyPath: _internalBody._shape
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114680489691796294, guid: 9f9dbfa5103b9a7489e4b0758e47e27f,
-        type: 3}
-      propertyPath: _internalBody._height
-      value: 244800
-      objectReference: {fileID: 0}
-    - target: {fileID: 114680489691796294, guid: 9f9dbfa5103b9a7489e4b0758e47e27f,
-        type: 3}
-      propertyPath: _internalBody._halfWidth
-      value: 168900
-      objectReference: {fileID: 0}
-    - target: {fileID: 114680489691796294, guid: 9f9dbfa5103b9a7489e4b0758e47e27f,
-        type: 3}
-      propertyPath: _internalBody._halfHeight
-      value: 105574
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f9dbfa5103b9a7489e4b0758e47e27f, type: 3}
@@ -1043,11 +1024,6 @@ PrefabInstance:
     - target: {fileID: 4488702193757374, guid: 0d0738dfacef668489aa12bcc6d825b7, type: 3}
       propertyPath: m_RootOrder
       value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 114584507045198590, guid: 0d0738dfacef668489aa12bcc6d825b7,
-        type: 3}
-      propertyPath: _internalBody._shape
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d0738dfacef668489aa12bcc6d825b7, type: 3}
