@@ -151,7 +151,7 @@ namespace RTSLockstep
             }
             else
             {
-                Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
+                Vector2d targetDirection = CurrentProject.Body.Position - CachedBody.Position;
                 long fastMag = targetDirection.FastMagnitude();
 
                 if (!IsWindingUp)
@@ -198,7 +198,7 @@ namespace RTSLockstep
                         cachedMove.PauseCollisionStop();
                         if (cachedMove.IsMoving == false)
                         {
-                            cachedMove.StartMove(CurrentProject.Body._position);
+                            cachedMove.StartMove(CurrentProject.Body.Position);
                             CachedBody.Priority = basePriority;
                         }
                         else
@@ -214,7 +214,7 @@ namespace RTSLockstep
                                     if (CurrentProject.Body.PositionChangedBuffer &&
                                         CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
                                     {
-                                        cachedMove.StartMove(CurrentProject.Body._position);
+                                        cachedMove.StartMove(CurrentProject.Body.Position);
                                         //So units don't sync up and path on the same frame
                                         repathTimer.AdvanceFrames(repathRandom);
                                     }
@@ -278,7 +278,7 @@ namespace RTSLockstep
 
         private bool CheckRange()
         {
-            Vector2d targetDirection = CurrentProject.Body._position - CachedBody._position;
+            Vector2d targetDirection = CurrentProject.Body.Position - CachedBody.Position;
             long fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -311,7 +311,7 @@ namespace RTSLockstep
                     newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
                     newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
 
-                    if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body._position))
+                    if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
                         Agent.GetCommander().CachedResourceManager.RemoveResources(newRTSAgent);
 
@@ -392,7 +392,7 @@ namespace RTSLockstep
 
                 IsBuildMoving = true;
                 // send move command
-                cachedMove.StartMove(CurrentProject.Body._position);
+                cachedMove.StartMove(CurrentProject.Body.Position);
             }
         }
 

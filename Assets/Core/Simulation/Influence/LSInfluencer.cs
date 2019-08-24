@@ -54,7 +54,7 @@ namespace RTSLockstep
 
         public void Initialize()
         {
-            LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
+            LocatedNode = GridManager.GetNode(Body.Position.x, Body.Position.y);
 
             LocatedNode.Add(this);
 
@@ -68,7 +68,7 @@ namespace RTSLockstep
         {
             if (Body.PositionChangedBuffer)
             {
-                tempNode = GridManager.GetNode(Body._position.x, Body._position.y);
+                tempNode = GridManager.GetNode(Body.Position.x, Body.Position.y);
 
                 if (tempNode.IsNull())
                 {

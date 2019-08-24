@@ -437,8 +437,7 @@ namespace RTSLockstep
             var agent = CreateRawAgent(agentCode, position, rotation);
 
             InitializeAgent(agent, position, rotation);
-            if (onCreateAgent != null)
-                onCreateAgent(agent);
+            onCreateAgent?.Invoke(agent);
 
             return agent;
         }

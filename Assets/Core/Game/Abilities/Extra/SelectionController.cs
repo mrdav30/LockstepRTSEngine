@@ -103,7 +103,7 @@ namespace RTSLockstep
         {
             GUI.skin = GameResourceManager.SelectBoxSkin;
 
-            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body.Position.ToVector3());
             Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
 
             // Draw the selection box around the currently selected object, within the bounds of the playing area
@@ -172,7 +172,7 @@ namespace RTSLockstep
         private void DrawBuildProgress()
         {
             GUI.skin = GameResourceManager.SelectBoxSkin;
-            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body._position.ToVector3());
+            Bounds selectionBounds = WorkManager.CalculateBounds(Agent.gameObject, Agent.Body.Position.ToVector3());
             Rect selectBox = WorkManager.CalculateSelectionBox(selectionBounds, Agent.GetPlayerArea());
             //Draw the selection box around the currently selected object, within the bounds of the main draw area
             GUI.BeginGroup(Agent.GetPlayerArea());

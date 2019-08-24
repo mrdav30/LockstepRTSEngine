@@ -419,7 +419,7 @@ public static class WallPositioningHelper
         float currentDistance = Mathf.Infinity;
         foreach (Transform child in OrganizerWalls)
         {
-            currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody._position.ToVector3());
+            currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody.Position.ToVector3());
             if (currentDistance < distance)
             {
                 closest = child.gameObject;

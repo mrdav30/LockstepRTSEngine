@@ -1,4 +1,4 @@
-﻿//=======================================================================
+//=======================================================================
 // Copyright (c) 2015 John Pan
 // Distributed under the MIT License.
 // (See accompanying file LICENSE or copy at
@@ -73,7 +73,10 @@ namespace RTSLockstep
             set
             {
                 if (value)
+                {
                     ForwardNeedsSet = true;
+                }
+
                 _rotationChanged = value;
             }
         }
@@ -345,7 +348,7 @@ namespace RTSLockstep
         {
             get
             {
-                return this.Position.ToVector3d(this.HeightPos);
+                return this._position.ToVector3d(this.HeightPos);
             }
         }
         public Transform transform { get; internal set; }
@@ -557,10 +560,10 @@ namespace RTSLockstep
 
             if (PositionChanged || this.HeightPosChanged)
             {
-                PositionChangedBuffer = true;
+                PositionChangedBuffer = PositionChanged ? true : false;
                 PositionChanged = false;
-                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
                 this.HeightPosChanged = false;
+                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
             }
             else
             {
@@ -678,7 +681,7 @@ namespace RTSLockstep
             {
                 if (PhysicsManager.ResetAccumulation)
                 {
-                    DoSetVisualPosition(Position.ToVector3(HeightPos.ToFloat()));
+                    DoSetVisualPosition(_position.ToVector3(HeightPos.ToFloat()));
                     DoSetVisualRotation(Rotation);
                 }
                 //PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);

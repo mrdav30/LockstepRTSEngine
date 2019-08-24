@@ -233,7 +233,7 @@ namespace RTSLockstep
 			Scan (center, radius);
 			for (int i = 0; i < ScanOutput.Count; i++) {
 				RTSAgent agent = ScanOutput [i];
-				if (agent.Body._position.FastDistance (center.x, center.y) < num) {
+				if (agent.Body.Position.FastDistance (center.x, center.y) < num) {
 					HitAgent (agent);
 				}
 			}
@@ -261,7 +261,7 @@ namespace RTSLockstep
 			Scan (center, radius);
 			for (int i = 0; i < ScanOutput.Count; i++) {
 				RTSAgent agent = ScanOutput [i];
-				Vector2d agentPos = agent.Body._position;
+				Vector2d agentPos = agent.Body.Position;
 				Vector2d difference = agentPos - center;
 
 				if (difference.FastMagnitude () > fastRange) {
@@ -403,7 +403,7 @@ namespace RTSLockstep
 			this.Target = target;
 			this.TargetVersion = this.Target.SpawnVersion;
 
-			this.TargetPosition = this.Target.Body._position;
+			this.TargetPosition = this.Target.Body.Position;
 			this.TargetHeight = this.Target.Body.HeightPos + this.Target.Body.Height / 2;
 
 			this.cachedTransform.rotation = Quaternion.LookRotation (target.CachedTransform.position - this.Position.ToVector3 ());
@@ -630,7 +630,7 @@ namespace RTSLockstep
 					goto case TargetingType.Positional;
 				}
 				if (this.CheckCollision ()) {
-					this.TargetPosition = this.Target.Body._position;
+					this.TargetPosition = this.Target.Body.Position;
 					this.Hit ();
 				} else {
 					TargetPosition = Target.Body.Position;

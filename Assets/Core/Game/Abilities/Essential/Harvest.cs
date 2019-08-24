@@ -178,7 +178,7 @@ namespace RTSLockstep
 
                 if (!IsWindingUp)
                 {
-                    Vector2d targetDirection = resourceTarget.Body._position - CachedBody._position;
+                    Vector2d targetDirection = resourceTarget.Body.Position - CachedBody.Position;
                     long fastMag = targetDirection.FastMagnitude();
 
                     if (CheckRange(resourceTarget.Body))
@@ -216,7 +216,7 @@ namespace RTSLockstep
                         cachedMove.PauseCollisionStop();
                         if (cachedMove.IsMoving == false)
                         {
-                            cachedMove.StartMove(resourceTarget.Body._position);
+                            cachedMove.StartMove(resourceTarget.Body.Position);
                             CachedBody.Priority = basePriority;
                         }
                         else
@@ -232,7 +232,7 @@ namespace RTSLockstep
                                     if (resourceTarget.Body.PositionChangedBuffer &&
                                         resourceTarget.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
                                     {
-                                        cachedMove.StartMove(resourceTarget.Body._position);
+                                        cachedMove.StartMove(resourceTarget.Body.Position);
                                         //So units don't sync up and path on the same frame
                                         repathTimer.AdvanceFrames(repathRandom);
                                     }
@@ -292,7 +292,7 @@ namespace RTSLockstep
             {
                 if (!IsWindingUp)
                 {
-                    Vector2d targetDirection = resourceStorage.Body._position - CachedBody._position;
+                    Vector2d targetDirection = resourceStorage.Body.Position - CachedBody.Position;
                     long fastMag = targetDirection.FastMagnitude();
 
                     if (CheckRange(resourceStorage.Body))
@@ -333,7 +333,7 @@ namespace RTSLockstep
                         cachedMove.PauseCollisionStop();
                         if (cachedMove.IsMoving == false)
                         {
-                            cachedMove.StartMove(resourceStorage.Body._position);
+                            cachedMove.StartMove(resourceStorage.Body.Position);
                             CachedBody.Priority = basePriority;
                         }
                         else
@@ -349,7 +349,7 @@ namespace RTSLockstep
                                     if (resourceStorage.Body.PositionChangedBuffer &&
                                         resourceStorage.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
                                     {
-                                        cachedMove.StartMove(resourceStorage.Body._position);
+                                        cachedMove.StartMove(resourceStorage.Body.Position);
                                         //So units don't sync up and path on the same frame
                                         repathTimer.AdvanceFrames(repathRandom);
                                     }
@@ -540,7 +540,7 @@ namespace RTSLockstep
 
             if (!CheckRange(resourceTarget.Body))
             {
-                MoveToDestination(resourceTarget.Body._position);
+                MoveToDestination(resourceTarget.Body.Position);
             }
         }
 
@@ -554,7 +554,7 @@ namespace RTSLockstep
 
             if (!CheckRange(resourceStorage.Body))
             {
-                MoveToDestination(resourceStorage.Body._position);
+                MoveToDestination(resourceStorage.Body.Position);
             }
         }
 

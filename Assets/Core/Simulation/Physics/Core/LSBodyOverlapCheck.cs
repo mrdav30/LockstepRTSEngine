@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
+using System.Collections;
+using FastCollections;
 
 namespace RTSLockstep
 {
@@ -17,8 +18,8 @@ namespace RTSLockstep
         private static FastList<int> potentialEdges = new FastList<int>();
         private static bool calculateIntersections;
 
-        public static long CacheProj {  get { return cacheProj;  } }
-        public static FastList<int> PotentialEdges {  get { return potentialEdges; } }
+        public static long CacheProj { get { return cacheProj; } }
+        public static FastList<int> PotentialEdges { get { return potentialEdges; } }
 
         public static void PrepareAxisCheck(Vector2d p1, Vector2d p2, bool calculateIntersectionPoints = true)
         {
@@ -26,7 +27,7 @@ namespace RTSLockstep
             cacheP2 = p2;
             cacheAxis = p2 - p1;
             cacheAxis.Normalize();
-            cacheAxisNormal = cacheAxis.rotatedLeft; 
+            cacheAxisNormal = cacheAxis.rotatedLeft;
 
             axisMin = p1.Dot(cacheAxis.x, cacheAxis.y);
             axisMax = p2.Dot(cacheAxis.x, cacheAxis.y);
@@ -66,14 +67,16 @@ namespace RTSLockstep
                                 if (cos == 0)
                                 {
                                     outputIntersectionPoints.Add((cacheAxis * projPos) + perpVector);
-                                } else
+                                }
+                                else
                                 {
-                                    
+
                                     outputIntersectionPoints.Add(cacheAxis * (projPos - cos) + perpVector);
                                     outputIntersectionPoints.Add(cacheAxis * (projPos + cos) + perpVector);
                                 }
                             }
-                        } else
+                        }
+                        else
                         {
                             //If not, check distances to points
                             long p1Dist = _position.FastDistance(cacheP1.x, cacheP2.y);
@@ -92,25 +95,25 @@ namespace RTSLockstep
                         }
                         return overlaps;
                     }
-                    //break;
+                //break;
                 case ColliderType.AABox:
                     {
-                      
+
                     }
                     break;
                 case ColliderType.Polygon:
                     {
                         bool intersected = false;
 
-   
+
                         for (int i = 0; i < this.Vertices.Length; i++)
                         {
                             int edgeIndex = i;
-                            Vector2d pivot = this.RealPoints [edgeIndex];
-                            Vector2d edge = this.Edges [edgeIndex];
+                            Vector2d pivot = this.RealPoints[edgeIndex];
+                            Vector2d edge = this.Edges[edgeIndex];
                             long proj1 = 0;
                             int nextIndex = edgeIndex + 1 < this.RealPoints.Length ? edgeIndex + 1 : 0;
-                            Vector2d nextPoint = RealPoints [nextIndex];
+                            Vector2d nextPoint = RealPoints[nextIndex];
                             long proj2 = (nextPoint - pivot).Dot(edge);
 
                             long min;
@@ -119,7 +122,8 @@ namespace RTSLockstep
                             {
                                 min = proj1;
                                 max = proj2;
-                            } else
+                            }
+                            else
                             {
                                 min = proj2;
                                 max = proj1;
@@ -134,14 +138,15 @@ namespace RTSLockstep
                             {
                                 lineMin = lineProj1;
                                 lineMax = lineProj2;
-                            } else
+                            }
+                            else
                             {
                                 lineMin = lineProj2;
                                 lineMax = lineProj1;
                             }
                             if (CollisionPair.CheckOverlap(min, max, lineMin, lineMax))
                             {
-                                Vector2d edgeNorm = this.EdgeNorms [edgeIndex];
+                                Vector2d edgeNorm = this.EdgeNorms[edgeIndex];
                                 long normProj = 0;
                                 long normLineProj1 = (cacheP1 - pivot).Dot(edgeNorm);
                                 long normLineProj2 = (cacheP2 - pivot).Dot(edgeNorm);
@@ -153,7 +158,8 @@ namespace RTSLockstep
                                 {
                                     normLineMin = normLineProj1;
                                     normLineMax = normLineProj2;
-                                } else
+                                }
+                                else
                                 {
                                     normLineMin = normLineProj2;
                                     normLineMax = normLineProj1;
@@ -170,7 +176,8 @@ namespace RTSLockstep
                                     {
                                         revMin = revProj1;
                                         revMax = revProj2;
-                                    } else
+                                    }
+                                    else
                                     {
                                         revMin = revProj2;
                                         revMax = revProj1;
@@ -181,9 +188,9 @@ namespace RTSLockstep
                                         intersected = true;
                                         if (LSBody.calculateIntersections)
                                         {
-                                            
+
                                             long fraction = normLineProj1.Abs().Div(normLineMax - normLineMin);
-                                            long intersectionProj = FixedMath.Lerp(lineProj1,lineProj2,fraction);
+                                            long intersectionProj = FixedMath.Lerp(lineProj1, lineProj2, fraction);
                                             outputIntersectionPoints.Add(edge * intersectionProj + pivot);
 
                                             if (outputIntersectionPoints.Count == 2)
@@ -202,7 +209,5 @@ namespace RTSLockstep
             }
             return false;
         }
-       
-
     }
 }

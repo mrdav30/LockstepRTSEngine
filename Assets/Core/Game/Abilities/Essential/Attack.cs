@@ -256,7 +256,7 @@ namespace RTSLockstep
 
         bool CheckRange()
         {
-            Vector2d targetDirection = Target.Body._position - cachedBody._position;
+            Vector2d targetDirection = Target.Body.Position - cachedBody.Position;
             long fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -274,7 +274,7 @@ namespace RTSLockstep
             {
                 if (!IsWindingUp)
                 {
-                    Vector2d targetDirection = Target.Body._position - cachedBody._position;
+                    Vector2d targetDirection = Target.Body.Position - cachedBody.Position;
                     long fastMag = targetDirection.FastMagnitude();
 
                     //TODO: Optimize this instead of recalculating magnitude multiple times
@@ -322,7 +322,7 @@ namespace RTSLockstep
                             cachedMove.PauseCollisionStop();
                             if (cachedMove.IsMoving == false)
                             {
-                                cachedMove.StartMove(Target.Body._position);
+                                cachedMove.StartMove(Target.Body.Position);
                                 cachedBody.Priority = basePriority;
                             }
                             else
@@ -338,7 +338,7 @@ namespace RTSLockstep
                                         if (Target.Body.PositionChangedBuffer &&
                                             Target.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
                                         {
-                                            cachedMove.StartMove(Target.Body._position);
+                                            cachedMove.StartMove(Target.Body.Position);
                                             //So units don't sync up and path on the same frame
                                             repathTimer.AdvanceFrames(repathRandom);
                                         }
@@ -361,7 +361,7 @@ namespace RTSLockstep
                     windupCount += LockstepManager.DeltaTime;
                     if (CanTurn)
                     {
-                        Vector2d targetVector = Target.Body._position - cachedBody._position;
+                        Vector2d targetVector = Target.Body.Position - cachedBody.Position;
                         cachedTurn.StartTurnVector(targetVector);
                     }
                     if (windupCount >= Windup)

@@ -52,7 +52,7 @@ namespace RTSLockstep
                 //autoturn direction will be culmination of positional changes
                 if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger))
                 {
-                    Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;
+                    Vector2d delta = this.Agent.Body.Position - this.Agent.Body.LastPosition;
                     if (delta.FastMagnitude() > collisionTurnThreshold)
                     {
                         delta.Normalize();

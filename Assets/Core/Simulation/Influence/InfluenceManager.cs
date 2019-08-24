@@ -124,7 +124,7 @@ namespace RTSLockstep
 
                 if (closestAgent != null)
                 {
-                    long tempDistance = agent.Body._position.FastDistance(sourceX, sourceY);
+                    long tempDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
                     if (tempDistance < closestDistance)
                     {
                         closestAgent = agent;
@@ -139,7 +139,7 @@ namespace RTSLockstep
                 else
                 {
                     closestAgent = agent;
-                    closestDistance = agent.Body._position.FastDistance(sourceX, sourceY);
+                    closestDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
                 }
             }
             return closestAgent;

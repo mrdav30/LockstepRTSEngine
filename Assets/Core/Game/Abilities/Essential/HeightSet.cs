@@ -33,17 +33,18 @@ namespace RTSLockstep
 
         public bool ForceUpdate { get; set; }
 
-        public void UpdateHeight () {
-            long height = HeightmapSaver.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
-            Agent.Body.HeightPos = height;
-        }
-
         protected override void OnSimulate()
         {
             if (Agent && (Agent.Body.PositionChanged || Agent.Body.PositionChangedBuffer || ForceUpdate))
             {
                 UpdateHeight ();
             }
+        }
+        public void UpdateHeight()
+        {
+            long height = HeightmapSaver.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
+            Debug.Log("updating height: heightset");
+            Agent.Body.HeightPos = height;
         }
     }
 }
