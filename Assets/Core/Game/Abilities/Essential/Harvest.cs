@@ -282,9 +282,9 @@ namespace RTSLockstep
         void BehaveWithStorage()
         {
             resourceStorage = ClosestResourceStore();
-            if (!resourceStorage)
+            if (!resourceStorage || !resourceStorage.IsActive)
             {
-                // can't find clostest resource store
+                // still can't find clostest resource store
                 // send command to stop harvesting...
                 StopHarvesting(true);
             }
@@ -620,13 +620,15 @@ namespace RTSLockstep
             // use RTS influencer?
             foreach (RTSAgent child in Agent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
             {
-                if (child.GetAbility<Structure>()
-                    && child.GetAbility<Structure>().CanStoreResources(HarvestType)
-                    && !child.GetAbility<Structure>().NeedsConstruction)
+                Structure childStructure = child.GetAbility<Structure>();
+                if (childStructure
+                    && childStructure.CanStoreResources(HarvestType)
+                    && !childStructure.NeedsConstruction)
                 {
                     playerBuildings.Add(child);
                 }
             }
+
             if (playerBuildings.Count > 0)
             {
                 RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, transform.position) as RTSAgent;
