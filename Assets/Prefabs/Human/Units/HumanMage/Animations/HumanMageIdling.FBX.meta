@@ -1,169 +1,494 @@
 fileFormatVersion: 2
 guid: 89dedb24d8d63214595a7c045713fbeb
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: _M3_Anim_Data
-    100002: ArmClothL1
-    100004: ArmClothL2
-    100006: ArmClothR1
-    100008: ArmClothR2
-    100010: Bone_Chest
-    100012: Bone_Head
-    100014: BookMain
-    100016: Chest Ref
-    100018: 'Foot Left Ref '
-    100020: 'Foot Right Ref '
-    100022: FootL
-    100024: FootR
-    100026: Geo__sBeard2
-    100028: Geo_ArmCloth1L
-    100030: Geo_ArmCloth1R
-    100032: Geo_ArmCloth2L
-    100034: Geo_ArmCloth2R
-    100036: Geo_ArmLowL
-    100038: Geo_ArmLowR
-    100040: Geo_ArmUpL
-    100042: Geo_ArmUpR
-    100044: Geo_Daggers
-    100046: Geo_FootL
-    100048: Geo_FootR
-    100050: Geo_HandL
-    100052: Geo_HandR
-    100054: Geo_MoustachR
-    100056: Geo_pages01
-    100058: Geo_Pelvis
-    100060: Geo_Portrait_Beard1
-    100062: Geo_Portrait_Eyelids
-    100064: Geo_Portrait_Head
-    100066: Geo_Portrait_MoustachL
-    100068: Geo_RobeBackL
-    100070: Geo_RobeBackR
-    100072: Geo_RobeSideL
-    100074: Geo_RobeSideR
-    100076: Geo_ShinL
-    100078: Geo_ShinR
-    100080: Geo_Staff
-    100082: Geo_ThighL
-    100084: Geo_ThighR
-    100086: gutz00
-    100088: 'Hand Left Ref '
-    100090: 'Hand Right Ref '
-    100092: HandL
-    100094: HandR
-    100096: Head Ref
-    100098: //RootNode
-    100100: LowArmL
-    100102: LowArmR
-    100104: LowerLegL
-    100106: LowerLegR
-    100108: m3bone_root
-    100110: Main
-    100112: 'Origin Ref '
-    100114: 'OverHead Ref '
-    100116: Pelvis
-    100118: RobeBackL
-    100120: RobeBackR
-    100122: RobeSideL
-    100124: RobeSideR
-    100126: Root
-    100128: ShoulderL
-    100130: ShoulderR
-    100132: StaffBase
-    100134: UpArmL
-    100136: UpArmR
-    100138: UpperLegL
-    100140: UpperLegR
-    100142: Wc1Mage1
-    100144: Wc1Mage2
-    100146: Wc1Mage3
-    100148: 'Weapon Ref '
-    400000: _M3_Anim_Data
-    400002: ArmClothL1
-    400004: ArmClothL2
-    400006: ArmClothR1
-    400008: ArmClothR2
-    400010: Bone_Chest
-    400012: Bone_Head
-    400014: BookMain
-    400016: Chest Ref
-    400018: 'Foot Left Ref '
-    400020: 'Foot Right Ref '
-    400022: FootL
-    400024: FootR
-    400026: Geo__sBeard2
-    400028: Geo_ArmCloth1L
-    400030: Geo_ArmCloth1R
-    400032: Geo_ArmCloth2L
-    400034: Geo_ArmCloth2R
-    400036: Geo_ArmLowL
-    400038: Geo_ArmLowR
-    400040: Geo_ArmUpL
-    400042: Geo_ArmUpR
-    400044: Geo_Daggers
-    400046: Geo_FootL
-    400048: Geo_FootR
-    400050: Geo_HandL
-    400052: Geo_HandR
-    400054: Geo_MoustachR
-    400056: Geo_pages01
-    400058: Geo_Pelvis
-    400060: Geo_Portrait_Beard1
-    400062: Geo_Portrait_Eyelids
-    400064: Geo_Portrait_Head
-    400066: Geo_Portrait_MoustachL
-    400068: Geo_RobeBackL
-    400070: Geo_RobeBackR
-    400072: Geo_RobeSideL
-    400074: Geo_RobeSideR
-    400076: Geo_ShinL
-    400078: Geo_ShinR
-    400080: Geo_Staff
-    400082: Geo_ThighL
-    400084: Geo_ThighR
-    400086: gutz00
-    400088: 'Hand Left Ref '
-    400090: 'Hand Right Ref '
-    400092: HandL
-    400094: HandR
-    400096: Head Ref
-    400098: //RootNode
-    400100: LowArmL
-    400102: LowArmR
-    400104: LowerLegL
-    400106: LowerLegR
-    400108: m3bone_root
-    400110: Main
-    400112: 'Origin Ref '
-    400114: 'OverHead Ref '
-    400116: Pelvis
-    400118: RobeBackL
-    400120: RobeBackR
-    400122: RobeSideL
-    400124: RobeSideR
-    400126: Root
-    400128: ShoulderL
-    400130: ShoulderR
-    400132: StaffBase
-    400134: UpArmL
-    400136: UpArmR
-    400138: UpperLegL
-    400140: UpperLegR
-    400142: Wc1Mage1
-    400144: Wc1Mage2
-    400146: Wc1Mage3
-    400148: 'Weapon Ref '
-    2100000: 'Material #30'
-    2300000: Wc1Mage3
-    3300000: Wc1Mage3
-    4300000: Wc1Mage1
-    4300002: Wc1Mage2
-    4300004: Wc1Mage3
-    7400000: Idling
-    9500000: //RootNode
-    13700000: Wc1Mage1
-    13700002: Wc1Mage2
-  externalObjects: {}
+  serializedVersion: 26
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: _M3_Anim_Data
+  - first:
+      1: 100002
+    second: ArmClothL1
+  - first:
+      1: 100004
+    second: ArmClothL2
+  - first:
+      1: 100006
+    second: ArmClothR1
+  - first:
+      1: 100008
+    second: ArmClothR2
+  - first:
+      1: 100010
+    second: Bone_Chest
+  - first:
+      1: 100012
+    second: Bone_Head
+  - first:
+      1: 100014
+    second: BookMain
+  - first:
+      1: 100016
+    second: Chest Ref
+  - first:
+      1: 100018
+    second: 'Foot Left Ref '
+  - first:
+      1: 100020
+    second: 'Foot Right Ref '
+  - first:
+      1: 100022
+    second: FootL
+  - first:
+      1: 100024
+    second: FootR
+  - first:
+      1: 100026
+    second: Geo__sBeard2
+  - first:
+      1: 100028
+    second: Geo_ArmCloth1L
+  - first:
+      1: 100030
+    second: Geo_ArmCloth1R
+  - first:
+      1: 100032
+    second: Geo_ArmCloth2L
+  - first:
+      1: 100034
+    second: Geo_ArmCloth2R
+  - first:
+      1: 100036
+    second: Geo_ArmLowL
+  - first:
+      1: 100038
+    second: Geo_ArmLowR
+  - first:
+      1: 100040
+    second: Geo_ArmUpL
+  - first:
+      1: 100042
+    second: Geo_ArmUpR
+  - first:
+      1: 100044
+    second: Geo_Daggers
+  - first:
+      1: 100046
+    second: Geo_FootL
+  - first:
+      1: 100048
+    second: Geo_FootR
+  - first:
+      1: 100050
+    second: Geo_HandL
+  - first:
+      1: 100052
+    second: Geo_HandR
+  - first:
+      1: 100054
+    second: Geo_MoustachR
+  - first:
+      1: 100056
+    second: Geo_pages01
+  - first:
+      1: 100058
+    second: Geo_Pelvis
+  - first:
+      1: 100060
+    second: Geo_Portrait_Beard1
+  - first:
+      1: 100062
+    second: Geo_Portrait_Eyelids
+  - first:
+      1: 100064
+    second: Geo_Portrait_Head
+  - first:
+      1: 100066
+    second: Geo_Portrait_MoustachL
+  - first:
+      1: 100068
+    second: Geo_RobeBackL
+  - first:
+      1: 100070
+    second: Geo_RobeBackR
+  - first:
+      1: 100072
+    second: Geo_RobeSideL
+  - first:
+      1: 100074
+    second: Geo_RobeSideR
+  - first:
+      1: 100076
+    second: Geo_ShinL
+  - first:
+      1: 100078
+    second: Geo_ShinR
+  - first:
+      1: 100080
+    second: Geo_Staff
+  - first:
+      1: 100082
+    second: Geo_ThighL
+  - first:
+      1: 100084
+    second: Geo_ThighR
+  - first:
+      1: 100086
+    second: gutz00
+  - first:
+      1: 100088
+    second: 'Hand Left Ref '
+  - first:
+      1: 100090
+    second: 'Hand Right Ref '
+  - first:
+      1: 100092
+    second: HandL
+  - first:
+      1: 100094
+    second: HandR
+  - first:
+      1: 100096
+    second: Head Ref
+  - first:
+      1: 100098
+    second: //RootNode
+  - first:
+      1: 100100
+    second: LowArmL
+  - first:
+      1: 100102
+    second: LowArmR
+  - first:
+      1: 100104
+    second: LowerLegL
+  - first:
+      1: 100106
+    second: LowerLegR
+  - first:
+      1: 100108
+    second: m3bone_root
+  - first:
+      1: 100110
+    second: Main
+  - first:
+      1: 100112
+    second: 'Origin Ref '
+  - first:
+      1: 100114
+    second: 'OverHead Ref '
+  - first:
+      1: 100116
+    second: Pelvis
+  - first:
+      1: 100118
+    second: RobeBackL
+  - first:
+      1: 100120
+    second: RobeBackR
+  - first:
+      1: 100122
+    second: RobeSideL
+  - first:
+      1: 100124
+    second: RobeSideR
+  - first:
+      1: 100126
+    second: Root
+  - first:
+      1: 100128
+    second: ShoulderL
+  - first:
+      1: 100130
+    second: ShoulderR
+  - first:
+      1: 100132
+    second: StaffBase
+  - first:
+      1: 100134
+    second: UpArmL
+  - first:
+      1: 100136
+    second: UpArmR
+  - first:
+      1: 100138
+    second: UpperLegL
+  - first:
+      1: 100140
+    second: UpperLegR
+  - first:
+      1: 100142
+    second: Wc1Mage1
+  - first:
+      1: 100144
+    second: Wc1Mage2
+  - first:
+      1: 100146
+    second: Wc1Mage3
+  - first:
+      1: 100148
+    second: 'Weapon Ref '
+  - first:
+      4: 400000
+    second: _M3_Anim_Data
+  - first:
+      4: 400002
+    second: ArmClothL1
+  - first:
+      4: 400004
+    second: ArmClothL2
+  - first:
+      4: 400006
+    second: ArmClothR1
+  - first:
+      4: 400008
+    second: ArmClothR2
+  - first:
+      4: 400010
+    second: Bone_Chest
+  - first:
+      4: 400012
+    second: Bone_Head
+  - first:
+      4: 400014
+    second: BookMain
+  - first:
+      4: 400016
+    second: Chest Ref
+  - first:
+      4: 400018
+    second: 'Foot Left Ref '
+  - first:
+      4: 400020
+    second: 'Foot Right Ref '
+  - first:
+      4: 400022
+    second: FootL
+  - first:
+      4: 400024
+    second: FootR
+  - first:
+      4: 400026
+    second: Geo__sBeard2
+  - first:
+      4: 400028
+    second: Geo_ArmCloth1L
+  - first:
+      4: 400030
+    second: Geo_ArmCloth1R
+  - first:
+      4: 400032
+    second: Geo_ArmCloth2L
+  - first:
+      4: 400034
+    second: Geo_ArmCloth2R
+  - first:
+      4: 400036
+    second: Geo_ArmLowL
+  - first:
+      4: 400038
+    second: Geo_ArmLowR
+  - first:
+      4: 400040
+    second: Geo_ArmUpL
+  - first:
+      4: 400042
+    second: Geo_ArmUpR
+  - first:
+      4: 400044
+    second: Geo_Daggers
+  - first:
+      4: 400046
+    second: Geo_FootL
+  - first:
+      4: 400048
+    second: Geo_FootR
+  - first:
+      4: 400050
+    second: Geo_HandL
+  - first:
+      4: 400052
+    second: Geo_HandR
+  - first:
+      4: 400054
+    second: Geo_MoustachR
+  - first:
+      4: 400056
+    second: Geo_pages01
+  - first:
+      4: 400058
+    second: Geo_Pelvis
+  - first:
+      4: 400060
+    second: Geo_Portrait_Beard1
+  - first:
+      4: 400062
+    second: Geo_Portrait_Eyelids
+  - first:
+      4: 400064
+    second: Geo_Portrait_Head
+  - first:
+      4: 400066
+    second: Geo_Portrait_MoustachL
+  - first:
+      4: 400068
+    second: Geo_RobeBackL
+  - first:
+      4: 400070
+    second: Geo_RobeBackR
+  - first:
+      4: 400072
+    second: Geo_RobeSideL
+  - first:
+      4: 400074
+    second: Geo_RobeSideR
+  - first:
+      4: 400076
+    second: Geo_ShinL
+  - first:
+      4: 400078
+    second: Geo_ShinR
+  - first:
+      4: 400080
+    second: Geo_Staff
+  - first:
+      4: 400082
+    second: Geo_ThighL
+  - first:
+      4: 400084
+    second: Geo_ThighR
+  - first:
+      4: 400086
+    second: gutz00
+  - first:
+      4: 400088
+    second: 'Hand Left Ref '
+  - first:
+      4: 400090
+    second: 'Hand Right Ref '
+  - first:
+      4: 400092
+    second: HandL
+  - first:
+      4: 400094
+    second: HandR
+  - first:
+      4: 400096
+    second: Head Ref
+  - first:
+      4: 400098
+    second: //RootNode
+  - first:
+      4: 400100
+    second: LowArmL
+  - first:
+      4: 400102
+    second: LowArmR
+  - first:
+      4: 400104
+    second: LowerLegL
+  - first:
+      4: 400106
+    second: LowerLegR
+  - first:
+      4: 400108
+    second: m3bone_root
+  - first:
+      4: 400110
+    second: Main
+  - first:
+      4: 400112
+    second: 'Origin Ref '
+  - first:
+      4: 400114
+    second: 'OverHead Ref '
+  - first:
+      4: 400116
+    second: Pelvis
+  - first:
+      4: 400118
+    second: RobeBackL
+  - first:
+      4: 400120
+    second: RobeBackR
+  - first:
+      4: 400122
+    second: RobeSideL
+  - first:
+      4: 400124
+    second: RobeSideR
+  - first:
+      4: 400126
+    second: Root
+  - first:
+      4: 400128
+    second: ShoulderL
+  - first:
+      4: 400130
+    second: ShoulderR
+  - first:
+      4: 400132
+    second: StaffBase
+  - first:
+      4: 400134
+    second: UpArmL
+  - first:
+      4: 400136
+    second: UpArmR
+  - first:
+      4: 400138
+    second: UpperLegL
+  - first:
+      4: 400140
+    second: UpperLegR
+  - first:
+      4: 400142
+    second: Wc1Mage1
+  - first:
+      4: 400144
+    second: Wc1Mage2
+  - first:
+      4: 400146
+    second: Wc1Mage3
+  - first:
+      4: 400148
+    second: 'Weapon Ref '
+  - first:
+      21: 2100000
+    second: 'Material #30'
+  - first:
+      23: 2300000
+    second: Wc1Mage3
+  - first:
+      33: 3300000
+    second: Wc1Mage3
+  - first:
+      43: 4300000
+    second: Wc1Mage1
+  - first:
+      43: 4300002
+    second: Wc1Mage2
+  - first:
+      43: 4300004
+    second: Wc1Mage3
+  - first:
+      74: 7400000
+    second: Idling
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Wc1Mage1
+  - first:
+      137: 13700002
+    second: Wc1Mage2
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #30'
+    second: {fileID: 2100000, guid: 66b5b881faad97042b856ef075fd6a08, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -190,13 +515,44 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idling
+      takeName: Idling
+      internalID: 0
+      firstFrame: 104
+      lastFrame: 208
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -204,27 +560,32 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.0254
-    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
+  copyAvatar: 1
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -234,11 +595,13 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 30d51a42bcc52c34c868fd7527cdb0f6,
+    type: 3}
   animationType: 2
   humanoidOversampling: 1
   additionalBone: 0

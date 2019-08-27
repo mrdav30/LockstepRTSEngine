@@ -1,122 +1,373 @@
 fileFormatVersion: 2
 guid: e28f9a4b33576154791f17e64aee7851
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: _M3_Anim_Data
-    100002: Arrow
-    100004: Bone_Arm1_L
-    100006: Bone_Arm1_R
-    100008: Bone_Arm2_L
-    100010: Bone_Arm2_R
-    100012: Bone_Chest
-    100014: Bone_Foot_L
-    100016: Bone_Foot_R
-    100018: Bone_Hand_L
-    100020: Bone_Head
-    100022: Bone_Leg1_L
-    100024: Bone_Leg1_R
-    100026: Bone_Leg2_L
-    100028: Bone_Leg2_R
-    100030: Bone_Pelvis
-    100032: Bone_Root
-    100034: Chest Ref
-    100036: 'Foot Left Ref '
-    100038: 'Foot Right Ref '
-    100040: gutz00
-    100042: 'Hand Left Ref '
-    100044: 'Hand Right Ref '
-    100046: Head mesh
-    100048: Head Ref
-    100050: Human Archer1
-    100052: Human Archer2
-    100054: Human Archer3
-    100056: Human Archer4
-    100058: Human Archer5
-    100060: //RootNode
-    100062: m3bone_root
-    100064: Mesh04x
-    100066: Mesh06
-    100068: Mesh08
-    100070: Mesh09x
-    100072: Mesh10x
-    100074: Mesh13
-    100076: Mesh17
-    100078: Mesh23
-    100080: Object02
-    100082: Object03
-    100084: Object04
-    100086: 'Origin Ref '
-    100088: 'OverHead Ref '
-    100090: Weapon Ref
-    400000: _M3_Anim_Data
-    400002: Arrow
-    400004: Bone_Arm1_L
-    400006: Bone_Arm1_R
-    400008: Bone_Arm2_L
-    400010: Bone_Arm2_R
-    400012: Bone_Chest
-    400014: Bone_Foot_L
-    400016: Bone_Foot_R
-    400018: Bone_Hand_L
-    400020: Bone_Head
-    400022: Bone_Leg1_L
-    400024: Bone_Leg1_R
-    400026: Bone_Leg2_L
-    400028: Bone_Leg2_R
-    400030: Bone_Pelvis
-    400032: Bone_Root
-    400034: Chest Ref
-    400036: 'Foot Left Ref '
-    400038: 'Foot Right Ref '
-    400040: gutz00
-    400042: 'Hand Left Ref '
-    400044: 'Hand Right Ref '
-    400046: Head mesh
-    400048: Head Ref
-    400050: Human Archer1
-    400052: Human Archer2
-    400054: Human Archer3
-    400056: Human Archer4
-    400058: Human Archer5
-    400060: //RootNode
-    400062: m3bone_root
-    400064: Mesh04x
-    400066: Mesh06
-    400068: Mesh08
-    400070: Mesh09x
-    400072: Mesh10x
-    400074: Mesh13
-    400076: Mesh17
-    400078: Mesh23
-    400080: Object02
-    400082: Object03
-    400084: Object04
-    400086: 'Origin Ref '
-    400088: 'OverHead Ref '
-    400090: Weapon Ref
-    2100000: 'Material #41'
-    2100002: 'Material #44'
-    2100004: 'Material #45'
-    2100006: 'Material #43'
-    2100008: 'Material #42'
-    2300000: Human Archer1
-    2300002: Human Archer2
-    2300004: Human Archer3
-    2300006: Human Archer4
-    3300000: Human Archer1
-    3300002: Human Archer2
-    3300004: Human Archer3
-    3300006: Human Archer4
-    4300000: Human Archer5
-    4300002: Human Archer1
-    4300004: Human Archer4
-    4300006: Human Archer3
-    4300008: Human Archer2
-    7400000: Dying
-    9500000: //RootNode
-    13700000: Human Archer5
-  externalObjects: {}
+  serializedVersion: 26
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: _M3_Anim_Data
+  - first:
+      1: 100002
+    second: Arrow
+  - first:
+      1: 100004
+    second: Bone_Arm1_L
+  - first:
+      1: 100006
+    second: Bone_Arm1_R
+  - first:
+      1: 100008
+    second: Bone_Arm2_L
+  - first:
+      1: 100010
+    second: Bone_Arm2_R
+  - first:
+      1: 100012
+    second: Bone_Chest
+  - first:
+      1: 100014
+    second: Bone_Foot_L
+  - first:
+      1: 100016
+    second: Bone_Foot_R
+  - first:
+      1: 100018
+    second: Bone_Hand_L
+  - first:
+      1: 100020
+    second: Bone_Head
+  - first:
+      1: 100022
+    second: Bone_Leg1_L
+  - first:
+      1: 100024
+    second: Bone_Leg1_R
+  - first:
+      1: 100026
+    second: Bone_Leg2_L
+  - first:
+      1: 100028
+    second: Bone_Leg2_R
+  - first:
+      1: 100030
+    second: Bone_Pelvis
+  - first:
+      1: 100032
+    second: Bone_Root
+  - first:
+      1: 100034
+    second: Chest Ref
+  - first:
+      1: 100036
+    second: 'Foot Left Ref '
+  - first:
+      1: 100038
+    second: 'Foot Right Ref '
+  - first:
+      1: 100040
+    second: gutz00
+  - first:
+      1: 100042
+    second: 'Hand Left Ref '
+  - first:
+      1: 100044
+    second: 'Hand Right Ref '
+  - first:
+      1: 100046
+    second: Head mesh
+  - first:
+      1: 100048
+    second: Head Ref
+  - first:
+      1: 100050
+    second: Human Archer1
+  - first:
+      1: 100052
+    second: Human Archer2
+  - first:
+      1: 100054
+    second: Human Archer3
+  - first:
+      1: 100056
+    second: Human Archer4
+  - first:
+      1: 100058
+    second: Human Archer5
+  - first:
+      1: 100060
+    second: //RootNode
+  - first:
+      1: 100062
+    second: m3bone_root
+  - first:
+      1: 100064
+    second: Mesh04x
+  - first:
+      1: 100066
+    second: Mesh06
+  - first:
+      1: 100068
+    second: Mesh08
+  - first:
+      1: 100070
+    second: Mesh09x
+  - first:
+      1: 100072
+    second: Mesh10x
+  - first:
+      1: 100074
+    second: Mesh13
+  - first:
+      1: 100076
+    second: Mesh17
+  - first:
+      1: 100078
+    second: Mesh23
+  - first:
+      1: 100080
+    second: Object02
+  - first:
+      1: 100082
+    second: Object03
+  - first:
+      1: 100084
+    second: Object04
+  - first:
+      1: 100086
+    second: 'Origin Ref '
+  - first:
+      1: 100088
+    second: 'OverHead Ref '
+  - first:
+      1: 100090
+    second: Weapon Ref
+  - first:
+      4: 400000
+    second: _M3_Anim_Data
+  - first:
+      4: 400002
+    second: Arrow
+  - first:
+      4: 400004
+    second: Bone_Arm1_L
+  - first:
+      4: 400006
+    second: Bone_Arm1_R
+  - first:
+      4: 400008
+    second: Bone_Arm2_L
+  - first:
+      4: 400010
+    second: Bone_Arm2_R
+  - first:
+      4: 400012
+    second: Bone_Chest
+  - first:
+      4: 400014
+    second: Bone_Foot_L
+  - first:
+      4: 400016
+    second: Bone_Foot_R
+  - first:
+      4: 400018
+    second: Bone_Hand_L
+  - first:
+      4: 400020
+    second: Bone_Head
+  - first:
+      4: 400022
+    second: Bone_Leg1_L
+  - first:
+      4: 400024
+    second: Bone_Leg1_R
+  - first:
+      4: 400026
+    second: Bone_Leg2_L
+  - first:
+      4: 400028
+    second: Bone_Leg2_R
+  - first:
+      4: 400030
+    second: Bone_Pelvis
+  - first:
+      4: 400032
+    second: Bone_Root
+  - first:
+      4: 400034
+    second: Chest Ref
+  - first:
+      4: 400036
+    second: 'Foot Left Ref '
+  - first:
+      4: 400038
+    second: 'Foot Right Ref '
+  - first:
+      4: 400040
+    second: gutz00
+  - first:
+      4: 400042
+    second: 'Hand Left Ref '
+  - first:
+      4: 400044
+    second: 'Hand Right Ref '
+  - first:
+      4: 400046
+    second: Head mesh
+  - first:
+      4: 400048
+    second: Head Ref
+  - first:
+      4: 400050
+    second: Human Archer1
+  - first:
+      4: 400052
+    second: Human Archer2
+  - first:
+      4: 400054
+    second: Human Archer3
+  - first:
+      4: 400056
+    second: Human Archer4
+  - first:
+      4: 400058
+    second: Human Archer5
+  - first:
+      4: 400060
+    second: //RootNode
+  - first:
+      4: 400062
+    second: m3bone_root
+  - first:
+      4: 400064
+    second: Mesh04x
+  - first:
+      4: 400066
+    second: Mesh06
+  - first:
+      4: 400068
+    second: Mesh08
+  - first:
+      4: 400070
+    second: Mesh09x
+  - first:
+      4: 400072
+    second: Mesh10x
+  - first:
+      4: 400074
+    second: Mesh13
+  - first:
+      4: 400076
+    second: Mesh17
+  - first:
+      4: 400078
+    second: Mesh23
+  - first:
+      4: 400080
+    second: Object02
+  - first:
+      4: 400082
+    second: Object03
+  - first:
+      4: 400084
+    second: Object04
+  - first:
+      4: 400086
+    second: 'Origin Ref '
+  - first:
+      4: 400088
+    second: 'OverHead Ref '
+  - first:
+      4: 400090
+    second: Weapon Ref
+  - first:
+      21: 2100000
+    second: 'Material #41'
+  - first:
+      21: 2100002
+    second: 'Material #44'
+  - first:
+      21: 2100004
+    second: 'Material #45'
+  - first:
+      21: 2100006
+    second: 'Material #43'
+  - first:
+      21: 2100008
+    second: 'Material #42'
+  - first:
+      23: 2300000
+    second: Human Archer1
+  - first:
+      23: 2300002
+    second: Human Archer2
+  - first:
+      23: 2300004
+    second: Human Archer3
+  - first:
+      23: 2300006
+    second: Human Archer4
+  - first:
+      33: 3300000
+    second: Human Archer1
+  - first:
+      33: 3300002
+    second: Human Archer2
+  - first:
+      33: 3300004
+    second: Human Archer3
+  - first:
+      33: 3300006
+    second: Human Archer4
+  - first:
+      43: 4300000
+    second: Human Archer5
+  - first:
+      43: 4300002
+    second: Human Archer1
+  - first:
+      43: 4300004
+    second: Human Archer4
+  - first:
+      43: 4300006
+    second: Human Archer3
+  - first:
+      43: 4300008
+    second: Human Archer2
+  - first:
+      74: 7400000
+    second: Dying
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Human Archer5
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #41'
+    second: {fileID: 2100000, guid: b1588b5b7aa51e84c9112c090dd746ce, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #42'
+    second: {fileID: 2100000, guid: 6a30c35cfbccf4f45b91694350cfc2f6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #43'
+    second: {fileID: 2100000, guid: 5c6230aa3b00d654b88a24311b0420ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #44'
+    second: {fileID: 2100000, guid: 8e4ee7fb33c058b4ba416d8a1e5fbadf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #45'
+    second: {fileID: 2100000, guid: c3396bbee8c6c004b83a5cff5b0a6867, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -147,6 +398,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Dying
       takeName: Dying
+      internalID: 7400000
       firstFrame: 359
       lastFrame: 460
       wrapMode: 0
@@ -155,7 +407,7 @@ ModelImporter:
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0
@@ -178,34 +430,41 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    importVisibility: 1
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 0
     importBlendShapes: 1
-    importCameras: 1
-    importLights: 1
+    importCameras: 0
+    importLights: 0
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.0254
-    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
+  copyAvatar: 1
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -215,11 +474,13 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 2528618d7e08bbc4b81d5bb96722bf8e,
+    type: 3}
   animationType: 2
   humanoidOversampling: 1
   additionalBone: 0

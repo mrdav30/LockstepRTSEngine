@@ -1051,6 +1051,7 @@ SkinnedMeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -1954,10 +1955,10 @@ MonoBehaviour:
   _cooldown: 0
   _isOffensive: 1
   _projectileCode: Melee
-  _range: 131072
+  _range: 196608
   _sight: 1310720
-  _damage: 983040
-  _attackInterval: 98304
+  _damage: 2293760
+  _attackInterval: 131072
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
@@ -1981,7 +1982,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 32768000
+  _maxHealth: 39321600
   _currentHealth: 0
 --- !u!114 &114500290942403552
 MonoBehaviour:
@@ -2009,7 +2010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98fc48ededc345d44aae37a9f634442e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentAnimState: 0
+  currentAnimState: 1
   idling: Idling
   moving: Moving
   engaging: Engaging

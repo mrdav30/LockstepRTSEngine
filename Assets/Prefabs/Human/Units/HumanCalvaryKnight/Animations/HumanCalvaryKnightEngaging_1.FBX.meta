@@ -1,0 +1,905 @@
+fileFormatVersion: 2
+guid: b3c0fd58a5f83e744b1200e45d568095
+ModelImporter:
+  serializedVersion: 26
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: 1KnightHand
+  - first:
+      1: 100002
+    second: _M3_Anim_Data
+  - first:
+      1: 100004
+    second: Bone HorseBONE_ABDOMEN
+  - first:
+      1: 100006
+    second: Bone HorseBONE_CHEST
+  - first:
+      1: 100008
+    second: Bone HorseBONE_HEAD
+  - first:
+      1: 100010
+    second: Bone HorseBone_Hoof_Front_L
+  - first:
+      1: 100012
+    second: Bone HorseBone_Hoof_Front_R
+  - first:
+      1: 100014
+    second: Bone HorseBone_Hoof_Rear_L
+  - first:
+      1: 100016
+    second: Bone HorseBone_Hoof_Rear_R
+  - first:
+      1: 100018
+    second: Bone HorseBone_Leg1_Front_L
+  - first:
+      1: 100020
+    second: Bone HorseBone_Leg1_Front_R
+  - first:
+      1: 100022
+    second: Bone HorseBone_Leg1_Rear_L
+  - first:
+      1: 100024
+    second: Bone HorseBone_Leg1_Rear_R
+  - first:
+      1: 100026
+    second: Bone HorseBone_Leg2_Front_L
+  - first:
+      1: 100028
+    second: Bone HorseBone_Leg2_Front_R
+  - first:
+      1: 100030
+    second: Bone HorseBone_Leg2_Rear_L
+  - first:
+      1: 100032
+    second: Bone HorseBone_Leg2_Rear_R
+  - first:
+      1: 100034
+    second: Bone HorseBone_Leg3_Front_L\
+  - first:
+      1: 100036
+    second: Bone HorseBone_Leg3_Front_R
+  - first:
+      1: 100038
+    second: Bone HorseBone_Leg3_Rear_L
+  - first:
+      1: 100040
+    second: Bone HorseBone_Leg3_Rear_R
+  - first:
+      1: 100042
+    second: Bone HorseBONE_NECK
+  - first:
+      1: 100044
+    second: Bone HorseBONE_PELVIS
+  - first:
+      1: 100046
+    second: Bone HorseBONE_TAIL1
+  - first:
+      1: 100048
+    second: Bone_Arm1_L
+  - first:
+      1: 100050
+    second: 'Bone_Arm1_R '
+  - first:
+      1: 100052
+    second: Bone_Arm2_L
+  - first:
+      1: 100054
+    second: Bone_Arm2_R
+  - first:
+      1: 100056
+    second: Bone_Chest
+  - first:
+      1: 100058
+    second: 'Bone_Hand_R '
+  - first:
+      1: 100060
+    second: Bone_Hand_R 01
+  - first:
+      1: 100062
+    second: Bone_Head
+  - first:
+      1: 100064
+    second: Bone_Leg2_L
+  - first:
+      1: 100066
+    second: Bone_Leg2_R
+  - first:
+      1: 100068
+    second: Bone_Root
+  - first:
+      1: 100070
+    second: Box01
+  - first:
+      1: 100072
+    second: Chest Mount Left Ref
+  - first:
+      1: 100074
+    second: Chest Mount Rear Ref
+  - first:
+      1: 100076
+    second: Chest Mount Ref
+  - first:
+      1: 100078
+    second: Chest Mount Right Ref
+  - first:
+      1: 100080
+    second: Chest Ref
+  - first:
+      1: 100082
+    second: Dummy08
+  - first:
+      1: 100084
+    second: 'Eyes '
+  - first:
+      1: 100086
+    second: Foot Left Rear Ref
+  - first:
+      1: 100088
+    second: 'Foot Left Ref '
+  - first:
+      1: 100090
+    second: Foot Right Rear Ref
+  - first:
+      1: 100092
+    second: 'Foot Right Ref '
+  - first:
+      1: 100094
+    second: gutz00
+  - first:
+      1: 100096
+    second: gutz08
+  - first:
+      1: 100098
+    second: 'Hand Left Ref '
+  - first:
+      1: 100100
+    second: 'Hand Right Ref '
+  - first:
+      1: 100102
+    second: Head - Ref
+  - first:
+      1: 100104
+    second: Head Mount - Ref
+  - first:
+      1: 100106
+    second: HorseDummy
+  - first:
+      1: 100108
+    second: //RootNode
+  - first:
+      1: 100110
+    second: m3bone_root
+  - first:
+      1: 100112
+    second: Mesh01
+  - first:
+      1: 100114
+    second: Mesh07
+  - first:
+      1: 100116
+    second: Mesh08
+  - first:
+      1: 100118
+    second: Mesh10
+  - first:
+      1: 100120
+    second: Mesh11
+  - first:
+      1: 100122
+    second: Mesh12
+  - first:
+      1: 100124
+    second: Mesh13
+  - first:
+      1: 100126
+    second: Mesh14
+  - first:
+      1: 100128
+    second: Mesh35
+  - first:
+      1: 100130
+    second: Mesh37
+  - first:
+      1: 100132
+    second: Mesh38
+  - first:
+      1: 100134
+    second: Mesh41
+  - first:
+      1: 100136
+    second: Mounted Footman1
+  - first:
+      1: 100138
+    second: Mounted Footman2
+  - first:
+      1: 100140
+    second: Mounted Footman3
+  - first:
+      1: 100142
+    second: Mounted Footman4
+  - first:
+      1: 100144
+    second: Mounted Footman5
+  - first:
+      1: 100146
+    second: Mounted Footman6
+  - first:
+      1: 100148
+    second: Object03
+  - first:
+      1: 100150
+    second: Object09
+  - first:
+      1: 100152
+    second: Object11
+  - first:
+      1: 100154
+    second: Object12
+  - first:
+      1: 100156
+    second: Object13
+  - first:
+      1: 100158
+    second: Object14
+  - first:
+      1: 100160
+    second: Object15
+  - first:
+      1: 100162
+    second: Object16
+  - first:
+      1: 100164
+    second: Object17
+  - first:
+      1: 100166
+    second: Object18
+  - first:
+      1: 100168
+    second: Object19
+  - first:
+      1: 100170
+    second: Object20
+  - first:
+      1: 100172
+    second: Object21
+  - first:
+      1: 100174
+    second: Object22
+  - first:
+      1: 100176
+    second: Object23
+  - first:
+      1: 100178
+    second: 'Origin Ref '
+  - first:
+      1: 100180
+    second: 'OverHead Ref '
+  - first:
+      1: 100182
+    second: Portrait Head
+  - first:
+      1: 100184
+    second: Pupils
+  - first:
+      1: 100186
+    second: SwordPlane01
+  - first:
+      1: 100188
+    second: SwordPlane02
+  - first:
+      1: 100190
+    second: SwordPlane03
+  - first:
+      1: 100192
+    second: T-Box02
+  - first:
+      1: 100194
+    second: T-Box08
+  - first:
+      1: 100196
+    second: T-Mesh08
+  - first:
+      1: 100198
+    second: T-Mesh37
+  - first:
+      1: 100200
+    second: T-Mesh38
+  - first:
+      1: 100202
+    second: T_Mesh02
+  - first:
+      1: 100204
+    second: T_Mesh04
+  - first:
+      1: 100206
+    second: T_Mesh32
+  - first:
+      1: 100208
+    second: T_Mesh36
+  - first:
+      1: 100210
+    second: T_Mesh39
+  - first:
+      1: 100212
+    second: T_Mesh40
+  - first:
+      1: 100214
+    second: T_Object01
+  - first:
+      1: 100216
+    second: T_Object06
+  - first:
+      1: 100218
+    second: T_Object08
+  - first:
+      1: 100220
+    second: T_Object10
+  - first:
+      1: 100222
+    second: T_Object11
+  - first:
+      1: 100224
+    second: T_Object13
+  - first:
+      1: 100226
+    second: T_Object14
+  - first:
+      1: 100228
+    second: T_Object15
+  - first:
+      1: 100230
+    second: vObject05
+  - first:
+      1: 100232
+    second: Weapon Left Ref
+  - first:
+      1: 100234
+    second: Weapon Right Ref
+  - first:
+      4: 400000
+    second: 1KnightHand
+  - first:
+      4: 400002
+    second: _M3_Anim_Data
+  - first:
+      4: 400004
+    second: Bone HorseBONE_ABDOMEN
+  - first:
+      4: 400006
+    second: Bone HorseBONE_CHEST
+  - first:
+      4: 400008
+    second: Bone HorseBONE_HEAD
+  - first:
+      4: 400010
+    second: Bone HorseBone_Hoof_Front_L
+  - first:
+      4: 400012
+    second: Bone HorseBone_Hoof_Front_R
+  - first:
+      4: 400014
+    second: Bone HorseBone_Hoof_Rear_L
+  - first:
+      4: 400016
+    second: Bone HorseBone_Hoof_Rear_R
+  - first:
+      4: 400018
+    second: Bone HorseBone_Leg1_Front_L
+  - first:
+      4: 400020
+    second: Bone HorseBone_Leg1_Front_R
+  - first:
+      4: 400022
+    second: Bone HorseBone_Leg1_Rear_L
+  - first:
+      4: 400024
+    second: Bone HorseBone_Leg1_Rear_R
+  - first:
+      4: 400026
+    second: Bone HorseBone_Leg2_Front_L
+  - first:
+      4: 400028
+    second: Bone HorseBone_Leg2_Front_R
+  - first:
+      4: 400030
+    second: Bone HorseBone_Leg2_Rear_L
+  - first:
+      4: 400032
+    second: Bone HorseBone_Leg2_Rear_R
+  - first:
+      4: 400034
+    second: Bone HorseBone_Leg3_Front_L\
+  - first:
+      4: 400036
+    second: Bone HorseBone_Leg3_Front_R
+  - first:
+      4: 400038
+    second: Bone HorseBone_Leg3_Rear_L
+  - first:
+      4: 400040
+    second: Bone HorseBone_Leg3_Rear_R
+  - first:
+      4: 400042
+    second: Bone HorseBONE_NECK
+  - first:
+      4: 400044
+    second: Bone HorseBONE_PELVIS
+  - first:
+      4: 400046
+    second: Bone HorseBONE_TAIL1
+  - first:
+      4: 400048
+    second: Bone_Arm1_L
+  - first:
+      4: 400050
+    second: 'Bone_Arm1_R '
+  - first:
+      4: 400052
+    second: Bone_Arm2_L
+  - first:
+      4: 400054
+    second: Bone_Arm2_R
+  - first:
+      4: 400056
+    second: Bone_Chest
+  - first:
+      4: 400058
+    second: 'Bone_Hand_R '
+  - first:
+      4: 400060
+    second: Bone_Hand_R 01
+  - first:
+      4: 400062
+    second: Bone_Head
+  - first:
+      4: 400064
+    second: Bone_Leg2_L
+  - first:
+      4: 400066
+    second: Bone_Leg2_R
+  - first:
+      4: 400068
+    second: Bone_Root
+  - first:
+      4: 400070
+    second: Box01
+  - first:
+      4: 400072
+    second: Chest Mount Left Ref
+  - first:
+      4: 400074
+    second: Chest Mount Rear Ref
+  - first:
+      4: 400076
+    second: Chest Mount Ref
+  - first:
+      4: 400078
+    second: Chest Mount Right Ref
+  - first:
+      4: 400080
+    second: Chest Ref
+  - first:
+      4: 400082
+    second: Dummy08
+  - first:
+      4: 400084
+    second: 'Eyes '
+  - first:
+      4: 400086
+    second: Foot Left Rear Ref
+  - first:
+      4: 400088
+    second: 'Foot Left Ref '
+  - first:
+      4: 400090
+    second: Foot Right Rear Ref
+  - first:
+      4: 400092
+    second: 'Foot Right Ref '
+  - first:
+      4: 400094
+    second: gutz00
+  - first:
+      4: 400096
+    second: gutz08
+  - first:
+      4: 400098
+    second: 'Hand Left Ref '
+  - first:
+      4: 400100
+    second: 'Hand Right Ref '
+  - first:
+      4: 400102
+    second: Head - Ref
+  - first:
+      4: 400104
+    second: Head Mount - Ref
+  - first:
+      4: 400106
+    second: HorseDummy
+  - first:
+      4: 400108
+    second: //RootNode
+  - first:
+      4: 400110
+    second: m3bone_root
+  - first:
+      4: 400112
+    second: Mesh01
+  - first:
+      4: 400114
+    second: Mesh07
+  - first:
+      4: 400116
+    second: Mesh08
+  - first:
+      4: 400118
+    second: Mesh10
+  - first:
+      4: 400120
+    second: Mesh11
+  - first:
+      4: 400122
+    second: Mesh12
+  - first:
+      4: 400124
+    second: Mesh13
+  - first:
+      4: 400126
+    second: Mesh14
+  - first:
+      4: 400128
+    second: Mesh35
+  - first:
+      4: 400130
+    second: Mesh37
+  - first:
+      4: 400132
+    second: Mesh38
+  - first:
+      4: 400134
+    second: Mesh41
+  - first:
+      4: 400136
+    second: Mounted Footman1
+  - first:
+      4: 400138
+    second: Mounted Footman2
+  - first:
+      4: 400140
+    second: Mounted Footman3
+  - first:
+      4: 400142
+    second: Mounted Footman4
+  - first:
+      4: 400144
+    second: Mounted Footman5
+  - first:
+      4: 400146
+    second: Mounted Footman6
+  - first:
+      4: 400148
+    second: Object03
+  - first:
+      4: 400150
+    second: Object09
+  - first:
+      4: 400152
+    second: Object11
+  - first:
+      4: 400154
+    second: Object12
+  - first:
+      4: 400156
+    second: Object13
+  - first:
+      4: 400158
+    second: Object14
+  - first:
+      4: 400160
+    second: Object15
+  - first:
+      4: 400162
+    second: Object16
+  - first:
+      4: 400164
+    second: Object17
+  - first:
+      4: 400166
+    second: Object18
+  - first:
+      4: 400168
+    second: Object19
+  - first:
+      4: 400170
+    second: Object20
+  - first:
+      4: 400172
+    second: Object21
+  - first:
+      4: 400174
+    second: Object22
+  - first:
+      4: 400176
+    second: Object23
+  - first:
+      4: 400178
+    second: 'Origin Ref '
+  - first:
+      4: 400180
+    second: 'OverHead Ref '
+  - first:
+      4: 400182
+    second: Portrait Head
+  - first:
+      4: 400184
+    second: Pupils
+  - first:
+      4: 400186
+    second: SwordPlane01
+  - first:
+      4: 400188
+    second: SwordPlane02
+  - first:
+      4: 400190
+    second: SwordPlane03
+  - first:
+      4: 400192
+    second: T-Box02
+  - first:
+      4: 400194
+    second: T-Box08
+  - first:
+      4: 400196
+    second: T-Mesh08
+  - first:
+      4: 400198
+    second: T-Mesh37
+  - first:
+      4: 400200
+    second: T-Mesh38
+  - first:
+      4: 400202
+    second: T_Mesh02
+  - first:
+      4: 400204
+    second: T_Mesh04
+  - first:
+      4: 400206
+    second: T_Mesh32
+  - first:
+      4: 400208
+    second: T_Mesh36
+  - first:
+      4: 400210
+    second: T_Mesh39
+  - first:
+      4: 400212
+    second: T_Mesh40
+  - first:
+      4: 400214
+    second: T_Object01
+  - first:
+      4: 400216
+    second: T_Object06
+  - first:
+      4: 400218
+    second: T_Object08
+  - first:
+      4: 400220
+    second: T_Object10
+  - first:
+      4: 400222
+    second: T_Object11
+  - first:
+      4: 400224
+    second: T_Object13
+  - first:
+      4: 400226
+    second: T_Object14
+  - first:
+      4: 400228
+    second: T_Object15
+  - first:
+      4: 400230
+    second: vObject05
+  - first:
+      4: 400232
+    second: Weapon Left Ref
+  - first:
+      4: 400234
+    second: Weapon Right Ref
+  - first:
+      21: 2100000
+    second: 'Material #28'
+  - first:
+      21: 2100002
+    second: 'Material #27'
+  - first:
+      21: 2100004
+    second: No Name
+  - first:
+      23: 2300000
+    second: Mounted Footman3
+  - first:
+      23: 2300002
+    second: Mounted Footman4
+  - first:
+      33: 3300000
+    second: Mounted Footman3
+  - first:
+      33: 3300002
+    second: Mounted Footman4
+  - first:
+      43: 4300000
+    second: Mounted Footman1
+  - first:
+      43: 4300002
+    second: Mounted Footman2
+  - first:
+      43: 4300004
+    second: Mounted Footman5
+  - first:
+      43: 4300006
+    second: Mounted Footman6
+  - first:
+      43: 4300008
+    second: Mounted Footman3
+  - first:
+      43: 4300010
+    second: Mounted Footman4
+  - first:
+      74: 7400000
+    second: Engaging_1
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Mounted Footman1
+  - first:
+      137: 13700002
+    second: Mounted Footman2
+  - first:
+      137: 13700004
+    second: Mounted Footman5
+  - first:
+      137: 13700006
+    second: Mounted Footman6
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #27'
+    second: {fileID: 2100000, guid: b39662cf118e0cc4a932058120e3e8d8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #28'
+    second: {fileID: 2100000, guid: 9fddadf969233c94cb1f295d880bf2e5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: No Name
+    second: {fileID: 2100000, guid: b3bb4d94e29d1d641895cdc8c80e2c58, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Engaging_1
+      takeName: Engaging_1
+      internalID: 0
+      firstFrame: 674
+      lastFrame: 708
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  copyAvatar: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: fe9118745b9d588428d43e3d0f5061fd,
+    type: 3}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

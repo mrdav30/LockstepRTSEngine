@@ -314,7 +314,7 @@ Transform:
   m_GameObject: {fileID: 1588637964981362}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 2, y: 2.25, z: 2}
   m_Children:
   - {fileID: 4465759843105384}
   - {fileID: 4575518720356006}
@@ -468,7 +468,7 @@ MonoBehaviour:
   _range: 65536
   _sight: 655360
   _damage: 524288
-  _attackInterval: 65536
+  _attackInterval: 131072
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
@@ -492,7 +492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 6553600
+  _maxHealth: 9830400
   _currentHealth: 0
 --- !u!114 &114084417549043994
 MonoBehaviour:
@@ -786,6 +786,7 @@ SkinnedMeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0

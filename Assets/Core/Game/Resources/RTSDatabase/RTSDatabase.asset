@@ -106,6 +106,21 @@ MonoBehaviour:
     _description: Tree
     _icon: {fileID: 0}
     _prefab: {fileID: 1770353392784764, guid: 1bf0d6935618d8747b374385d915360b, type: 3}
+  - _name: HumanPikeman
+    _description: Pikeman
+    _icon: {fileID: 0}
+    _prefab: {fileID: 5395349145590078745, guid: 0f5d1b5b9eb8b0144b399d38592d73ad,
+      type: 3}
+  - _name: HumanCalvaryKnight
+    _description: Calvary Knight
+    _icon: {fileID: 0}
+    _prefab: {fileID: 4579221143010542061, guid: 9a0889b9a10060e46b261ff1c96fcaba,
+      type: 3}
+  - _name: HumanMage
+    _description: Mage
+    _icon: {fileID: 0}
+    _prefab: {fileID: 3837881372369562816, guid: b94cfdd7258b8f148b1bd022d61cdefb,
+      type: 3}
   _worldObjectData:
   - _name: Sun
     _description: 
@@ -136,6 +151,11 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 1454817680262554, guid: 40884fb93fdcfdb4f8174c11f1c6684a, type: 3}
+  - _name: MagicBullet
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 779093933934988061, guid: 22e714f295846cb4da7bf359b17c9d58,
+      type: 3}
   _effectData: []
   _abilityData:
   - _name: Attack

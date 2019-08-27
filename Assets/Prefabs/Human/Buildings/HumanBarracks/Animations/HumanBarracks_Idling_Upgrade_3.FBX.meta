@@ -1,169 +1,554 @@
 fileFormatVersion: 2
 guid: 3897e23c91ca72a4ab9501212425c5aa
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: _M3_Anim_Data
-    100002: Barracks1
-    100004: Barracks10
-    100006: Barracks11
-    100008: Barracks12
-    100010: Barracks13
-    100012: Barracks14
-    100014: Barracks15
-    100016: Barracks16
-    100018: Barracks17
-    100020: Barracks18
-    100022: Barracks19
-    100024: Barracks2
-    100026: Barracks20
-    100028: Barracks21
-    100030: Barracks22
-    100032: Barracks23
-    100034: Barracks24
-    100036: Barracks3
-    100038: Barracks4
-    100040: Barracks5
-    100042: Barracks6
-    100044: Barracks7
-    100046: Barracks8
-    100048: Barracks9
-    100050: bone_null
-    100052: door
-    100054: Explosion
-    100056: Flag1
-    100058: Flag2
-    100060: //RootNode
-    100062: m3bone_root
-    100064: Main house
-    100066: Origin Ref
-    100068: Overhead Ref
-    100070: Sprite first ref
-    100072: Sprite second ref
-    400000: _M3_Anim_Data
-    400002: Barracks1
-    400004: Barracks10
-    400006: Barracks11
-    400008: Barracks12
-    400010: Barracks13
-    400012: Barracks14
-    400014: Barracks15
-    400016: Barracks16
-    400018: Barracks17
-    400020: Barracks18
-    400022: Barracks19
-    400024: Barracks2
-    400026: Barracks20
-    400028: Barracks21
-    400030: Barracks22
-    400032: Barracks23
-    400034: Barracks24
-    400036: Barracks3
-    400038: Barracks4
-    400040: Barracks5
-    400042: Barracks6
-    400044: Barracks7
-    400046: Barracks8
-    400048: Barracks9
-    400050: bone_null
-    400052: door
-    400054: Explosion
-    400056: Flag1
-    400058: Flag2
-    400060: //RootNode
-    400062: m3bone_root
-    400064: Main house
-    400066: Origin Ref
-    400068: Overhead Ref
-    400070: Sprite first ref
-    400072: Sprite second ref
-    2100000: No Name
-    2100002: 'Material #153'
-    2100004: 'Material #155'
-    2100006: 'Material #156'
-    2100008: 'Material #152'
-    2100010: 'Material #158'
-    2100012: 'Material #151'
-    2100014: 'Material #163'
-    2100016: 'Material #154'
-    2100018: 'Material #161'
-    2100020: 'Material #162'
-    2100022: 'Material #159'
-    2100024: 'Material #157'
-    2300000: Barracks1
-    2300002: Barracks10
-    2300004: Barracks11
-    2300006: Barracks12
-    2300008: Barracks13
-    2300010: Barracks14
-    2300012: Barracks15
-    2300014: Barracks16
-    2300016: Barracks17
-    2300018: Barracks18
-    2300020: Barracks19
-    2300022: Barracks2
-    2300024: Barracks20
-    2300026: Barracks21
-    2300028: Barracks22
-    2300030: Barracks23
-    2300032: Barracks24
-    2300034: Barracks3
-    2300036: Barracks4
-    2300038: Barracks5
-    2300040: Barracks6
-    2300042: Barracks7
-    2300044: Barracks8
-    3300000: Barracks1
-    3300002: Barracks10
-    3300004: Barracks11
-    3300006: Barracks12
-    3300008: Barracks13
-    3300010: Barracks14
-    3300012: Barracks15
-    3300014: Barracks16
-    3300016: Barracks17
-    3300018: Barracks18
-    3300020: Barracks19
-    3300022: Barracks2
-    3300024: Barracks20
-    3300026: Barracks21
-    3300028: Barracks22
-    3300030: Barracks23
-    3300032: Barracks24
-    3300034: Barracks3
-    3300036: Barracks4
-    3300038: Barracks5
-    3300040: Barracks6
-    3300042: Barracks7
-    3300044: Barracks8
-    4300000: Barracks9
-    4300002: Barracks11
-    4300004: Barracks1
-    4300006: Barracks3
-    4300008: Barracks5
-    4300010: Barracks6
-    4300012: Barracks8
-    4300014: Barracks12
-    4300016: Barracks16
-    4300018: Barracks18
-    4300020: Barracks21
-    4300022: Barracks24
-    4300024: Barracks10
-    4300026: Barracks2
-    4300028: Barracks4
-    4300030: Barracks7
-    4300032: Barracks13
-    4300034: Barracks14
-    4300036: Barracks15
-    4300038: Barracks17
-    4300040: Barracks19
-    4300042: Barracks20
-    4300044: Barracks22
-    4300046: Barracks23
-    7400000: Idling_Upgrade_3
-    9500000: //RootNode
-    13700000: Barracks9
-  externalObjects: {}
+  serializedVersion: 26
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: _M3_Anim_Data
+  - first:
+      1: 100002
+    second: Barracks1
+  - first:
+      1: 100004
+    second: Barracks10
+  - first:
+      1: 100006
+    second: Barracks11
+  - first:
+      1: 100008
+    second: Barracks12
+  - first:
+      1: 100010
+    second: Barracks13
+  - first:
+      1: 100012
+    second: Barracks14
+  - first:
+      1: 100014
+    second: Barracks15
+  - first:
+      1: 100016
+    second: Barracks16
+  - first:
+      1: 100018
+    second: Barracks17
+  - first:
+      1: 100020
+    second: Barracks18
+  - first:
+      1: 100022
+    second: Barracks19
+  - first:
+      1: 100024
+    second: Barracks2
+  - first:
+      1: 100026
+    second: Barracks20
+  - first:
+      1: 100028
+    second: Barracks21
+  - first:
+      1: 100030
+    second: Barracks22
+  - first:
+      1: 100032
+    second: Barracks23
+  - first:
+      1: 100034
+    second: Barracks24
+  - first:
+      1: 100036
+    second: Barracks3
+  - first:
+      1: 100038
+    second: Barracks4
+  - first:
+      1: 100040
+    second: Barracks5
+  - first:
+      1: 100042
+    second: Barracks6
+  - first:
+      1: 100044
+    second: Barracks7
+  - first:
+      1: 100046
+    second: Barracks8
+  - first:
+      1: 100048
+    second: Barracks9
+  - first:
+      1: 100050
+    second: bone_null
+  - first:
+      1: 100052
+    second: door
+  - first:
+      1: 100054
+    second: Explosion
+  - first:
+      1: 100056
+    second: Flag1
+  - first:
+      1: 100058
+    second: Flag2
+  - first:
+      1: 100060
+    second: //RootNode
+  - first:
+      1: 100062
+    second: m3bone_root
+  - first:
+      1: 100064
+    second: Main house
+  - first:
+      1: 100066
+    second: Origin Ref
+  - first:
+      1: 100068
+    second: Overhead Ref
+  - first:
+      1: 100070
+    second: Sprite first ref
+  - first:
+      1: 100072
+    second: Sprite second ref
+  - first:
+      4: 400000
+    second: _M3_Anim_Data
+  - first:
+      4: 400002
+    second: Barracks1
+  - first:
+      4: 400004
+    second: Barracks10
+  - first:
+      4: 400006
+    second: Barracks11
+  - first:
+      4: 400008
+    second: Barracks12
+  - first:
+      4: 400010
+    second: Barracks13
+  - first:
+      4: 400012
+    second: Barracks14
+  - first:
+      4: 400014
+    second: Barracks15
+  - first:
+      4: 400016
+    second: Barracks16
+  - first:
+      4: 400018
+    second: Barracks17
+  - first:
+      4: 400020
+    second: Barracks18
+  - first:
+      4: 400022
+    second: Barracks19
+  - first:
+      4: 400024
+    second: Barracks2
+  - first:
+      4: 400026
+    second: Barracks20
+  - first:
+      4: 400028
+    second: Barracks21
+  - first:
+      4: 400030
+    second: Barracks22
+  - first:
+      4: 400032
+    second: Barracks23
+  - first:
+      4: 400034
+    second: Barracks24
+  - first:
+      4: 400036
+    second: Barracks3
+  - first:
+      4: 400038
+    second: Barracks4
+  - first:
+      4: 400040
+    second: Barracks5
+  - first:
+      4: 400042
+    second: Barracks6
+  - first:
+      4: 400044
+    second: Barracks7
+  - first:
+      4: 400046
+    second: Barracks8
+  - first:
+      4: 400048
+    second: Barracks9
+  - first:
+      4: 400050
+    second: bone_null
+  - first:
+      4: 400052
+    second: door
+  - first:
+      4: 400054
+    second: Explosion
+  - first:
+      4: 400056
+    second: Flag1
+  - first:
+      4: 400058
+    second: Flag2
+  - first:
+      4: 400060
+    second: //RootNode
+  - first:
+      4: 400062
+    second: m3bone_root
+  - first:
+      4: 400064
+    second: Main house
+  - first:
+      4: 400066
+    second: Origin Ref
+  - first:
+      4: 400068
+    second: Overhead Ref
+  - first:
+      4: 400070
+    second: Sprite first ref
+  - first:
+      4: 400072
+    second: Sprite second ref
+  - first:
+      21: 2100000
+    second: No Name
+  - first:
+      21: 2100002
+    second: 'Material #153'
+  - first:
+      21: 2100004
+    second: 'Material #155'
+  - first:
+      21: 2100006
+    second: 'Material #156'
+  - first:
+      21: 2100008
+    second: 'Material #152'
+  - first:
+      21: 2100010
+    second: 'Material #158'
+  - first:
+      21: 2100012
+    second: 'Material #151'
+  - first:
+      21: 2100014
+    second: 'Material #163'
+  - first:
+      21: 2100016
+    second: 'Material #154'
+  - first:
+      21: 2100018
+    second: 'Material #161'
+  - first:
+      21: 2100020
+    second: 'Material #162'
+  - first:
+      21: 2100022
+    second: 'Material #159'
+  - first:
+      21: 2100024
+    second: 'Material #157'
+  - first:
+      23: 2300000
+    second: Barracks1
+  - first:
+      23: 2300002
+    second: Barracks10
+  - first:
+      23: 2300004
+    second: Barracks11
+  - first:
+      23: 2300006
+    second: Barracks12
+  - first:
+      23: 2300008
+    second: Barracks13
+  - first:
+      23: 2300010
+    second: Barracks14
+  - first:
+      23: 2300012
+    second: Barracks15
+  - first:
+      23: 2300014
+    second: Barracks16
+  - first:
+      23: 2300016
+    second: Barracks17
+  - first:
+      23: 2300018
+    second: Barracks18
+  - first:
+      23: 2300020
+    second: Barracks19
+  - first:
+      23: 2300022
+    second: Barracks2
+  - first:
+      23: 2300024
+    second: Barracks20
+  - first:
+      23: 2300026
+    second: Barracks21
+  - first:
+      23: 2300028
+    second: Barracks22
+  - first:
+      23: 2300030
+    second: Barracks23
+  - first:
+      23: 2300032
+    second: Barracks24
+  - first:
+      23: 2300034
+    second: Barracks3
+  - first:
+      23: 2300036
+    second: Barracks4
+  - first:
+      23: 2300038
+    second: Barracks5
+  - first:
+      23: 2300040
+    second: Barracks6
+  - first:
+      23: 2300042
+    second: Barracks7
+  - first:
+      23: 2300044
+    second: Barracks8
+  - first:
+      33: 3300000
+    second: Barracks1
+  - first:
+      33: 3300002
+    second: Barracks10
+  - first:
+      33: 3300004
+    second: Barracks11
+  - first:
+      33: 3300006
+    second: Barracks12
+  - first:
+      33: 3300008
+    second: Barracks13
+  - first:
+      33: 3300010
+    second: Barracks14
+  - first:
+      33: 3300012
+    second: Barracks15
+  - first:
+      33: 3300014
+    second: Barracks16
+  - first:
+      33: 3300016
+    second: Barracks17
+  - first:
+      33: 3300018
+    second: Barracks18
+  - first:
+      33: 3300020
+    second: Barracks19
+  - first:
+      33: 3300022
+    second: Barracks2
+  - first:
+      33: 3300024
+    second: Barracks20
+  - first:
+      33: 3300026
+    second: Barracks21
+  - first:
+      33: 3300028
+    second: Barracks22
+  - first:
+      33: 3300030
+    second: Barracks23
+  - first:
+      33: 3300032
+    second: Barracks24
+  - first:
+      33: 3300034
+    second: Barracks3
+  - first:
+      33: 3300036
+    second: Barracks4
+  - first:
+      33: 3300038
+    second: Barracks5
+  - first:
+      33: 3300040
+    second: Barracks6
+  - first:
+      33: 3300042
+    second: Barracks7
+  - first:
+      33: 3300044
+    second: Barracks8
+  - first:
+      43: 4300000
+    second: Barracks9
+  - first:
+      43: 4300002
+    second: Barracks11
+  - first:
+      43: 4300004
+    second: Barracks1
+  - first:
+      43: 4300006
+    second: Barracks3
+  - first:
+      43: 4300008
+    second: Barracks5
+  - first:
+      43: 4300010
+    second: Barracks6
+  - first:
+      43: 4300012
+    second: Barracks8
+  - first:
+      43: 4300014
+    second: Barracks12
+  - first:
+      43: 4300016
+    second: Barracks16
+  - first:
+      43: 4300018
+    second: Barracks18
+  - first:
+      43: 4300020
+    second: Barracks21
+  - first:
+      43: 4300022
+    second: Barracks24
+  - first:
+      43: 4300024
+    second: Barracks10
+  - first:
+      43: 4300026
+    second: Barracks2
+  - first:
+      43: 4300028
+    second: Barracks4
+  - first:
+      43: 4300030
+    second: Barracks7
+  - first:
+      43: 4300032
+    second: Barracks13
+  - first:
+      43: 4300034
+    second: Barracks14
+  - first:
+      43: 4300036
+    second: Barracks15
+  - first:
+      43: 4300038
+    second: Barracks17
+  - first:
+      43: 4300040
+    second: Barracks19
+  - first:
+      43: 4300042
+    second: Barracks20
+  - first:
+      43: 4300044
+    second: Barracks22
+  - first:
+      43: 4300046
+    second: Barracks23
+  - first:
+      74: 7400000
+    second: Idling_Upgrade_3
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Barracks9
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #151'
+    second: {fileID: 2100000, guid: 2a453459dc04d5445b4b96f9c3996284, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #152'
+    second: {fileID: 2100000, guid: 3f4d0b44e84456145a59e4a525ed3813, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #153'
+    second: {fileID: 2100000, guid: 2271b79fe0c3cd946a45ad79813bcb32, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #154'
+    second: {fileID: 2100000, guid: df7f5d65120b3644d9c09051acaa9412, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #155'
+    second: {fileID: 2100000, guid: 4f56cba04fa58e24a870dc4d30c93125, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #156'
+    second: {fileID: 2100000, guid: f1f385c945e9e0348b4e102daaeb0cd4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #157'
+    second: {fileID: 2100000, guid: 509a375bccd0ba44dadaa0bbf44ea285, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #158'
+    second: {fileID: 2100000, guid: 8d6c935304c51c3418697e01beaf7f58, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #159'
+    second: {fileID: 2100000, guid: c7cf88f3f0df7284791467af42b0880a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #161'
+    second: {fileID: 2100000, guid: 8e1cb9b06f01aa4488e64c05c78504bd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #162'
+    second: {fileID: 2100000, guid: 1a473dee99288114da2be3819d128503, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: 'Material #163'
+    second: {fileID: 2100000, guid: 0292718a8c45cff439d01abb5762ebd8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: No Name
+    second: {fileID: 2100000, guid: 2d511ed93a81b414088e277c5708c38d, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
@@ -197,6 +582,8 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -204,27 +591,32 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.0254
-    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -234,6 +626,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

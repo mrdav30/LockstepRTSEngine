@@ -95,6 +95,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -194,6 +195,7 @@ SkinnedMeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -335,6 +337,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -1030,7 +1033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 4915200
+  _maxHealth: 6553600
   _currentHealth: 0
 --- !u!114 &114121839624242634
 MonoBehaviour:
@@ -1045,19 +1048,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  _isOffensive: 0
+  _isOffensive: 1
   _projectileCode: Arrow
-  _range: 655360
-  _sight: 983040
-  _damage: 327680
-  _attackInterval: 131072
+  _range: 1310720
+  _sight: 1310720
+  _damage: 458752
+  _attackInterval: 65536
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
   _projectileOffset:
     x: 0
-    y: 0
-    z: 262144
+    y: 131072
+    z: 98304
   _secondaryProjectileOffsets: []
   _cycleProjectiles: 0
   _windup: 0
@@ -1121,7 +1124,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 2528618d7e08bbc4b81d5bb96722bf8e, type: 3}
   m_Controller: {fileID: 9100000, guid: 1029a9e8b3a487045adb97363c558900, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -1635,6 +1638,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0

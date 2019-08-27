@@ -608,7 +608,7 @@ namespace RTSLockstep
         private void RegisterLockstep()
         {
             TrackedLockstepTickets.Add(LSVariableManager.Register(this.Body));
-            foreach (Ability abil in this.abilityManager.Abilitys)
+            foreach (Ability abil in this.abilityManager.Abilities)
             {
                 TrackedLockstepTickets.Add(LSVariableManager.Register(abil));
             }
