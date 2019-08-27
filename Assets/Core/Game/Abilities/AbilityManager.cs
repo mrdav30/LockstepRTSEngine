@@ -6,20 +6,19 @@ namespace RTSLockstep
 {
     public class AbilityManager
     {
-
         static FastList<ActiveAbility> setupActives = new FastList<ActiveAbility>();
 
-        public Ability[] Abilitys { get; private set; }
+        public Ability[] Abilities { get; private set; }
         public ActiveAbility[] ActiveAbilitys { get; private set; }
         public readonly FastList<AbilityDataItem> Interfacers = new FastList<AbilityDataItem>();
 
         public void Setup(RTSAgent agent)
         {
             setupActives.FastClear();
-            Abilitys = agent.AttachedAbilities;
-            for (int i = 0; i < Abilitys.Length; i++)
+            Abilities = agent.AttachedAbilities;
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Ability abil = Abilitys[i];
+                Ability abil = Abilities[i];
 
                 ActiveAbility activeAbil = abil as ActiveAbility;
                 if (activeAbil.IsNotNull())
@@ -28,13 +27,13 @@ namespace RTSLockstep
 
             ActiveAbilitys = setupActives.ToArray();
 
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].Setup(agent, i);
+                Abilities[i].Setup(agent, i);
             }
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].LateSetup();
+                Abilities[i].LateSetup();
             }
             for (int i = 0; i < ActiveAbilitys.Length; i++)
             {
@@ -46,39 +45,40 @@ namespace RTSLockstep
 
         public void Initialize()
         {
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].Initialize();
+                Abilities[i].Initialize();
             }
         }
 
         public void Simulate()
         {
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].Simulate();
+                Abilities[i].Simulate();
             }
         }
+
         public void LateSimulate()
         {
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].LateSimulate();
+                Abilities[i].LateSimulate();
             }
         }
 
         public void Visualize()
         {
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].Visualize();
+                Abilities[i].Visualize();
             }
         }
         public void LateVisualize()
         {
-            for (int i = 0; i < Abilitys.Length; i++)
+            for (int i = 0; i < Abilities.Length; i++)
             {
-                Abilitys[i].LateVisualize();
+                Abilities[i].LateVisualize();
             }
         }
         public void Execute(Command com)
@@ -99,9 +99,9 @@ namespace RTSLockstep
 
         public bool CheckCasting()
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                if (Abilitys[k].IsCasting)
+                if (Abilities[k].IsCasting)
                 {
                     return true;
                 }
@@ -111,9 +111,9 @@ namespace RTSLockstep
 
         public bool CheckFocus()
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                if (Abilitys[k].IsFocused)
+                if (Abilities[k].IsFocused)
                 {
                     return true;
                 }
@@ -123,20 +123,20 @@ namespace RTSLockstep
 
         public void StopCast(int exception)
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
                 if (k != exception)
                 {
-                    Abilitys[k].StopCast();
+                    Abilities[k].StopCast();
                 }
             }
         }
 
         public void Deactivate()
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                Abilitys[k].Deactivate();
+                Abilities[k].Deactivate();
             }
         }
 
@@ -165,9 +165,9 @@ namespace RTSLockstep
 
         public Ability GetAbilityAny(Type type)
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                var ability = Abilitys[k];
+                var ability = Abilities[k];
                 Type abilType = ability.GetType();
                 if (abilType == type || abilType.IsSubclassOf(type))
                 {
@@ -178,34 +178,44 @@ namespace RTSLockstep
         }
         public Ability GetAbility(string name)
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            if (Abilities.IsNotNull())
             {
-                var ability = Abilitys[k];
-                if (ability.Data != null)
-                    if (ability.Data.Name == name)
+                for (var k = 0; k < Abilities.Length; k++)
+                {
+                    var ability = Abilities[k];
+                    if (ability.Data != null)
                     {
-                        return ability;
+                        if (ability.Data.Name == name)
+                        {
+                            return ability;
+                        }
                     }
+                }
             }
+
             return null;
         }
         public T GetAbility<T>() where T : Ability
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            if (Abilities.IsNotNull())
             {
-                var ability = Abilitys[k] as T;
-                if (ReferenceEquals(ability, null) == false)
+                for (var k = 0; k < Abilities.Length; k++)
                 {
-                    return ability;
+                    var ability = Abilities[k] as T;
+                    if (ReferenceEquals(ability, null) == false)
+                    {
+                        return ability;
+                    }
                 }
             }
+
             return null;
         }
         public Ability GetAbilityAny<T>()
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                Ability abil = Abilitys[k];
+                Ability abil = Abilities[k];
                 if (abil is T)
                 {
                     return abil;
@@ -216,13 +226,12 @@ namespace RTSLockstep
 
         public IEnumerable<Ability> GetAbilitiesAny<T>()
         {
-            for (var k = 0; k < Abilitys.Length; k++)
+            for (var k = 0; k < Abilities.Length; k++)
             {
-                var abil = this.Abilitys[k];
+                var abil = this.Abilities[k];
                 if (abil is T)
                     yield return abil;
             }
         }
-
     }
 }
