@@ -2,19 +2,19 @@
 {
     public sealed class GridSettings
     {
-        public int Width { get; private set; }
+        public int Width { get; private set; } = 500;
 
-        public int Height { get; private set; }
+        public int Height { get; private set; } = 500;
 
-        public long XOffset { get; private set; }
+        public long XOffset { get; private set; } = FixedMath.Create(-100);
 
-        public long YOffset { get; private set; }
+        public long YOffset { get; private set; } = FixedMath.Create(-100);
 
-        public bool UseDiagonalConnections { get; private set; }
+        public bool UseDiagonalConnections { get; private set; } = true;
 
         public GridSettings()
         {
-            Init(500, 500, FixedMath.Create(-100), FixedMath.Create(-100), true);
+            Init(Width, Height, XOffset, YOffset, UseDiagonalConnections);
         }
 
         public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)

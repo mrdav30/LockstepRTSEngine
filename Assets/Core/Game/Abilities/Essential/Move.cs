@@ -56,7 +56,19 @@ namespace RTSLockstep
         private bool viableDestination;
 
         private readonly FastList<Vector2d> myPath = new FastList<Vector2d>();
-        private int pathIndex;
+        private int _pathIndex;
+
+        private int pathIndex
+        {
+            get { return _pathIndex; }
+            set
+            {
+                if (value != _pathIndex)
+                {
+                    _pathIndex = value;
+                }
+            }
+        }
 
         private int StoppedTime;
         private Vector2d targetPos;
@@ -105,19 +117,20 @@ namespace RTSLockstep
         private readonly bool paused;
         private static Vector2d desiredVelocity;
 
+        [HideInInspector]
+        public bool CanMove = true;
+        private bool canTurn;
+
         #region Serialized
-        [SerializeField]
-        public bool CanMove { get; set; }
-        [SerializeField]
-        public bool CanTurn { get; private set; }
         [SerializeField, FixedNumber]
         private long _speed = FixedMath.One * 4;
         public virtual long Speed { get { return _speed; } }
         [SerializeField, FixedNumber]
         private long _acceleration = FixedMath.One * 4;
         public long Acceleration { get { return _acceleration; } }
-        [SerializeField]
-        public bool CanPathfind { get; private set; }
+        [SerializeField, Tooltip("Disable if unit doesn't need to find path, i.e. flying")]
+        private bool _canPathfind = true;
+        public bool CanPathfind { get { return _canPathfind; } set { _canPathfind = value; } }
         #endregion
 
         protected override void OnSetup()
@@ -125,7 +138,7 @@ namespace RTSLockstep
             cachedBody = Agent.Body;
             cachedBody.onContact += HandleCollision;
             cachedTurn = Agent.GetAbility<Turn>();
-            CanTurn = cachedTurn.IsNotNull();
+            canTurn = cachedTurn.IsNotNull();
 
             timescaledAcceleration = Acceleration.Mul(Speed) / LockstepManager.FrameRate;
             //Cleaner stops with more decelleration
@@ -306,7 +319,7 @@ namespace RTSLockstep
             if (distanceToMove > slowDistance || movingToWaypoint)
             {
                 desiredVelocity = (movementDirection);
-                if (CanTurn)
+                if (canTurn)
                 {
                     cachedTurn.StartTurnDirection(movementDirection);
                 }
@@ -321,7 +334,7 @@ namespace RTSLockstep
                 }
                 if (distanceToMove > closingDistance)
                 {
-                    if (CanTurn)
+                    if (canTurn)
                     {
                         cachedTurn.StartTurnDirection(movementDirection);
                     }
@@ -329,7 +342,7 @@ namespace RTSLockstep
                 if (distanceToMove <= slowDistance)
                 {
                     long closingSpeed = distanceToMove.Div(slowDistance);
-                    if (CanTurn)
+                    if (canTurn)
                     {
                         cachedTurn.StartTurnDirection(movementDirection);
                     }
@@ -645,7 +658,7 @@ namespace RTSLockstep
 #if UNITY_EDITOR
         public bool DrawPath = true;
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             if (DrawPath)
             {

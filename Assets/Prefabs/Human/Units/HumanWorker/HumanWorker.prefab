@@ -155,11 +155,10 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  _canMove: 1
-  _canTurn: 1
+  CanMove: 1
   _speed: 196608
   _acceleration: 131072
-  _canPathfind: 1
+  CanPathfind: 1
   DrawPath: 1
 --- !u!114 &114276689992937454
 MonoBehaviour:

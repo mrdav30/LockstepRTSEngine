@@ -26,18 +26,7 @@ namespace RTSLockstep
         public const int SqrScanResolution = ScanResolution * ScanResolution;
         public static long OffsetX { get; private set; }
         public static long OffsetY { get; private set; }
-        private static bool _useDiagonalConnections = true;
-        public static bool UseDiagonalConnections
-        {
-            get
-            {
-                return _useDiagonalConnections;
-            }
-            private set
-            {
-                _useDiagonalConnections = value;
-            }
-        }
+        public static bool UseDiagonalConnections { get; private set; }
         public static uint GridVersion { get; private set; }
 
         private static bool _settingsChanged = true;
@@ -166,7 +155,8 @@ namespace RTSLockstep
             }
             #endregion
 
-            //long startMem = System.GC.GetTotalMemory (true);
+            long startMem = System.GC.GetTotalMemory(true);
+
             ScanGrid = new ScanNode[ScanGridSize];
             for (int i = ScanWidth - 1; i >= 0; i--)
             {
@@ -188,8 +178,9 @@ namespace RTSLockstep
                     Grid[GetGridIndex(i, j)] = node;
                 }
             }
-            //long usedMem = System.GC.GetTotalMemory (true) - startMem;
-            //Debug.Log ("Grid generated using " + usedMem + " Bytes!");
+
+            long usedMem = System.GC.GetTotalMemory(true) - startMem;
+            Debug.Log("Grid generated using " + usedMem + " Bytes!");
         }
 
         public static int GenerateDeltaCount(int size)
@@ -233,7 +224,7 @@ namespace RTSLockstep
 
         public static Vector2d GetOffsettedPos(Vector2d worldPos)
         {
-            return new Vector2d(worldPos.x - OffsetX,worldPos.y - OffsetY);
+            return new Vector2d(worldPos.x - OffsetX, worldPos.y - OffsetY);
         }
         public static void GetCoordinates(long xPos, long yPos, out int xGrid, out int yGrid)
         {

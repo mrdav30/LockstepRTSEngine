@@ -64,7 +64,7 @@ namespace RTSLockstep
 
         public float distance;
 
-        private byte _clearanceSource;
+        public byte ClearanceSource;
         /// <summary>
         /// How many connections until the closest unwalkable node.
         /// If a big unit stands directly on this node, it won't be able to fit if the degree is too low.
@@ -117,11 +117,10 @@ namespace RTSLockstep
 
         public void Initialize()
         {
-
             GenerateNeighbors();
             LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
             ClearanceDegree = DEFAULT_DEGREE;
-            _clearanceSource = DEFAULT_SOURCE;
+            ClearanceSource = DEFAULT_SOURCE;
             this.FastInitialize();
         }
 
@@ -156,14 +155,14 @@ namespace RTSLockstep
             if (Unwalkable)
             {
                 ClearanceDegree = 0;
-                _clearanceSource = DEFAULT_SOURCE;
+                ClearanceSource = DEFAULT_SOURCE;
             }
             else
             {
-                if (_clearanceSource <= 7)
+                if (ClearanceSource <= 7)
                 {
                     //refresh source in case the map changed
-                    var source = NeighborNodes[_clearanceSource];
+                    var source = NeighborNodes[ClearanceSource];
                     if (source.IsNull() == false)
                     {
                         var prevSourceDegree = source.ClearanceDegree;
@@ -174,7 +173,7 @@ namespace RTSLockstep
                             if (source.ClearanceDegree != prevSourceDegree)
                             {
                                 ClearanceDegree = DEFAULT_DEGREE;
-                                _clearanceSource = DEFAULT_SOURCE;
+                                ClearanceSource = DEFAULT_SOURCE;
                             }
                         }
                         else
@@ -193,14 +192,14 @@ namespace RTSLockstep
                     if (neighbor.IsNull() || neighbor.Unwalkable)
                     {
                         ClearanceDegree = 1;
-                        _clearanceSource = (byte)i;
+                        ClearanceSource = (byte)i;
                         break;
                     }
                     //Cap clearance to 8. Something larger than that won't work very well with pathfinding.
                     if (neighbor.ClearanceDegree < ClearanceDegree && neighbor.ClearanceDegree < 8)
                     {
                         ClearanceDegree = (byte)(neighbor.ClearanceDegree + 1);
-                        _clearanceSource = (byte)i;
+                        ClearanceSource = (byte)i;
                     }
                 }
             }
