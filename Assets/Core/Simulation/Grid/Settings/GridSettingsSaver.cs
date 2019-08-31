@@ -14,7 +14,6 @@ namespace RTSLockstep
             }
         }
 
-
         [SerializeField]
         private int _mapWidth = 100;
         public int MapWidth {get {return _mapWidth;}}
@@ -36,13 +35,14 @@ namespace RTSLockstep
             GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y, this.UseDiagonalConnetions);
         }
 
-
-
         #if UNITY_EDITOR
         public bool Show;
 
         void OnDrawGizmos () {
-            if (!Show || Application.isPlaying) return;
+            if (!Show || Application.isPlaying)
+            {
+                return;
+            }
             Gizmos.color = Color.green;
             Vector3 offset = Offset.ToVector3(this.transform.position.y);
             Vector3 scale = Vector3.one * .5f;

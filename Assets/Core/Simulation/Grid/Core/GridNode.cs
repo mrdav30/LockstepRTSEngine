@@ -53,7 +53,6 @@ namespace RTSLockstep
         public const byte DEFAULT_SOURCE = byte.MaxValue;
 
         private byte _obstacleCount;
-        public byte ObstacleCount { get { return _obstacleCount; } }
 
         public bool Unwalkable
         {
@@ -63,14 +62,14 @@ namespace RTSLockstep
             }
         }
 
+        public float distance;
+
         private byte _clearanceSource;
-        internal byte ClearanceSource { get { return _clearanceSource; } }
         /// <summary>
         /// How many connections until the closest unwalkable node.
         /// If a big unit stands directly on this node, it won't be able to fit if the degree is too low.
         /// </summary>
-        private byte _clearanceDegree;
-        public byte ClearanceDegree { get { return _clearanceDegree; } }
+        public byte ClearanceDegree;
         #endregion
 
         private static int CachedUnpassableCheckSize;
@@ -81,7 +80,7 @@ namespace RTSLockstep
         private static int dstX;
         private static int dstY;
 
-        private static int i, j, checkX, checkY, leIndex;
+        private static int x, y, checkX, checkY, leIndex;
         #endregion
 
         #region Constructor
@@ -121,7 +120,7 @@ namespace RTSLockstep
 
             GenerateNeighbors();
             LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
-            _clearanceDegree = DEFAULT_DEGREE;
+            ClearanceDegree = DEFAULT_DEGREE;
             _clearanceSource = DEFAULT_SOURCE;
             this.FastInitialize();
         }
@@ -141,7 +140,7 @@ namespace RTSLockstep
         public byte GetClearanceDegree()
         {
             CheckUpdateValues();
-            return _clearanceDegree;
+            return ClearanceDegree;
         }
 
         private void CheckUpdateValues()
@@ -156,7 +155,7 @@ namespace RTSLockstep
         {
             if (Unwalkable)
             {
-                _clearanceDegree = 0;
+                ClearanceDegree = 0;
                 _clearanceSource = DEFAULT_SOURCE;
             }
             else
@@ -168,19 +167,19 @@ namespace RTSLockstep
                     if (source.IsNull() == false)
                     {
                         var prevSourceDegree = source.ClearanceDegree;
-                        if (source.ClearanceDegree < _clearanceDegree)
+                        if (source.ClearanceDegree < ClearanceDegree)
                         {
                             source.UpdateValues();
                             //Clearance from source can no longer be trusted!
                             if (source.ClearanceDegree != prevSourceDegree)
                             {
-                                _clearanceDegree = DEFAULT_DEGREE;
+                                ClearanceDegree = DEFAULT_DEGREE;
                                 _clearanceSource = DEFAULT_SOURCE;
                             }
                         }
                         else
                         {
-                            _clearanceDegree = (byte)(source.ClearanceDegree + 1);
+                            ClearanceDegree = (byte)(source.ClearanceDegree + 1);
                         }
                     }
                 }
@@ -193,14 +192,14 @@ namespace RTSLockstep
                     var neighbor = NeighborNodes[i];
                     if (neighbor.IsNull() || neighbor.Unwalkable)
                     {
-                        _clearanceDegree = 1;
+                        ClearanceDegree = 1;
                         _clearanceSource = (byte)i;
                         break;
                     }
                     //Cap clearance to 8. Something larger than that won't work very well with pathfinding.
-                    if (neighbor._clearanceDegree < ClearanceDegree && neighbor._clearanceDegree < 8)
+                    if (neighbor.ClearanceDegree < ClearanceDegree && neighbor.ClearanceDegree < 8)
                     {
-                        _clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
+                        ClearanceDegree = (byte)(neighbor.ClearanceDegree + 1);
                         _clearanceSource = (byte)i;
                     }
                 }
@@ -229,11 +228,11 @@ namespace RTSLockstep
         /// </summary>
         internal bool Unpassable()
         {
-            if (true)
-            {//CachedUnpassableCheckSize) {
-             //If there's an unwalkable within the size's number of connections, the unit cannot pass
-                return GetClearanceDegree() < CachedUnpassableCheckSize;
-            }
+            //    if (true)
+            //  {//CachedUnpassableCheckSize) {
+            //If there's an unwalkable within the size's number of connections, the unit cannot pass
+            return GetClearanceDegree() < CachedUnpassableCheckSize;
+            //   }
             //return Unwalkable;
         }
 
@@ -273,21 +272,22 @@ namespace RTSLockstep
             int sideIndex = 0;
             int diagonalIndex = 4; //I learned how to spell [s]diagnal[/s] diagonal!!!
 
-            for (i = -1; i <= 1; i++)
+            for (x = -1; x <= 1; x++)
             {
-                checkX = gridX + i;
-
-                for (j = -1; j <= 1; j++)
+                for (y = -1; y <= 1; y++)
                 {
-                    if (i == 0 && j == 0) //Don't do anything for the same node
+                    if (x == 0 && y == 0) //Don't do anything for the same node
                     {
                         continue;
                     }
-                    checkY = gridY + j;
+
+                    checkX = gridX + x;
+                    checkY = gridY + y;
+
                     if (GridManager.ValidateCoordinates(checkX, checkY))
                     {
                         int neighborIndex;
-                        if ((i != 0 && j != 0))
+                        if ((x != 0 && y != 0))
                         {
                             //Diagonal
                             if (GridManager.UseDiagonalConnections)
@@ -315,32 +315,55 @@ namespace RTSLockstep
 #if true
             //manhattan
             if (gridX > HeuristicTargetX)
+            {
                 dstX = gridX - HeuristicTargetX;
+            }
             else
+            {
                 dstX = HeuristicTargetX - gridX;
+            }
+
             if (gridY > HeuristicTargetY)
+            {
                 dstY = gridY - HeuristicTargetY;
+            }
             else
+            {
                 dstY = HeuristicTargetY - gridY;
+            }
 
             hCost = (dstX + dstY) * 100;
+
 #elif true
 			//octile
 			if (gridX > HeuristicTargetX)
+            {
+
 				dstX = gridX - HeuristicTargetX;
+            }
 			else
+            {
+
 				dstX = HeuristicTargetX - gridX;
-			
+			}
+
 			if (gridY > HeuristicTargetY)
+            {
 				dstY = gridY - HeuristicTargetY;
+            }
 			else
+            {
 				dstY = HeuristicTargetY - gridY;
+            }
 			
 			if (dstX > dstY)
+            {
 				this.hCost = dstY * 141 + (dstX - dstY) * 100;
+            }
 			else
+            {
 				this.hCost = dstX * 141 + (dstY - dstX) * 100;
-
+            }
 #elif false
 			//euclidean
 			dstX = HeuristicTargetX - gridX;
@@ -351,7 +374,6 @@ namespace RTSLockstep
 #endif
 
             fCost = gCost + hCost;
-
         }
         #endregion
 
