@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using RTSLockstep.Pathfinding;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -55,20 +56,9 @@ namespace RTSLockstep
         private bool straightPath;
         private bool viableDestination;
 
-        private readonly FastList<Vector2d> myPath = new FastList<Vector2d>();
+        // key = postion, value = direction
+        private Dictionary<Vector2d, Vector2d> flowField = new Dictionary<Vector2d, Vector2d>();
         private int _pathIndex;
-
-        private int pathIndex
-        {
-            get { return _pathIndex; }
-            set
-            {
-                if (value != _pathIndex)
-                {
-                    _pathIndex = value;
-                }
-            }
-        }
 
         private int StoppedTime;
         private Vector2d targetPos;
@@ -92,8 +82,6 @@ namespace RTSLockstep
         private bool decelerating;
 
         private Vector2d lastTargetPos;
-
-        private Vector2d waypointDirection { get; set; }
 
         private GridNode currentNode;
         private GridNode destinationNode;
@@ -152,8 +140,6 @@ namespace RTSLockstep
 
         protected override void OnInitialize()
         {
-            myPath.FastClear();
-            pathIndex = 0;
             StoppedTime = 0;
 
             IsFormationMoving = false;
@@ -253,22 +239,7 @@ namespace RTSLockstep
                 }
             }
 
-            if (straightPath)
-            {
-                targetPos = Destination;
-            }
-            else if (hasPath)
-            {
-                if (pathIndex >= myPath.Count)
-                {
-                    targetPos = this.Destination;
-                }
-                else
-                {
-                    targetPos = myPath[pathIndex];
-                }
-            }
-            else
+            if (straightPath || hasPath)
             {
                 targetPos = Destination;
             }
@@ -278,10 +249,9 @@ namespace RTSLockstep
         {
             if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
             {
-                if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath, GridSize, GetNodeHash(destinationNode)))
+                if (Pathfinder.FindPath(currentNode, destinationNode, flowField, GridSize))
                 {
                     hasPath = true;
-                    pathIndex = 0;
                 }
                 else if (IsFormationMoving)
                 {
@@ -302,23 +272,68 @@ namespace RTSLockstep
 
         private void SetMovementVelocity()
         {
-            movementDirection = targetPos - cachedBody._position;
+            if (straightPath)
+            {
+                movementDirection = targetPos - cachedBody._position;
+            }
+            else
+            {
+                // Calculate steering and flocking forces for all agents &
+                // work out the force to apply to us based on the flow field grid squares we are on.
+                // We apply bilinear interpolation on the 4 grid squares nearest to us to work out our force.
+                // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-            movementDirection.Normalize(out distanceToMove);
+                movementDirection = cachedBody._position;
+
+                int floorX = movementDirection.x.ToInt();
+                int floorY = movementDirection.y.ToInt();
+
+                // The 4 weights we'll interpolate
+                // see http://en.wikipedia.org/wiki/File:Bilininterp.png for the coordinates
+                Vector2d f00;
+                flowField.TryGetValue(new Vector2d(floorX, floorY), out f00);
+                Vector2d f01;
+                flowField.TryGetValue(new Vector2d(floorX, floorY + 1), out f01);
+                Vector2d f10;
+                flowField.TryGetValue(new Vector2d(floorX + 1, floorY), out f10);
+                Vector2d f11;
+                flowField.TryGetValue(new Vector2d(floorX + 1, floorY + 1), out f11);
+
+                //Do the x interpolations
+                int xWeight = movementDirection.x.CeilToInt() - floorX;
+
+                Vector2d top = (f00 * (1 - xWeight)) + (f10 * xWeight);
+                Vector2d bottom = (f01 * (1 - xWeight)) + (f11 * xWeight);
+
+                //Do the y interpolation
+                int yWeight = movementDirection.y.CeilToInt() - floorY;
+
+                // This is now the direction we want to be travelling in 
+                // needs to be normalized
+                movementDirection = ((top * (1 - yWeight)) + (bottom * yWeight));
+
+                // If we are centered on a grid square with no flow vector this will happen
+                // we need to keep moving on...
+                if (movementDirection.Equals(Vector2d.zero))
+                {
+                    movementDirection = targetPos - cachedBody._position;
+                }
+            }
+
             if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y)
             {
                 lastTargetPos = targetPos;
-                waypointDirection = movementDirection;
             }
 
-            bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
-            long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
+            movementDirection.Normalize(out distanceToMove);
 
+           // bool movingToWaypoint = (this.hasPath && this.flowField.Count > 0);
+            long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
             long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
 
-            if (distanceToMove > slowDistance || movingToWaypoint)
+            if (distanceToMove > slowDistance)// movingToWaypoint
             {
-                desiredVelocity = (movementDirection);
+                desiredVelocity = movementDirection;
                 if (canTurn)
                 {
                     cachedTurn.StartTurnDirection(movementDirection);
@@ -332,6 +347,7 @@ namespace RTSLockstep
                     //TODO: Don't skip this frame of slowing down
                     return;
                 }
+
                 if (distanceToMove > closingDistance)
                 {
                     if (canTurn)
@@ -339,6 +355,7 @@ namespace RTSLockstep
                         cachedTurn.StartTurnDirection(movementDirection);
                     }
                 }
+
                 if (distanceToMove <= slowDistance)
                 {
                     long closingSpeed = distanceToMove.Div(slowDistance);
@@ -362,15 +379,16 @@ namespace RTSLockstep
                 {
                     if (stuckTime > StuckTimeThreshold)
                     {
-                        if (movingToWaypoint)
-                        {
-                            this.pathIndex++;
-                        }
-                        else
-                        {
+                        //if (movingToWaypoint)
+                        //{
+                        //    // this.pathIndex++;
+                        //    desiredVelocity = Vector2d.up;
+                        //}
+                        //else
+                        //{
                             if (RepathTries < StuckRepathTries)
                             {
-                                DoPathfind = true;
+                               // DoPathfind = true;
                                 RepathTries++;
                             }
                             else
@@ -378,7 +396,7 @@ namespace RTSLockstep
                                 RepathTries = 0;
                                 this.Arrive();
                             }
-                        }
+                      //  }
                         stuckTime = 0;
                     }
                 }
@@ -393,18 +411,8 @@ namespace RTSLockstep
                 }
             }
 
-            if (movingToWaypoint)
-            {
-                if ((this.pathIndex >= 0
-                    && distanceToMove < closingDistance
-                    && movementDirection.Dot(waypointDirection) < 0)
-                    || distanceToMove < FixedMath.Mul(closingDistance, FixedMath.Half))
-                {
-                    this.pathIndex++;
-                }
-            }
-
             desiredVelocity *= Speed;
+
             cachedBody._velocity += GetAdjustVector(desiredVelocity);
 
             cachedBody.VelocityChanged = true;
@@ -458,18 +466,18 @@ namespace RTSLockstep
 
         private Vector2d GetAdjustVector(Vector2d desiredVel)
         {
-            var adjust = desiredVel - cachedBody._velocity;
-            var adjustFastMag = adjust.FastMagnitude();
+            var velocityChange = desiredVel - cachedBody._velocity;
+            var adjustFastMag = velocityChange.FastMagnitude();
             //Cap acceleration vector magnitude
             long accel = decelerating ? timescaledDecceleration : timescaledAcceleration;
 
             if (adjustFastMag > accel * (accel))
             {
                 var mag = FixedMath.Sqrt(adjustFastMag >> FixedMath.SHIFT_AMOUNT);
-                adjust *= accel.Div(mag);
+                velocityChange *= accel.Div(mag);
             }
 
-            return adjust;
+            return velocityChange;
         }
 
         protected override void OnExecute(Command com)
@@ -563,10 +571,11 @@ namespace RTSLockstep
 
         public void StartMove(Vector2d destination)
         {
+            flowField.Clear();
+
             DoPathfind = true;
             hasPath = false;
             straightPath = false;
-            this.Destination = destination;
             IsMoving = true;
             StoppedTime = 0;
             Arrived = false;
@@ -577,6 +586,9 @@ namespace RTSLockstep
             viableDestination = this.GridSize <= 1 ?
                 Pathfinder.GetEndNode(Agent.Body.Position, destination, out destinationNode) :
                 Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
+
+            this.Destination = destinationNode.WorldPos;
+
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distanceToMove
 
@@ -619,19 +631,6 @@ namespace RTSLockstep
                                 Arrive();
                             }
                         }
-                        else
-                        {
-                            if (hasPath
-                                && otherMover.hasPath
-                                && otherMover.pathIndex > 0
-                                && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < closingDistance.Mul(closingDistance))
-                            {
-                                if (this.distanceToMove < this.closingDistance)
-                                {
-                                    this.pathIndex++;
-                                }
-                            }
-                        }
                     }
 
                     if (GetLookingForStopPause())
@@ -655,23 +654,25 @@ namespace RTSLockstep
             }
         }
 
+        #region Debug
 #if UNITY_EDITOR
         public bool DrawPath = true;
 
         private void OnDrawGizmos()
         {
-            if (DrawPath)
+            if (DrawPath && flowField.IsNotNull())
             {
                 const float height = 0f;
-                for (int i = 1; i < myPath.Count; i++)
+                int gridNumber = 0;
+                foreach (KeyValuePair<Vector2d, Vector2d> flow in flowField)
                 {
-                    UnityEditor.Handles.Label(myPath[i - 1].ToVector3(height), i.ToString());
-                    Gizmos.DrawLine(myPath[i - 1].ToVector3(height), myPath[i].ToVector3(height));
+                    UnityEditor.Handles.Label(flow.Key.ToVector3(height), gridNumber.ToString());
+                    gridNumber++;
                 }
             }
         }
 #endif
-
+        #endregion
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
@@ -681,7 +682,6 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "HasPath", hasPath);
             SaveManager.WriteBoolean(writer, "StraightPath", straightPath);
             SaveManager.WriteBoolean(writer, "ViableDestination", viableDestination);
-            SaveManager.WriteInt(writer, "PathIndex", pathIndex);
             SaveManager.WriteInt(writer, "StoppedTime", StoppedTime);
             SaveManager.WriteVector2d(writer, "TargetPos", targetPos);
             SaveManager.WriteVector2d(writer, "Destination", Destination);
@@ -689,7 +689,6 @@ namespace RTSLockstep
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
             SaveManager.WriteBoolean(writer, "decelerating", decelerating);
             SaveManager.WriteVector2d(writer, "LastTargetPos", lastTargetPos);
-            SaveManager.WriteVector2d(writer, "TargetDirection", waypointDirection);
             SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
         }
 
@@ -716,9 +715,6 @@ namespace RTSLockstep
                 case "ViableDestination":
                     viableDestination = (bool)readValue;
                     break;
-                case "PathIndex":
-                    pathIndex = (int)readValue;
-                    break;
                 case "StoppedTime":
                     StoppedTime = (int)readValue;
                     break;
@@ -739,9 +735,6 @@ namespace RTSLockstep
                     break;
                 case "LastTargetPos":
                     lastTargetPos = LoadManager.LoadVector2d(reader);
-                    break;
-                case "TargetDirection":
-                    waypointDirection = LoadManager.LoadVector2d(reader);
                     break;
                 case "MovementDirection":
                     movementDirection = LoadManager.LoadVector2d(reader);

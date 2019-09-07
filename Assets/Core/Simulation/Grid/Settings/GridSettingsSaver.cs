@@ -27,7 +27,7 @@ namespace RTSLockstep
 
         protected override void OnSave()
         {
-            //this._mapCenter = new Vector2d(transform.position);
+            this._mapCenter = new Vector2d(transform.position);
         }
 
         protected override void OnEarlyApply()

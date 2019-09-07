@@ -52,8 +52,8 @@ namespace RTSLockstep
             }
         }
 
-        private static FastStack<GridNode> CachedGridNodes = new FastStack<GridNode>(GridManager.DefaultCapacity);
-        private static FastStack<ScanNode> CachedScanNodes = new FastStack<ScanNode>(GridManager.DefaultCapacity);
+        private static FastStack<GridNode> CachedGridNodes = new FastStack<GridNode>(DefaultCapacity);
+        private static FastStack<ScanNode> CachedScanNodes = new FastStack<ScanNode>(DefaultCapacity);
 
         private static int indexX;
         private static int indexY;
@@ -65,7 +65,6 @@ namespace RTSLockstep
 
         public static void Initialize()
         {
-            Pathfinding.Pathfinder.Reset();
             GridVersion = 1;
             if (!LockstepManager.PoolingEnabled)
             {
@@ -98,6 +97,8 @@ namespace RTSLockstep
                 }
             }
             MaxIndex = GetGridIndex(Width - 1, Height - 1);
+
+            Pathfinding.Pathfinder.Reset();
         }
 
         public static void LateSimulate()
@@ -108,7 +109,7 @@ namespace RTSLockstep
         public static void NotifyGridChanged()
         {
             GridVersion++;
-            Pathfinding.Pathfinder.ChangeCombineIteration();
+         //   Pathfinding.Pathfinder.ChangeCombineIteration();
         }
 
         static void ApplySettings()
@@ -155,7 +156,7 @@ namespace RTSLockstep
             }
             #endregion
 
-            long startMem = System.GC.GetTotalMemory(true);
+           // long startMem = System.GC.GetTotalMemory(true);
 
             ScanGrid = new ScanNode[ScanGridSize];
             for (int i = ScanWidth - 1; i >= 0; i--)
@@ -179,8 +180,8 @@ namespace RTSLockstep
                 }
             }
 
-            long usedMem = System.GC.GetTotalMemory(true) - startMem;
-            Debug.Log("Grid generated using " + usedMem + " Bytes!");
+            //long usedMem = System.GC.GetTotalMemory(true) - startMem;
+            //Debug.Log("Grid generated using " + usedMem + " Bytes!");
         }
 
         public static int GenerateDeltaCount(int size)

@@ -37,8 +37,8 @@ namespace RTSLockstep
         public static readonly FastBucket<AgentController> AgentControllers = new FastBucket<AgentController>();
 
         public static AgentController MainController { get; private set; }
-     //   public static Player MainController.Commander { get; private set; }
-      //  public static AgentController _environmentController { get; set; }
+        //   public static Player MainController.Commander { get; private set; }
+        //  public static AgentController _environmentController { get; set; }
         #endregion
 
         #region Public
@@ -64,7 +64,7 @@ namespace RTSLockstep
 
         public static AgentController GetAgentController(int index)
         {
-            return AgentControllers [index];
+            return AgentControllers[index];
         }
 
         //instantiate commander object
@@ -77,15 +77,15 @@ namespace RTSLockstep
             }
 
             agentController.PlayerIndex = AgentControllers.Add(agentController);
-			if (MainController == null)
-			{
-				MainController = agentController;
-			}
-          //  CreatePlayerObject(agentController, defaultController);
+            if (MainController == null)
+            {
+                MainController = agentController;
+            }
+            //  CreatePlayerObject(agentController, defaultController);
         }
 
         public static void RemoveController(AgentController agentController)
-        { 
+        {
             Selector.Clear();
             AgentControllers.RemoveAt(agentController.PlayerIndex);
             if (MainController == agentController)
@@ -96,9 +96,9 @@ namespace RTSLockstep
                 {
                     for (int i = 0; i < AgentControllers.PeakCount; i++)
                     {
-                        if (AgentControllers.arrayAllocation [i])
+                        if (AgentControllers.arrayAllocation[i])
                         {
-                            MainController = AgentControllers [i];
+                            MainController = AgentControllers[i];
                             break;
                         }
                     }
@@ -120,7 +120,7 @@ namespace RTSLockstep
 
         public static bool ContainsController(AgentController controller)
         {
-			if (AgentControllers == null) Debug.Log(controller);
+            if (AgentControllers == null) Debug.Log(controller);
             return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers.ContainsAt(controller.PlayerIndex, controller);
         }
 
@@ -148,15 +148,15 @@ namespace RTSLockstep
             com.Add<Selection>(new Selection());
             for (int i = 0; i < AgentControllers.PeakCount; i++)
             {
-                if (AgentControllers.arrayAllocation [i])
+                if (AgentControllers.arrayAllocation[i])
                 {
-                    AgentController cont = AgentControllers [i];
+                    AgentController cont = AgentControllers[i];
 
-					if (cont.SelectedAgents.Count > 0)
+                    if (cont.SelectedAgents.Count > 0)
                     {
                         com.ControllerID = cont.ControllerID;
 
-						#if false
+#if false
                         if (cont.SelectionChanged)
                         {
                             com.SetData<Selection>(new Selection(cont.SelectedAgents));
@@ -166,11 +166,11 @@ namespace RTSLockstep
                         {
                             com.ClearData<Selection>();
                         }
-						#else
-						//we always sending selection data
-						com.SetData<Selection>(new Selection(cont.SelectedAgents));
-						cont.SelectionChanged = false;
-						#endif
+#else
+                        //we always sending selection data
+                        com.SetData<Selection>(new Selection(cont.SelectedAgents));
+                        cont.SelectionChanged = false;
+#endif
                         CommandManager.SendCommand(com);
                     }
                 }

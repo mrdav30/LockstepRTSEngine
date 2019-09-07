@@ -405,17 +405,11 @@ MonoBehaviour:
       x: 0
       y: 0
   - AgentCode: HumanWorker
-    Count: 5
+    Count: 1
     ControllerCode: Player 1
     Position:
       x: 0
       y: 0
-  - AgentCode: RockWarrior
-    Count: 5
-    ControllerCode: Hostile
-    Position:
-      x: 2293760
-      y: 2293760
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:

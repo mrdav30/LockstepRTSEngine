@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 
-
 namespace RTSLockstep
 {
     [Serializable]
@@ -12,9 +11,7 @@ namespace RTSLockstep
         [FixedNumber]
         public long y;
 
-
         #region Constructors
-
         public Vector2d(long xFixed, long yFixed)
         {
             this.x = xFixed;
@@ -527,6 +524,4 @@ namespace RTSLockstep
             this.y = reader.ReadLong();
         }
     }
-
-
 }
