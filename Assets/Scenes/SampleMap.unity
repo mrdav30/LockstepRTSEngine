@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc69fa32ee78fb14289a140246917531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Show: 1
+  Show: 0
   LeGridType: 0
   LeHeight: 0
   NodeSize: 0.4

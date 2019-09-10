@@ -1,5 +1,4 @@
-﻿using FastCollections;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using RTSLockstep.Pathfinding;
 using System;
 using System.Collections.Generic;
@@ -57,7 +56,7 @@ namespace RTSLockstep
         private bool viableDestination;
 
         // key = postion, value = direction
-        private Dictionary<Vector2d, Vector2d> flowField = new Dictionary<Vector2d, Vector2d>();
+        private Dictionary<Vector2d, FlowField> flowField = new Dictionary<Vector2d, FlowField>();
         private int _pathIndex;
 
         private int StoppedTime;
@@ -86,6 +85,7 @@ namespace RTSLockstep
         private GridNode currentNode;
         private GridNode destinationNode;
         private Vector2d movementDirection;
+        private Vector2d lastDirection;
 
         // How far we move each update
         private long distanceToMove;
@@ -119,6 +119,7 @@ namespace RTSLockstep
         [SerializeField, Tooltip("Disable if unit doesn't need to find path, i.e. flying")]
         private bool _canPathfind = true;
         public bool CanPathfind { get { return _canPathfind; } set { _canPathfind = value; } }
+        public bool DrawPath = true;
         #endregion
 
         protected override void OnSetup()
@@ -249,7 +250,8 @@ namespace RTSLockstep
         {
             if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
             {
-                if (Pathfinder.FindPath(currentNode, destinationNode, flowField, GridSize))
+                if (GridManager.PathfindingAlgorithm == PathfindingType.VectorFlowField
+                    && VectorFlowFieldFinder.FindPath(currentNode, destinationNode, flowField, GridSize))
                 {
                     hasPath = true;
                 }
@@ -283,40 +285,28 @@ namespace RTSLockstep
                 // We apply bilinear interpolation on the 4 grid squares nearest to us to work out our force.
                 // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-                movementDirection = cachedBody._position;
+                movementDirection = cachedBody.Position;
 
                 int floorX = movementDirection.x.ToInt();
                 int floorY = movementDirection.y.ToInt();
 
-                // The 4 weights we'll interpolate
-                // see http://en.wikipedia.org/wiki/File:Bilininterp.png for the coordinates
-                Vector2d f00;
-                flowField.TryGetValue(new Vector2d(floorX, floorY), out f00);
-                Vector2d f01;
-                flowField.TryGetValue(new Vector2d(floorX, floorY + 1), out f01);
-                Vector2d f10;
-                flowField.TryGetValue(new Vector2d(floorX + 1, floorY), out f10);
-                Vector2d f11;
-                flowField.TryGetValue(new Vector2d(floorX + 1, floorY + 1), out f11);
-
-                //Do the x interpolations
-                int xWeight = movementDirection.x.CeilToInt() - floorX;
-
-                Vector2d top = (f00 * (1 - xWeight)) + (f10 * xWeight);
-                Vector2d bottom = (f01 * (1 - xWeight)) + (f11 * xWeight);
-
-                //Do the y interpolation
-                int yWeight = movementDirection.y.CeilToInt() - floorY;
-
-                // This is now the direction we want to be travelling in 
-                // needs to be normalized
-                movementDirection = ((top * (1 - yWeight)) + (bottom * yWeight));
-
-                // If we are centered on a grid square with no flow vector this will happen
-                // we need to keep moving on...
-                if (movementDirection.Equals(Vector2d.zero))
+                FlowField flowDirection;
+                if (flowField.TryGetValue(new Vector2d(floorX, floorY), out flowDirection))
                 {
-                    movementDirection = targetPos - cachedBody._position;
+                    movementDirection = flowDirection.Direction;
+                    lastDirection = movementDirection;
+                }
+                else
+                {
+                    // we need to keep moving on...
+                    movementDirection = lastDirection;
+
+                    // If we are centered on a grid square with no flow vector this will happen
+                    if (movementDirection.Equals(Vector2d.zero))
+                    {
+                        Debug.Log("zero vector");
+                        movementDirection = targetPos - cachedBody.Position;
+                    }
                 }
             }
 
@@ -325,9 +315,11 @@ namespace RTSLockstep
                 lastTargetPos = targetPos;
             }
 
+            // This is now the direction we want to be travelling in 
+            // needs to be normalized
             movementDirection.Normalize(out distanceToMove);
 
-           // bool movingToWaypoint = (this.hasPath && this.flowField.Count > 0);
+            // bool movingToWaypoint = (this.hasPath && this.flowField.Count > 0);
             long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
             long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
 
@@ -382,21 +374,20 @@ namespace RTSLockstep
                         //if (movingToWaypoint)
                         //{
                         //    // this.pathIndex++;
-                        //    desiredVelocity = Vector2d.up;
                         //}
                         //else
                         //{
-                            if (RepathTries < StuckRepathTries)
-                            {
-                               // DoPathfind = true;
-                                RepathTries++;
-                            }
-                            else
-                            {
-                                RepathTries = 0;
-                                this.Arrive();
-                            }
-                      //  }
+                        if (RepathTries < StuckRepathTries)
+                        {
+                            DoPathfind = true;
+                            RepathTries++;
+                        }
+                        else
+                        {
+                            RepathTries = 0;
+                            this.Arrive();
+                        }
+                        //  }
                         stuckTime = 0;
                     }
                 }
@@ -508,6 +499,8 @@ namespace RTSLockstep
         public void Arrive()
         {
             StopMove();
+
+            //   flowField.Clear();
 
             if (onArrive.IsNotNull())
             {
@@ -656,18 +649,20 @@ namespace RTSLockstep
 
         #region Debug
 #if UNITY_EDITOR
-        public bool DrawPath = true;
-
         private void OnDrawGizmos()
         {
             if (DrawPath && flowField.IsNotNull())
             {
-                const float height = 0f;
-                int gridNumber = 0;
-                foreach (KeyValuePair<Vector2d, Vector2d> flow in flowField)
+                const float height = 0.25f;
+                foreach (KeyValuePair<Vector2d, FlowField> flow in flowField)
                 {
-                    UnityEditor.Handles.Label(flow.Key.ToVector3(height), gridNumber.ToString());
-                    gridNumber++;
+                    Vector2d nodePos = flow.Key;
+                    FlowField flowField = flow.Value;
+                    UnityEditor.Handles.Label(nodePos.ToVector3(height), flowField.Distance.ToString());
+                    if (flowField.Direction != Vector2d.zero)
+                    {
+                        DrawArrow.ForGizmo(nodePos.ToVector3(height), flowField.Direction.ToVector3(height), Color.blue);
+                    }
                 }
             }
         }

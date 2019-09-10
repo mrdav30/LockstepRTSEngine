@@ -131,4 +131,10 @@
         Enemy = 1 << 2,
         All = 0xff
     }
+
+    public enum PathfindingType
+    {
+        AStar,
+        VectorFlowField
+    }
 }

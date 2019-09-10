@@ -29,7 +29,7 @@ namespace RTSLockstep
         public int gridY;
         public uint gridIndex;
 
-        public long Distance;
+        public int Distance;
         public Vector2d Direction;
 
         public const byte DEFAULT_DEGREE = byte.MaxValue;

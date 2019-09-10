@@ -27,6 +27,7 @@ namespace RTSLockstep
         public static long OffsetX { get; private set; }
         public static long OffsetY { get; private set; }
         public static bool UseDiagonalConnections { get; private set; }
+        public static PathfindingType PathfindingAlgorithm { get; private set; }
         public static uint GridVersion { get; private set; }
 
         private static bool _settingsChanged = true;
@@ -98,7 +99,10 @@ namespace RTSLockstep
             }
             MaxIndex = GetGridIndex(Width - 1, Height - 1);
 
-            Pathfinding.Pathfinder.Reset();
+            if (PathfindingAlgorithm == PathfindingType.VectorFlowField)
+            {
+                Pathfinding.VectorFlowFieldFinder.Reset();
+            }
         }
 
         public static void LateSimulate()
@@ -109,7 +113,6 @@ namespace RTSLockstep
         public static void NotifyGridChanged()
         {
             GridVersion++;
-         //   Pathfinding.Pathfinder.ChangeCombineIteration();
         }
 
         static void ApplySettings()
@@ -124,6 +127,8 @@ namespace RTSLockstep
 
             ScanGridSize = ScanHeight * ScanWidth;
             UseDiagonalConnections = Settings.UseDiagonalConnections;
+
+            PathfindingAlgorithm = Settings.PathfindingAlgorithm;
         }
 
         private static void Generate()
@@ -156,7 +161,7 @@ namespace RTSLockstep
             }
             #endregion
 
-           // long startMem = System.GC.GetTotalMemory(true);
+            // long startMem = System.GC.GetTotalMemory(true);
 
             ScanGrid = new ScanNode[ScanGridSize];
             for (int i = ScanWidth - 1; i >= 0; i--)

@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using System.Reflection;
-using System;
-using RTSLockstep.Data;
 
 namespace RTSLockstep
 {
@@ -41,7 +38,8 @@ namespace RTSLockstep
         /// Initializes a new instance of the <see cref="Lockstep.FrameCountAttribute"/> class.
         /// </summary>
         /// <param name="isRate">Is this FrameCount a rate (true) or a count?</param>
-        public FrameCountAttribute (bool isRate = false) {
+        public FrameCountAttribute(bool isRate = false)
+        {
             this.IsRate = isRate;
         }
     }
@@ -50,10 +48,12 @@ namespace RTSLockstep
     {
     }
 
-    public class VectorRotationAttribute : PropertyAttribute {
+    public class VectorRotationAttribute : PropertyAttribute
+    {
 
-        public bool Timescaled {get; private set;}
-        public VectorRotationAttribute (bool timescaled) {
+        public bool Timescaled { get; private set; }
+        public VectorRotationAttribute(bool timescaled)
+        {
             Timescaled = timescaled;
         }
     }
@@ -66,7 +66,8 @@ namespace RTSLockstep
     /// <summary>
     /// Allows customization of a derived ActiveAbility in the database.
     /// </summary>
-    public class CustomActiveAbilityAttribute :System.Attribute {
+    public class CustomActiveAbilityAttribute : System.Attribute
+    {
 
     }
 
@@ -82,6 +83,6 @@ namespace RTSLockstep
     }
     public class EnumMaskAttribute : PropertyAttribute
     {
-    
+
     }
 }

@@ -12,17 +12,19 @@
 
         public bool UseDiagonalConnections { get; private set; } = true;
 
+        public PathfindingType PathfindingAlgorithm = PathfindingType.VectorFlowField;
+
         public GridSettings()
         {
-            Init(Width, Height, XOffset, YOffset, UseDiagonalConnections);
+            Init(Width, Height, XOffset, YOffset, UseDiagonalConnections, PathfindingAlgorithm);
         }
 
-        public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
+        public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections, PathfindingType pathfindingAlgorithm)
         {
-            Init(width, height, xOffset, yOffset, useDiagonalConnections);
+            Init(width, height, xOffset, yOffset, useDiagonalConnections, pathfindingAlgorithm);
         }
 
-        private void Init(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
+        private void Init(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections, PathfindingType pathfindingAlgorithm)
         {
             this.Width = width;
             this.Height = height;
