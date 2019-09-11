@@ -6,6 +6,7 @@
 //=======================================================================
 using UnityEngine;
 using FastCollections;
+using RTSLockstep.Pathfinding;
 
 namespace RTSLockstep
 {
@@ -99,10 +100,7 @@ namespace RTSLockstep
             }
             MaxIndex = GetGridIndex(Width - 1, Height - 1);
 
-            if (PathfindingAlgorithm == PathfindingType.VectorFlowField)
-            {
-                Pathfinding.VectorFlowFieldFinder.Reset();
-            }
+            PathRequestManager.Reset();
         }
 
         public static void LateSimulate()

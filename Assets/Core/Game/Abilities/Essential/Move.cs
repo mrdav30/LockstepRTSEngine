@@ -120,6 +120,9 @@ namespace RTSLockstep
         private bool _canPathfind = true;
         public bool CanPathfind { get { return _canPathfind; } set { _canPathfind = value; } }
         public bool DrawPath = true;
+
+        public event Action onGroupProcessed;
+        public bool MoveOnGroupProcessed { get; private set; }
         #endregion
 
         protected override void OnSetup()
@@ -250,21 +253,25 @@ namespace RTSLockstep
         {
             if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
             {
-                if (GridManager.PathfindingAlgorithm == PathfindingType.VectorFlowField
-                    && VectorFlowFieldFinder.FindPath(currentNode, destinationNode, flowField, GridSize))
-                {
-                    hasPath = true;
-                }
-                else if (IsFormationMoving)
-                {
-                    StartMove(MyMovementGroup.Destination);
-                    IsFormationMoving = false;
-                }
-
                 if (straightPath)
                 {
                     straightPath = false;
                 }
+
+                PathRequestManager.RequestPath(currentNode, destinationNode, GridSize, (_flowField, success) =>
+                {
+                    if (success)
+                    {
+                        hasPath = true;
+                        flowField.Clear();
+                        flowField = _flowField;
+                    }
+                    else if (IsFormationMoving)
+                    {
+                        IsFormationMoving = false;
+                        StartMove(MyMovementGroup.Destination);
+                    }
+                });
             }
             else
             {
@@ -500,8 +507,6 @@ namespace RTSLockstep
         {
             StopMove();
 
-            //   flowField.Clear();
-
             if (onArrive.IsNotNull())
             {
                 onArrive();
@@ -557,10 +562,6 @@ namespace RTSLockstep
 
             this.onGroupProcessed?.Invoke();
         }
-
-        public event Action onGroupProcessed;
-
-        public bool MoveOnGroupProcessed { get; private set; }
 
         public void StartMove(Vector2d destination)
         {

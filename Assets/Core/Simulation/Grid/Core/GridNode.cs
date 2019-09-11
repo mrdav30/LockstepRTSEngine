@@ -5,6 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
+using RTSLockstep.Pathfinding;
 using System;
 using UnityEngine;
 namespace RTSLockstep
@@ -13,6 +14,9 @@ namespace RTSLockstep
     {
         #region Properties
         #region Collection Helpers
+        public uint HeapVersion;
+        //public uint ClosedHeapVersion;
+        public uint HeapIndex;
         /// <summary>
         /// TODO: Maybe it will be more efficient for memory to not cache this?
         /// </summary>
@@ -29,8 +33,9 @@ namespace RTSLockstep
         public int gridY;
         public uint gridIndex;
 
-        public int Distance;
-        public Vector2d Direction;
+        //public int Distance;
+        //public Vector2d Direction;
+        public FlowField FlowField;
 
         public const byte DEFAULT_DEGREE = byte.MaxValue;
         public const byte DEFAULT_SOURCE = byte.MaxValue;
@@ -59,7 +64,7 @@ namespace RTSLockstep
         private GridNode _node;
 
         private static int x, y, checkX, checkY, leIndex;
-        #endregion
+        #endregion        
 
         #region Constructor
         public GridNode()
@@ -78,6 +83,8 @@ namespace RTSLockstep
             gridIndex = GridManager.GetGridIndex(gridX, gridY);
             WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
             WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
+
+            FlowField = new FlowField(0, Vector2d.zero);
         }
 
         public void Initialize()
@@ -91,6 +98,8 @@ namespace RTSLockstep
 
         public void FastInitialize()
         {
+            this.HeapIndex = 0;
+            this.HeapVersion = 0;
             this.GridVersion = 0;
             this._obstacleCount = 0;
         }
