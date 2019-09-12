@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
+
 namespace RTSLockstep.Data
 {
     [System.Serializable]
     public class MetaDataItem : DataItem
     {
-
         [SerializeField]
         protected string _description = "";
 

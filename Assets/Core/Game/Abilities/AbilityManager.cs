@@ -2,6 +2,7 @@
 using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
+
 namespace RTSLockstep
 {
     public class AbilityManager
@@ -22,7 +23,9 @@ namespace RTSLockstep
 
                 ActiveAbility activeAbil = abil as ActiveAbility;
                 if (activeAbil.IsNotNull())
+                {
                     setupActives.Add(activeAbil);
+                }
             }
 
             ActiveAbilitys = setupActives.ToArray();
@@ -147,8 +150,11 @@ namespace RTSLockstep
             {
                 var abil = ActiveAbilitys[i];
                 if (abil.Data.ListenInputCode == inputCode)
+                {
                     return abil;
+                }
             }
+
             return null;
         }
         public Ability GetAbilityWithInput(int inputID)

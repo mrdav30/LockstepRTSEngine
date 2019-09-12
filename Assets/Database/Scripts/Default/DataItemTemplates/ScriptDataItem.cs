@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System;
 using TypeReferences;
+
 namespace RTSLockstep.Data
 {
     public class ScriptDataItem : MetaDataItem
     {
-
         [SerializeField, HideInInspector]
         TypeReferences.ClassTypeReference _script;
-        public ClassTypeReference Script {get {return _script;}
-            protected set {_script = value;}
+        public ClassTypeReference Script
+        {
+            get { return _script; }
+            protected set { _script = value; }
         }
         protected sealed override void OnInject(object[] data)
         {

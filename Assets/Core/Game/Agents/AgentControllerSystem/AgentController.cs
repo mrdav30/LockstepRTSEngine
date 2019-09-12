@@ -293,7 +293,7 @@ namespace RTSLockstep
 
         public static AgentController GetInstanceManager(int index)
         {
-            if (index >= AgentController.InstanceManagers.Count)
+            if (index >= InstanceManagers.Count)
             {
                 Debug.LogError("Controller with index " + index + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
                 return null;
@@ -302,7 +302,7 @@ namespace RTSLockstep
             {
                 Debug.LogError("Controller cannot have negative index.");
             }
-            return AgentController.InstanceManagers[index];
+            return InstanceManagers[index];
         }
 
         public static AgentController Create(AllegianceType defaultAllegiance = AllegianceType.Neutral, string controllerName = "")
