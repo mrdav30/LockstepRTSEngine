@@ -405,7 +405,7 @@ MonoBehaviour:
       x: 0
       y: 0
   - AgentCode: HumanWorker
-    Count: 1
+    Count: 3
     ControllerCode: Player 1
     Position:
       x: 0

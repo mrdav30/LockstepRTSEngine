@@ -1,4 +1,4 @@
-﻿namespace RTSLockstep
+﻿namespace RTSLockstep.Grid
 {
     public sealed class GridSettings
     {
@@ -12,19 +12,17 @@
 
         public bool UseDiagonalConnections { get; private set; } = true;
 
-        public PathfindingType PathfindingAlgorithm = PathfindingType.VectorFlowField;
-
         public GridSettings()
         {
-            Init(Width, Height, XOffset, YOffset, UseDiagonalConnections, PathfindingAlgorithm);
+            Init(Width, Height, XOffset, YOffset, UseDiagonalConnections);
         }
 
-        public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections, PathfindingType pathfindingAlgorithm)
+        public GridSettings(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
         {
-            Init(width, height, xOffset, yOffset, useDiagonalConnections, pathfindingAlgorithm);
+            Init(width, height, xOffset, yOffset, useDiagonalConnections);
         }
 
-        private void Init(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections, PathfindingType pathfindingAlgorithm)
+        private void Init(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
         {
             this.Width = width;
             this.Height = height;

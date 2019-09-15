@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Grid;
+using UnityEngine;
 
 namespace RTSLockstep
 {

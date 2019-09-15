@@ -1,7 +1,7 @@
 ﻿using FastCollections;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     //Blocker for static environment pieces in a scene.
     [DisallowMultipleComponent]
@@ -24,17 +24,18 @@ namespace RTSLockstep
 
             if (this.BlockPathfinding)
             {
-                //const long gridSpacing = FixedMath.One;
                 bufferCoordinates.FastClear();
                 CachedBody.GetCoveredNodePositions(FixedMath.One / 8, bufferCoordinates);
 
-
                 foreach (Vector2d vec in bufferCoordinates)
                 {
-                    GridNode node = GridManager.GetNode(vec.x, vec.y);
-                    int gridX, gridY;
-                    GridManager.GetCoordinates(vec.x, vec.y, out gridX, out gridY);
-                    if (node == null) continue;
+                    GridManager.GetCoordinates(vec.x, vec.y, out int gridX, out int gridY);
+                    GridNode node = GridManager.GetNode(gridX, gridY);
+
+                    if (node == null)
+                    {
+                        continue;
+                    }
 
                     node.AddObstacle();
                 }

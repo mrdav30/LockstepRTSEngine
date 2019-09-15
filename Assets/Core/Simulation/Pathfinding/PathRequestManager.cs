@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using RTSLockstep.Grid;
 
 namespace RTSLockstep.Pathfinding
 {
@@ -12,7 +13,7 @@ namespace RTSLockstep.Pathfinding
 
         public static void Reset()
         {
-            FlowFieldFinder.Reset();
+            FlowFieldPathFinder.Reset();
         }
 
         public static void RequestPath(GridNode currentNode, GridNode destinationNode, int gridSize, Action<Dictionary<Vector2d, FlowField>, bool> callback)
@@ -28,7 +29,7 @@ namespace RTSLockstep.Pathfinding
             {
                 currentPathRequest = pathRequestQueue.Dequeue();
                 isProcessingPath = true;
-                FlowFieldFinder.FindPath(currentPathRequest.currentNode, currentPathRequest.destinationNode, currentPathRequest.gridSize);
+                FlowFieldPathFinder.FindPath(currentPathRequest.currentNode, currentPathRequest.destinationNode, currentPathRequest.gridSize);
             }
         }
 

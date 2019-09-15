@@ -629,7 +629,9 @@ namespace RTSLockstep
             else
             {
                 if (Target == null)
+                {
                     cachedMove.StartMove(position);
+                }
             }
             IsAttackMoving = true;
             IsFocused = false;

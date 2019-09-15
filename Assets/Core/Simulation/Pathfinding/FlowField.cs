@@ -4,11 +4,14 @@
     {
         public int Distance;
         public Vector2d Direction;
+        public bool HasLOS;
 
-        public FlowField(int distance, Vector2d direction)
+        public FlowField(int _distance, Vector2d _direction, bool _hasLOS = false)
         {
-            this.Distance = distance;
-            this.Direction = direction;
+            this.Distance = _distance;
+            this.Direction = _direction;
+
+            this.HasLOS = _hasLOS;
         }
     }
 }

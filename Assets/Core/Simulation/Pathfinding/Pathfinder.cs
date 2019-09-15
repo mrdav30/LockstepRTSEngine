@@ -6,6 +6,8 @@
 // @modified 2019 David Oravsky
 //=======================================================================
 
+using RTSLockstep.Grid;
+
 namespace RTSLockstep.Pathfinding
 {
     public static class Pathfinder
@@ -16,7 +18,7 @@ namespace RTSLockstep.Pathfinding
 
         public static bool AllowUnwalkableEndNode { get; set; }
 
-        public static bool NeedsPath(GridNode startNode, GridNode endNode, int unitSize)
+        public static bool NeedsPath(GridNode startNode, GridNode endNode, int unitSize = 1)
         {
             int dx, dy, error, ystep, x, y, t;
             int x0, y0, x1, y1;

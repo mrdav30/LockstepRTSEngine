@@ -1,7 +1,7 @@
 ﻿using FastCollections;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UnityLSBody))]

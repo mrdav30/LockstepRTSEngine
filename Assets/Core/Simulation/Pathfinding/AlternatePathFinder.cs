@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Grid;
+using UnityEngine;
 
 namespace RTSLockstep.Pathfinding
 {
@@ -54,7 +55,7 @@ namespace RTSLockstep.Pathfinding
             yDif = yDif.ClampOne();
             long nodeHalfWidth = FixedMath.One / 2;
             //Check to see if we should raycast towards corner first
-            if ((xDif.Abs() >= nodeHalfWidth / 2) 
+            if ((xDif.Abs() >= nodeHalfWidth / 2)
                 && (yDif.Abs() >= nodeHalfWidth / 2))
             {
                 dirX = FixedMath.RoundToInt(xDif);

@@ -1919,10 +1919,9 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  _canMove: 1
-  _canTurn: 1
-  _speed: 131072
-  _acceleration: 65536
+  CanMove: 1
+  _speed: 65536
+  _acceleration: 655360
   _canPathfind: 1
   DrawPath: 1
 --- !u!114 &114951773368346060

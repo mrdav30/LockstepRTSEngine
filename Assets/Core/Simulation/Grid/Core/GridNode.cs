@@ -6,17 +6,14 @@
 //=======================================================================
 
 using RTSLockstep.Pathfinding;
-using System;
 using UnityEngine;
-namespace RTSLockstep
+
+namespace RTSLockstep.Grid
 {
     public class GridNode
     {
         #region Properties
         #region Collection Helpers
-        public uint HeapVersion;
-        //public uint ClosedHeapVersion;
-        public uint HeapIndex;
         /// <summary>
         /// TODO: Maybe it will be more efficient for memory to not cache this?
         /// </summary>
@@ -33,8 +30,6 @@ namespace RTSLockstep
         public int gridY;
         public uint gridIndex;
 
-        //public int Distance;
-        //public Vector2d Direction;
         public FlowField FlowField;
 
         public const byte DEFAULT_DEGREE = byte.MaxValue;
@@ -98,8 +93,6 @@ namespace RTSLockstep
 
         public void FastInitialize()
         {
-            this.HeapIndex = 0;
-            this.HeapVersion = 0;
             this.GridVersion = 0;
             this._obstacleCount = 0;
         }

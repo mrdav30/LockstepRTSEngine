@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     //Blocker for static environment pieces in a scene.
     [DisallowMultipleComponent]

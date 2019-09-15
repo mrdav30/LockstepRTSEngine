@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using FastCollections;
-using System.Collections.Generic;
+﻿using FastCollections;
 using System;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     public class ScanNode
     {

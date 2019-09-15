@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     public sealed class GridSettingsSaver : EnvironmentSaver
     {
@@ -25,10 +25,6 @@ namespace RTSLockstep
         private bool _useDiagonalConnections = true;
         public bool UseDiagonalConnetions { get { return _useDiagonalConnections; } }
 
-        [SerializeField]
-        private PathfindingType _pathfindingAlgorithm = PathfindingType.VectorFlowField;
-        public PathfindingType PathfindingAlgorithm { get { return PathfindingAlgorithm; } }
-
         protected override void OnSave()
         {
             this._mapCenter = new Vector2d(transform.position);
@@ -36,7 +32,7 @@ namespace RTSLockstep
 
         protected override void OnEarlyApply()
         {
-            GridManager.Settings = new GridSettings(this.MapWidth, this.MapHeight, this.Offset.x, this.Offset.y, this.UseDiagonalConnetions, this._pathfindingAlgorithm);
+            GridManager.Settings = new GridSettings(this.MapWidth, this.MapHeight, this.Offset.x, this.Offset.y, this.UseDiagonalConnetions);
         }
 
 #if UNITY_EDITOR

@@ -27,6 +27,7 @@ using RTSLockstep.NetworkHelpers;
 using UnityEngine;
 using RTSLockstep.Data;
 using System;
+using RTSLockstep.Grid;
 
 namespace RTSLockstep
 {

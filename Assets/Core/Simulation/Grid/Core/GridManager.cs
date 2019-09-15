@@ -8,7 +8,7 @@ using UnityEngine;
 using FastCollections;
 using RTSLockstep.Pathfinding;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grid
 {
     public static class GridManager
     {
@@ -28,7 +28,6 @@ namespace RTSLockstep
         public static long OffsetX { get; private set; }
         public static long OffsetY { get; private set; }
         public static bool UseDiagonalConnections { get; private set; }
-        public static PathfindingType PathfindingAlgorithm { get; private set; }
         public static uint GridVersion { get; private set; }
 
         private static bool _settingsChanged = true;
@@ -125,8 +124,6 @@ namespace RTSLockstep
 
             ScanGridSize = ScanHeight * ScanWidth;
             UseDiagonalConnections = Settings.UseDiagonalConnections;
-
-            PathfindingAlgorithm = Settings.PathfindingAlgorithm;
         }
 
         private static void Generate()
@@ -230,6 +227,7 @@ namespace RTSLockstep
         {
             return new Vector2d(worldPos.x - OffsetX, worldPos.y - OffsetY);
         }
+
         public static void GetCoordinates(long xPos, long yPos, out int xGrid, out int yGrid)
         {
             xGrid = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);

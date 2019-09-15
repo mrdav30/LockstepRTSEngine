@@ -1,5 +1,7 @@
-﻿using System;
+﻿using RTSLockstep.Grid;
+using System;
 using System.Collections.Generic;
+
 namespace RTSLockstep.Pathfinding
 {
     public struct PathRequest
