@@ -398,14 +398,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Spawns:
-  - AgentCode: HumanBarracks
-    Count: 1
+  - AgentCode: HumanWorker
+    Count: 3
     ControllerCode: Player 1
     Position:
       x: 0
       y: 0
-  - AgentCode: HumanWorker
-    Count: 3
+  - AgentCode: HumanBarracks
+    Count: 1
     ControllerCode: Player 1
     Position:
       x: 0

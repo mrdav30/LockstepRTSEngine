@@ -132,7 +132,7 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfLength: 32768
-    _radius: 98304
+    _radius: 65536
     _immovable: 0
     _basePriority: 0
     _vertices: []
@@ -155,6 +155,7 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
+  straightPath: 0
   CanMove: 1
   _speed: 196608
   _acceleration: 983040

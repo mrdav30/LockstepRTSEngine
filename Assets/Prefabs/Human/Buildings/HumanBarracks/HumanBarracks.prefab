@@ -289,7 +289,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1188499760507754}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0021, y: 0, z: 0.0034}
+  m_LocalPosition: {x: 0.0018, y: 0, z: 0.0032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4098782723908472}
@@ -438,7 +438,7 @@ MonoBehaviour:
   _selectable: 1
   Tag: 0
   _selectionRadius: -1
-  _visualCenter: {fileID: 4202374847975352}
+  _visualCenter: {fileID: 4452996533959122}
   objectName: HumanBarracks
   AgentDescription: 
   destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
@@ -501,15 +501,15 @@ MonoBehaviour:
     _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 294912
-    _halfLength: 294912
-    _radius: 425984
+    _halfWidth: 262144
+    _halfLength: 262144
+    _radius: 360448
     _immovable: 1
     _basePriority: 0
     _vertices: []
     _height: 524288
-    _positionalTransform: {fileID: 4202374847975352}
-    _rotationalTransform: {fileID: 4202374847975352}
+    _positionalTransform: {fileID: 4452996533959122}
+    _rotationalTransform: {fileID: 4452996533959122}
 --- !u!114 &114719505328788896
 MonoBehaviour:
   m_ObjectHideFlags: 0

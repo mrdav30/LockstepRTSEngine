@@ -16,8 +16,6 @@ namespace RTSLockstep.Pathfinding
         private static GridNode currentNode;
         #endregion
 
-        public static bool AllowUnwalkableEndNode { get; set; }
-
         public static bool NeedsPath(GridNode startNode, GridNode endNode, int unitSize = 1)
         {
             int dx, dy, error, ystep, x, y, t;
@@ -114,30 +112,33 @@ namespace RTSLockstep.Pathfinding
         /// <param name="dest"></param>
         /// <param name="returnNode"></param>
         /// <returns></returns>
-        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode)
+        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false)
         {
             outputNode = GridManager.GetNode(dest.x, dest.y);
-            if (outputNode == null)
+            if (outputNode.IsNull())
             {
                 //If null, it is off the grid. Raycast back onto grid for closest viable node to the destination.
                 foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
                     outputNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
-                    if (outputNode != null)
+                    if (outputNode.IsNotNull())
                     {
                         return true;
                     }
                 }
+
                 return false;
             }
             else if (outputNode.Unwalkable)
             {
-                if (AllowUnwalkableEndNode && AlternativeNodeFinder.Instance.CheckValidNeighbor(outputNode))
+                if (allowUnwalkableEndNode && AlternativeNodeFinder.Instance.CheckValidNeighbor(outputNode))
                 {
                     return true;
                 }
+
                 return StarCast(dest, out outputNode);
             }
+
             return true;
         }
 
@@ -163,8 +164,9 @@ namespace RTSLockstep.Pathfinding
             GridManager.GetCoordinates(dest.x, dest.y, out xGrid, out yGrid);
             const int maxTestDistance = 3;
             AlternativeNodeFinder.Instance.SetValues(dest, xGrid, yGrid, maxTestDistance);
+
             returnNode = AlternativeNodeFinder.Instance.GetNode();
-            if (returnNode == null)
+            if (returnNode.IsNull())
             {
                 return false;
             }

@@ -182,7 +182,16 @@ namespace RTSLockstep
                         GetMovementPath();
                     }
 
-                    SetMovementVelocity();
+                    // we only need to set velocity if we're going somewhere
+                    if(hasPath || straightPath)
+                    {
+                        SetMovementVelocity();
+                    }
+                    else
+                    {
+                        //agent shouldn't be moving then...
+                        StopMove();
+                    }
                 }
                 // agent is not moving
                 else
@@ -237,15 +246,27 @@ namespace RTSLockstep
 
         private void CheckPath()
         {
-            PathRequestManager.RequestPath(currentNode, destinationNode, this.GridSize, (_flowField, success) =>
+            if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
             {
-                if (success)
+                if (straightPath)
                 {
-                    hasPath = true;
-                    flowFields.Clear();
-                    flowFields = _flowField;
+                    straightPath = false;
                 }
-            });
+
+                PathRequestManager.RequestPath(currentNode, destinationNode, this.GridSize, (_flowField, success) =>
+                {
+                    if (success)
+                    {
+                        hasPath = true;
+                        flowFields.Clear();
+                        flowFields = _flowField;
+                    }
+                });
+            }
+            else
+            {
+                straightPath = true;
+            }
         }
 
         private void SetMovementVelocity()
@@ -350,6 +371,7 @@ namespace RTSLockstep
                 {
                     if (stuckTime > StuckTimeThreshold)
                     {
+                        Debug.Log("Stuck");
                         if (RepathTries < StuckRepathTries)
                         {
                             DoPathfind = true;
@@ -459,95 +481,12 @@ namespace RTSLockstep
             RegisterGroup();
         }
 
-        public void StartMove(Vector2d destination)
-        {
-            flowFields.Clear();
-
-            IsMoving = true;
-            StoppedTime = 0;
-            Arrived = false;
-
-            Agent.Animator.SetMovingState(AnimState.Moving);
-
-            //TODO: If next-best-node, autostop more easily
-            //Also implement stopping sooner based on distanceToMove
-            stuckTime = 0;
-            RepathTries = 0;
-            IsCasting = true;
-
-            if (!IsGroupMoving)
-            {
-                DoPathfind = true;
-                hasPath = false;
-
-                //For now, use old next-best-node system when size requires consideration
-                viableDestination = this.GridSize <= 1 ?
-                    Pathfinder.GetEndNode(Agent.Body.Position, destination, out destinationNode) :
-                    Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
-
-                this.Destination = destinationNode.WorldPos;
-            }
-            else
-            {
-                DoPathfind = false;
-                hasPath = true;
-                this.Destination = MyMovementGroup.Destination;
-            }
-
-            onStartMove?.Invoke();
-        }
-
         public void RegisterGroup(bool moveOnProcessed = true)
         {
             MoveOnGroupProcessed = moveOnProcessed;
             if (MovementGroupHelper.CheckValidAndAlert())
             {
                 MovementGroupHelper.LastCreatedGroup.Add(this);
-            }
-        }
-
-        public void Arrive()
-        {
-            StopMove();
-
-            if (onArrive.IsNotNull())
-            {
-                onArrive();
-            }
-            this.OnArrive();
-
-            //TODO: Reset this variables when changing destination/command
-            AutoStopPauser = 0;
-            CollisionStopPauser = 0;
-            StopPauseLooker = 0;
-            StopPauseLayer = 0;
-
-            Arrived = true;
-        }
-
-        protected virtual void OnArrive()
-        {
-
-        }
-
-        public void StopMove()
-        {
-            if (IsMoving)
-            {
-                if (MyMovementGroup.IsNotNull())
-                {
-                    MyMovementGroup.Remove(this);
-                }
-
-                IsMoving = false;
-                StoppedTime = 0;
-                IsGroupMoving = false;
-
-                IsCasting = false;
-                if (OnStopMove.IsNotNull())
-                {
-                    OnStopMove();
-                }
             }
         }
 
@@ -567,6 +506,77 @@ namespace RTSLockstep
             this.onGroupProcessed?.Invoke();
         }
 
+        public void StartMove(Vector2d destination, bool allowUnwalkableEndNode = false)
+        {
+            flowFields.Clear();
+
+            IsMoving = true;
+            StoppedTime = 0;
+            Arrived = false;
+
+            this.Destination = destination;
+
+            Agent.Animator.SetMovingState(AnimState.Moving);
+
+            //TODO: If next-best-node, autostop more easily
+            //Also implement stopping sooner based on distanceToMove
+            stuckTime = 0;
+            RepathTries = 0;
+            IsCasting = true;
+
+            if (!IsGroupMoving)
+            {
+                DoPathfind = true;
+                hasPath = false;
+
+                //For now, use old next-best-node system when size requires consideration
+                viableDestination = this.GridSize <= 1 ?
+                    Pathfinder.GetEndNode(Position, destination, out destinationNode, allowUnwalkableEndNode) :
+                    Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
+            }
+            else
+            {
+                DoPathfind = false;
+                hasPath = true;
+            }
+
+            onStartMove?.Invoke();
+        }
+
+        public void Arrive()
+        {
+            StopMove();
+
+            //TODO: Reset this variables when changing destination/command
+            AutoStopPauser = 0;
+            CollisionStopPauser = 0;
+            StopPauseLooker = 0;
+            StopPauseLayer = 0;
+
+            Arrived = true;
+
+            onArrive?.Invoke();
+        }
+
+        public void StopMove()
+        {
+            if (IsMoving)
+            {
+                if (MyMovementGroup.IsNotNull())
+                {
+                    MyMovementGroup.Remove(this);
+                }
+
+                IsMoving = false;
+                StoppedTime = 0;
+                IsGroupMoving = false;
+
+                IsCasting = false;
+
+                OnStopMove?.Invoke();
+            }
+        }
+
         protected override void OnStopCast()
         {
             StopMove();
@@ -574,22 +584,21 @@ namespace RTSLockstep
 
         private void HandleCollision(LSBody other)
         {
-            if (!CanMove)
-            {
-                return;
-            }
-            if ((tempAgent = other.Agent) == null)
+            if (!CanMove || other.Agent.IsNull())
             {
                 return;
             }
 
+            tempAgent = other.Agent;
+
             Move otherMover = tempAgent.GetAbility<Move>();
-            if (ReferenceEquals(otherMover, null) == false)
+            if (otherMover.IsNotNull())
             {
                 if (IsMoving)
                 {
                     //If the other mover is moving to a similar point
-                    if (otherMover.MyMovementGroupID == MyMovementGroupID
+                    //don't check if agent isn't assigned move group
+                    if (MyMovementGroupID > 0 && otherMover.MyMovementGroupID == MyMovementGroupID
                         || otherMover.Destination.FastDistance(this.Destination) <= (closingDistance * closingDistance))
                     {
                         if (otherMover.IsMoving == false)

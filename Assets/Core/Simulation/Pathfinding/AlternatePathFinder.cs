@@ -112,10 +112,14 @@ namespace RTSLockstep.Pathfinding
             }
 
             //If the cast node is found or the side has been checked, do not raycast on that side
-
             if (!castNodeFound)
+            {
                 return null;
-            return closestNode;
+            }
+            else
+            {
+                return closestNode;
+            }
         }
         //Advances the rotation clockwise
         private void AdvanceRotation()

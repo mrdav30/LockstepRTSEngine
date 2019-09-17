@@ -121,8 +121,8 @@ MonoBehaviour:
     _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 65536
-    _halfLength: 65536
+    _halfWidth: 98304
+    _halfLength: 98304
     _radius: 32768
     _immovable: 1
     _basePriority: 0
@@ -273,6 +273,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0

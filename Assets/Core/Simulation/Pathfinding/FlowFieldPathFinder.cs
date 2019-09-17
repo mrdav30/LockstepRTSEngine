@@ -19,8 +19,6 @@ namespace RTSLockstep.Pathfinding
     {
         #region method sharing variables
         private static int SearchCount;
-        private static int length;
-        private static int greatestDistance;
 
         private static FlowFieldPath flowFieldPath;
 
@@ -46,11 +44,12 @@ namespace RTSLockstep.Pathfinding
 
         public static void FindPath(GridNode startNode, GridNode endNode, int unitHalfSize = 1)
         {
+            UnityEngine.Debug.Log("finding path");
             markedNodesBuffer.FastClear();
             if (GenerateDistanceField(startNode, endNode, unitHalfSize, markedNodesBuffer))
             {
                 // Distance vector field created, 
-                GenerateVectorFlowField(markedNodesBuffer);
+                GenerateVectorFlowField(markedNodesBuffer, flowFieldPath);
             }
             else
             {
@@ -71,8 +70,8 @@ namespace RTSLockstep.Pathfinding
         /// <param name="endNode">End node.</param>
         public static bool GenerateDistanceField(GridNode _startNode, GridNode _endNode, int _unitHalfSize, FastList<GridNode> _markedNodes)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 
             rawMarkedNodes = _markedNodes;
             rawMarkedNodes.FastClear();
@@ -126,19 +125,19 @@ namespace RTSLockstep.Pathfinding
                             if (neighbor.gridIndex == flowFieldPath.StartNodeIndex)
                             {
                                 //We found our way to the start node!
-                                sw.Stop();
-                                UnityEngine.Debug.Log("Path found: " + sw.ElapsedMilliseconds + " ms");
-
                                 destinationIsReached = true;
-                                // break;
                             }
                         }
                     }
                 }
 
+                // no need to capture entire grid if start point reached
+                // go a bit further past the start node
                 if (destinationIsReached
-                    && rawNode.FlowField.Distance > flowFieldPath.StartNode.FlowField.Distance + 10)
+                    && rawNode.FlowField.Distance > (flowFieldPath.StartNode.FlowField.Distance + 10))
                 {
+                    //sw.Stop();
+                    //UnityEngine.Debug.Log("Path found: " + sw.ElapsedMilliseconds + " ms");
                     break;
                 }
 
@@ -148,136 +147,68 @@ namespace RTSLockstep.Pathfinding
             return destinationIsReached;
         }
 
-        public static void GenerateVectorFlowField(FastList<GridNode> _markedNodes)
+        public static void GenerateVectorFlowField(FastList<GridNode> _markedNodes, FlowFieldPath _flowFieldPath)
         {
-            length = _markedNodes.Count - 1;
-            greatestDistance = _markedNodes[length].FlowField.Distance;
-            UnityEngine.Debug.Log("endnode: " + flowFieldPath.EndNode.WorldPos);
-            //for each grid square
-            for (int i = 0; i < length; i++)
+            int length = _markedNodes.Count - 1;
+            int greatestDistance = _markedNodes[length].FlowField.Distance;
+
+            try
             {
-                GridNode node = _markedNodes[i];
-                int nodeDistance = node.FlowField.Distance;
-
-                if (node.gridIndex != flowFieldPath.EndNodeIndex)
+                //for each grid square
+                for (int i = 0; i < length; i++)
                 {
-                    GridNode[] neighbors = node.NeighborNodes;
+                    rawNode = _markedNodes[i];
 
-                    int left, right, up, down;
-
-                    //// The 4 weights we'll interpolate (only straight line neighbours, not diagonals)
-                    //// see http://en.wikipedia.org/wiki/File:Bilininterp.png for the coordinates
-                    left = GetNodeDistance(neighbors[0], nodeDistance); // west
-                    down = GetNodeDistance(neighbors[1], nodeDistance); // south
-                    up = GetNodeDistance(neighbors[2], nodeDistance); // east
-                    right = GetNodeDistance(neighbors[3], nodeDistance); // north
-
-                    //Do the x interpolations
-                    int x = left - right;
-                    //Do the y interpolation
-                    int y = down - up;
-
-                    //point in the direction of its neighbor
-                    node.FlowField.Direction = new Vector2d(x, y);
-                }
-                else
-                {
-                    //end node shouldn't point anywhere
-                    node.FlowField.Direction = Vector2d.zero;
-                }
-
-                node.FlowField.Direction.Normalize();
-
-                flowFieldPath.OutputVectorPath.Add(node.WorldPos, new FlowField(node.FlowField.Distance, node.FlowField.Direction, node.FlowField.HasLOS));
-            }
-
-            PathRequestManager.FinishedProcessingPath(flowFieldPath.OutputVectorPath, true);
-        }
-
-        //private void CalculateLOS()
-        //{
-        //    var xDif = flowFieldPath.EndNode.gridX - rawNode.gridX;
-        //    var yDif = flowFieldPath.EndNode.gridY - rawNode.gridY;
-
-        //    var xDifAbs = Math.Abs(xDif);
-        //    var yDifAbs = Math.Abs(yDif);
-
-        //    var hasLos = false;
-
-        //    var xDifOne = Math.Sign(xDif);
-        //    var yDifOne = Math.Sign(yDif);
-
-        //    //Check the direction we are furtherest from the destination on (or both if equal)
-        //    // If it has LOS then we might
-
-        //    //Check in the x direction
-        //    if (xDifAbs >= yDifAbs)
-        //    {
-
-        //        if (closedSet.[new Vector2d(rawNode.gridX + xDifOne, rawNode.gridY)].HasLOS)
-        //        {
-        //            hasLos = true;
-        //        }
-        //    }
-        //    //Check in the y direction
-        //    if (yDifAbs >= xDifAbs)
-        //    {
-
-        //        if (losGrid[at.x][at.y + yDifOne])
-        //        {
-        //            hasLos = true;
-        //        }
-        //    }
-
-        //    //If we are not a straight line vertically/horizontally to the exit
-        //    if (yDifAbs > 0 && xDifAbs > 0)
-        //    {
-        //        //If the diagonal doesn't have LOS, we don't
-        //        if (!losGrid[at.x + xDifOne][at.y + yDifOne])
-        //        {
-        //            hasLos = false;
-        //        }
-        //        else if (yDifAbs === xDifAbs)
-        //        {
-        //            //If we are an exact diagonal and either straight direction is a wall, we don't have LOS
-        //            if (dijkstraGrid[at.x + xDifOne][at.y] === Number.MAX_VALUE || dijkstraGrid[at.x][at.y + yDifOne] === Number.MAX_VALUE)
-        //            {
-        //                hasLos = false;
-        //            }
-        //        }
-        //    }
-        //    //It's a definite now
-        //    losGrid[at.x][at.y] = hasLos;
-
-        //    //TODO: Could replace our distance with a direct distance?
-        //    // Might not be worth it, would need to use a priority queue for the open list.
-        //}
-
-        private static int GetNodeDistance(GridNode node, int parentNodeDistance)
-        {
-            if (node.IsNotNull())
-            {
-                if (!node.Unpassable())
-                {
-                    if (!closedSet.Contains(node))
+                    if (rawNode.gridIndex != _flowFieldPath.EndNodeIndex)
                     {
-                        // node not in grid, should be the nodes on the outside edge
-                        // assign greatest distance
-                        return greatestDistance;
+                        GridNode[] neighbors = rawNode.NeighborNodes;
+
+                        //Go through all neighbours and find the one with the lowest distance
+                        GridNode minNode = null;
+                        int minDist = 0;
+                        for (int z = 0; z < neighbors.Length; z++)
+                        {
+                            neighbor = neighbors[z];
+                            if (neighbor.IsNotNull() && !neighbor.Unpassable())
+                            {
+                                // check if node is in closed set, otherwise return greatest distance
+                                int nDistance = neighbor.Unpassable() ? rawNode.FlowField.Distance + 1
+                                    : closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
+                                    : greatestDistance;
+                                int dist = nDistance - rawNode.FlowField.Distance;
+
+                                if (dist < minDist)
+                                {
+                                    minNode = neighbor;
+                                    minDist = dist;
+                                }
+                            }
+                        }
+
+                        //If we found a valid neighbour, point in its direction
+                        if (minNode != null)
+                        {
+                            rawNode.FlowField.Direction = (minNode.WorldPos - rawNode.WorldPos);
+                        }
+                    }
+                    else
+                    {
+                        //end node shouldn't point anywhere
+                        rawNode.FlowField.Direction = Vector2d.zero;
                     }
 
-                    // only the end node should have 0 distance;
-                    return node.FlowField.Distance > 0 ? node.FlowField.Distance : parentNodeDistance;
-                }
-                else if (node.gridIndex != flowFieldPath.EndNodeIndex)
-                {
-                    // node is a blocker, assign parent
-                    return parentNodeDistance + 1;
-                }
-            }
+                    rawNode.FlowField.Direction.Normalize();
 
-            //node is null, assign max distance
-            return int.MaxValue;
+                    _flowFieldPath.OutputVectorPath.Add(rawNode.WorldPos, new FlowField(rawNode.FlowField.Distance, rawNode.FlowField.Direction, rawNode.FlowField.HasLOS));
+                }
+
+                PathRequestManager.FinishedProcessingPath(_flowFieldPath.OutputVectorPath, true);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.Log("couldn't create vector path: " + e.Message);
+                PathRequestManager.FinishedProcessingPath(null, false);
+            }
         }
     }
 }

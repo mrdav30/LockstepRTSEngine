@@ -82,6 +82,7 @@ namespace RTSLockstep
         public void CalculateAndExecuteBehaviors()
         {
             Move mover;
+
             // check to make sure the group is moving to a good area
             bool viableDestination = Pathfinder.GetEndNode(groupPosition, Destination, out groupDestinationNode);
 
@@ -135,7 +136,6 @@ namespace RTSLockstep
                         //    // ExecuteGroupIndividualMove();
                         //    // return;
                         //}
-
 
                         biggestSqrDistance = currentSqrDistance;
                         radius = currentDistance;
