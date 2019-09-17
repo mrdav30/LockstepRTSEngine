@@ -62,6 +62,7 @@ namespace RTSLockstep
             cachedMove = Agent.GetAbility<Move>();
             cachedAttack = Agent.GetAbility<Attack>();
             cachedMove.onStartMove += HandleStartMove;
+            cachedMove.OnStopMove += HandleStopMove;
 
             basePriority = CachedBody.Priority;
         }
@@ -136,6 +137,11 @@ namespace RTSLockstep
             }
         }
 
+        private void HandleStopMove()
+        {
+
+        }
+
         private void StartWindup()
         {
             windupCount = 0;
@@ -144,7 +150,9 @@ namespace RTSLockstep
 
         private void BehaveWithTarget()
         {
-            if (CurrentProject && (CurrentProject.IsActive == false || !CurrentProject.GetAbility<Structure>().NeedsConstruction))
+            if (CurrentProject.IsNull()
+                || CurrentProject.IsActive == false 
+                || !CurrentProject.GetAbility<Structure>().NeedsConstruction)
             {
                 //Target's lifecycle has ended
                 StopConstruction();
@@ -231,6 +239,12 @@ namespace RTSLockstep
 
                 if (IsWindingUp)
                 {
+                    if (cachedMove.IsMoving)
+                    {
+                        cachedMove.StopMove();
+                        CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+                    }
+
                     //TODO: Do we need AgentConditional checks here?
                     windupCount += LockstepManager.DeltaTime;
                     if (windupCount >= Windup)
@@ -261,9 +275,6 @@ namespace RTSLockstep
 
         private void Build()
         {
-            cachedMove.StopMove();
-            CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
-
             CurrentProject.GetAbility<Structure>().Construct(constructAmount);
 
             if (!CurrentProject.GetAbility<Structure>().NeedsConstruction)
@@ -386,12 +397,17 @@ namespace RTSLockstep
             fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
 
+            //long spawnX = (long)(CurrentProject.Body.XMin.CeilToInt() + CurrentProject.transform.forward.x * CurrentProject.Body.XMax.CeilToInt() + CurrentProject.transform.forward.x * 20);
+            //long spawnZ = (long)(CurrentProject.Body.YMin.CeilToInt() + CurrentProject.transform.forward.z * CurrentProject.Body.YMax.CeilToInt() + CurrentProject.transform.forward.z * 20);
+            //spawnPoint = new Vector3(spawnX, 0, spawnZ);
+
             if (!CheckRange())
             {
                 Agent.StopCast(this.ID);
 
                 IsBuildMoving = true;
                 // send move command
+                // allow for unwalkable node
                 cachedMove.StartMove(CurrentProject.Body.Position);
             }
         }
