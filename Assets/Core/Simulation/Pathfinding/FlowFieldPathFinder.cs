@@ -172,8 +172,7 @@ namespace RTSLockstep.Pathfinding
                             if (neighbor.IsNotNull() && !neighbor.Unpassable())
                             {
                                 // check if node is in closed set, otherwise return greatest distance
-                                int nDistance = neighbor.Unpassable() ? rawNode.FlowField.Distance + 1
-                                    : closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
+                                int nDistance = closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
                                     : greatestDistance;
                                 int dist = nDistance - rawNode.FlowField.Distance;
 
@@ -182,6 +181,11 @@ namespace RTSLockstep.Pathfinding
                                     minNode = neighbor;
                                     minDist = dist;
                                 }
+                            }
+                            else
+                            {
+                                // raw node has a blocker for a neighbor, increase distance
+                                rawNode.FlowField.Distance = rawNode.FlowField.Distance + 1;
                             }
                         }
 
