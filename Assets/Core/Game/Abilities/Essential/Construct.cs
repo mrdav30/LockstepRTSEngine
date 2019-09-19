@@ -18,6 +18,7 @@ namespace RTSLockstep
         private Attack cachedAttack;
         protected LSBody CachedBody { get { return Agent.Body; } }
         private RTSAgent CurrentProject;
+        private Structure projectStructure { get { return CurrentProject.GetAbility<Structure>(); } }
         public bool IsBuildMoving { get; private set; }
         public bool IsBuilding { get; private set; }
 
@@ -79,10 +80,6 @@ namespace RTSLockstep
 
             repathTimer.Reset(repathInterval);
             repathRandom = LSUtility.GetRandom(repathInterval);
-
-            //caching parameters
-            var spawnVersion = Agent.SpawnVersion;
-            var controller = Agent.Controller;
 
             if (Agent.GetCommander() && loadedSavedValues && loadedProjectId >= 0)
             {
@@ -151,8 +148,8 @@ namespace RTSLockstep
         private void BehaveWithTarget()
         {
             if (CurrentProject.IsNull()
-                || CurrentProject.IsActive == false 
-                || !CurrentProject.GetAbility<Structure>().NeedsConstruction)
+                || CurrentProject.IsActive == false
+                || !projectStructure.NeedsConstruction)
             {
                 //Target's lifecycle has ended
                 StopConstruction();
@@ -174,9 +171,9 @@ namespace RTSLockstep
                         }
                         Agent.Animator.SetState(ConstructingAnimState);
 
-                        if (!CurrentProject.GetAbility<Structure>().ConstructionStarted)
+                        if (!projectStructure.ConstructionStarted)
                         {
-                            CurrentProject.GetAbility<Structure>().ConstructionStarted = true;
+                            projectStructure.ConstructionStarted = true;
                             // Restore material
                             ConstructionHandler.RestoreMaterial(CurrentProject.gameObject);
                         }
@@ -275,9 +272,9 @@ namespace RTSLockstep
 
         private void Build()
         {
-            CurrentProject.GetAbility<Structure>().Construct(constructAmount);
+            projectStructure.Construct(constructAmount);
 
-            if (!CurrentProject.GetAbility<Structure>().NeedsConstruction)
+            if (!projectStructure.NeedsConstruction)
             {
                 //if (audioElement != null)
                 //{
@@ -397,17 +394,12 @@ namespace RTSLockstep
             fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
 
-            //long spawnX = (long)(CurrentProject.Body.XMin.CeilToInt() + CurrentProject.transform.forward.x * CurrentProject.Body.XMax.CeilToInt() + CurrentProject.transform.forward.x * 20);
-            //long spawnZ = (long)(CurrentProject.Body.YMin.CeilToInt() + CurrentProject.transform.forward.z * CurrentProject.Body.YMax.CeilToInt() + CurrentProject.transform.forward.z * 20);
-            //spawnPoint = new Vector3(spawnX, 0, spawnZ);
-
             if (!CheckRange())
             {
                 Agent.StopCast(this.ID);
 
                 IsBuildMoving = true;
                 // send move command
-                // allow for unwalkable node
                 cachedMove.StartMove(CurrentProject.Body.Position);
             }
         }

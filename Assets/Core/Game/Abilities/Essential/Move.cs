@@ -529,10 +529,17 @@ namespace RTSLockstep
                 DoPathfind = true;
                 hasPath = false;
 
-                //For now, use old next-best-node system when size requires consideration
-                viableDestination = this.GridSize <= 1 ?
-                    Pathfinder.GetEndNode(Position, destination, out destinationNode, allowUnwalkableEndNode) :
-                    Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
+                // if size is of no concern...
+                if(this.GridSize <= 1)
+                {
+                    Pathfinder.GetEndNode(Position, destination, out destinationNode, allowUnwalkableEndNode);
+                }
+
+                // if end node wasn't found or if size requires consideration, use old next-best-node system
+                if(!viableDestination || this.GridSize > 1)
+                {
+                    viableDestination = Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
+                }
             }
             else
             {

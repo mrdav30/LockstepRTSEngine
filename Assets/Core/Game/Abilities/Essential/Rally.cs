@@ -15,7 +15,6 @@ namespace RTSLockstep
 
         private LSBody CachedBody { get { return Agent.Body; } }
 
-
         #region Serialized Values (Further description in properties)
         public Texture2D rallyPointImage;
         #endregion
@@ -23,6 +22,7 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             Agent.OnSelectedChange += HandleSelectedChange;
+            SetSpawnPoint();
         }
 
         public void HandleSelectedChange()
@@ -80,8 +80,8 @@ namespace RTSLockstep
 
         public void SetSpawnPoint()
         {
-            long spawnX = (long)(Agent.Body.XMin.CeilToInt() + transform.forward.x * Agent.Body.XMax.CeilToInt() + transform.forward.x * 20);
-            long spawnZ = (long)(Agent.Body.YMin.CeilToInt() + transform.forward.z * Agent.Body.YMax.CeilToInt() + transform.forward.z * 20);
+            int spawnX = (int)(Agent.Body.XMin.CeilToInt() + transform.forward.x * Agent.Body.XMax.CeilToInt() + transform.forward.x * 20);
+            int spawnZ = (int)(Agent.Body.YMin.CeilToInt() + transform.forward.z * Agent.Body.YMax.CeilToInt() + transform.forward.z * 20);
             spawnPoint = new Vector3(spawnX, 0, spawnZ);
             rallyPoint = spawnPoint;
         }
@@ -89,7 +89,7 @@ namespace RTSLockstep
         protected override void OnExecute(Command com)
         {
             Vector2d pos;
-            if (com.TryGetData<Vector2d>(out pos))
+            if (com.TryGetData(out pos))
             {
                 if (pos.ToVector3d() != GameResourceManager.InvalidPosition)
                 {
