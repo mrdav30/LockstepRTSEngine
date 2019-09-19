@@ -162,7 +162,7 @@ namespace RTSLockstep.Pathfinding
         {
             int xGrid, yGrid;
             GridManager.GetCoordinates(dest.x, dest.y, out xGrid, out yGrid);
-            const int maxTestDistance = 3;
+            const int maxTestDistance = 5;
             AlternativeNodeFinder.Instance.SetValues(dest, xGrid, yGrid, maxTestDistance);
 
             returnNode = AlternativeNodeFinder.Instance.GetNode();

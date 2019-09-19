@@ -224,6 +224,12 @@ namespace RTSLockstep
                 {
                     if (Pathfinder.GetStartNode(Position, out currentNode))
                     {
+                        // we have to be somewhere if currentNode is null...
+                        if (currentNode.IsNull())
+                        {
+                            Pathfinder.GetClosestViableNode(Position, Position, this.GridSize, out currentNode);
+                        }
+
                         if (currentNode.DoesEqual(this.destinationNode))
                         {
                             if (this.RepathTries >= 1)
@@ -506,7 +512,7 @@ namespace RTSLockstep
             this.onGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d destination, bool allowUnwalkableEndNode = false)
+        public void StartMove(Vector2d destination)
         {
             flowFields.Clear();
 
@@ -529,17 +535,9 @@ namespace RTSLockstep
                 DoPathfind = true;
                 hasPath = false;
 
-                // if size is of no concern...
-                if(this.GridSize <= 1)
-                {
-                    Pathfinder.GetEndNode(Position, destination, out destinationNode, allowUnwalkableEndNode);
-                }
-
-                // if end node wasn't found or if size requires consideration, use old next-best-node system
-                if(!viableDestination || this.GridSize > 1)
-                {
-                    viableDestination = Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
-                }
+                //if size requires consideration, use old next-best-node system
+                viableDestination = this.GridSize <= 1 ? Pathfinder.GetEndNode(Position, destination, out destinationNode)
+                    : Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
             }
             else
             {
