@@ -102,7 +102,6 @@ namespace RTSLockstep
 
                 long biggestSqrDistance = 0;
                 long farthestSqrDistance = 0;
-                //long maxiumDistDif = 500;
                 for (int i = 0; i < movers.Count; i++)
                 {
                     mover = movers[i];
@@ -142,7 +141,7 @@ namespace RTSLockstep
                     }
 
                     long destinationSqrDistance = mover.Position.SqrDistance(Destination.x, Destination.y);
-                    if(destinationSqrDistance > farthestSqrDistance)
+                    if (destinationSqrDistance > farthestSqrDistance)
                     {
                         farthestSqrDistance = destinationSqrDistance;
                         farthestPosition = mover.Position;
@@ -166,40 +165,49 @@ namespace RTSLockstep
         {
             //pass the largest unit?
             int groupGridSize = 2;
-            Pathfinder.GetStartNode(farthestPosition, out groupCurrentNode);
-            PathRequestManager.RequestPath(groupCurrentNode, groupDestinationNode, groupGridSize, (_flowField, success) =>
+
+            if (Pathfinder.GetStartNode(farthestPosition, out groupCurrentNode)
+                || Pathfinder.GetClosestViableNode(farthestPosition, farthestPosition, groupGridSize, out groupCurrentNode))
             {
-                if (success)
+                PathRequestManager.RequestPath(groupCurrentNode, groupDestinationNode, groupGridSize, (_flowField, success) =>
                 {
-                    GroupFlowField.Clear();
-                    GroupFlowField = _flowField;
-
-                    if (radius == 0)
+                    if (success)
                     {
-                        ExecuteGroupIndividualMove();
-                        return;
-                    }
+                        GroupFlowField.Clear();
+                        GroupFlowField = _flowField;
 
-                    long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
-                    long groupSize = radius.Mul(radius);
+                        if (radius == 0)
+                        {
+                            // we must not have a group then...
+                            ExecuteGroupIndividualMove();
+                            return;
+                        }
 
-                    if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius * radius))
-                    {
-                        ExecuteGroupIndividualMove();
-                        return;
+                        long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
+                        long groupSize = radius.Mul(radius);
+
+                        if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius * radius))
+                        {
+                            // group members are spread to far out
+                            ExecuteGroupIndividualMove();
+                            return;
+                        }
+                        else
+                        {
+                            // everyone is huddled together for group movement
+                            ExecuteGroupMove();
+                            return;
+                        }
                     }
                     else
                     {
-                        ExecuteGroupMove();
+                        // unable to find path, try having each agent find their own path
+                        ExecuteIndividualMove();
                         return;
                     }
-                }
-                else
-                {
-                    ExecuteIndividualMove();
-                    return;
-                }
-            });
+                });
+
+            }
         }
 
         public void Deactivate()

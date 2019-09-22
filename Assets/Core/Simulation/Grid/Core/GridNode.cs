@@ -5,6 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
+using FastCollections;
 using RTSLockstep.Pathfinding;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ namespace RTSLockstep.Grid
         public ScanNode LinkedScanNode;
 
         #region Pathfinding Variables
+        public Vector2d GridPos;
         public int gridX;
         public int gridY;
         public uint gridIndex;
@@ -75,11 +77,12 @@ namespace RTSLockstep.Grid
             }
             gridX = _x;
             gridY = _y;
+            GridPos = new Vector2d(gridX, gridY);
             gridIndex = GridManager.GetGridIndex(gridX, gridY);
             WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
             WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
 
-            FlowField = new FlowField(0, Vector2d.zero);
+            FlowField = new FlowField(WorldPos, 0, Vector2d.zero);
         }
 
         public void Initialize()
@@ -274,6 +277,82 @@ namespace RTSLockstep.Grid
                     }
                 }
             }
+        }
+
+        //Returns the unobstructed neighbours of the given grid location.
+        //Diagonals are only included if their neighbours are also unobstructed
+        public FastList<GridNode> UnblockedNeighboursOf()
+        {
+            FastList<GridNode> unobstructedNeighbors = new FastList<GridNode>();
+
+            GridNode South = NeighborNodes[1];
+            GridNode East = NeighborNodes[2];
+            GridNode West = NeighborNodes[0];
+            GridNode North = NeighborNodes[3];
+
+            //We test each straight direction, then subtest the next one clockwise
+
+            if (West.IsNotNull() && !West.Unwalkable)
+            {
+                unobstructedNeighbors.Add(West);
+
+                //left up
+                if (South.IsNotNull() && !South.Unwalkable)
+                {
+                    GridNode SouthWest = NeighborNodes[4];
+                    if (SouthWest.IsNotNull() && !SouthWest.Unwalkable)
+                    {
+                        unobstructedNeighbors.Add(SouthWest);
+                    }
+                }
+            }
+
+            if (South.IsNotNull() & !South.Unwalkable)
+            {
+                unobstructedNeighbors.Add(South);
+
+                //up right
+                if (North.IsNotNull() && !North.Unwalkable)
+                {
+                    GridNode SouthEast = NeighborNodes[6];
+                    if (SouthEast.IsNotNull() && !SouthEast.Unwalkable)
+                    {
+                        unobstructedNeighbors.Add(SouthEast);
+                    }
+                }
+            }
+
+            if (North.IsNotNull() && !North.Unwalkable)
+            {
+                unobstructedNeighbors.Add(North);
+
+                //right down
+                if (East.IsNotNull() && !East.Unwalkable)
+                {
+                    GridNode NorthEast = NeighborNodes[7];
+                    if (NorthEast.IsNotNull() && !NorthEast.Unwalkable)
+                    {
+                        unobstructedNeighbors.Add(NorthEast);
+                    }
+                }
+            }
+
+            if (East.IsNotNull() && !East.Unwalkable)
+            {
+                unobstructedNeighbors.Add(East);
+
+                //down left
+                if (West.IsNotNull() && !West.Unwalkable)
+                {
+                    GridNode NorthWest = NeighborNodes[5];
+                    if (NorthWest.IsNotNull() && !NorthWest.Unwalkable)
+                    {
+                        unobstructedNeighbors.Add(NorthWest);
+                    }
+                }
+            }
+
+            return unobstructedNeighbors;
         }
         #endregion
 

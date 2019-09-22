@@ -56,8 +56,9 @@ namespace RTSLockstep
         public bool straightPath;
         private bool viableDestination;
 
-        // key = postion, value = direction
+        // key = world position, value = vector flow field
         private Dictionary<Vector2d, FlowField> flowFields = new Dictionary<Vector2d, FlowField>();
+        private Dictionary<Vector2d, FlowField> flowFieldBuffer;
         private int _pathIndex;
 
         private int StoppedTime;
@@ -80,12 +81,9 @@ namespace RTSLockstep
         private long timescaledDecceleration;
         private bool decelerating;
 
-        private Vector2d lastTargetPos;
-
         public GridNode currentNode;
         private GridNode destinationNode;
-        private Vector2d movementDirection;
-        private Vector2d lastDirection;
+        private static Vector2d movementDirection;
 
         // How far we move each update
         private long distanceToMove;
@@ -183,7 +181,7 @@ namespace RTSLockstep
                     }
 
                     // we only need to set velocity if we're going somewhere
-                    if(hasPath || straightPath)
+                    if (hasPath || straightPath)
                     {
                         SetMovementVelocity();
                     }
@@ -217,12 +215,13 @@ namespace RTSLockstep
 
         private void GetMovementPath()
         {
-            if (DoPathfind)
+            if (Pathfinder.GetStartNode(Position, out currentNode)
+                || Pathfinder.GetClosestViableNode(Position, Position, this.GridSize, out currentNode))
             {
-                DoPathfind = false;
-                if (viableDestination)
+                if (DoPathfind)
                 {
-                    if (Pathfinder.GetStartNode(Position, out currentNode))
+                    DoPathfind = false;
+                    if (viableDestination)
                     {
                         // we have to be somewhere if currentNode is null...
                         if (currentNode.IsNull())
@@ -241,11 +240,12 @@ namespace RTSLockstep
                         {
                             this.CheckPath();
                         }
+
                     }
-                }
-                else
-                {
-                    hasPath = false;
+                    else
+                    {
+                        hasPath = false;
+                    }
                 }
             }
         }
@@ -284,42 +284,34 @@ namespace RTSLockstep
             }
             else
             {
-                // Calculate steering and flocking forces for all agents &
+                // Calculate steering and flocking forces for all agents
                 // work out the force to apply to us based on the flow field grid squares we are on.
-                // We apply bilinear interpolation on the 4 grid squares nearest to us to work out our force.
                 // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-                movementDirection = cachedBody.Position;
+                flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowField;
 
-                int floorX = movementDirection.x.ToInt();
-                int floorY = movementDirection.y.ToInt();
-
-                FlowField flowDirection;
-                Dictionary<Vector2d, FlowField> flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowField;
-
-                if (flowFieldBuffer.TryGetValue(new Vector2d(floorX, floorY), out flowDirection))
+                if (flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
                 {
-                    movementDirection = flowDirection.Direction;
-
-                    lastDirection = movementDirection;
+                    if (flowField.HasLOS)
+                    {
+                        straightPath = true;
+                        movementDirection = Destination - cachedBody.Position;
+                    }
+                    else
+                    {
+                        movementDirection = flowField.Direction;
+                    }
                 }
                 else
                 {
-                    // we need to keep moving on...
-                    movementDirection = lastDirection;
-
+                    // vecitor not found
                     // If we are centered on a grid square with no flow vector this will happen
+                    // we need to keep moving on...
                     if (movementDirection.Equals(Vector2d.zero))
                     {
-                        Debug.Log("zero vector");
                         movementDirection = Destination - cachedBody.Position;
                     }
                 }
-            }
-
-            if (Destination.x != lastTargetPos.x || Destination.y != lastTargetPos.y)
-            {
-                lastTargetPos = Destination;
             }
 
             // This is now the direction we want to be travelling in 
@@ -380,6 +372,10 @@ namespace RTSLockstep
                         Debug.Log("Stuck");
                         if (RepathTries < StuckRepathTries)
                         {
+                            if (IsGroupMoving)
+                            {
+                                IsGroupMoving = false;
+                            }
                             DoPathfind = true;
                             RepathTries++;
                         }
@@ -402,11 +398,10 @@ namespace RTSLockstep
                 }
             }
 
+            //Multiply our direction by speed for our desired speed
             desiredVelocity *= Speed;
 
-            cachedBody._velocity += GetAdjustVector(desiredVelocity);
-
-            cachedBody.VelocityChanged = true;
+            cachedBody.Velocity += GetAdjustVector(desiredVelocity);
         }
 
         private uint GetNodeHash(GridNode node)
@@ -457,6 +452,7 @@ namespace RTSLockstep
 
         private Vector2d GetAdjustVector(Vector2d desiredVel)
         {
+            //The velocity change we want
             var velocityChange = desiredVel - cachedBody._velocity;
             var adjustFastMag = velocityChange.FastMagnitude();
             //Cap acceleration vector magnitude
@@ -465,6 +461,7 @@ namespace RTSLockstep
             if (adjustFastMag > accel * (accel))
             {
                 var mag = FixedMath.Sqrt(adjustFastMag >> FixedMath.SHIFT_AMOUNT);
+                //Convert to a force
                 velocityChange *= accel.Div(mag);
             }
 
@@ -647,13 +644,12 @@ namespace RTSLockstep
                 Dictionary<Vector2d, FlowField> flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowField;
                 foreach (KeyValuePair<Vector2d, FlowField> flow in flowFieldBuffer)
                 {
-                    Vector2d nodePos = flow.Key;
                     FlowField flowField = flow.Value;
-                    UnityEditor.Handles.Label(nodePos.ToVector3(height), flowField.Distance.ToString());
+                    UnityEditor.Handles.Label(flowField.WorldPos.ToVector3(height), flowField.Distance.ToString());
                     if (flowField.Direction != Vector2d.zero)
                     {
                         Color hasLOS = flowField.HasLOS ? Color.yellow : Color.blue;
-                        DrawArrow.ForGizmo(nodePos.ToVector3(height), flowField.Direction.ToVector3(height), hasLOS);
+                        DrawArrow.ForGizmo(flowField.WorldPos.ToVector3(height), flowField.Direction.ToVector3(height), hasLOS);
                     }
                 }
             }
@@ -674,7 +670,6 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Arrived", Arrived);
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
             SaveManager.WriteBoolean(writer, "decelerating", decelerating);
-            SaveManager.WriteVector2d(writer, "LastTargetPos", lastTargetPos);
             SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
         }
 
@@ -715,9 +710,6 @@ namespace RTSLockstep
                     break;
                 case "decelerating":
                     decelerating = (bool)readValue;
-                    break;
-                case "LastTargetPos":
-                    lastTargetPos = LoadManager.LoadVector2d(reader);
                     break;
                 case "MovementDirection":
                     movementDirection = LoadManager.LoadVector2d(reader);

@@ -501,8 +501,8 @@ MonoBehaviour:
     _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 262144
-    _halfLength: 262144
+    _halfWidth: 294912
+    _halfLength: 294912
     _radius: 360448
     _immovable: 1
     _basePriority: 0

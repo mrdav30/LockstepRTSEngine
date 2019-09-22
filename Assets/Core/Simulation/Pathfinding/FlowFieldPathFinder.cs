@@ -30,6 +30,10 @@ namespace RTSLockstep.Pathfinding
 
         private static GridNode rawNode;
         private static GridNode neighbor;
+        private static FastList<GridNode> neighbors;
+
+        private static GridNode minDistanceNode;
+        private static FlowField flowField;
 
         private static bool destinationIsReached;
         #endregion
@@ -49,7 +53,7 @@ namespace RTSLockstep.Pathfinding
             if (GenerateDistanceField(startNode, endNode, unitHalfSize, markedNodesBuffer))
             {
                 // Distance vector field created, 
-                GenerateVectorFlowField(markedNodesBuffer, flowFieldPath);
+                GenerateVectorFlowField(markedNodesBuffer, flowFieldPath, unitHalfSize);
             }
             else
             {
@@ -99,9 +103,16 @@ namespace RTSLockstep.Pathfinding
             {
                 rawNode = rawMarkedNodes[SearchCount];
 
+                rawNode.FlowField.HasLOS = false;
+
                 if (rawNode.IsNull())
                 {
                     continue;
+                }
+
+                if(rawNode.gridIndex != flowFieldPath.EndNodeIndex)
+                {
+                    rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
                 }
 
                 //for each neighbour of this node  (only straight line neighbours, not diagonals)
@@ -115,9 +126,6 @@ namespace RTSLockstep.Pathfinding
                         if (!neighbor.Unpassable())
                         {
                             neighbor.FlowField.Distance = rawNode.FlowField.Distance + 1;
-
-                            // Check if we have LOS		
-                            //rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
 
                             rawMarkedNodes.Add(neighbor);
                             closedSet.Add(neighbor);
@@ -147,7 +155,7 @@ namespace RTSLockstep.Pathfinding
             return destinationIsReached;
         }
 
-        public static void GenerateVectorFlowField(FastList<GridNode> _markedNodes, FlowFieldPath _flowFieldPath)
+        public static void GenerateVectorFlowField(FastList<GridNode> _markedNodes, FlowFieldPath _flowFieldPath, int _unitHalfSize)
         {
             int length = _markedNodes.Count - 1;
             int greatestDistance = _markedNodes[length].FlowField.Distance;
@@ -161,38 +169,44 @@ namespace RTSLockstep.Pathfinding
 
                     if (rawNode.gridIndex != _flowFieldPath.EndNodeIndex)
                     {
-                        GridNode[] neighbors = rawNode.NeighborNodes;
+                        neighbors = rawNode.UnblockedNeighboursOf();
+
+                        // exclude LOS from a node is it has blockers for neighbors
+                        if(neighbors.Count < 8)
+                        {
+                            rawNode.FlowField.HasLOS = false;
+                        }
 
                         //Go through all neighbours and find the one with the lowest distance
-                        GridNode minNode = null;
+                        minDistanceNode = null;
                         int minDist = 0;
-                        for (int z = 0; z < neighbors.Length; z++)
+                        for (int z = 0; z < neighbors.Count; z++)
                         {
                             neighbor = neighbors[z];
-                            if (neighbor.IsNotNull() && !neighbor.Unpassable())
-                            {
-                                // check if node is in closed set, otherwise return greatest distance
-                                int nDistance = closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
-                                    : greatestDistance;
-                                int dist = nDistance - rawNode.FlowField.Distance;
 
-                                if (dist < minDist)
-                                {
-                                    minNode = neighbor;
-                                    minDist = dist;
-                                }
-                            }
-                            else
+                            // check if node is in closed set, otherwise return greatest distance
+                            int nDistance = closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
+                                : greatestDistance;
+                            int dist = nDistance - rawNode.FlowField.Distance;
+
+                            if (dist < minDist)
                             {
-                                // raw node has a blocker for a neighbor, increase distance
-                                rawNode.FlowField.Distance = rawNode.FlowField.Distance + 1;
+                                minDistanceNode = neighbor;
+                                minDist = dist;
                             }
                         }
 
                         //If we found a valid neighbour, point in its direction
-                        if (minNode != null)
+                        if (minDistanceNode.IsNotNull())
                         {
-                            rawNode.FlowField.Direction = (minNode.WorldPos - rawNode.WorldPos);
+                            // If nodes has line of sight to destination, point in that direction instead
+                            rawNode.FlowField.Direction = rawNode.FlowField.HasLOS ? (flowFieldPath.EndNode.WorldPos - rawNode.WorldPos) 
+                                : (minDistanceNode.WorldPos - rawNode.WorldPos);
+                        }
+                        else
+                        {
+                            // no good direction
+                            rawNode.FlowField.Direction = Vector2d.zero;
                         }
                     }
                     else
@@ -203,7 +217,9 @@ namespace RTSLockstep.Pathfinding
 
                     rawNode.FlowField.Direction.Normalize();
 
-                    _flowFieldPath.OutputVectorPath.Add(rawNode.WorldPos, new FlowField(rawNode.FlowField.Distance, rawNode.FlowField.Direction, rawNode.FlowField.HasLOS));
+                    flowField = new FlowField(rawNode.WorldPos, rawNode.FlowField.Distance, rawNode.FlowField.Direction, rawNode.FlowField.HasLOS);
+
+                    _flowFieldPath.OutputVectorPath.Add(rawNode.GridPos, flowField);
                 }
 
                 PathRequestManager.FinishedProcessingPath(_flowFieldPath.OutputVectorPath, true);

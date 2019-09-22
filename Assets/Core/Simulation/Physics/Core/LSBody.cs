@@ -118,7 +118,7 @@ namespace RTSLockstep
         /// </summary>
         /// <value>The velocity.</value>
         [SerializeField]
-        public Vector2d _velocity;
+        internal Vector2d _velocity;
         [Lockstep]
         public Vector2d Velocity
         {

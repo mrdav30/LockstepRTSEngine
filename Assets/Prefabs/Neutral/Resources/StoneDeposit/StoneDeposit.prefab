@@ -354,11 +354,11 @@ MonoBehaviour:
     RealPoints: []
     Edges: []
     EdgeNorms: []
-    _shape: 1
+    _shape: 2
     _isTrigger: 0
     _layer: 0
-    _halfWidth: 0
-    _halfLength: 0
+    _halfWidth: 98304
+    _halfLength: 98304
     _radius: 131072
     _immovable: 1
     _basePriority: 0
