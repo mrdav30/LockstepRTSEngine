@@ -162,7 +162,8 @@ namespace RTSLockstep.Pathfinding
         {
             int xGrid, yGrid;
             GridManager.GetCoordinates(dest.x, dest.y, out xGrid, out yGrid);
-            const int maxTestDistance = 5;
+            // set to the highest height or width value of any game object
+            const int maxTestDistance = 3;
             AlternativeNodeFinder.Instance.SetValues(dest, xGrid, yGrid, maxTestDistance);
 
             returnNode = AlternativeNodeFinder.Instance.GetNode();

@@ -29,7 +29,7 @@ namespace RTSLockstep
         public bool SlowArrival { get; set; }
         public Vector2d AveragePosition { get; set; }
 
-        public int GridSize { get { return (cachedBody.Radius).CeilToInt(); } }
+        public int GridSize { get { return cachedBody.Radius.CeilToInt(); } }
 
         public Vector2d Position { get { return cachedBody.Position; } }
 
@@ -45,8 +45,33 @@ namespace RTSLockstep
 
         public Command LastCommand;
 
+        private Vector2d _destination;
         [HideInInspector]
-        public Vector2d Destination;
+        public Vector2d Destination
+        {
+            get
+            {
+                if (MyMovementGroup.IsNotNull())
+                {
+                    return MyMovementGroup.Destination;
+                }
+                else
+                {
+                    return _destination;
+                }
+            }
+            set
+            {
+                if (MyMovementGroup.IsNotNull())
+                {
+                    MyMovementGroup.Destination = value;
+                }
+                else
+                {
+                    _destination = value;
+                }
+            }
+        }
 
         private const int MinimumOtherStopTime = LockstepManager.FrameRate / 4;
         private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
@@ -83,6 +108,9 @@ namespace RTSLockstep
 
         public GridNode currentNode;
         private GridNode destinationNode;
+
+        private bool allowUnwalkableEndNode;
+
         private static Vector2d movementDirection;
 
         // How far we move each update
@@ -117,7 +145,7 @@ namespace RTSLockstep
         [SerializeField, Tooltip("Disable if unit doesn't need to find path, i.e. flying")]
         private bool _canPathfind = true;
         public bool CanPathfind { get { return _canPathfind; } set { _canPathfind = value; } }
-        public bool DrawPath = false;
+        public bool DrawPath;
 
         public event Action onGroupProcessed;
         public bool MoveOnGroupProcessed { get; private set; }
@@ -130,6 +158,8 @@ namespace RTSLockstep
             cachedTurn = Agent.GetAbility<Turn>();
             canTurn = cachedTurn.IsNotNull();
 
+            DrawPath = false;
+
             timescaledAcceleration = Acceleration.Mul(Speed) / LockstepManager.FrameRate;
             //Cleaner stops with more decelleration
             timescaledDecceleration = timescaledAcceleration * 4;
@@ -137,7 +167,7 @@ namespace RTSLockstep
             closingDistance = cachedBody.Radius;
             stuckTolerance = ((cachedBody.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
-            this.SlowArrival = true;
+            SlowArrival = true;
         }
 
         protected override void OnInitialize()
@@ -187,7 +217,7 @@ namespace RTSLockstep
                     }
                     else
                     {
-                        //agent shouldn't be moving then...
+                        //agent shouldn't be moving then and is stuck...
                         StopMove();
                     }
                 }
@@ -221,6 +251,19 @@ namespace RTSLockstep
                 if (DoPathfind)
                 {
                     DoPathfind = false;
+
+                    if (this.GridSize <= 1)
+                    {
+                        viableDestination = Pathfinder.GetEndNode(Position, Destination, out destinationNode, allowUnwalkableEndNode);
+                    }
+
+                    // if size requires consideration, use old next-best-node system
+                    // also a catch in case GetEndNode returns null
+                    if (GridSize > 1 || !viableDestination)
+                    {
+                        viableDestination = Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out destinationNode);
+                    }
+
                     if (viableDestination)
                     {
                         // we have to be somewhere if currentNode is null...
@@ -288,12 +331,13 @@ namespace RTSLockstep
                 // work out the force to apply to us based on the flow field grid squares we are on.
                 // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-                flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowField;
+                flowFieldBuffer = !IsGroupMoving ? flowFields : MyMovementGroup.GroupFlowFields;
 
                 if (flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
                 {
                     if (flowField.HasLOS)
                     {
+                        // we have no more use for flow fields if the agent has line of sight to destination
                         straightPath = true;
                         movementDirection = Destination - cachedBody.Position;
                     }
@@ -304,11 +348,11 @@ namespace RTSLockstep
                 }
                 else
                 {
-                    // vecitor not found
+                    // vector not found
                     // If we are centered on a grid square with no flow vector this will happen
-                    // we need to keep moving on...
                     if (movementDirection.Equals(Vector2d.zero))
                     {
+                        // we need to keep moving on...
                         movementDirection = Destination - cachedBody.Position;
                     }
                 }
@@ -369,20 +413,20 @@ namespace RTSLockstep
                 {
                     if (stuckTime > StuckTimeThreshold)
                     {
-                        Debug.Log("Stuck");
                         if (RepathTries < StuckRepathTries)
                         {
-                            if (IsGroupMoving)
+                            if (!IsGroupMoving)
                             {
-                                IsGroupMoving = false;
+                                // attempt to repath if agent is by themselves
+                                DoPathfind = true;
                             }
-                            DoPathfind = true;
+
                             RepathTries++;
                         }
                         else
                         {
-                            RepathTries = 0;
-                            this.Arrive();
+                            // we've tried to many times, we stuck stuck
+                            Arrive();
                         }
                         stuckTime = 0;
                     }
@@ -493,31 +537,32 @@ namespace RTSLockstep
             }
         }
 
-        public void OnGroupProcessed(Vector2d destination)
+        public void OnGroupProcessed(Vector2d _destination)
         {
-            Destination = destination;
             if (MoveOnGroupProcessed)
             {
-                StartMove(destination);
+                StartMove(_destination);
                 MoveOnGroupProcessed = false;
             }
             else
             {
-                this.Destination = destination;
+                Destination = _destination;
             }
 
-            this.onGroupProcessed?.Invoke();
+            onGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d destination)
+        public void StartMove(Vector2d _destination, bool _allowUnwalkableEndNode = false)
         {
             flowFields.Clear();
+            straightPath = false;
+            allowUnwalkableEndNode = _allowUnwalkableEndNode;
 
             IsMoving = true;
             StoppedTime = 0;
             Arrived = false;
 
-            this.Destination = destination;
+            Destination = _destination;
 
             Agent.Animator.SetMovingState(AnimState.Moving);
 
@@ -531,10 +576,6 @@ namespace RTSLockstep
             {
                 DoPathfind = true;
                 hasPath = false;
-
-                //if size requires consideration, use old next-best-node system
-                viableDestination = this.GridSize <= 1 ? Pathfinder.GetEndNode(Position, destination, out destinationNode)
-                    : Pathfinder.GetClosestViableNode(Position, destination, this.GridSize, out destinationNode);
             }
             else
             {
@@ -549,12 +590,6 @@ namespace RTSLockstep
         {
             StopMove();
 
-            //TODO: Reset this variables when changing destination/command
-            AutoStopPauser = 0;
-            CollisionStopPauser = 0;
-            StopPauseLooker = 0;
-            StopPauseLayer = 0;
-
             Arrived = true;
 
             onArrive?.Invoke();
@@ -564,6 +599,14 @@ namespace RTSLockstep
         {
             if (IsMoving)
             {
+                RepathTries = 0;
+
+                //TODO: Reset these variables when changing destination/command
+                AutoStopPauser = 0;
+                CollisionStopPauser = 0;
+                StopPauseLooker = 0;
+                StopPauseLayer = 0;
+
                 if (MyMovementGroup.IsNotNull())
                 {
                     MyMovementGroup.Remove(this);
@@ -641,7 +684,7 @@ namespace RTSLockstep
             if (DrawPath && flowFields.IsNotNull() && !straightPath)
             {
                 const float height = 0.25f;
-                Dictionary<Vector2d, FlowField> flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowField;
+                Dictionary<Vector2d, FlowField> flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowFields;
                 foreach (KeyValuePair<Vector2d, FlowField> flow in flowFieldBuffer)
                 {
                     FlowField flowField = flow.Value;

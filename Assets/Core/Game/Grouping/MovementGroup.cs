@@ -8,9 +8,8 @@ namespace RTSLockstep
 {
     public class MovementGroup
     {
-        public Vector2d Destination { get; private set; }
-
-        public Vector2d groupPosition;
+        public Vector2d Destination;
+        private Vector2d groupPosition;
 
         private Vector2d farthestPosition;
 
@@ -18,7 +17,7 @@ namespace RTSLockstep
         private GridNode groupDestinationNode;
 
         // key = postion, value = direction
-        public Dictionary<Vector2d, FlowField> GroupFlowField = new Dictionary<Vector2d, FlowField>();
+        public Dictionary<Vector2d, FlowField> GroupFlowFields = new Dictionary<Vector2d, FlowField>();
 
         public int indexID { get; set; }
 
@@ -48,12 +47,12 @@ namespace RTSLockstep
 
         public void LateSimulate()
         {
-            if (!calculatedBehaviors)
+            if (movers.Count > 0 && !calculatedBehaviors)
             {
-                CalculateAndExecuteBehaviors();
+                calculatedBehaviors = CalculateAndExecuteBehaviors();
             }
 
-            if (movers.Count == 0)
+            if(movers.Count == 0)
             {
                 Deactivate();
             }
@@ -79,92 +78,68 @@ namespace RTSLockstep
             }
         }
 
-        public void CalculateAndExecuteBehaviors()
+        public bool CalculateAndExecuteBehaviors()
         {
-            Move mover;
-
-            // check to make sure the group is moving to a good area
-            bool viableDestination = Pathfinder.GetEndNode(groupPosition, Destination, out groupDestinationNode);
-
-            if (movers.Count >= MinGroupSize && viableDestination)
+            if (movers.Count >= MinGroupSize)
             {
-                averageCollisionSize = 0;
-                groupPosition = Vector2d.zero;
-                for (int i = 0; i < movers.Count; i++)
+                // check to make sure the group is moving to a good area
+                if (Pathfinder.GetEndNode(groupPosition, Destination, out groupDestinationNode))
                 {
-                    mover = movers[i];
-                    groupPosition += mover.Position;
-                    averageCollisionSize += mover.CollisionSize;
-                }
+                    Move mover;
 
-                groupPosition /= movers.Count;
-                averageCollisionSize /= movers.Count;
-
-                long biggestSqrDistance = 0;
-                long farthestSqrDistance = 0;
-                for (int i = 0; i < movers.Count; i++)
-                {
-                    mover = movers[i];
-
-                    if (Pathfinder.GetStartNode(mover.Position, out mover.currentNode))
+                    averageCollisionSize = 0;
+                    groupPosition = Vector2d.zero;
+                    for (int i = 0; i < movers.Count; i++)
                     {
-                        // check if mover already has LOS to destination
-                        if (Pathfinder.NeedsPath(mover.currentNode, groupDestinationNode, mover.GridSize))
+                        mover = movers[i];
+                        groupPosition += mover.Position;
+                        averageCollisionSize += mover.CollisionSize;
+                    }
+
+                    groupPosition /= movers.Count;
+                    averageCollisionSize /= movers.Count;
+
+                    long biggestSqrDistance = 0;
+                    long farthestSqrDistance = 0;
+                    for (int i = 0; i < movers.Count; i++)
+                    {
+                        mover = movers[i];
+
+                        long currentSqrDistance = mover.Position.SqrDistance(groupPosition.x, groupPosition.y);
+                        if (currentSqrDistance > biggestSqrDistance)
                         {
-                            if (mover.straightPath)
-                            {
-                                mover.straightPath = false;
-                            }
+                            long currentDistance = FixedMath.Sqrt(currentSqrDistance);
+
+                            biggestSqrDistance = currentSqrDistance;
+                            radius = currentDistance;
                         }
-                        else
+
+                        long destinationSqrDistance = mover.Position.SqrDistance(Destination.x, Destination.y);
+                        if (destinationSqrDistance > farthestSqrDistance)
                         {
-                            // mover doesn't have to path find bc they have LOS
-                            mover.straightPath = true;
+                            farthestSqrDistance = destinationSqrDistance;
+                            farthestPosition = mover.Position;
                         }
                     }
 
-                    long currentSqrDistance = mover.Position.SqrDistance(groupPosition.x, groupPosition.y);
-                    if (currentSqrDistance > biggestSqrDistance)
-                    {
-                        long currentDistance = FixedMath.Sqrt(currentSqrDistance);
-
-                        //long distDif = currentDistance - radius;
-                        //if (distDif > maxiumDistDif * movers.Count / 128)
-                        //{
-                        //    Debug.Log("farther away");
-                        //    // ExecuteGroupIndividualMove();
-                        //    // return;
-                        //}
-
-                        biggestSqrDistance = currentSqrDistance;
-                        radius = currentDistance;
-                    }
-
-                    long destinationSqrDistance = mover.Position.SqrDistance(Destination.x, Destination.y);
-                    if (destinationSqrDistance > farthestSqrDistance)
-                    {
-                        farthestSqrDistance = destinationSqrDistance;
-                        farthestPosition = mover.Position;
-                    }
+                    // Generate a flow field for the entire movement group
+                    GetGroupMovementPath();
                 }
-
-                // at this point we know what to do
-                calculatedBehaviors = true;
-
-                // Generate a flow field for the entire movement group
-                GetGroupMovementPath();
             }
             else
             {
                 // try to find the individual agent path
                 ExecuteIndividualMove();
             }
+
+            // at this point we know what to do
+            return true;
         }
 
         public void GetGroupMovementPath()
         {
-            //pass the largest unit?
-            int groupGridSize = 2;
+            //pass the largest unit or just average?
+            int groupGridSize = averageCollisionSize.CeilToInt();
 
             if (Pathfinder.GetStartNode(farthestPosition, out groupCurrentNode)
                 || Pathfinder.GetClosestViableNode(farthestPosition, farthestPosition, groupGridSize, out groupCurrentNode))
@@ -173,8 +148,8 @@ namespace RTSLockstep
                 {
                     if (success)
                     {
-                        GroupFlowField.Clear();
-                        GroupFlowField = _flowField;
+                        GroupFlowFields.Clear();
+                        GroupFlowFields = _flowField;
 
                         if (radius == 0)
                         {
@@ -186,7 +161,7 @@ namespace RTSLockstep
                         long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
                         long groupSize = radius.Mul(radius);
 
-                        if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius * radius))
+                        if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius.Mul(radius)))
                         {
                             // group members are spread to far out
                             ExecuteGroupIndividualMove();
@@ -206,7 +181,6 @@ namespace RTSLockstep
                         return;
                     }
                 });
-
             }
         }
 
@@ -220,7 +194,7 @@ namespace RTSLockstep
                 mover.MyMovementGroupID = -1;
             }
             movers.FastClear();
-            GroupFlowField.Clear();
+            GroupFlowFields.Clear();
             MovementGroupHelper.Pool(this);
             calculatedBehaviors = false;
             indexID = -1;
@@ -254,6 +228,7 @@ namespace RTSLockstep
 
         private void ExecuteGroupIndividualMove()
         {
+            Debug.Log("individual group moving");
             movementType = MovementType.GroupIndividual;
             for (int i = 0; i < movers.Count; i++)
             {

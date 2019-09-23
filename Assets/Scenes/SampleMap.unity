@@ -402,20 +402,14 @@ MonoBehaviour:
     Count: 3
     ControllerCode: Player 1
     Position:
-      x: 327680
-      y: 327680
+      x: 0
+      y: 0
   - AgentCode: HumanBarracks
     Count: 1
     ControllerCode: Player 1
     Position:
-      x: 0
-      y: 0
-  - AgentCode: RockWarrior
-    Count: 2
-    ControllerCode: Player 1
-    Position:
-      x: 3276800
-      y: 0
+      x: 655360
+      y: 655360
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:

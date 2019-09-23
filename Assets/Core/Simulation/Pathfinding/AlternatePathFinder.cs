@@ -96,10 +96,24 @@ namespace RTSLockstep.Pathfinding
                 {
                     layer++;
                     //Advance a layer instead of rotation
-                    if (dirX > 0) dirX = layer;
-                    else if (dirX < 0) dirX = -layer;
-                    if (dirY > 0) dirY = layer;
-                    else if (dirY < 0) dirY = -layer;
+                    if (dirX > 0)
+                    {
+                        dirX = layer;
+                    }
+                    else if (dirX < 0)
+                    {
+                        dirX = -layer;
+                    }
+
+                    if (dirY > 0)
+                    {
+                        dirY = layer;
+                    }
+                    else if (dirY < 0)
+                    {
+                        dirY = -layer;
+                    }
+
                     layerStartX = dirX;
                     layerStartY = dirY;
                 }

@@ -10,8 +10,6 @@ using FastCollections;
 using RTSLockstep.Grid;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEngine;
 
 namespace RTSLockstep.Pathfinding
 {
@@ -25,7 +23,6 @@ namespace RTSLockstep.Pathfinding
         private static FastList<GridNode> markedNodesBuffer = new FastList<GridNode>();
         private static FastList<GridNode> rawMarkedNodes;
         //holding tank to check if node was checked, faster than searching list
-        //  private static Dictionary<Vector2d, bool> dijkstraGrid = new Dictionary<Vector2d, bool>();
         private static HashSet<GridNode> closedSet = new HashSet<GridNode>();
 
         private static GridNode rawNode;
@@ -103,14 +100,14 @@ namespace RTSLockstep.Pathfinding
             {
                 rawNode = rawMarkedNodes[SearchCount];
 
-                rawNode.FlowField.HasLOS = false;
-
                 if (rawNode.IsNull())
                 {
                     continue;
                 }
 
-                if(rawNode.gridIndex != flowFieldPath.EndNodeIndex)
+                rawNode.FlowField.HasLOS = false;
+
+                if (rawNode.gridIndex != flowFieldPath.EndNodeIndex)
                 {
                     rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
                 }
@@ -172,7 +169,7 @@ namespace RTSLockstep.Pathfinding
                         neighbors = rawNode.UnblockedNeighboursOf();
 
                         // exclude LOS from a node is it has blockers for neighbors
-                        if(neighbors.Count < 8)
+                        if (neighbors.Count < 8)
                         {
                             rawNode.FlowField.HasLOS = false;
                         }
@@ -200,8 +197,8 @@ namespace RTSLockstep.Pathfinding
                         if (minDistanceNode.IsNotNull())
                         {
                             // If nodes has line of sight to destination, point in that direction instead
-                            rawNode.FlowField.Direction = rawNode.FlowField.HasLOS ? (flowFieldPath.EndNode.WorldPos - rawNode.WorldPos) 
-                                : (minDistanceNode.WorldPos - rawNode.WorldPos);
+                            rawNode.FlowField.Direction = rawNode.FlowField.HasLOS ? (flowFieldPath.EndNode.GridPos - rawNode.GridPos)
+                                : (minDistanceNode.GridPos - rawNode.GridPos);
                         }
                         else
                         {
