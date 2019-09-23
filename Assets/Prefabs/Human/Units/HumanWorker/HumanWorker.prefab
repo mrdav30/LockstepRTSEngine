@@ -152,9 +152,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  Destination:
-    x: 0
-    y: 0
   straightPath: 0
   CanMove: 1
   _speed: 196608
@@ -234,14 +231,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldown: 0
   constructAmount: 3276800
-  _constructInterval: 65536
+  _constructInterval: 131072
   _buildActions:
   - HumanBarracks
   - HumanTownHall
   - HumanWatchTower
   - HumanHouse
   - HumanWoodWallPillar
-  _windup: 196608
+  _windup: 65536
   _increasePriority: 1
 --- !u!114 &114515592197092712
 MonoBehaviour:

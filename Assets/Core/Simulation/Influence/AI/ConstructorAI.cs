@@ -20,7 +20,7 @@ namespace RTSLockstep
         public override bool ShouldMakeDecision()
         {
             if (cachedAgent.Tag != AgentTag.Builder
-                || cachedConstruct.IsBuilding
+                || cachedConstruct.IsFocused
                 || cachedConstruct.HasStructuresQueued())
             {
                 searchCount -= 1;
