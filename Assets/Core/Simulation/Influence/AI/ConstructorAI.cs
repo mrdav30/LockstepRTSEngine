@@ -20,8 +20,9 @@ namespace RTSLockstep
         public override bool ShouldMakeDecision()
         {
             if (cachedAgent.Tag != AgentTag.Builder
+                || cachedConstruct.IsBuildMoving
                 || cachedConstruct.IsFocused
-                || cachedConstruct.HasStructuresQueued())
+                || cachedConstruct.CurrentProject.IsNotNull())
             {
                 searchCount -= 1;
                 return false;
@@ -60,10 +61,14 @@ namespace RTSLockstep
                 {
                     // send construct command
                     Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-                    constructCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+
+                    // send a flag for agent to register to construction group
+                    constructCom.Add(new DefaultData(DataType.Bool, true));
+
+                    constructCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
                     constructCom.ControllerID = cachedAgent.Controller.ControllerID;
 
-                    constructCom.Add<Influence>(new Influence(cachedAgent));
+                    constructCom.Add(new Influence(cachedAgent));
 
                     CommandManager.SendCommand(constructCom);
                 }

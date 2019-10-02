@@ -33,7 +33,7 @@ namespace RTSLockstep
         public AgentTag Tag;
         [SerializeField]
         private float _selectionRadius = -1f;
-        public float SelectionRadius { get { return _selectionRadius <= 0 ? this.Body.Radius.ToFloat() + 1f : _selectionRadius; } }
+        public float SelectionRadius { get { return _selectionRadius <= 0 ? Body.Radius.ToFloat() + 1f : _selectionRadius; } }
         [SerializeField]
         private Transform _visualCenter;
         public Transform VisualCenter { get { return _visualCenter; } }
@@ -132,7 +132,7 @@ namespace RTSLockstep
                     _stunned = value;
                     if (_stunned)
                     {
-                        this.StopCast();
+                        StopCast();
                     }
                 }
             }
@@ -209,7 +209,7 @@ namespace RTSLockstep
         public Coroutine poolCoroutine;
 
         public bool _provisioned { get; private set; }
-        private Rect _playingArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
+        private Rect _selectionArea = new Rect(0.0f, 0.0f, 0.0f, 0.0f);
         private bool loadedSavedValues = false;
         private AgentCommander _cachedCommander;
         #endregion
@@ -249,7 +249,7 @@ namespace RTSLockstep
 
             SelectionRadiusSquared = SelectionRadius * SelectionRadius;
 
-            this.RegisterLockstep();
+            RegisterLockstep();
         }
 
         public virtual void Initialize(
@@ -261,7 +261,7 @@ namespace RTSLockstep
             CheckCasting = true;
 
             // place game object under it's agent commander
-            CachedGameObject.transform.parent = this.Controller.Commander.GetComponentInChildren<RTSAgents>().transform;
+            CachedGameObject.transform.parent = Controller.Commander.GetComponentInChildren<RTSAgents>().transform;
 
             CachedGameObject.SetActive(true);
 
@@ -317,11 +317,11 @@ namespace RTSLockstep
         public void LateSimulate()
         {
             abilityManager.LateSimulate();
-            for (int i = 0; i < this.Buffs.PeakCount; i++)
+            for (int i = 0; i < Buffs.PeakCount; i++)
             {
-                if (this.Buffs.arrayAllocation[i])
+                if (Buffs.arrayAllocation[i])
                 {
-                    this.Buffs[i].Simulate();
+                    Buffs[i].Simulate();
                 }
             }
         }
@@ -351,7 +351,7 @@ namespace RTSLockstep
         public IEnumerable<LSVariable> GetDesyncs(int[] compare)
         {
             int position = 0;
-            foreach (int ticket in this.TrackedLockstepTickets)
+            foreach (int ticket in TrackedLockstepTickets)
             {
                 LSVariableContainer container = LSVariableManager.GetContainer(ticket);
                 int[] hashes = container.GetCompareHashes();
@@ -368,15 +368,15 @@ namespace RTSLockstep
 
         public void SessionReset()
         {
-            this.BoxVersion = 0;
-            this.SpawnVersion = 1;
+            BoxVersion = 0;
+            SpawnVersion = 1;
         }
 
         public void InitializeController(AgentController controller, ushort localID, ushort globalID)
         {
-            this.Controller = controller;
-            this.LocalID = localID;
-            this.GlobalID = globalID;
+            Controller = controller;
+            LocalID = localID;
+            GlobalID = globalID;
         }
 
         //Initialize this agent with basic functions and Ability system
@@ -419,7 +419,7 @@ namespace RTSLockstep
 
             if (OnDeactivate != null)
             {
-                this.OnDeactivate(this);
+                OnDeactivate(this);
             }
 
             _Deactivate();
@@ -441,7 +441,7 @@ namespace RTSLockstep
 
         private void _Deactivate()
         {
-            this.StopCast();
+            StopCast();
 
             IsSelected = false;
 
@@ -489,11 +489,11 @@ namespace RTSLockstep
         public long GetStateHash()
         {
             long hash = 3;
-            hash ^= this.GlobalID;
-            hash ^= this.LocalID;
-            hash ^= this.Body._position.GetStateHash();
-            hash ^= this.Body._rotation.GetHashCode();
-            hash ^= this.Body.Velocity.GetStateHash();
+            hash ^= GlobalID;
+            hash ^= LocalID;
+            hash ^= Body._position.GetStateHash();
+            hash ^= Body._rotation.GetHashCode();
+            hash ^= Body.Velocity.GetStateHash();
             return hash;
         }
 
@@ -558,17 +558,17 @@ namespace RTSLockstep
 
         public void SetPlayingArea(Rect value)
         {
-            this._playingArea = value;
+            _selectionArea = value;
         }
 
         public Rect GetPlayerArea()
         {
-            return this._playingArea;
+            return _selectionArea;
         }
 
         public void SetProvision(bool value)
         {
-            this._provisioned = value;
+            _provisioned = value;
         }
 
         public void SaveDetails(JsonWriter writer)
@@ -607,8 +607,8 @@ namespace RTSLockstep
         #region Private
         private void RegisterLockstep()
         {
-            TrackedLockstepTickets.Add(LSVariableManager.Register(this.Body));
-            foreach (Ability abil in this.abilityManager.Abilities)
+            TrackedLockstepTickets.Add(LSVariableManager.Register(Body));
+            foreach (Ability abil in abilityManager.Abilities)
             {
                 TrackedLockstepTickets.Add(LSVariableManager.Register(abil));
             }
@@ -631,10 +631,10 @@ namespace RTSLockstep
                     objectName = (string)readValue;
                     break;
                 case "GlobalID":
-                    this.GlobalID = (ushort)readValue;
+                    GlobalID = (ushort)readValue;
                     break;
                 case "LocalID":
-                    this.LocalID = (ushort)readValue;
+                    LocalID = (ushort)readValue;
                     break;
                 case "Position":
                     Body.Position = LoadManager.LoadVector2d(reader);

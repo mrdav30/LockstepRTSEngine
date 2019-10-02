@@ -555,7 +555,7 @@ public class HUD : MonoBehaviour
                             && agent.GetAbility<Construct>()
                             && !ConstructionHandler.IsFindingBuildingLocation())
                         {
-                            ConstructionHandler.CreateStructure(actions[i], agent, agent.GetPlayerArea());
+                            ConstructionHandler.CreateStructure(actions[i], agent);
                         }
                         else if (agent.MyAgentType == AgentType.Building 
                             && !agent.GetAbility<Structure>().NeedsConstruction

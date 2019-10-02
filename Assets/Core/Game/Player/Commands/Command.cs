@@ -58,7 +58,7 @@ namespace RTSLockstep
         {
             if (RegisterCount > ushort.MaxValue)
             {
-                throw new System.Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
+                throw new Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
             }
             if (RegisteredData.ContainsKey(t))
             {
@@ -88,7 +88,9 @@ namespace RTSLockstep
         public void Add<TData>(params TData[] addItems) where TData : ICommandData
         {
             for (int i = 0; i < addItems.Length; i++)
+            {
                 Add(addItems[i]);
+            }
         }
 
         public void Add<TData>(TData item) where TData : ICommandData
@@ -123,7 +125,10 @@ namespace RTSLockstep
         {
             ushort dataID;
             if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            {
                 return 0;
+            }
+
             FastList<ICommandData> items;
             if (!ContainedData.TryGetValue(dataID, out items))
             {
@@ -182,13 +187,24 @@ namespace RTSLockstep
         public bool SetFirstData<TData>(TData value) where TData : ICommandData
         {
             ushort dataID;
-            if (!RegisteredData.TryGetValue(typeof(TData), out dataID)) return false;
+            if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            {
+                return false;
+            }
             FastList<ICommandData> items;
-            if (!this.ContainedData.TryGetValue(dataID, out items)) return false;
+            if (!this.ContainedData.TryGetValue(dataID, out items))
+            {
+                return false;
+            }
             if (items.Count == 0)
+            {
                 items.Add(value);
+            }
             else
+            {
                 items[0] = value;
+            }
+
             return true;
         }
         public void ClearData<TData>()

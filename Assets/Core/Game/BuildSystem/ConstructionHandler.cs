@@ -1,4 +1,5 @@
-﻿using RTSLockstep;
+﻿using FastCollections;
+using RTSLockstep;
 using RTSLockstep.Data;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +11,13 @@ public static class ConstructionHandler
     private static Structure tempStructure;
     private static LSBody tempStructureBody;
     private static Vector3 lastLocation;
-    private static RTSAgent cachedAgent;
     private static bool _findingPlacement = false;
     private static bool _constructingWall = false;
 
     private static AgentCommander _cachedCommander;
     private static Dictionary<string, Material> oldMaterials = new Dictionary<string, Material>();
+
+    private static FastList<QStructure> constructionQueue = new FastList<QStructure>();
 
     public static Transform OrganizerStructures { get; private set; }
     #endregion
@@ -95,12 +97,12 @@ public static class ConstructionHandler
     {
         if (IsFindingBuildingLocation())
         {
-            // send false to clear agent's construct queue
-            SendConstructCommand(false);
+            //Reset construction handler
+            Reset();
         }
     }
 
-    public static void CreateStructure(string buildingName, RTSAgent constructingAgent, Rect playingArea)
+    public static void CreateStructure(string buildingName, RTSAgent constructingAgent)
     {
         Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
@@ -135,8 +137,6 @@ public static class ConstructionHandler
                     // structure size is 2 times the size of halfwidth & halfheight
                     tempStructure.BuildSizeLow = (tempStructureBody.HalfWidth.CeilToInt() * 2);
                     tempStructure.BuildSizeHigh = (tempStructureBody.HalfLength.CeilToInt() * 2);
-
-                    cachedAgent = constructingAgent;
 
                     tempStructure.gameObject.transform.position = Positioning.GetSnappedPosition(buildPoint.ToVector3());
                 }
@@ -214,20 +214,37 @@ public static class ConstructionHandler
         qStructure.HalfWidth = adjustHalfWidth > 0 ? adjustHalfWidth : tempStructureBody.HalfWidth;
         qStructure.HalfLength = adjustHalfLength > 0 ? adjustHalfLength : tempStructureBody.HalfLength;
 
-        Command queueCommand = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-        queueCommand.Add(new QueueStructure(qStructure));
-
-        UserInputHelper.SendCommand(queueCommand);
+        constructionQueue.Add(qStructure);
     }
 
     public static void SendConstructCommand(bool startConstruction = true)
     {
-        //Reset construction handler
-        Reset();
-
         // send construct command for selected agent to start construction queue
         Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+
+        // send a flag to start or cancel construction
         constructCom.Add(new DefaultData(DataType.Bool, startConstruction));
+
+        for (int i = 0; i < constructionQueue.Count; i++)
+        {
+            constructCom.Add(new QueueStructure(constructionQueue[i]));
+        }
+
+        UserInputHelper.SendCommand(constructCom);
+
+        //Reset construction handler
+        Reset();
+    }
+
+    public static void HelpConstruct()
+    {
+        // send construct command for selected agent to help construct an agent
+        Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
+
+        // send a flag for agent to register to construction group
+        constructCom.Add(new DefaultData(DataType.Bool, true));
+
+        constructCom.Add(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
 
         UserInputHelper.SendCommand(constructCom);
     }
@@ -241,11 +258,12 @@ public static class ConstructionHandler
             WallPositioningHelper.Reset();
         }
 
+        constructionQueue.Clear();
+
         //temp structure no longer required
         Object.Destroy(tempObject);
         tempStructure = null;
         tempStructureBody = null;
-        cachedAgent = null;
         // remove temporary structure from grid
         GridBuilder.Reset();
     }

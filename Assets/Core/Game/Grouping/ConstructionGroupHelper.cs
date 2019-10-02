@@ -1,23 +1,24 @@
 ﻿using FastCollections;
 using RTSLockstep.Data;
 using UnityEngine;
+
 namespace RTSLockstep
 {
-    public class MovementGroupHelper : BehaviourHelper
+    public class ConstructionGroupHelper : BehaviourHelper
     {
         public override ushort ListenInput
         {
             get
             {
-                return AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID;
+                return AbilityDataItem.FindInterfacer(typeof(Construct)).ListenInputID;
             }
         }
 
-        public static MovementGroup LastCreatedGroup { get; private set; }
-        private static readonly FastBucket<MovementGroup> activeGroups = new FastBucket<MovementGroup>();
-        private static readonly FastStack<MovementGroup> pooledGroups = new FastStack<MovementGroup>();
+        public static ConstructGroup LastCreatedGroup { get; private set; }
+        private static readonly FastBucket<ConstructGroup> activeGroups = new FastBucket<ConstructGroup>();
+        private static readonly FastStack<ConstructGroup> pooledGroups = new FastStack<ConstructGroup>();
 
-        public static MovementGroupHelper Instance { get; private set; }
+        public static ConstructionGroupHelper Instance { get; private set; }
 
         protected override void OnInitialize()
         {
@@ -31,8 +32,8 @@ namespace RTSLockstep
             {
                 if (activeGroups.arrayAllocation[i])
                 {
-                    MovementGroup moveGroup = activeGroups[i];
-                    moveGroup.LocalSimulate();
+                    ConstructGroup constructGroup = activeGroups[i];
+                    constructGroup.LocalSimulate();
                 }
             }
         }
@@ -43,8 +44,8 @@ namespace RTSLockstep
             {
                 if (activeGroups.arrayAllocation[i])
                 {
-                    MovementGroup moveGroup = activeGroups[i];
-                    moveGroup.LateSimulate();
+                    ConstructGroup constructGroup = activeGroups[i];
+                    constructGroup.LateSimulate();
                 }
             }
         }
@@ -67,10 +68,7 @@ namespace RTSLockstep
 
         protected override void OnExecute(Command com)
         {
-            if (com.ContainsData<Vector2d>())
-            {
-                StaticExecute(com);
-            }
+            StaticExecute(com);
         }
 
         public static void StaticExecute(Command com)
@@ -78,17 +76,17 @@ namespace RTSLockstep
             CreateGroup(com);
         }
 
-        public static MovementGroup CreateGroup(Command com)
+        public static ConstructGroup CreateGroup(Command com)
         {
-            MovementGroup moveGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new MovementGroup();
+            ConstructGroup constructGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new ConstructGroup();
 
-            moveGroup.indexID = activeGroups.Add(moveGroup);
-            LastCreatedGroup = moveGroup;
-            moveGroup.Initialize(com);
-            return moveGroup;
+            constructGroup.indexID = activeGroups.Add(constructGroup);
+            LastCreatedGroup = constructGroup;
+            constructGroup.Initialize(com);
+            return constructGroup;
         }
 
-        public static void Pool(MovementGroup group)
+        public static void Pool(ConstructGroup group)
         {
             int indexID = group.indexID;
             activeGroups.RemoveAt(indexID);

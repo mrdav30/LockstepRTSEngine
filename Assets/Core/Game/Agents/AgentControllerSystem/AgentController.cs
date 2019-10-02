@@ -359,7 +359,7 @@ namespace RTSLockstep
 
         public Selection GetSelection(Command com)
         {
-            if (com.ContainsData<Selection>() == false)
+            if (!com.ContainsData<Selection>())
             {
                 return previousSelection;
             }
@@ -369,7 +369,7 @@ namespace RTSLockstep
 
         public Influence GetInfluencedAgent(Command com)
         {
-            if (com.ContainsData<Influence>() == false)
+            if (!com.ContainsData<Influence>())
             {
                 return null;
             }

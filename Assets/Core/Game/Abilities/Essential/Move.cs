@@ -36,14 +36,11 @@ namespace RTSLockstep
         public long CollisionSize { get { return cachedBody.Radius; } }
 
         public MovementGroup MyMovementGroup { get; set; }
-
         public int MyMovementGroupID { get; set; }
 
         public bool IsGroupMoving { get; set; }
 
         public bool IsMoving { get; private set; }
-
-        public Command LastCommand;
 
         private Vector2d _destination;
         [HideInInspector]
@@ -51,7 +48,7 @@ namespace RTSLockstep
         {
             get
             {
-                if (MyMovementGroup.IsNotNull())
+                if (IsGroupMoving)
                 {
                     return MyMovementGroup.Destination;
                 }
@@ -62,7 +59,7 @@ namespace RTSLockstep
             }
             set
             {
-                if (MyMovementGroup.IsNotNull())
+                if (IsGroupMoving)
                 {
                     MyMovementGroup.Destination = value;
                 }
@@ -79,11 +76,10 @@ namespace RTSLockstep
 
         private bool hasPath;
         public bool straightPath;
-        private bool viableDestination;
 
         // key = world position, value = vector flow field
-        private Dictionary<Vector2d, FlowField> flowFields = new Dictionary<Vector2d, FlowField>();
-        private Dictionary<Vector2d, FlowField> flowFieldBuffer;
+        private Dictionary<Vector2d, FlowField> _flowFields = new Dictionary<Vector2d, FlowField>();
+        private Dictionary<Vector2d, FlowField> _flowFieldBuffer;
         private int _pathIndex;
 
         private int StoppedTime;
@@ -184,8 +180,6 @@ namespace RTSLockstep
 
             StopMultiplier = DirectStop;
 
-            viableDestination = false;
-
             Destination = Vector2d.zero;
             hasPath = false;
             IsMoving = false;
@@ -252,26 +246,11 @@ namespace RTSLockstep
                 {
                     DoPathfind = false;
 
-                    if (this.GridSize <= 1)
-                    {
-                        viableDestination = Pathfinder.GetEndNode(Position, Destination, out destinationNode, allowUnwalkableEndNode);
-                    }
-
                     // if size requires consideration, use old next-best-node system
                     // also a catch in case GetEndNode returns null
-                    if (GridSize > 1 || !viableDestination)
+                    if (this.GridSize <= 1 && Pathfinder.GetEndNode(Position, Destination, out destinationNode, allowUnwalkableEndNode)
+                        || Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out destinationNode))
                     {
-                        viableDestination = Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out destinationNode);
-                    }
-
-                    if (viableDestination)
-                    {
-                        // we have to be somewhere if currentNode is null...
-                        if (currentNode.IsNull())
-                        {
-                            Pathfinder.GetClosestViableNode(Position, Position, this.GridSize, out currentNode);
-                        }
-
                         if (currentNode.DoesEqual(this.destinationNode))
                         {
                             if (this.RepathTries >= 1)
@@ -283,7 +262,6 @@ namespace RTSLockstep
                         {
                             this.CheckPath();
                         }
-
                     }
                     else
                     {
@@ -302,13 +280,13 @@ namespace RTSLockstep
                     straightPath = false;
                 }
 
-                PathRequestManager.RequestPath(currentNode, destinationNode, this.GridSize, (_flowField, success) =>
+                PathRequestManager.RequestPath(currentNode, destinationNode, this.GridSize, (flowFields, success) =>
                 {
                     if (success)
                     {
                         hasPath = true;
-                        flowFields.Clear();
-                        flowFields = _flowField;
+                        _flowFields.Clear();
+                        _flowFields = flowFields;
                     }
                 });
             }
@@ -331,20 +309,20 @@ namespace RTSLockstep
                 // work out the force to apply to us based on the flow field grid squares we are on.
                 // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-                flowFieldBuffer = !IsGroupMoving ? flowFields : MyMovementGroup.GroupFlowFields;
+                _flowFieldBuffer = !IsGroupMoving ? _flowFields : MyMovementGroup.GroupFlowFields;
 
-                if (flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
+                if (_flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
                 {
-                    if (flowField.HasLOS)
-                    {
-                        // we have no more use for flow fields if the agent has line of sight to destination
-                        straightPath = true;
-                        movementDirection = Destination - cachedBody.Position;
-                    }
-                    else
-                    {
+                    //if (flowField.HasLOS)
+                    //{
+                    //    // we have no more use for flow fields if the agent has line of sight to destination
+                    //    straightPath = true;
+                    //    movementDirection = Destination - cachedBody.Position;
+                    //}
+                    //else
+                    //{
                         movementDirection = flowField.Direction;
-                    }
+                   // }
                 }
                 else
                 {
@@ -514,18 +492,12 @@ namespace RTSLockstep
 
         protected override void OnExecute(Command com)
         {
-            LastCommand = com;
             if (com.ContainsData<Vector2d>())
             {
-                StartFormalMove(com.GetData<Vector2d>());
+                Agent.StopCast(ID);
+                IsCasting = true;
+                RegisterGroup();
             }
-        }
-
-        public void StartFormalMove(Vector2d position)
-        {
-            Agent.StopCast(ID);
-            IsCasting = true;
-            RegisterGroup();
         }
 
         public void RegisterGroup(bool moveOnProcessed = true)
@@ -554,7 +526,7 @@ namespace RTSLockstep
 
         public void StartMove(Vector2d _destination, bool _allowUnwalkableEndNode = false)
         {
-            flowFields.Clear();
+            _flowFields.Clear();
             straightPath = false;
             allowUnwalkableEndNode = _allowUnwalkableEndNode;
 
@@ -615,6 +587,9 @@ namespace RTSLockstep
                 IsMoving = false;
                 StoppedTime = 0;
                 IsGroupMoving = false;
+
+                _flowFields.Clear();
+                straightPath = false;
 
                 IsCasting = false;
 
@@ -681,11 +656,10 @@ namespace RTSLockstep
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (DrawPath && flowFields.IsNotNull() && !straightPath)
+            if (DrawPath && _flowFieldBuffer.IsNotNull() && !straightPath)
             {
                 const float height = 0.25f;
-                Dictionary<Vector2d, FlowField> flowFieldBuffer = !IsGroupMoving ? this.flowFields : MyMovementGroup.GroupFlowFields;
-                foreach (KeyValuePair<Vector2d, FlowField> flow in flowFieldBuffer)
+                foreach (KeyValuePair<Vector2d, FlowField> flow in _flowFieldBuffer)
                 {
                     FlowField flowField = flow.Value;
                     UnityEditor.Handles.Label(flowField.WorldPos.ToVector3(height), flowField.Distance.ToString());
@@ -707,7 +681,6 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Moving", IsMoving);
             SaveManager.WriteBoolean(writer, "HasPath", hasPath);
             SaveManager.WriteBoolean(writer, "StraightPath", straightPath);
-            SaveManager.WriteBoolean(writer, "ViableDestination", viableDestination);
             SaveManager.WriteInt(writer, "StoppedTime", StoppedTime);
             SaveManager.WriteVector2d(writer, "Destination", Destination);
             SaveManager.WriteBoolean(writer, "Arrived", Arrived);
@@ -735,9 +708,6 @@ namespace RTSLockstep
                     break;
                 case "StraightPath":
                     straightPath = (bool)readValue;
-                    break;
-                case "ViableDestination":
-                    viableDestination = (bool)readValue;
                     break;
                 case "StoppedTime":
                     StoppedTime = (int)readValue;

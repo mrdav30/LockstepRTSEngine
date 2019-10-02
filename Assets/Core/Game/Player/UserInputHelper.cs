@@ -48,7 +48,6 @@ public class UserInputHelper : BehaviourHelper
     public static AbilityDataItem QuickMove;
     public static AbilityDataItem QuickTarget;
     public static AbilityDataItem QuickHarvest;
-    public static AbilityDataItem QuickBuild;
     public static AbilityDataItem QuickRally;
 
     public static event Action OnSingleLeftTapDown;
@@ -91,7 +90,6 @@ public class UserInputHelper : BehaviourHelper
         QuickMove = AbilityDataItem.FindInterfacer("Move");
         QuickTarget = AbilityDataItem.FindInterfacer("Attack");
         QuickHarvest = AbilityDataItem.FindInterfacer("Harvest");
-        QuickBuild = AbilityDataItem.FindInterfacer("Construct");
         QuickRally = AbilityDataItem.FindInterfacer("Rally");
 
         if (GUIManager == null)
@@ -452,8 +450,8 @@ public class UserInputHelper : BehaviourHelper
                         // moused agent is still under construction
                         else if (Selector.MainSelectedAgent.GetAbility<Construct>())
                         {
-                            //call build command
-                            ProcessInterfacer((QuickBuild));
+                            //call construct command
+                            ConstructionHandler.HelpConstruct();
                         }
                     }
                     else if (Selector.MainSelectedAgent.GetAbility<Attack>()
@@ -468,7 +466,7 @@ public class UserInputHelper : BehaviourHelper
                 {
                     // If there is no agent under the mouse or the selected agent doesn't have Attack, send a Move command - right clicking on terrain
                     // stop casting all abilities
-                    // Selector.MainSelectedAgent.StopCast();
+                    Selector.MainSelectedAgent.StopCast();
                     ProcessInterfacer((QuickMove));
                 }
             }
