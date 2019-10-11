@@ -50,7 +50,7 @@ namespace RTSLockstep
             }
         }
 
-        public static bool CheckValid()
+        private static bool CheckValid()
         {
             return Instance != null;
         }
@@ -76,14 +76,13 @@ namespace RTSLockstep
             CreateGroup(com);
         }
 
-        public static ConstructGroup CreateGroup(Command com)
+        private static void CreateGroup(Command com)
         {
             ConstructGroup constructGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new ConstructGroup();
 
             constructGroup.indexID = activeGroups.Add(constructGroup);
             LastCreatedGroup = constructGroup;
             constructGroup.Initialize(com);
-            return constructGroup;
         }
 
         public static void Pool(ConstructGroup group)

@@ -16,10 +16,10 @@ namespace RTSLockstep
         public ConstructGroup MyConstructGroup { get; set; }
         public int MyConstructGroupID { get; set; }
 
-        public bool IsGroupConstructing { get; set; }
-
         //Stuff for the logic
         private bool inRange;
+        private Vector2d targetDirection;
+        private long fastMag;
         private long fastRangeToTarget;
 
         private Move cachedMove;
@@ -34,7 +34,7 @@ namespace RTSLockstep
         {
             get
             {
-                if (IsGroupConstructing)
+                if (MyConstructGroup.IsNotNull())
                 {
                     return MyConstructGroup.CurrentProject;
                 }
@@ -45,7 +45,7 @@ namespace RTSLockstep
             }
             set
             {
-                if (IsGroupConstructing)
+                if (MyConstructGroup.IsNotNull())
                 {
                     MyConstructGroup.CurrentProject = value;
                 }
@@ -55,19 +55,11 @@ namespace RTSLockstep
                 }
             }
         }
-        private Structure _projectStructure { get { return CurrentProject.GetAbility<Structure>(); } }
-        public Structure ProjectStructure
+        private Structure _projectStructure
         {
             get
             {
-                if (IsGroupConstructing)
-                {
-                    return MyConstructGroup.ProjectStructure;
-                }
-                else
-                {
-                    return _projectStructure;
-                }
+                return CurrentProject.IsNotNull() ? CurrentProject.GetAbility<Structure>() : null;
             }
         }
         public bool IsBuildMoving { get; private set; }
@@ -136,7 +128,11 @@ namespace RTSLockstep
             basePriority = Agent.Body.Priority;
             constructCount = 0;
             CurrentProject = null;
+
             IsBuildMoving = false;
+
+            MyConstructGroupID = -1;
+
             inRange = false;
             IsFocused = false;
 
@@ -176,12 +172,9 @@ namespace RTSLockstep
                     }
                 }
 
-                if (canMove)
+                if (canMove && IsBuildMoving)
                 {
-                    if (IsBuildMoving)
-                    {
-                        cachedMove.StartLookingForStopPause();
-                    }
+                    cachedMove.StartLookingForStopPause();
                 }
             }
         }
@@ -211,18 +204,16 @@ namespace RTSLockstep
 
         private void BehaveWithTarget()
         {
+            // only stop construct when groups queue is empty
             if (CurrentProject.IsActive == false
                 || CurrentProject.SpawnVersion != targetVersion
-                || !ProjectStructure.NeedsConstruction)
+                || !_projectStructure.NeedsConstruction && MyConstructGroup.ConstructionQueue.Count == 0)
             {
                 //Target's lifecycle has ended
                 StopConstruction();
             }
             else
             {
-                Vector2d targetDirection = CurrentProject.Body.Position - cachedBody.Position;
-                long fastMag = targetDirection.FastMagnitude();
-
                 if (!IsWindingUp)
                 {
                     if (CheckRange())
@@ -238,19 +229,19 @@ namespace RTSLockstep
                         }
                         Agent.Animator.SetState(ConstructingAnimState);
 
-                        if (!ProjectStructure.ConstructionStarted)
+                        if (!_projectStructure.ConstructionStarted)
                         {
-                            ProjectStructure.ConstructionStarted = true;
+                            _projectStructure.ConstructionStarted = true;
                             // Restore material
                             ConstructionHandler.RestoreMaterial(CurrentProject.gameObject);
                         }
 
-                        long mag;
-                        targetDirection.Normalize(out mag);
+                        targetDirection.Normalize(out long mag);
                         bool withinTurn = cachedAttack.TrackAttackAngle == false ||
                                           (fastMag != 0 &&
                                           cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
                                           && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+
                         bool needTurn = mag != 0 && !withinTurn;
                         if (needTurn)
                         {
@@ -268,8 +259,8 @@ namespace RTSLockstep
                     {
                         if (canMove)
                         {
-                            cachedMove.PauseAutoStop();
-                            cachedMove.PauseCollisionStop();
+                            //     cachedMove.PauseAutoStop();
+                            //     cachedMove.PauseCollisionStop();
                             if (!cachedMove.IsMoving && !cachedMove.MoveOnGroupProcessed)
                             {
                                 StartConstructMove();
@@ -349,9 +340,9 @@ namespace RTSLockstep
             }
             cachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
-            if (ProjectStructure.NeedsConstruction)
+            if (_projectStructure.NeedsConstruction)
             {
-                ProjectStructure.Construct(constructAmount);
+                _projectStructure.Construct(constructAmount);
 
                 //if (audioElement != null)
                 //{
@@ -367,8 +358,8 @@ namespace RTSLockstep
 
         private bool CheckRange()
         {
-            Vector2d targetDirection = CurrentProject.Body.Position - cachedBody.Position;
-            long fastMag = targetDirection.FastMagnitude();
+            targetDirection = CurrentProject.Body.Position - cachedBody.Position;
+            fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
         }
@@ -398,11 +389,17 @@ namespace RTSLockstep
                 //if formal(going through normal Execute routes), do the group stuff
                 if (isFormal)
                 {
-                    cachedMove.RegisterGroup();
+                    if (CurrentProject.IsNotNull())
+                    {
+                        cachedMove.RegisterGroup(false);
+                    }
+                    else
+                    {
+                        cachedMove.RegisterGroup();
+                    }
                 }
                 else
                 {
-
                     cachedMove.StartMove(CurrentProject.Body.Position);
                 }
 
@@ -446,9 +443,12 @@ namespace RTSLockstep
 
             if (MyConstructGroup.IsNotNull())
             {
-                MyConstructGroup.Remove(this);
+                if (MyConstructGroup.ConstructionQueue.Count == 0 || complete)
+                {
+                    MyConstructGroup.Remove(this);
+                    MyConstructGroup = null;
+                }
             }
-            IsGroupConstructing = false;
 
             if (complete)
             {
@@ -457,13 +457,19 @@ namespace RTSLockstep
             }
             else
             {
-                if (canMove && CurrentProject.IsNotNull() && !inRange)
+                if (CurrentProject.IsNotNull())
                 {
-                    cachedMove.StopMove();
+                    if (IsBuildMoving)
+                    {
+                        cachedMove.StartMove(CurrentProject.Body.Position);
+                    }
+                    else if (canMove && !inRange)
+                    {
+                        cachedMove.StopMove();
+                    }
                 }
             }
 
-            CurrentProject = null;
             cachedBody.Priority = basePriority;
 
             IsCasting = false;

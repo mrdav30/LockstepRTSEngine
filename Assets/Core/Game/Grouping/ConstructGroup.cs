@@ -9,31 +9,31 @@ namespace RTSLockstep
 {
     public class ConstructGroup
     {
-        public Queue<QStructure> ConstructionQueue;
+        public Queue<RTSAgent> ConstructionQueue = new Queue<RTSAgent>();
 
         public RTSAgent CurrentProject;
-        public Structure ProjectStructure { get { return CurrentProject.GetAbility<Structure>(); } }
 
         public int indexID { get; set; }
 
         private byte controllerID;
 
-        public FastList<Construct> constructors;
+        private FastList<Construct> constructors;
 
-        private bool calculatedBehaviors;
+        private bool _calculatedBehaviors;
 
         public void Initialize(Command com)
         {
+            _calculatedBehaviors = false;
+            controllerID = com.ControllerID;
+            Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
+            constructors = new FastList<Construct>(selection.selectedAgentLocalIDs.Count);
+
             // check if we're queueing structures to construct
             if (com.ContainsData<QueueStructure>())
             {
                 QueueStructure[] queuedStructures = com.GetDataArray<QueueStructure>();
-                ConstructionQueue = new Queue<QStructure>();
 
-                for (int i = 0; i < queuedStructures.Length; i++)
-                {
-                    ConstructionQueue.Enqueue(queuedStructures[i].Value);
-                }
+                ProcessConstructionQueue(queuedStructures);
             }
             // otherwise were going to help construct
             else if (com.TryGetData(out DefaultData targetValue, 1) && targetValue.Is(DataType.UShort))
@@ -47,10 +47,18 @@ namespace RTSLockstep
                 }
             }
 
-            calculatedBehaviors = false;
-            controllerID = com.ControllerID;
-            Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
-            constructors = new FastList<Construct>(selection.selectedAgentLocalIDs.Count);
+            if (CurrentProject.IsNotNull())
+            {
+                // create a movement group for constructors based on the current project
+                Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
+                {
+                    ControllerID = controllerID
+                };
+
+                moveCommand.Add(CurrentProject.Body.Position);
+
+                MovementGroupHelper.StaticExecute(moveCommand);
+            }
         }
 
         public void LocalSimulate()
@@ -62,9 +70,16 @@ namespace RTSLockstep
         {
             if (constructors.IsNotNull())
             {
-                if (constructors.Count > 0 && !calculatedBehaviors)
+                if (constructors.Count > 0)
                 {
-                    calculatedBehaviors = CalculateAndExecuteBehaviors();
+                    if (!_calculatedBehaviors)
+                    {
+                        _calculatedBehaviors = CalculateAndExecuteBehaviors();
+                    }
+                    else if (!CurrentProject.GetAbility<Structure>().NeedsConstruction && ConstructionQueue.Count > 0)
+                    {
+                        CurrentProject = ConstructionQueue.Dequeue();
+                    }
                 }
 
                 if (constructors.Count == 0)
@@ -94,59 +109,8 @@ namespace RTSLockstep
             }
         }
 
-        public bool CalculateAndExecuteBehaviors()
+        private bool CalculateAndExecuteBehaviors()
         {
-            if (ConstructionQueue.IsNotNull())
-            {
-                while (ConstructionQueue.Count > 0)
-                {
-                    QStructure qStructure = ConstructionQueue.Dequeue();
-                    if (qStructure.IsNotNull())
-                    {
-                        RTSAgent newRTSAgent = AgentController.InstanceManagers[controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
-                        Structure newStructure = newRTSAgent.GetAbility<Structure>();
-
-                        if (newStructure.StructureType == StructureType.Wall)
-                        {
-                            newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
-                            newStructure.IsOverlay = true;
-                        }
-
-                        newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;
-                        newRTSAgent.Body.HalfLength = qStructure.HalfLength;
-
-                        newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
-                        newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
-
-                        if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
-                        {
-                            AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
-
-                            newRTSAgent.SetCommander(AgentController.InstanceManagers[controllerID].Commander);
-
-                            newRTSAgent.gameObject.name = newRTSAgent.objectName;
-                            newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
-                                : ConstructionHandler.OrganizerStructures.transform;
-
-                            newStructure.AwaitConstruction();
-                            // Set to transparent material until constructor is in range to start
-                            ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
-
-                            if (CurrentProject.IsNull())
-                            {
-                                //Set the current project is we don't have one
-                                CurrentProject = newRTSAgent;
-                            }
-                        }
-                        else
-                        {
-                            Debug.Log("Couldn't place building!");
-                            newRTSAgent.Die();
-                        }
-                    }
-                }
-            }
-
             if (CurrentProject.IsNotNull())
             {
                 ExecuteConstruction();
@@ -155,7 +119,62 @@ namespace RTSLockstep
             return true;
         }
 
-        public void Deactivate()
+        private void ProcessConstructionQueue(QueueStructure[] _queueStructures)
+        {
+            for (int i = 0; i < _queueStructures.Length; i++)
+            {
+                QStructure qStructure = _queueStructures[i].Value;
+                if (qStructure.IsNotNull())
+                {
+                    RTSAgent newRTSAgent = AgentController.InstanceManagers[controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
+                    Structure newStructure = newRTSAgent.GetAbility<Structure>();
+
+                    if (newStructure.StructureType == StructureType.Wall)
+                    {
+                        newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
+                        newStructure.IsOverlay = true;
+                    }
+
+                    newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;
+                    newRTSAgent.Body.HalfLength = qStructure.HalfLength;
+
+                    newStructure.BuildSizeLow = (newRTSAgent.Body.HalfWidth.CeilToInt() * 2);
+                    newStructure.BuildSizeHigh = (newRTSAgent.Body.HalfLength.CeilToInt() * 2);
+
+                    if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
+                    {
+                        AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
+
+                        newRTSAgent.SetCommander(AgentController.InstanceManagers[controllerID].Commander);
+
+                        newRTSAgent.gameObject.name = newRTSAgent.objectName;
+                        newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
+                            : ConstructionHandler.OrganizerStructures.transform;
+
+                        newStructure.AwaitConstruction();
+                        // Set to transparent material until constructor is in range to start
+                        ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
+
+                        if (CurrentProject.IsNull())
+                        {
+                            //Set the current project if we don't have one
+                            CurrentProject = newRTSAgent;
+                        }
+                        else
+                        {
+                            ConstructionQueue.Enqueue(newRTSAgent);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Couldn't place building!");
+                        newRTSAgent.Die();
+                    }
+                }
+            }
+        }
+
+        private void Deactivate()
         {
             Construct constructor;
             for (int i = 0; i < constructors.Count; i++)
@@ -165,29 +184,18 @@ namespace RTSLockstep
                 constructor.MyConstructGroupID = -1;
             }
             constructors.FastClear();
-            if (ConstructionQueue.IsNotNull())
-            {
-                ConstructionQueue.Clear();
-            }
+            ConstructionQueue.Clear();
             CurrentProject = null;
             ConstructionGroupHelper.Pool(this);
-            calculatedBehaviors = false;
+            _calculatedBehaviors = false;
             indexID = -1;
         }
 
         private void ExecuteConstruction()
         {
-            // create a movement group for constructors based on the current project
-            Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID);
-            moveCommand.ControllerID = controllerID;
-            moveCommand.Add(CurrentProject.Body.Position);
-
-            MovementGroupHelper.StaticExecute(moveCommand);
-
             for (int i = 0; i < constructors.Count; i++)
             {
                 Construct constructor = constructors[i];
-                constructor.IsGroupConstructing = true;
                 constructor.OnConstructGroupProcessed();
             }
         }

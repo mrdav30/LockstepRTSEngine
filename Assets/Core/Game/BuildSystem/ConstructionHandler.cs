@@ -205,14 +205,16 @@ public static class ConstructionHandler
 
     public static void SetConstructionQueue(GameObject buildingProject, long adjustHalfWidth = 0, long adjustHalfLength = 0)
     {
-        QStructure qStructure = new QStructure();
-        qStructure.StructureName = buildingProject.gameObject.name;
-        qStructure.BuildPoint = new Vector2d(buildingProject.transform.localPosition.x, buildingProject.transform.localPosition.z);
-        qStructure.RotationPoint = new Vector2d(buildingProject.transform.localRotation.w, buildingProject.transform.localRotation.y);
-        qStructure.LocalScale = new Vector3d(buildingProject.transform.localScale);
+        QStructure qStructure = new QStructure
+        {
+            StructureName = buildingProject.gameObject.name,
+            BuildPoint = new Vector2d(buildingProject.transform.localPosition.x, buildingProject.transform.localPosition.z),
+            RotationPoint = new Vector2d(buildingProject.transform.localRotation.w, buildingProject.transform.localRotation.y),
+            LocalScale = new Vector3d(buildingProject.transform.localScale),
 
-        qStructure.HalfWidth = adjustHalfWidth > 0 ? adjustHalfWidth : tempStructureBody.HalfWidth;
-        qStructure.HalfLength = adjustHalfLength > 0 ? adjustHalfLength : tempStructureBody.HalfLength;
+            HalfWidth = adjustHalfWidth > 0 ? adjustHalfWidth : tempStructureBody.HalfWidth,
+            HalfLength = adjustHalfLength > 0 ? adjustHalfLength : tempStructureBody.HalfLength
+        };
 
         constructionQueue.Add(qStructure);
     }
