@@ -81,9 +81,9 @@ namespace RTSLockstep
             }
         }
 
-        private Selection previousSelection = new Selection();
+        public Selection previousSelection = new Selection();
 
-        public event Action<RTSAgent> onCreateAgent;
+        public event Action<RTSAgent> OnCreateAgent;
         #endregion
 
         #region Event Behavior
@@ -188,7 +188,7 @@ namespace RTSLockstep
                 if (GlobalAgentActive[i])
                 {
                     RTSAgent agent = GlobalAgents[i];
-                    AgentController.DestroyAgent(agent);
+                    DestroyAgent(agent);
                 }
             }
         }
@@ -344,7 +344,7 @@ namespace RTSLockstep
 
         public void AddToSelection(RTSAgent agent)
         {
-            if (agent.IsSelected == false)
+            if (!agent.IsSelected)
             {
                 SelectedAgents.Add(agent);
                 SelectionChanged = true;
@@ -379,14 +379,24 @@ namespace RTSLockstep
 
         public void Execute(Command com)
         {
-            if (com.ContainsData<Selection>())
+            Selection selection = GetSelection(com);
+            //check to see if selection has changed since the last command
+            ushort[] arr1 = selection.selectedAgentLocalIDs.innerArray;
+            ushort[] arr2 = previousSelection.selectedAgentLocalIDs.innerArray;
+
+            if (!arr1.StructuralEquals(arr2))
             {
-                previousSelection = com.GetData<Selection>();
+                previousSelection = selection;
+                SelectionChanged = true;
+            }
+            else
+            {
+                SelectionChanged = false;
             }
 
-            BehaviourHelperManager.Execute(com);
-            Selection selection = GetSelection(com);
             Influence influence = GetInfluencedAgent(com);
+
+            BehaviourHelperManager.Execute(com);
 
             // check if command is an influence from AI
             if (influence.IsNotNull())
@@ -437,7 +447,7 @@ namespace RTSLockstep
             var agent = CreateRawAgent(agentCode, position, rotation);
 
             InitializeAgent(agent, position, rotation);
-            onCreateAgent?.Invoke(agent);
+            OnCreateAgent?.Invoke(agent);
 
             return agent;
         }

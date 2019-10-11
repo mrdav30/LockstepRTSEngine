@@ -164,21 +164,9 @@ namespace RTSLockstep
                     {
                         com.ControllerID = cont.ControllerID;
 
-#if false
-                        if (cont.SelectionChanged)
-                        {
-                            com.SetData<Selection>(new Selection(cont.SelectedAgents));
-                            cont.SelectionChanged = false;
-
-						} else
-                        {
-                            com.ClearData<Selection>();
-                        }
-#else
                         //we always sending selection data
-                        com.SetData<Selection>(new Selection(cont.SelectedAgents));
-                        cont.SelectionChanged = false;
-#endif
+                        com.SetData(new Selection(cont.SelectedAgents));
+
                         CommandManager.SendCommand(com);
                     }
                 }
