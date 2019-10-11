@@ -20,17 +20,18 @@ namespace RTSLockstep
 
         public Selection() { }
 
-        static readonly FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
+        private static readonly FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
+
         public Selection(FastEnumerable<RTSAgent> selectedAgents)
         {
             bufferAgents.FastClear();
             selectedAgents.Enumerate(bufferAgents);
-            this.AddAgents(bufferAgents.ToArray());
+            AddAgents(bufferAgents.ToArray());
         }
 
         public byte[] GetBytes()
         {
-            this.Serialize();
+            Serialize();
 
             bufferBites.FastClear();
             //Serialize header

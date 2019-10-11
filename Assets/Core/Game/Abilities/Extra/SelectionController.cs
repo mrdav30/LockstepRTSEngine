@@ -6,7 +6,6 @@ namespace RTSLockstep
     {
         private Health cachedHealth;
         private Harvest cachedHarvest;
-        private Spawner cachedSpawner;
         private Structure cachedStructure;
 
         protected Rect selectBox;
@@ -20,7 +19,6 @@ namespace RTSLockstep
 
             cachedHealth = Agent.GetAbility<Health>();
             cachedHarvest = Agent.GetAbility<Harvest>();
-            cachedSpawner = Agent.GetAbility<Spawner>();
             cachedStructure = Agent.GetAbility<Structure>();
         }
 

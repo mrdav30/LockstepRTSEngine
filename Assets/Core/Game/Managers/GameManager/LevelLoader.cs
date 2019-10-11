@@ -70,7 +70,9 @@ namespace RTSLockstep
                 {
                     RTSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
                     if (AutoCommand)
+                    {
                         Selector.Add(agent);
+                    }
                 }
             }
 
@@ -84,7 +86,7 @@ namespace RTSLockstep
                 }
                 battlePos /= Spawns.Length;
                 Command com = new Command(Data.AbilityDataItem.FindInterfacer<Attack>().ListenInputID);
-                com.Add<Vector2d>(battlePos);
+                com.Add(battlePos);
 
                 PlayerManager.SendCommand(com);
                 Selector.Clear();

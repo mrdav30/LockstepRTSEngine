@@ -70,14 +70,14 @@ namespace RTSLockstep
         //instantiate commander object
         public static void AddController(AgentController agentController) //, string defaultController
         {
-            if (PlayerManager.ContainsController(agentController))
+            if (ContainsController(agentController))
             {
                 Debug.Log("BOOM");
                 return;
             }
 
             agentController.PlayerIndex = AgentControllers.Add(agentController);
-            if (MainController == null)
+            if (MainController.IsNull())
             {
                 MainController = agentController;
             }
@@ -120,22 +120,30 @@ namespace RTSLockstep
 
         public static bool ContainsController(AgentController controller)
         {
-            if (AgentControllers == null) Debug.Log(controller);
+            if (AgentControllers.IsNull())
+            {
+                Debug.Log(controller);
+            }
             return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers.ContainsAt(controller.PlayerIndex, controller);
         }
 
         public static AllegianceType GetAllegiance(AgentController otherController)
         {
-            if (Selector.MainSelectedAgent != null)
+            if (Selector.MainSelectedAgent.IsNotNull())
+            {
                 return Selector.MainSelectedAgent.Controller.GetAllegiance(otherController);
-            if (MainController == null)
+            }
+            else if (MainController.IsNull())
+            {
                 return AllegianceType.Neutral;
+            }
+
             return MainController.GetAllegiance(otherController);
         }
 
         public static AllegianceType GetAllegiance(RTSAgent agent)
         {
-            return PlayerManager.GetAllegiance(agent.Controller);
+            return GetAllegiance(agent.Controller);
         }
 
         /// <summary>
@@ -145,7 +153,7 @@ namespace RTSLockstep
         /// <param name="com">COM.</param>
         public static void SendCommand(Command com)
         {
-            com.Add<Selection>(new Selection());
+            com.Add(new Selection());
             for (int i = 0; i < AgentControllers.PeakCount; i++)
             {
                 if (AgentControllers.arrayAllocation[i])

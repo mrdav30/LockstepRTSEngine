@@ -7,9 +7,7 @@ namespace RTSLockstep
 {
     public static class SelectionManager
     {
-        private static bool _canBox = true;
-
-        public static bool CanBox { get { return _canBox; } set { _canBox = value; } }
+        public static bool CanBox = true;
 
         public const int MaximumSelection = 512;
 
@@ -26,8 +24,6 @@ namespace RTSLockstep
         public static Vector2 Box_BottomLeft;
         public static Vector2 Box_BottomRight;
         public static bool Boxing;
-        private static float BoxingTime;
-        private static bool CheckBoxDistance { get; set; }
         private const float MinBoxSqrDist = 4;
 
         private static Vector2 agentPos;
@@ -41,7 +37,7 @@ namespace RTSLockstep
         private static Vector2 Edge;
         private static Vector2 dif;
 
-        public static bool _selectionLocked { get; private set; }
+        private static bool _selectionLocked;
 
         public static void Initialize()
         {
@@ -61,7 +57,6 @@ namespace RTSLockstep
             {
                 if (CanBox)
                 {
-                    BoxingTime += Time.deltaTime;
                     if (MousePosition != BoxEnd)
                     {
                         Vector2 RaycastTopLeft;
@@ -181,7 +176,7 @@ namespace RTSLockstep
                         ClearSelection();
                     }
 
-                    if (IsGathering == false)
+                    if (!IsGathering)
                     {
                         SelectSelectedAgents();
                     }
@@ -200,7 +195,6 @@ namespace RTSLockstep
         // do left click hold things
         public static void HandleLeftClickHoldDown()
         {
-            CheckBoxDistance = true;
             StartBoxing(MousePosition);
         }
 
@@ -251,14 +245,13 @@ namespace RTSLockstep
         public static void StartBoxing(Vector2 boxStart)
         {
             Boxing = true;
-            BoxingTime = 0f;
             BoxStart = MousePosition;
             BoxEnd = MousePosition;
         }
 
         public static void BoxAgent(RTSAgent agent)
         {
-            if (ReferenceEquals(agent, null))
+            if (agent is null)
             {
                 return;
             }
@@ -270,13 +263,15 @@ namespace RTSLockstep
         public static void QuickSelect()
         {
             if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+            {
                 ClearSelection();
+            }
+
             SelectAgent(MousedAgent);
         }
 
         public static void SelectAgent(RTSAgent agent)
         {
-
             if (agent.IsNotNull())
             {
                 Selector.Add(agent);
@@ -311,14 +306,7 @@ namespace RTSLockstep
 
         public static void SetSelectionLock(bool lockState)
         {
-            if (lockState)
-            {
-                _selectionLocked = true;
-            }
-            else
-            {
-                _selectionLocked = false;
-            }
+            _selectionLocked = lockState ? true : false;
         }
 
         public static void ClearBox()
@@ -358,7 +346,7 @@ namespace RTSLockstep
 
         private static void GetMousedAgent()
         {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            if (EventSystem.current.IsNotNull() && EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }
@@ -368,7 +356,6 @@ namespace RTSLockstep
             {
                 return agent.CanSelect; // && PlayerManager.ContainsController(agent.Controller);
             }));
-
         }
 
         private static void MouseOver(RTSAgent agent)
@@ -387,8 +374,10 @@ namespace RTSLockstep
 
             if (agent.IsNotNull())
             {
-                if (SelectionManager.Boxing == false)
+                if (!Boxing)
+                {
                     agent.IsHighlighted = true;
+                }
             }
         }
     }

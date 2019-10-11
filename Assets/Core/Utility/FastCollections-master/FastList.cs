@@ -100,7 +100,7 @@ namespace FastCollections
         public void RemoveAt(int index)
         {
             Count--;
-            innerArray[index] = default(T);
+            innerArray[index] = default;
             Array.Copy(innerArray, index + 1, innerArray, index, Count - index);
         }
 
