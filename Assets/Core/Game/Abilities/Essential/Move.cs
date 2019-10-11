@@ -313,16 +313,16 @@ namespace RTSLockstep
 
                 if (_flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
                 {
-                    //if (flowField.HasLOS)
-                    //{
-                    //    // we have no more use for flow fields if the agent has line of sight to destination
-                    //    straightPath = true;
-                    //    movementDirection = Destination - cachedBody.Position;
-                    //}
-                    //else
-                    //{
+                    if (flowField.HasLOS)
+                    {
+                        // we have no more use for flow fields if the agent has line of sight to destination
+                        straightPath = true;
+                        movementDirection = Destination - cachedBody.Position;
+                    }
+                    else
+                    {
                         movementDirection = flowField.Direction;
-                   // }
+                    }
                 }
                 else
                 {
@@ -464,7 +464,7 @@ namespace RTSLockstep
         }
 
         /// <summary>
-        /// Start the search process for collisions/obstructions that are in the same attack group.
+        /// Start the search process for collisions/obstructions that are in the same group.
         /// </summary>
         public void StartLookingForStopPause()
         {
@@ -618,10 +618,10 @@ namespace RTSLockstep
                 {
                     //If the other mover is moving to a similar point
                     //don't check if agent isn't assigned move group
-                    if (MyMovementGroupID > 0 && otherMover.MyMovementGroupID == MyMovementGroupID
+                    if (MyMovementGroupID >= 0 && otherMover.MyMovementGroupID == MyMovementGroupID
                         || otherMover.Destination.FastDistance(this.Destination) <= (closingDistance * closingDistance))
                     {
-                        if (otherMover.IsMoving == false)
+                        if (!otherMover.IsMoving)
                         {
                             if (otherMover.Arrived
                                 && otherMover.StoppedTime > MinimumOtherStopTime)
@@ -634,12 +634,12 @@ namespace RTSLockstep
                     if (GetLookingForStopPause())
                     {
                         //As soon as the original collision stop unit is released, units will start breaking out of pauses
-                        if (otherMover.GetCanCollisionStop() == false)
+                        if (!otherMover.GetCanCollisionStop())
                         {
                             StopPauseLayer = -1;
                             PauseAutoStop();
                         }
-                        else if (otherMover.GetCanAutoStop() == false)
+                        else if (!otherMover.GetCanAutoStop())
                         {
                             if (otherMover.StopPauseLayer < StopPauseLayer)
                             {

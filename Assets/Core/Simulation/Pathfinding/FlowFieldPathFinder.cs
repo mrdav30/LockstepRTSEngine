@@ -45,7 +45,6 @@ namespace RTSLockstep.Pathfinding
 
         public static void FindPath(GridNode startNode, GridNode endNode, int unitHalfSize = 1)
         {
-            UnityEngine.Debug.Log("finding path");
             markedNodesBuffer.FastClear();
             if (GenerateDistanceField(startNode, endNode, unitHalfSize, markedNodesBuffer))
             {
