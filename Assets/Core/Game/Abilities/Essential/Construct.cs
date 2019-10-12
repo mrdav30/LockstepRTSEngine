@@ -386,21 +386,17 @@ namespace RTSLockstep
 
             if (canMove && !CheckRange())
             {
-                //if formal(going through normal Execute routes), do the group stuff
-                if (isFormal)
+                if (CurrentProject.IsNotNull())
                 {
-                    if (CurrentProject.IsNotNull())
+                    //if formal(going through normal Execute routes), do the group stuff
+                    if (isFormal)
                     {
-                        cachedMove.RegisterGroup(false);
+                        MyConstructGroup.ConstructMoveGroup.Add(cachedMove);
                     }
                     else
                     {
-                        cachedMove.RegisterGroup();
+                        cachedMove.StartMove(CurrentProject.Body.Position);
                     }
-                }
-                else
-                {
-                    cachedMove.StartMove(CurrentProject.Body.Position);
                 }
 
                 IsBuildMoving = true;

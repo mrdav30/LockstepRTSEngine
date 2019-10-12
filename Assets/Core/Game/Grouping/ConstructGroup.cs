@@ -9,8 +9,8 @@ namespace RTSLockstep
 {
     public class ConstructGroup
     {
+        public MovementGroup ConstructMoveGroup;
         public Queue<RTSAgent> ConstructionQueue = new Queue<RTSAgent>();
-
         public RTSAgent CurrentProject;
 
         public int indexID { get; set; }
@@ -57,7 +57,7 @@ namespace RTSLockstep
 
                 moveCommand.Add(CurrentProject.Body.Position);
 
-                MovementGroupHelper.StaticExecute(moveCommand);
+                ConstructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
         }
 
