@@ -30,6 +30,7 @@
         PanDown,
         Harvest,
         Deposit,
+        Construct,
         RallyPoint
     }
 

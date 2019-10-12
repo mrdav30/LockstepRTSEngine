@@ -10,7 +10,7 @@ public class HUD : MonoBehaviour
     public GUISkin resourceSkin, ordersSkin, selectBoxSkin;
     private Texture2D activeCursor;
     public Texture2D pointerCursor, selectCursor, leftCursor, rightCursor, upCursor, downCursor;
-    public Texture2D[] moveCursors, attackCursors, harvestCursors, depositCursors, garrisonCursors;
+    public Texture2D[] moveCursors, attackCursors, harvestCursors, depositCursors, constructCursors, garrisonCursors;
     public GUISkin mouseCursorSkin;
     public Texture2D[] resources;
     // buildFrame provides a border around each buildImage
@@ -229,6 +229,10 @@ public class HUD : MonoBehaviour
             case CursorState.Deposit:
                 currentFrame = (int)Time.time % depositCursors.Length;
                 activeCursor = depositCursors[currentFrame];
+                break;
+            case CursorState.Construct:
+                currentFrame = (int)Time.time % constructCursors.Length;
+                activeCursor = constructCursors[currentFrame];
                 break;
             case CursorState.Move:
                 currentFrame = (int)Time.time % moveCursors.Length;
@@ -490,6 +494,11 @@ public class HUD : MonoBehaviour
         {
             currentFrame = (int)Time.time % harvestCursors.Length;
             activeCursor = harvestCursors[currentFrame];
+        }
+        else if (activeCursorState == CursorState.Construct)
+        {
+            currentFrame = (int)Time.time % constructCursors.Length;
+            activeCursor = constructCursors[currentFrame];
         }
     }
 

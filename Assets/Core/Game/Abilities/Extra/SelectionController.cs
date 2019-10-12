@@ -63,7 +63,17 @@ namespace RTSLockstep
                         if (Selector.MainSelectedAgent.Controller.RefEquals(Agent.Controller))
                         {
                             //agent belongs to current player
-                            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                            if (Selector.MainSelectedAgent.GetAbility<Construct>())
+                            {
+                                if (Agent.MyAgentType == AgentType.Building && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().NeedsConstruction)
+                                {
+                                    PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Construct);
+                                }
+                            }
+                            else
+                            {
+                                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                            }
                         }
                         else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.MainController.SelectedAgents.Count > 0
                             && Agent.MyAgentType != AgentType.Resource)
