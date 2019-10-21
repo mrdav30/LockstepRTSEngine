@@ -111,7 +111,7 @@ namespace RTSLockstep.Pathfinding
                     rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
                 }
 
-                //for each neighbour of this node  (only straight line neighbours, not diagonals)
+                // for each straight line neighbour of this node (no diagonals)
                 for (int i = 0; i < 4; i++)
                 {
                     neighbor = rawNode.NeighborNodes[i];

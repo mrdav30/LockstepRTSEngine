@@ -53,7 +53,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Structure structure = other.GetAbility<Structure>();
-                        return structure != null && !structure.NeedsConstruction;
+                        return structure.IsNotNull() && !structure.NeedsConstruction;
                     };
                 }
                 else
@@ -62,7 +62,7 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
-                        return resourceDeposit != null && !resourceDeposit.IsEmpty() && other.IsActive;
+                        return resourceDeposit.IsNotNull() && !resourceDeposit.IsEmpty() && other.IsActive;
                     };
                 }
 

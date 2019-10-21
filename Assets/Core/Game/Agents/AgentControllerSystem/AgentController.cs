@@ -481,7 +481,7 @@ namespace RTSLockstep
                 Vector3 pos = startPosition.ToVector3();
                 Quaternion rot = new Quaternion(0, startRotation.y, 0, startRotation.x);
 
-                curAgent = GameObject.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject, pos, rot).GetComponent<RTSAgent>();
+                curAgent = UnityEngine.Object.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject, pos, rot).GetComponent<RTSAgent>();
                 curAgent.Setup(interfacer);
 
                 RegisterRawAgent(curAgent);

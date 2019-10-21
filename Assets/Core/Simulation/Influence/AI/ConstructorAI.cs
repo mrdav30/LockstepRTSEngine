@@ -42,7 +42,7 @@ namespace RTSLockstep
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = agentConditional = (other) =>
+                Func<RTSAgent, bool> agentConditional = (other) =>
                     {
                         Structure structure = other.GetAbility<Structure>();
                         return structure != null && structure.NeedsConstruction && other.IsActive;

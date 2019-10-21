@@ -220,7 +220,7 @@ namespace RTSLockstep
             gameObject.SetActive(true);
             LoadComponents();
 
-            GameObject.DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
 
             _setupAbilitys.FastClear();
 

@@ -9,29 +9,21 @@ namespace RTSLockstep
 {
     public static class InfluenceManager
     {
-        static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
+        private static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
         public static FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
         private static FastList<LSBody> bufferBodies = new FastList<LSBody>();
-        const int FoundScanBuffer = 5;
+        private const int FoundScanBuffer = 5;
+
+        private const long circleCastRadius = FixedMath.One * 16;
 
         public static void Initialize()
         {
-            //DeltaCache.GenerateCache ();
         }
 
         public static void Simulate()
         {
 
         }
-
-        // not sure why this is here...
-        //public static int GenerateDeltaCount(long radius)
-        //{
-        //	radius /= GridManager.ScanResolution;
-        //	int ret = FixedMath.Mul(FixedMath.Mul(radius, radius), FixedMath.Pi).CeilToInt();
-        //	//if (ret < 5) ret = 5;
-        //	return ret;
-        //}
 
         #region Scanning
         // find single unit
@@ -43,10 +35,9 @@ namespace RTSLockstep
 
         public static void ScanAll(Vector2d position, long radius, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<RTSAgent> output)
         {
-            //If radius is too big and we scan too many tiles, performance will be bad
-            const long circleCastRadius = FixedMath.One * 16;
             output.FastClear();
 
+            //If radius is too big and we scan too many tiles, performance will be bad
             if (radius >= circleCastRadius)
             {
                 bufferBodies.FastClear();

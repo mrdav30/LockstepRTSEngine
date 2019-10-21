@@ -9,7 +9,7 @@ namespace RTSLockstep
     {
         public const long MissModifier = FixedMath.One / 2;
 
-        public virtual bool CanMove { get; private set; }
+        protected virtual bool CanMove { get; private set; }
 
         protected bool CanTurn { get; private set; }
 
@@ -150,7 +150,7 @@ namespace RTSLockstep
             if (CanMove)
             {
                 cachedMove.onArrive += HandleOnArrive;
-                cachedMove.onGroupProcessed += _HandleMoveGroupProcessed;
+                cachedMove.onGroupProcessed += HandleMoveGroupProcessed;
             }
 
             CanTurn = cachedTurn.IsNotNull();
@@ -284,7 +284,7 @@ namespace RTSLockstep
                         {
                             if (CanMove)
                             {
-                                cachedMove.StopMove();
+                                cachedMove.Arrive();
                             }
 
                             inRange = true;
@@ -320,7 +320,7 @@ namespace RTSLockstep
                         {
                             cachedMove.PauseAutoStop();
                             cachedMove.PauseCollisionStop();
-                            if (cachedMove.IsMoving == false)
+                            if (!cachedMove.IsMoving)
                             {
                                 cachedMove.StartMove(Target.Body.Position);
                                 cachedBody.Priority = basePriority;
@@ -364,6 +364,7 @@ namespace RTSLockstep
                         Vector2d targetVector = Target.Body.Position - cachedBody.Position;
                         cachedTurn.StartTurnVector(targetVector);
                     }
+
                     if (windupCount >= Windup)
                     {
                         windupCount = 0;
@@ -376,7 +377,6 @@ namespace RTSLockstep
                         this.attackCount += Windup;
                         IsWindingUp = false;
                     }
-
                 }
                 else
                 {
@@ -413,15 +413,14 @@ namespace RTSLockstep
 
         public void Fire()
         {
-
             if (CanMove)
             {
+                // we don't want to be able to fire and move!
                 cachedMove.StopMove();
             }
             cachedBody.Priority = IncreasePriority ? basePriority + 1 : basePriority;
 
             OnFire(Target);
-
         }
 
         /// <summary>
@@ -441,18 +440,14 @@ namespace RTSLockstep
                     CycleCount = 0;
                 }
                 FullFireProjectile(this.ProjCode, ProjectileOffsets[CycleCount], target);
-
-
             }
             else
             {
                 for (int i = 0; i < ProjectileOffsets.Length; i++)
                 {
                     FullFireProjectile(ProjCode, ProjectileOffsets[i], target);
-
                 }
             }
-
         }
 
         public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
@@ -544,7 +539,7 @@ namespace RTSLockstep
 
         public void Engage(RTSAgent other)
         {
-            if (other != Agent && other != null)
+            if (other != Agent && other.IsNotNull())
             {
                 cachedTargetHealth = other.GetAbility<Health>();
                 if (cachedTargetHealth.IsNotNull())
@@ -553,6 +548,7 @@ namespace RTSLockstep
                     Target = other;
                     targetVersion = Target.SpawnVersion;
                     IsCasting = true;
+
                     fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0) + Agent.Body.Radius;
                     fastRangeToTarget *= fastRangeToTarget;
 
@@ -591,7 +587,7 @@ namespace RTSLockstep
                 {
                     if (CanMove)
                     {
-                        if (Target != null && inRange == false)
+                        if (Target.IsNotNull() && !inRange)
                         {
                             cachedMove.StopMove();
                         }
@@ -633,25 +629,23 @@ namespace RTSLockstep
                     cachedMove.StartMove(position);
                 }
             }
+
             IsAttackMoving = true;
             IsFocused = false;
         }
 
         protected override void OnExecute(Command com)
         {
-            Vector2d pos;
-            DefaultData target;
-            if (com.TryGetData<Vector2d>(out pos) && CanMove)
+            if (com.TryGetData(out Vector2d pos) && CanMove)
             {
                 StartAttackMove(pos);
             }
-            else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
+            else if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
             {
                 IsFocused = true;
                 IsAttackMoving = false;
-                RTSAgent tempTarget;
                 ushort targetValue = (ushort)target.Value;
-                if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+                if (AgentController.TryGetAgentInstance(targetValue, out RTSAgent tempTarget))
                 {
                     Engage(tempTarget);
                 }
@@ -666,10 +660,6 @@ namespace RTSLockstep
         {
             StopEngage(true);
         }
-
-        Action _handleMoveGroupProcessed;
-
-        Action _HandleMoveGroupProcessed { get { return _handleMoveGroupProcessed ?? (_handleMoveGroupProcessed = HandleMoveGroupProcessed); } }
 
         void HandleMoveGroupProcessed()
         {

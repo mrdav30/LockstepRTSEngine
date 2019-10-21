@@ -13,8 +13,8 @@ namespace RTSLockstep
         private const int searchRate = LockstepManager.FrameRate / 2;
         private long currentAmountBuilt = 0;
 
-        public ConstructGroup MyConstructGroup { get; set; }
-        public int MyConstructGroupID { get; set; }
+        public ConstructGroup MyConstructGroup;
+        public int MyConstructGroupID;
 
         //Stuff for the logic
         private bool inRange;
@@ -22,7 +22,7 @@ namespace RTSLockstep
         private long fastMag;
         private long fastRangeToTarget;
 
-        private Move cachedMove;
+        public Move cachedMove;
         protected virtual bool canMove { get; private set; }
         private Turn cachedTurn;
         protected bool canTurn { get; private set; }
@@ -170,6 +170,15 @@ namespace RTSLockstep
                     {
                         BehaveWithTarget();
                     }
+                    else if (IsBuildMoving)
+                    {
+                        if (canMove && cachedMove.IsMoving)
+                        {
+                            // we shouldn't be moving then!
+                            cachedMove.StopMove();
+                            IsBuildMoving = false;
+                        }
+                    }
                 }
 
                 if (canMove && IsBuildMoving)
@@ -259,9 +268,10 @@ namespace RTSLockstep
                     {
                         if (canMove)
                         {
-                            //     cachedMove.PauseAutoStop();
-                            //     cachedMove.PauseCollisionStop();
-                            if (!cachedMove.IsMoving && !cachedMove.MoveOnGroupProcessed)
+                            cachedMove.PauseAutoStop();
+                            cachedMove.PauseCollisionStop();
+                            if (!cachedMove.IsMoving
+                                && !cachedMove.MoveOnGroupProcessed)
                             {
                                 StartConstructMove();
                                 cachedBody.Priority = basePriority;
@@ -374,29 +384,18 @@ namespace RTSLockstep
             targetVersion = CurrentProject.SpawnVersion;
             IsCasting = true;
 
-            StartConstructMove(true);
-        }
-
-        public virtual void StartConstructMove(bool isFormal = false)
-        {
-            Agent.StopCast(this.ID);
-
             fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
+        }
 
+        public virtual void StartConstructMove()
+        {
             if (canMove && !CheckRange())
             {
                 if (CurrentProject.IsNotNull())
                 {
-                    //if formal(going through normal Execute routes), do the group stuff
-                    if (isFormal)
-                    {
-                        MyConstructGroup.ConstructMoveGroup.Add(cachedMove);
-                    }
-                    else
-                    {
-                        cachedMove.StartMove(CurrentProject.Body.Position);
-                    }
+                    // position is set by the movement group tied to construct group
+                    cachedMove.StartMove(cachedMove.Destination);
                 }
 
                 IsBuildMoving = true;
@@ -411,6 +410,7 @@ namespace RTSLockstep
                 && target.Is(DataType.Bool)
                 && (bool)target.Value)
             {
+                Agent.StopCast(ID);
                 RegisterConstructGroup();
             }
         }
@@ -442,7 +442,6 @@ namespace RTSLockstep
                 if (MyConstructGroup.ConstructionQueue.Count == 0 || complete)
                 {
                     MyConstructGroup.Remove(this);
-                    MyConstructGroup = null;
                 }
             }
 

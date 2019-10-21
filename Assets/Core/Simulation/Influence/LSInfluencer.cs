@@ -76,9 +76,9 @@ namespace RTSLockstep
                     return;
                 }
 
-                if (System.Object.ReferenceEquals(tempNode, LocatedNode) == false)
+                if (!ReferenceEquals(tempNode, LocatedNode))
                 {
-                    if (LocatedNode != null)
+                    if (LocatedNode.IsNotNull())
                     {
                         LocatedNode.Remove(this);
                     }
@@ -99,7 +99,7 @@ namespace RTSLockstep
 
         public void Deactivate()
         {
-            if (LocatedNode != null)
+            if (LocatedNode.IsNotNull())
             {
                 LocatedNode.Remove(this);
                 LocatedNode = null;

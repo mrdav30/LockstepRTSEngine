@@ -5,6 +5,12 @@ namespace RTSLockstep.Grid
 {
     public class ScanNode
     {
+        //Agents are sorted into buckets based on their AC
+        private FastList<FastBucket<LSInfluencer>> AgentBuckets = new FastList<FastBucket<LSInfluencer>>();
+
+        public int X;
+        public int Y;
+        public int AgentCount;
 
         public ScanNode()
         {
@@ -12,16 +18,10 @@ namespace RTSLockstep.Grid
 
         public void Setup(int x, int y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
-        //Agents are sorted into buckets based on their AC
-        private FastList<FastBucket<LSInfluencer>> AgentBuckets = new FastList<FastBucket<LSInfluencer>>();
-
-        public int X;
-        public int Y;
-        public int AgentCount;
         //Adds the agent and returns a ticket number
         public void Add(LSInfluencer influencer)
         {
@@ -37,7 +37,7 @@ namespace RTSLockstep.Grid
             }
 
             FastBucket<LSInfluencer> bucket = AgentBuckets[controllerID];
-            if (bucket == null)
+            if (bucket.IsNull())
             {
                 //A new bucket for the controller must be created
                 bucket = new FastBucket<LSInfluencer>();
@@ -70,7 +70,9 @@ namespace RTSLockstep.Grid
                 if (bucket.IsNotNull())
                 {
                     if (bucketConditional(i))
+                    {
                         output.Add(bucket);
+                    }
                 }
             }
         }
