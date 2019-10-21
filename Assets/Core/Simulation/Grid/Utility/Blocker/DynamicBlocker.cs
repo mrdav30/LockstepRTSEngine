@@ -7,13 +7,13 @@ namespace RTSLockstep.Grid
     [RequireComponent(typeof(UnityLSBody))]
     public class DynamicBlocker : Ability
     {
-        private static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
-        private FastList<GridNode> LastCoordinates = new FastList<GridNode>();
-        private LSBody CachedBody;
+        private static readonly FastList<Vector2d> _bufferCoordinates = new FastList<Vector2d>();
+        private FastList<GridNode> _lastCoordinates = new FastList<GridNode>();
+        private LSBody _cachedBody;
 
         protected override void OnSetup()
         {
-            CachedBody = Agent.Body;
+            _cachedBody = Agent.Body;
             UpdateCoordinates();
         }
 
@@ -24,11 +24,17 @@ namespace RTSLockstep.Grid
 
         protected override void OnLateSimulate()
         {
-            if (this.CachedBody.PositionChangedBuffer || this.CachedBody.RotationChangedBuffer)
+            if (this._cachedBody.PositionChangedBuffer || this._cachedBody.RotationChangedBuffer)
             {
                 RemoveLastCoordinates();
                 UpdateCoordinates();
             }
+        }
+
+        public void UpdateNodeObstacles()
+        {
+            RemoveLastCoordinates();
+            UpdateCoordinates();
         }
 
         protected override void OnDeactivate()
@@ -38,20 +44,20 @@ namespace RTSLockstep.Grid
 
         private void RemoveLastCoordinates()
         {
-            for (int i = 0; i < LastCoordinates.Count; i++)
+            for (int i = 0; i < _lastCoordinates.Count; i++)
             {
-                GridNode node = LastCoordinates[i];
+                GridNode node = _lastCoordinates[i];
                 node.RemoveObstacle();
             }
-            LastCoordinates.FastClear();
+            _lastCoordinates.FastClear();
         }
 
         private void UpdateCoordinates()
         {
             const long gridSpacing = FixedMath.One;
-            bufferCoordinates.FastClear();
-            CachedBody.GetCoveredSnappedPositions(gridSpacing, bufferCoordinates);
-            foreach (Vector2d vec in bufferCoordinates)
+            _bufferCoordinates.FastClear();
+            _cachedBody.GetCoveredSnappedPositions(gridSpacing, _bufferCoordinates);
+            foreach (Vector2d vec in _bufferCoordinates)
             {
                 GridNode node = GridManager.GetNode(vec.x, vec.y);
 
@@ -61,7 +67,7 @@ namespace RTSLockstep.Grid
                 }
 
                 node.AddObstacle();
-                LastCoordinates.Add(node);
+                _lastCoordinates.Add(node);
             }
         }
     }

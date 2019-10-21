@@ -107,7 +107,7 @@ namespace RTSLockstep
             set
             {
                 _heightPos = value;
-                this.HeightPosChanged = true;
+                HeightPosChanged = true;
             }
         }
 
@@ -469,8 +469,10 @@ namespace RTSLockstep
 
             LastPosition = _position;
 
+            //  Move agents based on forces being applied (aka physics)
             if (VelocityMagnitude != 0)
             {
+                //  Apply the force
                 _position.x += _velocity.x / LockstepManager.FrameRate;
                 _position.y += _velocity.y / LockstepManager.FrameRate;
                 PositionChanged = true;
@@ -479,7 +481,7 @@ namespace RTSLockstep
             BuildChangedValues();
 
             PartitionChanged = false;
-            if (PositionChanged || this.PositionChangedBuffer)
+            if (PositionChanged || PositionChangedBuffer)
             {
                 Partition.UpdateObject(this);
             }
@@ -558,7 +560,7 @@ namespace RTSLockstep
                 this.ImmovableCollisionDirection = Vector2d.zero;
             }
 
-            if (PositionChanged || this.HeightPosChanged)
+            if (PositionChanged || HeightPosChanged)
             {
                 PositionChangedBuffer = PositionChanged ? true : false;
                 PositionChanged = false;
@@ -843,11 +845,11 @@ namespace RTSLockstep
         {
             //long referenceX = 0,
             //referenceY = 0;
-            long xmin = GetFlooredSnap(this.XMin - FixedMath.Half, snapSpacing);
-            long ymin = GetFlooredSnap(this.YMin - FixedMath.Half, snapSpacing);
+            long xmin = GetFlooredSnap(XMin - FixedMath.Half, snapSpacing);
+            long ymin = GetFlooredSnap(YMin - FixedMath.Half, snapSpacing);
 
-            long xmax = GetCeiledSnap(this.XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
-            long ymax = GetCeiledSnap(this.YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
+            long xmax = GetCeiledSnap(XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
+            long ymax = GetCeiledSnap(YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
 
             //Used for getting snapped positions this body covered
             for (long x = xmin; x < xmax; x += snapSpacing)
@@ -863,36 +865,31 @@ namespace RTSLockstep
             }
         }
 
+        //Checks if this body covers a position
         public bool IsPositionCovered(Vector2d position)
         {
-            //Checks if this body covers a position
-
             //Different techniques for different shapes
-            switch (this.Shape)
+            switch (Shape)
             {
                 case ColliderType.Circle:
-                    long maxDistance = this.Radius + FixedMath.Half;
+                    long maxDistance = Radius + FixedMath.Half;
                     maxDistance *= maxDistance;
-                    if ((this._position - position).FastMagnitude() > maxDistance)
+                    if ((_position - position).FastMagnitude() > maxDistance)
                     {
                         return false;
                     }
                     goto case ColliderType.AABox;
                 case ColliderType.AABox:
-                    return position.x + FixedMath.Half > this.XMin && position.x - FixedMath.Half < this.XMax
-                    && position.y + FixedMath.Half > this.YMin && position.y - FixedMath.Half < this.YMax;
+                    return position.x + FixedMath.Half > XMin && position.x - FixedMath.Half < XMax
+                    && position.y + FixedMath.Half > YMin && position.y - FixedMath.Half < YMax;
                 case ColliderType.Polygon:
-                    for (int i = this.EdgeNorms.Length - 1; i >= 0; i--)
+                    for (int i = EdgeNorms.Length - 1; i >= 0; i--)
                     {
-                        Vector2d norm = this.EdgeNorms[i];
+                        Vector2d norm = EdgeNorms[i];
                         long posProj = norm.Dot(position);
                         long polyMin, polyMax;
                         CollisionPair.ProjectPolygon(norm.x, norm.y, this, out polyMin, out polyMax);
-                        if (posProj >= polyMin && posProj <= polyMax)
-                        {
-
-                        }
-                        else
+                        if (posProj <= polyMin && posProj >= polyMax)
                         {
                             return false;
                         }

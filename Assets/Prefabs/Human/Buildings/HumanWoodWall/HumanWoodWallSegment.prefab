@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 4194013975892204290}
   - component: {fileID: 3016354350036366436}
   - component: {fileID: 3825574529060809207}
-  - component: {fileID: 6537317269125093331}
   - component: {fileID: 7409490820694846983}
   m_Layer: 11
   m_Name: HumanWoodWallSegment
@@ -181,20 +180,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6537317269125093331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6754609871906906199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c3ba75de30de14a9f9bc835c539797, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mapIndex: 0
-  _bonusHeight: 0
 --- !u!114 &7409490820694846983
 MonoBehaviour:
   m_ObjectHideFlags: 0

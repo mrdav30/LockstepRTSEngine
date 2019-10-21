@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 242638430047052249}
   - component: {fileID: 4139659409858952994}
   - component: {fileID: 5471459949468220228}
-  - component: {fileID: 4358255767055163161}
   - component: {fileID: 1422794587854036375}
   m_Layer: 11
   m_Name: HumanWoodWallPillar
@@ -182,20 +181,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &4358255767055163161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5530549526402322929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c3ba75de30de14a9f9bc835c539797, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mapIndex: 0
-  _bonusHeight: 0
 --- !u!114 &1422794587854036375
 MonoBehaviour:
   m_ObjectHideFlags: 0

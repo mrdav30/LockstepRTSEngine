@@ -470,6 +470,11 @@ namespace RTSLockstep
             return new Vector2d((v1.x * mag), (v1.y * mag));
         }
 
+        public static Vector2d operator *(Vector2d v1, float mag)
+        {
+            return new Vector2d((v1.x * mag), (v1.y * mag));
+        }
+
         public static Vector2d operator /(Vector2d v1, long div)
         {
             return new Vector2d(((v1.x << FixedMath.SHIFT_AMOUNT) / div), (v1.y << FixedMath.SHIFT_AMOUNT) / div);

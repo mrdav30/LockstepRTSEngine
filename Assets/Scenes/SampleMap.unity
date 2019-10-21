@@ -191,8 +191,9 @@ GameObject:
   - component: {fileID: 87167300}
   - component: {fileID: 87167299}
   - component: {fileID: 87167297}
-  - component: {fileID: 87167296}
   - component: {fileID: 87167295}
+  - component: {fileID: 87167296}
+  - component: {fileID: 87167304}
   - component: {fileID: 87167294}
   - component: {fileID: 87167293}
   - component: {fileID: 87167298}
@@ -398,18 +399,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Spawns:
-  - AgentCode: HumanWorker
-    Count: 3
+  - AgentCode: HumanFootman
+    Count: 25
     ControllerCode: Player 1
     Position:
       x: 0
       y: 0
-  - AgentCode: HumanBarracks
-    Count: 1
-    ControllerCode: Player 1
+  - AgentCode: HumanFootman
+    Count: 25
+    ControllerCode: Player 2
     Position:
-      x: 655360
-      y: 655360
+      x: 1966080
+      y: 1966080
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:
@@ -479,6 +480,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f780e30bb2cf216428b77399f095dd32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &87167304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87167291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7de6a41a30f2f0b4ca43eaa8d04a4089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!108 &219849900 stripped

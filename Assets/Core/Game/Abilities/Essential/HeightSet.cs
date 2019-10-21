@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace RTSLockstep
 {
@@ -13,7 +12,7 @@ namespace RTSLockstep
 
         [SerializeField, FixedNumber]
         private long _bonusHeight;
-        public long BonusHeight {get {return _bonusHeight;}}
+        public long BonusHeight { get { return _bonusHeight; } }
 
         private long _offset;
 
@@ -37,7 +36,7 @@ namespace RTSLockstep
         {
             if (Agent && (Agent.Body.PositionChanged || Agent.Body.PositionChangedBuffer || ForceUpdate))
             {
-                UpdateHeight ();
+                UpdateHeight();
             }
         }
         public void UpdateHeight()
