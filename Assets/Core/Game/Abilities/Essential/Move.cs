@@ -29,7 +29,8 @@ namespace RTSLockstep
         public bool SlowArrival { get; set; }
         public Vector2d AveragePosition { get; set; }
 
-        public int GridSize { get { return cachedBody.Radius.CeilToInt(); } }
+        // add a little padding to manevour around structures
+        public int GridSize { get { return (int)Math.Round(cachedBody.Radius.CeilToInt() * 1.5f, MidpointRounding.AwayFromZero); } }
 
         public Vector2d Position { get { return cachedBody.Position; } }
 
@@ -42,33 +43,11 @@ namespace RTSLockstep
 
         public bool IsMoving { get; private set; }
 
-        private Vector2d _destination;
         [HideInInspector]
-        public Vector2d Destination
-        {
-            get
-            {
-                if (IsGroupMoving)
-                {
-                    return MyMovementGroup.Destination;
-                }
-                else
-                {
-                    return _destination;
-                }
-            }
-            set
-            {
-                if (IsGroupMoving)
-                {
-                    MyMovementGroup.Destination = value;
-                }
-                else
-                {
-                    _destination = value;
-                }
-            }
-        }
+        public Vector2d Destination;
+        [HideInInspector]
+        public bool IsAvoidingLeft;
+        private long _minAvoidanceDistance;
 
         private const int MinimumOtherStopTime = LockstepManager.FrameRate / 4;
         private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
@@ -80,7 +59,6 @@ namespace RTSLockstep
         // key = world position, value = vector flow field
         private Dictionary<Vector2d, FlowField> _flowFields = new Dictionary<Vector2d, FlowField>();
         private Dictionary<Vector2d, FlowField> _flowFieldBuffer;
-        private int _pathIndex;
 
         private int StoppedTime;
 
@@ -97,6 +75,7 @@ namespace RTSLockstep
 
         private LSBody cachedBody { get; set; }
         private Turn cachedTurn { get; set; }
+        private Attack cachedAttack { get; set; }
 
         private long timescaledAcceleration;
         private long timescaledDecceleration;
@@ -105,9 +84,9 @@ namespace RTSLockstep
         public GridNode currentNode;
         private GridNode destinationNode;
 
-        private bool allowUnwalkableEndNode;
+        private bool _allowUnwalkableEndNode;
 
-        private static Vector2d movementDirection;
+        public Vector2d MovementDirection;
 
         // How far we move each update
         private long distanceToMove;
@@ -123,9 +102,9 @@ namespace RTSLockstep
         private readonly int collidedCount;
         private readonly ushort collidedID;
 
-        private static RTSAgent tempAgent;
+        private RTSAgent tempAgent;
         private readonly bool paused;
-        private static Vector2d desiredVelocity;
+        private Vector2d desiredVelocity;
 
         [HideInInspector]
         public bool CanMove = true;
@@ -151,6 +130,7 @@ namespace RTSLockstep
         {
             cachedBody = Agent.Body;
             cachedBody.onContact += HandleCollision;
+            cachedAttack = Agent.GetAbility<Attack>();
             cachedTurn = Agent.GetAbility<Turn>();
             canTurn = cachedTurn.IsNotNull();
 
@@ -183,6 +163,7 @@ namespace RTSLockstep
             Destination = Vector2d.zero;
             hasPath = false;
             IsMoving = false;
+            IsAvoidingLeft = false;
             stuckTime = 0;
             RepathTries = 0;
 
@@ -248,19 +229,20 @@ namespace RTSLockstep
 
                     // if size requires consideration, use old next-best-node system
                     // also a catch in case GetEndNode returns null
-                    if (this.GridSize <= 1 && Pathfinder.GetEndNode(Position, Destination, out destinationNode, allowUnwalkableEndNode)
+                    if (GridSize <= 1 && Pathfinder.GetEndNode(Position, Destination, out destinationNode)
                         || Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out destinationNode))
                     {
-                        if (currentNode.DoesEqual(this.destinationNode))
+                        Destination = destinationNode.WorldPos;
+                        if (currentNode.DoesEqual(destinationNode))
                         {
-                            if (this.RepathTries >= 1)
+                            if (RepathTries >= 1)
                             {
-                                this.Arrive();
+                                Arrive();
                             }
                         }
                         else
                         {
-                            this.CheckPath();
+                            CheckPath();
                         }
                     }
                     else
@@ -273,14 +255,14 @@ namespace RTSLockstep
 
         private void CheckPath()
         {
-            if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
+            if (Pathfinder.NeedsPath(currentNode, destinationNode, GridSize))
             {
                 if (straightPath)
                 {
                     straightPath = false;
                 }
 
-                PathRequestManager.RequestPath(currentNode, destinationNode, this.GridSize, (flowFields, success) =>
+                PathRequestManager.RequestPath(currentNode, destinationNode, GridSize, (flowFields, success) =>
                 {
                     if (success)
                     {
@@ -301,7 +283,7 @@ namespace RTSLockstep
             if (straightPath)
             {
                 // no need to check flow field, we got LOS
-                movementDirection = Destination - cachedBody.Position;
+                MovementDirection = Destination - cachedBody.Position;
             }
             else
             {
@@ -317,38 +299,54 @@ namespace RTSLockstep
                     {
                         // we have no more use for flow fields if the agent has line of sight to destination
                         straightPath = true;
-                        movementDirection = Destination - cachedBody.Position;
+                        MovementDirection = Destination - cachedBody.Position;
                     }
                     else
                     {
-                        movementDirection = flowField.Direction;
+                        MovementDirection = SteeringBehaviorFlowField();
                     }
                 }
                 else
                 {
-                    // vector not found
-                    // If we are centered on a grid square with no flow vector this will happen
-                    if (movementDirection.Equals(Vector2d.zero))
+                    //vector not found
+                    //If we are centered on a grid square with no flow vector this will happen
+                    if (MovementDirection.Equals(Vector2d.zero))
                     {
-                        // we need to keep moving on...
-                        movementDirection = Destination - cachedBody.Position;
+                        //we need to keep moving on...
+                        MovementDirection = Destination - cachedBody.Position;
                     }
                 }
             }
 
+            if (IsGroupMoving)
+            {
+                MovementDirection += CalculateGroupBehaviors();
+            }
+
+            // avoid any intersection agents!
+           MovementDirection += SteeringBehaviourAvoid();
+
+            // Cap agent's movement based on our max acceleration
+            long lengthSquared = MovementDirection.SqrMagnitude();
+            if (lengthSquared > (Acceleration * Acceleration))
+            {
+                Debug.Log("Agent moving to fast!");
+                MovementDirection *= (Acceleration / FixedMath.Sqrt(lengthSquared));
+            }
+
             // This is now the direction we want to be travelling in 
             // needs to be normalized
-            movementDirection.Normalize(out distanceToMove);
+            MovementDirection.Normalize(out distanceToMove);
 
             long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
             long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
 
             if (distanceToMove > slowDistance)
             {
-                desiredVelocity = movementDirection;
+                desiredVelocity = MovementDirection;
                 if (canTurn)
                 {
-                    cachedTurn.StartTurnDirection(movementDirection);
+                    cachedTurn.StartTurnDirection(MovementDirection);
                 }
             }
             else
@@ -364,7 +362,7 @@ namespace RTSLockstep
                 {
                     if (canTurn)
                     {
-                        cachedTurn.StartTurnDirection(movementDirection);
+                        cachedTurn.StartTurnDirection(MovementDirection);
                     }
                 }
 
@@ -373,13 +371,13 @@ namespace RTSLockstep
                     long closingSpeed = distanceToMove.Div(slowDistance);
                     if (canTurn)
                     {
-                        cachedTurn.StartTurnDirection(movementDirection);
+                        cachedTurn.StartTurnDirection(MovementDirection);
                     }
 
-                    desiredVelocity = movementDirection * closingSpeed;
+                    desiredVelocity = MovementDirection * closingSpeed;
                     decelerating = true;
                     //Reduce occurence of units preventing other units from reaching destination
-                    stuckThreshold *= 4;
+                    stuckThreshold *= 5;
                 }
             }
 
@@ -393,9 +391,11 @@ namespace RTSLockstep
                     {
                         if (RepathTries < StuckRepathTries)
                         {
+                            Debug.Log("Stuck Agent");
                             if (!IsGroupMoving)
                             {
                                 // attempt to repath if agent is by themselves
+                                // otherwise we already have the best path based on the group
                                 DoPathfind = true;
                             }
 
@@ -403,6 +403,7 @@ namespace RTSLockstep
                         }
                         else
                         {
+                            Debug.Log("Stuck Agent Stopping");
                             // we've tried to many times, we stuck stuck
                             Arrive();
                         }
@@ -424,6 +425,251 @@ namespace RTSLockstep
             desiredVelocity *= Speed;
 
             cachedBody.Velocity += GetAdjustVector(desiredVelocity);
+        }
+
+        private Vector2d SteeringBehaviorFlowField()
+        {
+
+            //Work out the force to apply to us based on the flow field grid squares we are on.
+            //we apply bilinear interpolation on the 4 grid squares nearest to us to work out our force.
+            // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
+
+            //Top left Coordinate of the 4
+            Vector2d gridPos = currentNode.GridPos;
+            int floorX = gridPos.x.CeilToInt();
+            int floorY = gridPos.y.CeilToInt();
+
+            //The 4 weights we'll interpolate, see http://en.wikipedia.org/wiki/File:Bilininterp.png for the coordinates
+
+            Vector2d f00 = _flowFieldBuffer.ContainsKey(new Vector2d(floorX, floorY)) ? _flowFieldBuffer[new Vector2d(floorX, floorY)].Direction : Vector2d.zero;
+            Vector2d f01 = _flowFieldBuffer.ContainsKey(new Vector2d(floorX, floorY + 1)) ? _flowFieldBuffer[new Vector2d(floorX, floorY)].Direction : Vector2d.zero;
+            Vector2d f10 = _flowFieldBuffer.ContainsKey(new Vector2d(floorX + 1, floorY)) ? _flowFieldBuffer[new Vector2d(floorX, floorY)].Direction : Vector2d.zero;
+            Vector2d f11 = _flowFieldBuffer.ContainsKey(new Vector2d(floorX + 1, floorY + 1)) ? _flowFieldBuffer[new Vector2d(floorX, floorY)].Direction : Vector2d.zero;
+
+            //Do the x interpolations
+            int xWeight = gridPos.x.ToInt() - floorX;
+
+            Vector2d top = f00 * (1 - xWeight) + (f10 * xWeight);
+            Vector2d bottom = f01 * (1 - xWeight) + (f11 * xWeight);
+
+            //Do the y interpolation
+            int yWeight = gridPos.y.ToInt() - floorY;
+
+            //This is now the direction we want to be travelling in (needs to be normalized)
+            Vector2d desiredDirection = top * (1 - yWeight) + (bottom * yWeight);
+
+            //If we are centered on a grid square with no vector this will happen
+            if (desiredDirection.Equals(Vector2d.zero))
+            {
+                return Vector2d.zero;
+            }
+
+            return desiredDirection;
+        }
+
+        //  Calculate steering and flocking forces for all agents
+        private Vector2d CalculateGroupBehaviors()
+        {
+            int _neighboursCount = 0;
+            long neighborRadius = FixedMath.One * 3;
+
+            Vector2d totalForce = Vector2d.zero;
+            Vector2d averageHeading = Vector2d.zero;
+            Vector2d centerOfMass = Vector2d.zero;
+
+            for (int i = 0; i < AgentController.GlobalAgents.Length; i++)
+            {
+                bool neighborFound = false;
+                RTSAgent a = AgentController.GlobalAgents[i];
+                if (a.IsNotNull() && a != Agent)
+                {
+                    Vector2d distance = Position - a.Body.Position;
+                    //  Normalize returns the magnitude to use for calculations
+                    distance.Normalize(out long distanceMag);
+
+                    // agent is within range of neighbor
+                    if (distanceMag < neighborRadius)
+                    {
+                        //  Move away from agents we are too close too
+                        //  Vector away from other agent
+                        totalForce += (distance * (1 - (distanceMag / neighborRadius)));
+
+                        //  Change our direction to be closer to our neighbours
+                        //  That are within the max distance and are moving
+                        if (a.Body.VelocityMagnitude > 0)
+                        {
+                            //Sum up our headings
+                            Vector2d head = a.Body._velocity;
+                            head.Normalize();
+                            averageHeading += head;
+                        }
+
+                        //  Move nearer to those entities we are near but not near enough to
+                        //  Sum up the position of our neighbours
+                        centerOfMass += a.Body.Position;
+
+                        neighborFound = true;
+                    }
+
+                    if (neighborFound)
+                    {
+                        _neighboursCount++;
+                    }
+                }
+            }
+
+            if (_neighboursCount > 0)
+            {
+                //  Separation calculates a force to move away from all of our neighbours. 
+                //  We do this by calculating a force from them to us and scaling it so the force is greater the nearer they are.
+                Vector2d _seperation = totalForce * (Acceleration / _neighboursCount);
+
+                //  Cohesion and Alignment are only for when other agents going to a similar location as us, 
+                //  otherwise we’ll get caught up when other agents move past.
+
+                //  Alignment calculates a force so that our direction is closer to our neighbours.
+                //  It does this similar to cohesion, but by summing up the direction vectors (normalised velocities) of ourself 
+                //  and our neighbours and working out the average direction.
+                //  Divide by amount of neighbors to get the average heading
+                Vector2d _alignment = (averageHeading / _neighboursCount);
+                //  Cohesion calculates a force that will bring us closer to our neighbours, so we move together as a group rather than individually.
+                //  Cohesion calculates the average position of our neighbours and ourself, and steers us towards it
+                //  seek this position
+                Vector2d _cohesion = SteeringBehaviorSeek(centerOfMass / _neighboursCount);
+
+                //Combine them to come up with a total force to apply, decreasing the effect of cohesion
+                return (_seperation * 2) + (_alignment * FixedMath.Create(0.5f)) + (_cohesion * FixedMath.Create(0.2f));
+            }
+            else
+            {
+                return Vector2d.zero;
+            }
+        }
+
+        private Vector2d SteeringBehaviorSeek(Vector2d _destination)
+        {
+            if (_destination == Position)
+            {
+                return Vector2d.zero;
+            }
+
+            //Desired change of location
+            Vector2d desired = _destination - Position;
+            desired.Normalize(out long desiredMag);
+            //Desired velocity (move there at maximum speed)
+            return desiredMag > 0 ? desired * (Speed / desiredMag) : Vector2d.zero;
+        }
+
+        protected virtual Func<RTSAgent, bool> AvoidAgentConditional
+        {
+            get
+            {
+                Func<RTSAgent, bool> agentConditional = (other) =>
+                {
+                    // check to make sure we didn't find ourselves and that the other agent can move
+                    if (Agent.GlobalID != other.GlobalID
+                    && other.GetAbility<Move>()
+                    && other.GetAbility<Move>().IsMoving)
+                    {
+                        Vector2d distance = (other.Body.Position - Position);
+                        distance.Normalize(out long distanceMag);
+
+                        long distanceSqr = distance.SqrMagnitude();
+
+                        if (distanceMag < _minAvoidanceDistance)
+                        {
+                        //    Debug.Log("Distance mag = " + distanceMag.CeilToInt() + ". Distance sqg = " + distanceSqr.CeilToInt());
+                            _minAvoidanceDistance = distanceMag;
+                            return true;
+                        }
+                    }
+
+                    // we don't need to avoid!
+                    return false;
+                };
+
+                return agentConditional;
+            }
+        }
+
+        private Vector2d SteeringBehaviourAvoid()
+        {
+            if (Agent.Body.Velocity.SqrMagnitude() <= Agent.Body.Radius)
+            {
+                return Vector2d.zero;
+            }
+
+            _minAvoidanceDistance = FixedMath.One * 6;
+
+            Func<RTSAgent, bool> avoidAgentConditional = AvoidAgentConditional;
+
+            RTSAgent closetAgent = InfluenceManager.Scan(
+                     Position,
+                     cachedAttack.Sight,
+                     avoidAgentConditional,
+                     (bite) =>
+                     {
+                         // trying to avoid all agents, we don't care about alliances!
+                         return true;
+                     }
+                 );
+
+            if (closetAgent.IsNull())
+            {
+                return Vector2d.zero;
+            }
+
+            Vector2d resultVector = Vector2d.zero;
+
+            LSBody collisionBody = closetAgent.Body;
+            long ourVelocityLengthSquared = Agent.Body.Velocity.SqrMagnitude();
+            Vector2d combinedVelocity = Agent.Body.Velocity + collisionBody.Velocity;
+            long combinedVelocityLengthSquared = combinedVelocity.SqrMagnitude();
+
+            //We are going in the same direction and they aren't avoiding
+            if (combinedVelocityLengthSquared > ourVelocityLengthSquared && !closetAgent.GetAbility<Move>().IsAvoidingLeft)
+            {
+                return Vector2d.zero;
+            }
+
+            //Steer to go around it
+            ColliderType otherType = closetAgent.Body.Shape;
+            if (otherType == ColliderType.Circle)
+            {
+                Vector2d vectorInOtherDirection = collisionBody.Position - Position;
+
+                //Are we more left or right of them
+                bool isLeft = false;
+                if (closetAgent.GetAbility<Move>().IsAvoidingLeft)
+                {
+                    //If they are avoiding, avoid with the same direction as them, so we go the opposite way
+                    isLeft = closetAgent.GetAbility<Move>().IsAvoidingLeft;
+                }
+                else
+                {
+                    //http://stackoverflow.com/questions/13221873/determining-if-one-2d-vector-is-to-the-right-or-left-of-another
+                    long dot = Agent.Body.Velocity.x * -vectorInOtherDirection.y + Agent.Body.Velocity.y * vectorInOtherDirection.x;
+                    isLeft = dot > 0;
+                }
+                IsAvoidingLeft = isLeft;
+
+                //Calculate a right angle of the vector between us
+                //http://www.gamedev.net/topic/551175-rotate-vector-90-degrees-to-the-right/#entry4546571
+                resultVector = isLeft ? new Vector2d(-vectorInOtherDirection.y, vectorInOtherDirection.x) : new Vector2d(vectorInOtherDirection.y, -vectorInOtherDirection.x);
+                resultVector.Normalize();
+
+                //Move it out based on our radius + theirs
+                resultVector *= (Agent.Body.Radius + closetAgent.Body.Radius);
+            }
+            else
+            {
+                //Not supported
+                //otherType == B2Shape.e_polygonShape
+                Debug.Log("Collider not supported for avoidance");
+            }
+
+            //Steer torwards it, increasing force based on how close we are
+            return (resultVector);// / _minAvoidanceDistance);
         }
 
         private uint GetNodeHash(GridNode node)
@@ -472,10 +718,10 @@ namespace RTSLockstep
         }
         #endregion
 
-        private Vector2d GetAdjustVector(Vector2d desiredVel)
+        private Vector2d GetAdjustVector(Vector2d desiredVelocity)
         {
             //The velocity change we want
-            var velocityChange = desiredVel - cachedBody._velocity;
+            var velocityChange = desiredVelocity - cachedBody._velocity;
             var adjustFastMag = velocityChange.FastMagnitude();
             //Cap acceleration vector magnitude
             long accel = decelerating ? timescaledDecceleration : timescaledAcceleration;
@@ -524,11 +770,11 @@ namespace RTSLockstep
             onGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d _destination, bool _allowUnwalkableEndNode = false)
+        public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false)
         {
             _flowFields.Clear();
             straightPath = false;
-            allowUnwalkableEndNode = _allowUnwalkableEndNode;
+            _allowUnwalkableEndNode = allowUnwalkableEndNode;
 
             IsMoving = true;
             StoppedTime = 0;
@@ -585,8 +831,8 @@ namespace RTSLockstep
                 }
 
                 IsMoving = false;
+                IsAvoidingLeft = false;
                 StoppedTime = 0;
-                IsGroupMoving = false;
 
                 _flowFields.Clear();
                 straightPath = false;
@@ -602,6 +848,7 @@ namespace RTSLockstep
             StopMove();
         }
 
+        // this helps prevent agents in large groups from trying to get to the middle of the group
         private void HandleCollision(LSBody other)
         {
             if (!CanMove || other.Agent.IsNull())
@@ -616,10 +863,9 @@ namespace RTSLockstep
             {
                 if (IsMoving)
                 {
-                    //If the other mover is moving to a similar point
-                    //don't check if agent isn't assigned move group
+                    //if agent is assigned move group and the other mover is moving to a similar point
                     if (MyMovementGroupID >= 0 && otherMover.MyMovementGroupID == MyMovementGroupID
-                        || otherMover.Destination.FastDistance(this.Destination) <= (closingDistance * closingDistance))
+                        || otherMover.Destination.FastDistance(Destination) <= (closingDistance * closingDistance))
                     {
                         if (!otherMover.IsMoving)
                         {
@@ -686,7 +932,7 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Arrived", Arrived);
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
             SaveManager.WriteBoolean(writer, "decelerating", decelerating);
-            SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
+            SaveManager.WriteVector2d(writer, "MovementDirection", MovementDirection);
         }
 
         protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
@@ -725,7 +971,7 @@ namespace RTSLockstep
                     decelerating = (bool)readValue;
                     break;
                 case "MovementDirection":
-                    movementDirection = LoadManager.LoadVector2d(reader);
+                    MovementDirection = LoadManager.LoadVector2d(reader);
                     break;
                 default: break;
             }

@@ -47,7 +47,7 @@ namespace RTSLockstep
                 }
             }
 
-            if (CurrentProject.IsNotNull())
+            if (CurrentProject.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for constructors based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -99,6 +99,8 @@ namespace RTSLockstep
             constructor.MyConstructGroupID = indexID;
 
             constructors.Add(constructor);
+
+            ConstructMoveGroup.Add(constructor.cachedMove);
         }
 
         public void Remove(Construct constructor)
@@ -106,6 +108,8 @@ namespace RTSLockstep
             if (constructor.MyConstructGroup.IsNotNull() && constructor.MyConstructGroupID == indexID)
             {
                 constructors.Remove(constructor);
+
+                ConstructMoveGroup.Remove(constructor.cachedMove);
             }
         }
 
@@ -143,6 +147,10 @@ namespace RTSLockstep
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
+                        // build structures bounds so the blocker can update the covered nodes
+                       // newRTSAgent.Body.BuildBounds();
+                       // newRTSAgent.GetAbility<DynamicBlocker>().UpdateNodeObstacles();
+
                         AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
 
                         newRTSAgent.SetCommander(AgentController.InstanceManagers[controllerID].Commander);
@@ -186,6 +194,7 @@ namespace RTSLockstep
             constructors.FastClear();
             ConstructionQueue.Clear();
             CurrentProject = null;
+            ConstructMoveGroup = null;
             ConstructionGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             indexID = -1;

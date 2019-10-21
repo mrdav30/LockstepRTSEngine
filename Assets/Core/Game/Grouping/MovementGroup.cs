@@ -1,6 +1,7 @@
 ﻿using FastCollections;
 using RTSLockstep.Grid;
 using RTSLockstep.Pathfinding;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,12 +26,12 @@ namespace RTSLockstep
 
         private const int MinGroupSize = 2;
 
-        private FastList<Move> movers;
+        public FastList<Move> Movers { get; private set; }
         private Vector2d groupDirection;
 
-        private long radius;
-        private long averageCollisionSize;
-        private bool calculatedBehaviors;
+        private long _radius;
+        private long _averageCollisionSize;
+        private bool _calculatedBehaviors;
 
         public void Initialize(Command com)
         {
@@ -39,9 +40,9 @@ namespace RTSLockstep
             {
                 Destination = com.GetData<Vector2d>();
             }
-            calculatedBehaviors = false;
+            _calculatedBehaviors = false;
             Selection selection = AgentController.InstanceManagers[com.ControllerID].GetSelection(com);
-            movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
+            Movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
         }
 
         public void LocalSimulate()
@@ -51,14 +52,29 @@ namespace RTSLockstep
 
         public void LateSimulate()
         {
-            if (movers.IsNotNull())
+            if (Movers.IsNotNull())
             {
-                if (movers.Count > 0 && !calculatedBehaviors)
+                if (Movers.Count > 0)
                 {
-                    calculatedBehaviors = CalculateAndExecuteBehaviors();
+                    if (!_calculatedBehaviors)
+                    {
+                        _calculatedBehaviors = CalculateAndExecuteBehaviors();
+                    }
+                    else
+                    {
+                        // reset movement and avoidance every game tick
+                        Move mover;
+                        for(int i = 0; i < Movers.Count; i++)
+                        {
+                            mover = Movers[i];
+                            mover.MovementDirection = Vector2d.zero;
+                            mover.IsAvoidingLeft = false;
+                        }
+
+                    }
                 }
 
-                if (movers.Count == 0)
+                if (Movers.Count == 0)
                 {
                     Deactivate();
                 }
@@ -69,45 +85,46 @@ namespace RTSLockstep
         {
             if (mover.MyMovementGroup.IsNotNull())
             {
-                mover.MyMovementGroup.movers.Remove(mover);
+                mover.MyMovementGroup.Movers.Remove(mover);
             }
             mover.MyMovementGroup = this;
             mover.MyMovementGroupID = indexID;
 
-            movers.Add(mover);
+            Movers.Add(mover);
         }
 
         public void Remove(Move mover)
         {
             if (mover.MyMovementGroup.IsNotNull() && mover.MyMovementGroupID == indexID)
             {
-                movers.Remove(mover);
+                Movers.Remove(mover);
             }
         }
 
         public bool CalculateAndExecuteBehaviors()
         {
-            if (movers.Count >= MinGroupSize)
+            if (Movers.Count >= MinGroupSize)
             {
                 Move mover;
 
-                averageCollisionSize = 0;
+                _averageCollisionSize = 0;
+                _radius = 0;
                 groupPosition = Vector2d.zero;
-                for (int i = 0; i < movers.Count; i++)
+                for (int i = 0; i < Movers.Count; i++)
                 {
-                    mover = movers[i];
+                    mover = Movers[i];
                     groupPosition += mover.Position;
-                    averageCollisionSize += mover.CollisionSize;
+                    _averageCollisionSize += mover.CollisionSize;
                 }
 
-                groupPosition /= movers.Count;
-                averageCollisionSize /= movers.Count;
+                groupPosition /= Movers.Count;
+                _averageCollisionSize = (_averageCollisionSize / Movers.Count) + FixedMath.Create(0.5f);
 
                 long biggestSqrDistance = 0;
                 long farthestSqrDistance = 0;
-                for (int i = 0; i < movers.Count; i++)
+                for (int i = 0; i < Movers.Count; i++)
                 {
-                    mover = movers[i];
+                    mover = Movers[i];
 
                     long currentSqrDistance = mover.Position.SqrDistance(groupPosition.x, groupPosition.y);
                     if (currentSqrDistance > biggestSqrDistance)
@@ -115,7 +132,7 @@ namespace RTSLockstep
                         long currentDistance = FixedMath.Sqrt(currentSqrDistance);
 
                         biggestSqrDistance = currentSqrDistance;
-                        radius = currentDistance;
+                        _radius = currentDistance;
                     }
 
                     long destinationSqrDistance = mover.Position.SqrDistance(Destination.x, Destination.y);
@@ -142,7 +159,7 @@ namespace RTSLockstep
         public void GetGroupMovementPath()
         {
             //pass the largest unit or just average?
-            int groupGridSize = averageCollisionSize.CeilToInt();
+            int groupGridSize = _averageCollisionSize.CeilToInt();
 
             if (Pathfinder.GetStartNode(farthestPosition, out groupCurrentNode)
                 || Pathfinder.GetClosestViableNode(farthestPosition, farthestPosition, groupGridSize, out groupCurrentNode))
@@ -151,6 +168,7 @@ namespace RTSLockstep
                 if (Pathfinder.GetEndNode(groupPosition, Destination, out groupDestinationNode)
                     || Pathfinder.GetClosestViableNode(farthestPosition, Destination, groupGridSize, out groupDestinationNode))
                 {
+                    Destination = groupDestinationNode.WorldPos;
                     PathRequestManager.RequestPath(groupCurrentNode, groupDestinationNode, groupGridSize, (_flowField, success) =>
                     {
                         if (success)
@@ -158,17 +176,17 @@ namespace RTSLockstep
                             GroupFlowFields.Clear();
                             GroupFlowFields = _flowField;
 
-                            if (radius == 0)
+                            if (_radius == 0)
                             {
                                 // we must not have a group then...
                                 ExecuteGroupIndividualMove();
                                 return;
                             }
 
-                            long expectedSize = averageCollisionSize.Mul(averageCollisionSize).Mul(FixedMath.One * 2).Mul(movers.Count);
-                            long groupSize = radius.Mul(radius);
+                            long expectedSize = _averageCollisionSize.Mul(_averageCollisionSize).Mul(FixedMath.One * 2).Mul(Movers.Count);
+                            long groupSize = _radius.Mul(_radius);
 
-                            if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (radius.Mul(radius)))
+                            if (groupSize > expectedSize || groupPosition.FastDistance(Destination.x, Destination.y) < (_radius.Mul(_radius)))
                             {
                                 // group members are spread to far out
                                 ExecuteGroupIndividualMove();
@@ -195,25 +213,26 @@ namespace RTSLockstep
         public void Deactivate()
         {
             Move mover;
-            for (int i = 0; i < movers.Count; i++)
+            for (int i = 0; i < Movers.Count; i++)
             {
-                mover = movers[i];
+                mover = Movers[i];
                 mover.MyMovementGroup = null;
                 mover.MyMovementGroupID = -1;
+                mover.IsGroupMoving = false;
             }
-            movers.FastClear();
+            Movers.FastClear();
             GroupFlowFields.Clear();
             MovementGroupHelper.Pool(this);
-            calculatedBehaviors = false;
+            _calculatedBehaviors = false;
             indexID = -1;
         }
 
         private void ExecuteIndividualMove()
         {
             movementType = MovementType.Individual;
-            for (int i = 0; i < movers.Count; i++)
+            for (int i = 0; i < Movers.Count; i++)
             {
-                Move mover = movers[i];
+                Move mover = Movers[i];
                 mover.IsGroupMoving = false;
                 mover.StopMultiplier = Move.DirectStop;
                 mover.OnGroupProcessed(Destination);
@@ -225,9 +244,9 @@ namespace RTSLockstep
             movementType = MovementType.Group;
             groupDirection = Destination - groupPosition;
 
-            for (int i = 0; i < movers.Count; i++)
+            for (int i = 0; i < Movers.Count; i++)
             {
-                Move mover = movers[i];
+                Move mover = Movers[i];
                 mover.IsGroupMoving = true;
                 mover.StopMultiplier = Move.GroupStop;
                 mover.OnGroupProcessed(mover.Position + groupDirection);
@@ -238,9 +257,10 @@ namespace RTSLockstep
         {
             Debug.Log("individual group moving");
             movementType = MovementType.GroupIndividual;
-            for (int i = 0; i < movers.Count; i++)
+
+            for (int i = 0; i < Movers.Count; i++)
             {
-                Move mover = movers[i];
+                Move mover = Movers[i];
                 mover.IsGroupMoving = true;
                 mover.StopMultiplier = Move.GroupDirectStop;
                 mover.OnGroupProcessed(Destination);
