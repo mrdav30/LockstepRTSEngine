@@ -106,10 +106,10 @@ namespace RTSLockstep.Pathfinding
 
                 rawNode.FlowField.HasLOS = false;
 
-                //if (rawNode.gridIndex != flowFieldPath.EndNodeIndex)
-                //{
-                //    rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
-                //}
+                if (rawNode.gridIndex != flowFieldPath.EndNodeIndex)
+                {
+                    rawNode.FlowField.HasLOS = !Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize);
+                }
 
                 // for each straight line neighbour of this node (no diagonals)
                 for (int i = 0; i < 4; i++)

@@ -67,7 +67,6 @@ namespace RTSLockstep
                         for(int i = 0; i < Movers.Count; i++)
                         {
                             mover = Movers[i];
-                            mover.MovementDirection = Vector2d.zero;
                             mover.IsAvoidingLeft = false;
                         }
 
