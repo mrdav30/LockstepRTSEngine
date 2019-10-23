@@ -10,6 +10,7 @@ namespace RTSLockstep.Grid
         private static readonly FastList<Vector2d> _bufferCoordinates = new FastList<Vector2d>();
         private FastList<GridNode> _lastCoordinates = new FastList<GridNode>();
         private LSBody _cachedBody;
+        private bool isTransparent = false;
 
         protected override void OnSetup()
         {
@@ -24,17 +25,27 @@ namespace RTSLockstep.Grid
 
         protected override void OnLateSimulate()
         {
-            if (this._cachedBody.PositionChangedBuffer || this._cachedBody.RotationChangedBuffer)
+            if (!isTransparent && (_cachedBody.PositionChangedBuffer || _cachedBody.RotationChangedBuffer))
             {
                 RemoveLastCoordinates();
                 UpdateCoordinates();
             }
         }
 
-        public void UpdateNodeObstacles()
+
+        public void SetTransparent(bool setTransparency)
         {
-            RemoveLastCoordinates();
-            UpdateCoordinates();
+            if (setTransparency)
+            {
+                RemoveLastCoordinates();
+            }
+            else
+            {
+                RemoveLastCoordinates();
+                UpdateCoordinates();
+            }
+
+            isTransparent = setTransparency;
         }
 
         protected override void OnDeactivate()

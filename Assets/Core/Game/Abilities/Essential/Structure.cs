@@ -90,17 +90,6 @@ namespace RTSLockstep
 
         public void Construct(long amount)
         {
-            if (NeedsConstruction && !ConstructionStarted)
-            {
-                if (Agent.Animator.IsNotNull())
-                {
-                    Agent.Animator.SetState(AnimState.Building);
-                }
-
-                ConstructionStarted = true;
-                ConstructionHandler.RestoreMaterial(Agent.gameObject);
-            }
-
             cachedHealth.HealthAmount += amount;
             if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
             {

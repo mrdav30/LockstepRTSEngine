@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RTSLockstep.Data;
+using RTSLockstep.Grid;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -242,8 +243,20 @@ namespace RTSLockstep
                         if (!_projectStructure.ConstructionStarted)
                         {
                             _projectStructure.ConstructionStarted = true;
+
+                            if (CurrentProject.Animator.IsNotNull())
+                            {
+                                CurrentProject.Animator.SetState(AnimState.Building);
+                            }
+
                             // Restore material
                             ConstructionHandler.RestoreMaterial(CurrentProject.gameObject);
+
+                            // restore bounds so structure is included in path & build grid
+                            if (CurrentProject.GetAbility<DynamicBlocker>())
+                            {
+                                CurrentProject.GetAbility<DynamicBlocker>().SetTransparent(false);
+                            }
                         }
 
                         targetDirection.Normalize(out long mag);

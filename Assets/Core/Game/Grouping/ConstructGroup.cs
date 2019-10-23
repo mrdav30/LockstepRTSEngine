@@ -133,6 +133,12 @@ namespace RTSLockstep
                     RTSAgent newRTSAgent = AgentController.InstanceManagers[controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
                     Structure newStructure = newRTSAgent.GetAbility<Structure>();
 
+                    // remove the bounds so we can get to the temp structure from any angle
+                    if (newRTSAgent.GetAbility<DynamicBlocker>())
+                    {
+                        newRTSAgent.GetAbility<DynamicBlocker>().SetTransparent(true);
+                    }
+
                     if (newStructure.StructureType == StructureType.Wall)
                     {
                         newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
@@ -147,10 +153,6 @@ namespace RTSLockstep
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        // build structures bounds so the blocker can update the covered nodes
-                        newRTSAgent.Body.BuildBounds();
-                        newRTSAgent.GetAbility<DynamicBlocker>().UpdateNodeObstacles();
-
                         AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
 
                         newRTSAgent.SetCommander(AgentController.InstanceManagers[controllerID].Commander);
