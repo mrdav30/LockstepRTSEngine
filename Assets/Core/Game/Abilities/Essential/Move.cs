@@ -433,7 +433,7 @@ namespace RTSLockstep
             var currentSpeed = cachedBody.Velocity.Magnitude();
             if (currentSpeed > Speed)
             {
-                desiredVelocity *= (Speed / FixedMath.Sqrt(currentSpeed)).CeilToInt();
+                desiredVelocity *= (Speed / currentSpeed).CeilToInt();
             }
 
             //Apply the force
