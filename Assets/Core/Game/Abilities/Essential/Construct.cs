@@ -14,6 +14,7 @@ namespace RTSLockstep
         private long currentAmountBuilt = 0;
 
         public ConstructGroup MyConstructGroup;
+        [HideInInspector]
         public int MyConstructGroupID;
 
         //Stuff for the logic
@@ -22,7 +23,7 @@ namespace RTSLockstep
         private long fastMag;
         private long fastRangeToTarget;
 
-        public Move cachedMove;
+        public Move CachedMove { get; private set; }
         protected virtual bool canMove { get; private set; }
         private Turn cachedTurn;
         protected bool canTurn { get; private set; }
@@ -107,15 +108,15 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             cachedTurn = Agent.GetAbility<Turn>();
-            cachedMove = Agent.GetAbility<Move>();
+            CachedMove = Agent.GetAbility<Move>();
 
             basePriority = cachedBody.Priority;
-            canMove = cachedMove.IsNotNull();
+            canMove = CachedMove.IsNotNull();
 
             if (canMove)
             {
-                cachedMove.onStartMove += HandleStartMove;
-                cachedMove.onArrive += HandleOnArrive;
+                CachedMove.onStartMove += HandleStartMove;
+                CachedMove.onArrive += HandleOnArrive;
             }
 
             canTurn = cachedTurn.IsNotNull();
@@ -172,10 +173,10 @@ namespace RTSLockstep
                     }
                     else if (IsBuildMoving)
                     {
-                        if (canMove && cachedMove.IsMoving)
+                        if (canMove && CachedMove.IsMoving)
                         {
                             // we shouldn't be moving then!
-                            cachedMove.StopMove();
+                            CachedMove.StopMove();
                             IsBuildMoving = false;
                         }
                     }
@@ -183,7 +184,7 @@ namespace RTSLockstep
 
                 if (canMove && IsBuildMoving)
                 {
-                    cachedMove.StartLookingForStopPause();
+                    CachedMove.StartLookingForStopPause();
                 }
             }
         }
@@ -231,7 +232,7 @@ namespace RTSLockstep
                         {
                             if (canMove)
                             {
-                                cachedMove.Arrive();
+                                CachedMove.Arrive();
                             }
 
                             inRange = true;
@@ -268,10 +269,10 @@ namespace RTSLockstep
                     {
                         if (canMove)
                         {
-                            cachedMove.PauseAutoStop();
-                            cachedMove.PauseCollisionStop();
-                            if (!cachedMove.IsMoving
-                                && !cachedMove.MoveOnGroupProcessed)
+                            CachedMove.PauseAutoStop();
+                            CachedMove.PauseCollisionStop();
+                            if (!CachedMove.IsMoving
+                                && !CachedMove.MoveOnGroupProcessed)
                             {
                                 StartConstructMove();
                                 cachedBody.Priority = basePriority;
@@ -280,14 +281,14 @@ namespace RTSLockstep
                             {
                                 if (inRange)
                                 {
-                                    cachedMove.Destination = CurrentProject.Body.Position;
+                                    CachedMove.Destination = CurrentProject.Body.Position;
                                 }
                                 else
                                 {
                                     if (repathTimer.AdvanceFrame())
                                     {
                                         if (CurrentProject.Body.PositionChangedBuffer &&
-                                            CurrentProject.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                            CurrentProject.Body.Position.FastDistance(CachedMove.Destination.x, CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                         {
                                             StartConstructMove();
                                             //So units don't sync up and path on the same frame
@@ -335,8 +336,8 @@ namespace RTSLockstep
 
                 if (canMove && inRange)
                 {
-                    cachedMove.PauseAutoStop();
-                    cachedMove.PauseCollisionStop();
+                    CachedMove.PauseAutoStop();
+                    CachedMove.PauseCollisionStop();
                 }
             }
         }
@@ -346,7 +347,7 @@ namespace RTSLockstep
             if (canMove)
             {
                 // we don't want to be able to fire and move!
-                cachedMove.StopMove();
+                CachedMove.StopMove();
             }
             cachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
@@ -395,7 +396,7 @@ namespace RTSLockstep
                 if (CurrentProject.IsNotNull())
                 {
                     // position is set by the movement group tied to construct group
-                    cachedMove.StartMove(cachedMove.Destination);
+                    CachedMove.StartMove(CachedMove.Destination);
                 }
 
                 IsBuildMoving = true;
@@ -456,11 +457,11 @@ namespace RTSLockstep
                 {
                     if (IsBuildMoving)
                     {
-                        cachedMove.StartMove(CurrentProject.Body.Position);
+                        CachedMove.StartMove(CurrentProject.Body.Position);
                     }
                     else if (canMove && !inRange)
                     {
-                        cachedMove.StopMove();
+                        CachedMove.StopMove();
                     }
                 }
             }

@@ -63,6 +63,7 @@ namespace RTSLockstep
                     else
                     {
                         // reset movement and avoidance every game tick
+                        // should reset before move ability
                         Move mover;
                         for(int i = 0; i < Movers.Count; i++)
                         {

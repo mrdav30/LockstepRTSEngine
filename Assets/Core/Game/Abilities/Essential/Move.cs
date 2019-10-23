@@ -54,7 +54,7 @@ namespace RTSLockstep
         private const int StuckRepathTries = 4;
 
         private bool hasPath;
-        public bool straightPath;
+        private bool straightPath;
 
         // key = world position, value = vector flow field
         private Dictionary<Vector2d, FlowField> _flowFields = new Dictionary<Vector2d, FlowField>();
@@ -87,6 +87,7 @@ namespace RTSLockstep
         private bool _allowUnwalkableEndNode;
 
         private Vector2d movementDirection;
+        private Vector2d lastDirection;
 
         // How far we move each update
         private long distanceToMove;
@@ -308,6 +309,8 @@ namespace RTSLockstep
                     {
                         movementDirection = SteeringBehaviorFlowField();
                     }
+
+                    lastDirection = movementDirection;
                 }
                 else
                 {
@@ -316,7 +319,7 @@ namespace RTSLockstep
                     if (movementDirection.Equals(Vector2d.zero))
                     {
                         //we need to keep moving on...
-                        movementDirection = Destination - cachedBody.Position;
+                        movementDirection = lastDirection.IsNotNull() ? lastDirection :  Destination - cachedBody.Position;
                     }
                 }
             }

@@ -181,8 +181,7 @@ namespace RTSLockstep.Pathfinding
                             neighbor = neighbors[z];
 
                             // check if node is in closed set, otherwise return greatest distance
-                            int nDistance = closedSet.Contains(neighbor) ? neighbor.FlowField.Distance
-                                : greatestDistance;
+                            int nDistance = closedSet.Contains(neighbor) ? neighbor.FlowField.Distance : greatestDistance;
                             int dist = nDistance - rawNode.FlowField.Distance;
 
                             if (dist < minDist)

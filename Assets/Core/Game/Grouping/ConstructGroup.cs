@@ -100,7 +100,7 @@ namespace RTSLockstep
 
             constructors.Add(constructor);
 
-            ConstructMoveGroup.Add(constructor.cachedMove);
+            ConstructMoveGroup.Add(constructor.CachedMove);
         }
 
         public void Remove(Construct constructor)
@@ -109,7 +109,7 @@ namespace RTSLockstep
             {
                 constructors.Remove(constructor);
 
-                ConstructMoveGroup.Remove(constructor.cachedMove);
+                ConstructMoveGroup.Remove(constructor.CachedMove);
             }
         }
 
@@ -148,8 +148,8 @@ namespace RTSLockstep
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
                         // build structures bounds so the blocker can update the covered nodes
-                       // newRTSAgent.Body.BuildBounds();
-                       // newRTSAgent.GetAbility<DynamicBlocker>().UpdateNodeObstacles();
+                        newRTSAgent.Body.BuildBounds();
+                        newRTSAgent.GetAbility<DynamicBlocker>().UpdateNodeObstacles();
 
                         AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
 
