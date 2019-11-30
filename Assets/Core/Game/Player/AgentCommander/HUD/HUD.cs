@@ -308,7 +308,7 @@ public class HUD : MonoBehaviour
             }
             if (selectedAgent.MyAgentType == AgentType.Unit && selectedAgent.GetAbility<Construct>())
             {
-                DrawActions(selectedAgent.GetAbility<Construct>().GetBuildActions());
+                DrawActions(selectedAgent.GetAbility<Construct>().BuildActions);
             }
             else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>() && !selectedAgent.GetAbility<Structure>().NeedsConstruction)
             {

@@ -275,7 +275,7 @@ namespace RTSLockstep
                     {
                         string propertyName = (string)reader.Value;
                         reader.Read();
-                        HandleLoadedProperty(reader, propertyName, reader.Value);
+                        OnLoadProperty(reader, propertyName, reader.Value);
                     }
                 }
                 else if (reader.TokenType == JsonToken.EndObject)
@@ -288,7 +288,6 @@ namespace RTSLockstep
             loadedSavedValues = true;
         }
 
-        protected virtual void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
-        { }
+        protected virtual void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue) { }
     }
 }

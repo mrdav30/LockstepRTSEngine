@@ -194,9 +194,9 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Colliding", isColliding);
         }
 
-        protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
+        protected override void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue)
         {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
+            base.OnLoadProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
                 case "TargetReached":

@@ -62,7 +62,7 @@ namespace RTSLockstep
                 return true;
             }
 
-            Debug.LogError("No instance of MovementGroupHelper found. Please configure the scene to have a MovementGroupHelper for the script that requires it.");
+            Debug.LogError("No instance of ConstructionGroupHelper found. Please configure the scene to have a ConstructionGroupHelper for the script that requires it.");
             return false;
         }
 

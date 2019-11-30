@@ -31,9 +31,11 @@ public class AgentCommander : BehaviourHelper
     protected override void OnInitialize()
     {
         if (!Setted)
+        {
             Setup();
+        }
+
         CachedResourceManager.Initialize();
-     //   CachedBuilderManager.Initialize();
     }
 
     // Update is called once per frame
@@ -43,7 +45,6 @@ public class AgentCommander : BehaviourHelper
         {
             CachedResourceManager.Visualize();
             CachedHud.Visualize();
-          //  CachedBuilderManager.Visualize();
         }
     }
 

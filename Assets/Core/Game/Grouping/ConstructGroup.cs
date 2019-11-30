@@ -1,7 +1,6 @@
 ﻿using FastCollections;
 using RTSLockstep.Data;
 using RTSLockstep.Grid;
-using RTSLockstep.Pathfinding;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -100,6 +99,7 @@ namespace RTSLockstep
 
             constructors.Add(constructor);
 
+            // add the constructor to our contructor move group too!
             ConstructMoveGroup.Add(constructor.CachedMove);
         }
 
@@ -109,6 +109,7 @@ namespace RTSLockstep
             {
                 constructors.Remove(constructor);
 
+                // Remove the constructor to our contructor move group too!
                 ConstructMoveGroup.Remove(constructor.CachedMove);
             }
         }
