@@ -11,7 +11,7 @@ public class AgentCommander : BehaviourHelper
     public ResourceManager CachedResourceManager { get; private set; }
     private AgentController _cachedController;
 
-    public Color teamColor;
+    public Color TeamColor;
     private bool Setted = false;
     #endregion
 
@@ -23,6 +23,16 @@ public class AgentCommander : BehaviourHelper
 
         CachedResourceManager.Setup();
         CachedHud.Setup();
+
+        if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
+        {
+            GameResourceManager.AssignedTeamColors.Add(TeamColor);
+        }
+        else
+        {
+            TeamColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            GameResourceManager.AssignedTeamColors.Add(TeamColor);
+        }
 
         Setted = true;
     }
@@ -59,7 +69,7 @@ public class AgentCommander : BehaviourHelper
     {
         SaveManager.WriteString(writer, "Username", username);
         SaveManager.WriteBoolean(writer, "Human", human);
-        SaveManager.WriteColor(writer, "TeamColor", teamColor);
+        SaveManager.WriteColor(writer, "TeamColor", TeamColor);
         SaveManager.SavePlayerResources(writer, CachedResourceManager.GetResources(), CachedResourceManager.GetResourceLimits());
         SaveManager.SavePlayerRTSAgents(writer, GetComponent<RTSAgents>().GetComponentsInChildren<RTSAgent>());
     }
@@ -113,7 +123,7 @@ public class AgentCommander : BehaviourHelper
                 switch (currValue)
                 {
                     case "TeamColor":
-                        teamColor = LoadManager.LoadColor(reader);
+                        TeamColor = LoadManager.LoadColor(reader);
                         break;
                     case "Resources":
                         CachedResourceManager.LoadResources(reader);

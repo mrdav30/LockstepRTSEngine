@@ -552,7 +552,7 @@ namespace RTSLockstep
             TeamColor[] teamColors = GetComponentsInChildren<TeamColor>();
             foreach (TeamColor teamColor in teamColors)
             {
-                teamColor.GetComponent<Renderer>().material.color = _cachedCommander.teamColor;
+                teamColor.GetComponent<Renderer>().material.color = _cachedCommander.TeamColor;
             }
         }
 

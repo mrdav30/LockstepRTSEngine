@@ -400,17 +400,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Spawns:
   - AgentCode: HumanFootman
-    Count: 25
+    Count: 5
     ControllerCode: Player 1
     Position:
       x: 0
       y: 0
   - AgentCode: HumanFootman
-    Count: 25
+    Count: 5
     ControllerCode: Player 2
     Position:
-      x: 1966080
-      y: 1966080
+      x: 983040
+      y: 983040
   AutoCommand: 0
 --- !u!114 &87167299
 MonoBehaviour:

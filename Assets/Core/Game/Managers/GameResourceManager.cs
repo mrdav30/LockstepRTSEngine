@@ -66,6 +66,8 @@ namespace RTSLockstep
         public static Texture2D[] Avatars;
         // public static string[] AvatarCodes;
 
+        public static FastList<Color> AssignedTeamColors = new FastList<Color>();
+
         #endregion
 
         #region MonoBehavior
