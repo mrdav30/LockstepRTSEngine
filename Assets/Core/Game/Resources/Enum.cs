@@ -5,8 +5,7 @@
         None,
         Builder,
         Harvester,
-        Infantry,
-        Ranged,
+        Offensive,
         Convoy,
         Environment
     }
@@ -105,7 +104,7 @@
 
     public enum AnimImpulse
     {
-        Fire,
+        Attack,
         SpecialFire,
         SpecialAttack,
         Extra

@@ -155,7 +155,7 @@ namespace RTSLockstep
         {
             if (ProjectilePool.ContainsKey(projCode) == false)
             {
-                Debug.Log(projCode + " fired by " + Attack.LastFire + " Caused boom");
+                Debug.Log(projCode + " fired by " + Attack.LastAttack + " Caused boom");
                 return null;
             }
             FastStack<LSProjectile> pool = ProjectilePool[projCode];

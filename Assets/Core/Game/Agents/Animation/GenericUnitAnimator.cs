@@ -117,7 +117,7 @@ namespace RTSLockstep
         {
             switch (impulse)
             {
-                case AnimImpulse.Fire:
+                case AnimImpulse.Attack:
                     return fire;
                 case AnimImpulse.SpecialFire:
                     return specialFire;
@@ -133,7 +133,7 @@ namespace RTSLockstep
         {
             switch (impulse)
             {
-                case AnimImpulse.Fire:
+                case AnimImpulse.Attack:
                     return fireClip;
                 case AnimImpulse.SpecialFire:
                     return specialFireClip;

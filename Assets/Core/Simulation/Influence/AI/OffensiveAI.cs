@@ -58,7 +58,7 @@ namespace RTSLockstep
             //determine what should be done by the agent at the current point in time
             //need sight from attack ability to be able to scan...
             base.DecideWhatToDo();
-            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.Target))
+            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.CurrentTarget))
             {
                 InfluenceAttack();
             }

@@ -149,7 +149,7 @@ namespace RTSLockstep
                     {
                         Agent.Animator.SetIdleState(IdlingAnimState);
                     }
-                    else if (!cachedAttack.Target)
+                    else if (!cachedAttack.CurrentTarget)
                     {
                         Agent.Animator.SetIdleState(AnimState.Idling);
                     }
@@ -681,9 +681,9 @@ namespace RTSLockstep
             SaveManager.WriteLong(writer, "FastRangeToTarget", fastRangeToTarget);
         }
 
-        protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
+        protected override void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue)
         {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
+            base.OnLoadProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
                 case "Harvesting":
