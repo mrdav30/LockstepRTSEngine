@@ -79,14 +79,14 @@ namespace RTSLockstep
         {
             AttackGroup attackGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new AttackGroup();
 
-            attackGroup.indexID = activeGroups.Add(attackGroup);
+            attackGroup.IndexID = activeGroups.Add(attackGroup);
             LastCreatedGroup = attackGroup;
             attackGroup.Initialize(com);
         }
 
         public static void Pool(AttackGroup group)
         {
-            int indexID = group.indexID;
+            int indexID = group.IndexID;
             activeGroups.RemoveAt(indexID);
             pooledGroups.Add(group);
         }

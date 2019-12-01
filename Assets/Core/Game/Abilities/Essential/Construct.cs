@@ -15,43 +15,7 @@ namespace RTSLockstep
         [HideInInspector]
         public int MyConstructGroupID;
 
-        public Move CachedMove { get; private set; }
-
         public bool IsBuildMoving { get; private set; }
-
-        private RTSAgent _currentProject;
-        public RTSAgent CurrentProject
-        {
-            get
-            {
-                if (MyConstructGroup.IsNotNull())
-                {
-                    return MyConstructGroup.CurrentProject;
-                }
-                else
-                {
-                    return _currentProject;
-                }
-            }
-            set
-            {
-                if (MyConstructGroup.IsNotNull())
-                {
-                    MyConstructGroup.CurrentProject = value;
-                }
-                else
-                {
-                    _currentProject = value;
-                }
-            }
-        }
-        private Structure _projectStructure
-        {
-            get
-            {
-                return CurrentProject.IsNotNull() ? CurrentProject.GetAbility<Structure>() : null;
-            }
-        }
 
         public string[] BuildActions
         {
@@ -61,14 +25,17 @@ namespace RTSLockstep
         //Called whenever construction is stopped... i.e. to attack
         public event Action OnStopConstruct;
 
+        public RTSAgent CurrentProject;
+        private Structure ProjectStructure
+        {
+            get
+            {
+                return CurrentProject.IsNotNull() ? CurrentProject.GetAbility<Structure>() : null;
+            }
+        }
+
         private const int searchRate = LockstepManager.FrameRate / 2;
         private long currentAmountBuilt = 0;
-
-        private bool canMove;
-        private Turn cachedTurn;
-        private bool canTurn;
-        private Attack cachedAttack;
-        private LSBody _cachedBody { get { return Agent.Body; } }
 
         //Stuff for the logic
         private bool inRange;
@@ -114,31 +81,25 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            CachedMove = Agent.GetAbility<Move>();
-            cachedTurn = Agent.GetAbility<Turn>();
+            basePriority = Agent.Body.Priority;
 
-            basePriority = _cachedBody.Priority;
-            canMove = CachedMove.IsNotNull();
-
-            if (canMove)
+            if (Agent.MyStats.CanMove)
             {
-                CachedMove.onStartMove += HandleStartMove;
-                CachedMove.onArrive += HandleOnArrive;
+                Agent.MyStats.CachedMove.onStartMove += HandleStartMove;
+                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
             }
-
-            canTurn = cachedTurn.IsNotNull();
-
-            cachedAttack = Agent.GetAbility<Attack>();
         }
 
         protected override void OnInitialize()
         {
             constructCount = 0;
-            CurrentProject = null;
-
+  
             IsBuildMoving = false;
 
+            MyConstructGroup = null;
             MyConstructGroupID = -1;
+
+            CurrentProject = null;
 
             inRange = false;
             IsFocused = false;
@@ -146,6 +107,7 @@ namespace RTSLockstep
             repathTimer.Reset(repathInterval);
             repathRandom = LSUtility.GetRandom(repathInterval);
 
+            // need to move this to a construct group
             if (Agent.GetCommander() && loadedSavedValues && loadedProjectId >= 0)
             {
                 RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedProjectId);
@@ -158,16 +120,17 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            if (Agent.Tag == AgentTag.Builder)
+            if (Agent.Tag == AgentTag.Builder
+                && MyConstructGroup.IsNotNull())
             {
                 if (constructCount > _constructInterval)
                 {
-                    //reset attackCount overcharge if left idle
+                    //reset constructCount overcharge if left idle
                     constructCount = _constructInterval;
                 }
                 else if (constructCount < _constructInterval)
                 {
-                    //charge up attack
+                    //charge up constructCount
                     constructCount += LockstepManager.DeltaTime;
                 }
 
@@ -179,18 +142,18 @@ namespace RTSLockstep
                     }
                     else if (IsBuildMoving)
                     {
-                        if (canMove && CachedMove.IsMoving)
+                        if (Agent.MyStats.CanMove && Agent.MyStats.CachedMove.IsMoving)
                         {
                             // we shouldn't be moving then!
-                            CachedMove.StopMove();
+                            Agent.MyStats.CachedMove.StopMove();
                             IsBuildMoving = false;
                         }
                     }
                 }
 
-                if (canMove && IsBuildMoving)
+                if (Agent.MyStats.CanMove && IsBuildMoving)
                 {
-                    CachedMove.StartLookingForStopPause();
+                    Agent.MyStats.CachedMove.StartLookingForStopPause();
                 }
             }
         }
@@ -209,12 +172,12 @@ namespace RTSLockstep
 
         protected virtual void OnStartConstructMove()
         {
-            if (canMove && !CheckRange())
+            if (Agent.MyStats.CanMove && !CheckRange())
             {
-                if (CurrentProject.IsNotNull())
+                if (ProjectStructure.IsNotNull())
                 {
                     // position is set by the movement group tied to construct group
-                    CachedMove.StartMove(CachedMove.Destination);
+                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
                 }
 
                 IsBuildMoving = true;
@@ -266,7 +229,7 @@ namespace RTSLockstep
             SaveDetails(writer);
             SaveManager.WriteFloat(writer, "AmountBuilt", currentAmountBuilt);
             SaveManager.WriteBoolean(writer, "BuildMoving", IsBuildMoving);
-            if (CurrentProject)
+            if (ProjectStructure)
             {
                 SaveManager.WriteInt(writer, "currentProjectId", CurrentProject.GlobalID);
             }
@@ -307,9 +270,11 @@ namespace RTSLockstep
             }
         }
 
-        public void OnConstructGroupProcessed() 
+        public void OnConstructGroupProcessed(RTSAgent currentProject) 
         {
             Agent.Tag = AgentTag.Builder;
+
+            CurrentProject = currentProject;
 
             IsFocused = true;
             IsBuildMoving = false;
@@ -317,7 +282,7 @@ namespace RTSLockstep
             targetVersion = CurrentProject.SpawnVersion;
             IsCasting = true;
 
-            fastRangeToTarget = cachedAttack.Range + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
+            fastRangeToTarget = Agent.MyStats.StrikeRange + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
         }
 
@@ -351,7 +316,7 @@ namespace RTSLockstep
             // only stop construct when groups queue is empty
             if (CurrentProject.IsActive == false
                 || CurrentProject.SpawnVersion != targetVersion
-                || !_projectStructure.NeedsConstruction && MyConstructGroup.ConstructionQueue.Count == 0)
+                || !ProjectStructure.NeedsConstruction && MyConstructGroup.ConstructionQueue.Count == 0)
             {
                 // Target's lifecycle has ended
                 StopConstruction();
@@ -364,18 +329,18 @@ namespace RTSLockstep
                     {
                         if (!inRange)
                         {
-                            if (canMove)
+                            if (Agent.MyStats.CanMove)
                             {
-                                CachedMove.Arrive();
+                                Agent.MyStats.CachedMove.Arrive();
                             }
 
                             inRange = true;
                         }
                         Agent.Animator.SetState(ConstructingAnimState);
 
-                        if (!_projectStructure.ConstructionStarted)
+                        if (!ProjectStructure.ConstructionStarted)
                         {
-                            _projectStructure.ConstructionStarted = true;
+                            ProjectStructure.ConstructionStarted = true;
 
                             if (CurrentProject.Animator.IsNotNull())
                             {
@@ -393,15 +358,15 @@ namespace RTSLockstep
                         }
 
                         targetDirection.Normalize(out long mag);
-                        bool withinTurn = cachedAttack.TrackAttackAngle == false ||
+                        bool withinTurn = Agent.MyStats.CachedAttack.TrackAttackAngle == false ||
                                           (fastMag != 0 &&
-                                          _cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                          && _cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+                                          Agent.Body.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && Agent.Body.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= Agent.MyStats.CachedAttack.AttackAngle);
 
                         bool needTurn = mag != 0 && !withinTurn;
-                        if (needTurn && canTurn)
+                        if (needTurn && Agent.MyStats.CanTurn)
                         {
-                            cachedTurn.StartTurnDirection(targetDirection);
+                            Agent.MyStats.CachedTurn.StartTurnDirection(targetDirection);
                         }
                         else if (constructCount >= _constructInterval)
                         {
@@ -410,28 +375,28 @@ namespace RTSLockstep
                     }
                     else
                     {
-                        if (canMove)
+                        if (Agent.MyStats.CanMove)
                         {
-                            CachedMove.PauseAutoStop();
-                            CachedMove.PauseCollisionStop();
-                            if (!CachedMove.IsMoving
-                                && !CachedMove.MoveOnGroupProcessed)
+                            Agent.MyStats.CachedMove.PauseAutoStop();
+                            Agent.MyStats.CachedMove.PauseCollisionStop();
+                            if (!Agent.MyStats.CachedMove.IsMoving
+                                && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
                             {
                                 OnStartConstructMove();
-                                _cachedBody.Priority = basePriority;
+                                Agent.Body.Priority = basePriority;
                             }
                             else
                             {
                                 if (inRange)
                                 {
-                                    CachedMove.Destination = CurrentProject.Body.Position;
+                                    Agent.MyStats.CachedMove.Destination = CurrentProject.Body.Position;
                                 }
                                 else
                                 {
                                     if (repathTimer.AdvanceFrame())
                                     {
                                         if (CurrentProject.Body.PositionChangedBuffer &&
-                                            CurrentProject.Body.Position.FastDistance(CachedMove.Destination.x, CachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                            CurrentProject.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                         {
                                             OnStartConstructMove();
                                             //So units don't sync up and path on the same frame
@@ -453,10 +418,10 @@ namespace RTSLockstep
                 {
                     //TODO: Do we need AgentConditional checks here?
                     windupCount += LockstepManager.DeltaTime;
-                    if (canTurn)
+                    if (Agent.MyStats.CanTurn)
                     {
-                        Vector2d targetVector = CurrentProject.Body.Position - _cachedBody.Position;
-                        cachedTurn.StartTurnVector(targetVector);
+                        Vector2d targetVector = CurrentProject.Body.Position - Agent.Body.Position;
+                        Agent.MyStats.CachedTurn.StartTurnVector(targetVector);
                     }
 
                     if (windupCount >= _windup)
@@ -477,17 +442,17 @@ namespace RTSLockstep
                     windupCount = 0;
                 }
 
-                if (canMove && inRange)
+                if (Agent.MyStats.CanMove && inRange)
                 {
-                    CachedMove.PauseAutoStop();
-                    CachedMove.PauseCollisionStop();
+                    Agent.MyStats.CachedMove.PauseAutoStop();
+                    Agent.MyStats.CachedMove.PauseCollisionStop();
                 }
             }
         }
 
         private bool CheckRange()
         {
-            targetDirection = CurrentProject.Body.Position - _cachedBody.Position;
+            targetDirection = CurrentProject.Body.Position - Agent.Body.Position;
             fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -502,14 +467,14 @@ namespace RTSLockstep
 
         private void StartConstruction()
         {
-            if (canMove)
+            if (Agent.MyStats.CanMove)
             {
                 // we don't want to be able to construct and move!
-                CachedMove.StopMove();
+                Agent.MyStats.CachedMove.StopMove();
             }
-            _cachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+            Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
-            OnConstruct(_projectStructure);
+            OnConstruct(ProjectStructure);
         }
 
         private void StopConstruction(bool complete = false)
@@ -535,15 +500,17 @@ namespace RTSLockstep
             {
                 if (IsBuildMoving)
                 {
-                    CachedMove.StartMove(CurrentProject.Body.Position);
+                    Agent.MyStats.CachedMove.StartMove(CurrentProject.Body.Position);
                 }
-                else if (canMove && !inRange)
+                else if (Agent.MyStats.CanMove && !inRange)
                 {
-                    CachedMove.StopMove();
+                    Agent.MyStats.CachedMove.StopMove();
                 }
             }
 
-            _cachedBody.Priority = basePriority;
+            CurrentProject = null;
+
+            Agent.Body.Priority = basePriority;
 
             IsCasting = false;
 

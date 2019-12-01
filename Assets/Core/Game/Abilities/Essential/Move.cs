@@ -30,11 +30,11 @@ namespace RTSLockstep
         public Vector2d AveragePosition { get; set; }
 
         // add a little padding to manevour around structures
-        public int GridSize { get { return (int)Math.Round(cachedBody.Radius.CeilToInt() * 1.5f, MidpointRounding.AwayFromZero); } }
+        public int GridSize { get { return (int)Math.Round(Agent.Body.Radius.CeilToInt() * 1.5f, MidpointRounding.AwayFromZero); } }
 
-        public Vector2d Position { get { return cachedBody.Position; } }
+        public Vector2d Position { get { return Agent.Body.Position; } }
 
-        public long CollisionSize { get { return cachedBody.Radius; } }
+        public long CollisionSize { get { return Agent.Body.Radius; } }
 
         public MovementGroup MyMovementGroup { get; set; }
         public int MyMovementGroupID { get; set; }
@@ -73,10 +73,6 @@ namespace RTSLockstep
         private int StopPauseLooker;
         #endregion
 
-        private LSBody cachedBody { get; set; }
-        private Turn cachedTurn { get; set; }
-        private Attack cachedAttack { get; set; }
-
         private long timescaledAcceleration;
         private long timescaledDecceleration;
         private bool decelerating;
@@ -107,14 +103,12 @@ namespace RTSLockstep
         private readonly bool paused;
         private Vector2d desiredVelocity;
 
-        [HideInInspector]
-        public bool CanMove = true;
-        private bool canTurn;
+        public bool CanMove { get; private set; }
 
         #region Serialized
         [SerializeField, FixedNumber]
-        private long _speed = FixedMath.One * 4;
-        public virtual long Speed { get { return _speed; } }
+        private long _movementSpeed = FixedMath.One * 4;
+        public virtual long MovementSpeed { get { return _movementSpeed; } }
         [SerializeField, FixedNumber]
         private long _acceleration = FixedMath.One * 4;
         public long Acceleration { get { return _acceleration; } }
@@ -129,20 +123,17 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            cachedBody = Agent.Body;
-            cachedBody.onContact += HandleCollision;
-            cachedAttack = Agent.GetAbility<Attack>();
-            cachedTurn = Agent.GetAbility<Turn>();
-            canTurn = cachedTurn.IsNotNull();
-
+            CanMove = true;
+          //  Agent.Body.onContact += HandleCollision;
+ 
             DrawPath = false;
 
-            timescaledAcceleration = Acceleration.Mul(Speed) / LockstepManager.FrameRate;
+            timescaledAcceleration = Acceleration.Mul(MovementSpeed) / LockstepManager.FrameRate;
             //Cleaner stops with more decelleration
             timescaledDecceleration = timescaledAcceleration * 4;
             //Fatter objects can afford to land imprecisely
-            closingDistance = cachedBody.Radius;
-            stuckTolerance = ((cachedBody.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
+            closingDistance = Agent.Body.Radius;
+            stuckTolerance = ((Agent.Body.Radius * MovementSpeed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
             SlowArrival = true;
         }
@@ -203,9 +194,9 @@ namespace RTSLockstep
                     decelerating = true;
 
                     //Slowin' down
-                    if (cachedBody.VelocityMagnitude > 0)
+                    if (Agent.Body.VelocityMagnitude > 0)
                     {
-                        cachedBody.Velocity += GetAdjustVector(Vector2d.zero);
+                        Agent.Body.Velocity += GetAdjustVector(Vector2d.zero);
                     }
 
                     StoppedTime++;
@@ -287,7 +278,7 @@ namespace RTSLockstep
             if (straightPath)
             {
                 // no need to check flow field, we got LOS
-                movementDirection = Destination - cachedBody.Position;
+                movementDirection = Destination - Agent.Body.Position;
             }
             else
             {
@@ -303,7 +294,7 @@ namespace RTSLockstep
                     {
                         // we have no more use for flow fields if the agent has line of sight to destination
                         straightPath = true;
-                        movementDirection = Destination - cachedBody.Position;
+                        movementDirection = Destination - Agent.Body.Position;
                     }
                     else
                     {
@@ -319,7 +310,7 @@ namespace RTSLockstep
                     if (movementDirection.Equals(Vector2d.zero))
                     {
                         //we need to keep moving on...
-                        movementDirection = lastDirection.IsNotNull() ? lastDirection :  Destination - cachedBody.Position;
+                        movementDirection = lastDirection.IsNotNull() ? lastDirection :  Destination - Agent.Body.Position;
                     }
                 }
             }
@@ -337,14 +328,14 @@ namespace RTSLockstep
             movementDirection += SteeringBehaviourAvoid();
 
             long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
-            long slowDistance = cachedBody.VelocityMagnitude.Div(timescaledDecceleration);
+            long slowDistance = Agent.Body.VelocityMagnitude.Div(timescaledDecceleration);
 
             if (distanceToMove > slowDistance)
             {
                 desiredVelocity = movementDirection;
-                if (canTurn)
+                if (Agent.MyStats.CanTurn)
                 {
-                    cachedTurn.StartTurnDirection(movementDirection);
+                    Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
                 }
             }
             else
@@ -358,18 +349,18 @@ namespace RTSLockstep
 
                 if (distanceToMove > closingDistance)
                 {
-                    if (canTurn)
+                    if (Agent.MyStats.CanTurn)
                     {
-                        cachedTurn.StartTurnDirection(movementDirection);
+                        Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
                     }
                 }
 
                 if (distanceToMove <= slowDistance)
                 {
                     long closingSpeed = distanceToMove.Div(slowDistance);
-                    if (canTurn)
+                    if (Agent.MyStats.CanTurn)
                     {
-                        cachedTurn.StartTurnDirection(movementDirection);
+                        Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
                     }
 
                     desiredVelocity = movementDirection * closingSpeed;
@@ -390,12 +381,12 @@ namespace RTSLockstep
                         if (RepathTries < StuckRepathTries)
                         {
                             Debug.Log("Stuck Agent");
-                            if (!IsGroupMoving)
-                            {
+                        //    if (!IsGroupMoving)
+                         //   {
                                 // attempt to repath if agent is by themselves
                                 // otherwise we already have the best path based on the group
                                 DoPathfind = true;
-                            }
+                         //   }
 
                             RepathTries++;
                         }
@@ -427,17 +418,17 @@ namespace RTSLockstep
             }
 
             //Multiply our direction by speed for our desired speed
-            desiredVelocity *= Speed;
+            desiredVelocity *= MovementSpeed;
 
             // Cap speed as required
-            var currentSpeed = cachedBody.Velocity.Magnitude();
-            if (currentSpeed > Speed)
+            var currentSpeed = Agent.Body.Velocity.Magnitude();
+            if (currentSpeed > MovementSpeed)
             {
-                desiredVelocity *= (Speed / currentSpeed).CeilToInt();
+                desiredVelocity *= (MovementSpeed / currentSpeed).CeilToInt();
             }
 
             //Apply the force
-            cachedBody.Velocity += GetAdjustVector(desiredVelocity);
+            Agent.Body.Velocity += GetAdjustVector(desiredVelocity);
         }
 
         private Vector2d SteeringBehaviorFlowField()
@@ -570,7 +561,7 @@ namespace RTSLockstep
             Vector2d desired = _destination - Position;
             desired.Normalize(out long desiredMag);
             //Desired velocity (move there at maximum speed)
-            return desiredMag > 0 ? desired * (Speed / desiredMag) : Vector2d.zero;
+            return desiredMag > 0 ? desired * (MovementSpeed / desiredMag) : Vector2d.zero;
         }
 
         protected virtual Func<RTSAgent, bool> AvoidAgentConditional
@@ -582,10 +573,9 @@ namespace RTSLockstep
                     // check to make sure we didn't find ourselves and that the other agent can move
                     if (Agent.GlobalID != other.GlobalID
                     && other.GetAbility<Move>()
-                    && other.GetAbility<Move>().IsMoving)
+                    && (other.GetAbility<Move>().IsMoving || other.GetAbility<Move>().Arrived))
                     {
-                        Vector2d distance = (other.Body.Position - Position);
-                        distance.Normalize(out long distanceMag);
+                        (other.Body.Position - Position).Normalize(out long distanceMag);
 
                         if (distanceMag < _minAvoidanceDistance)
                         {
@@ -615,7 +605,7 @@ namespace RTSLockstep
 
             RTSAgent closetAgent = InfluenceManager.Scan(
                      Position,
-                     cachedAttack.Sight,
+                     Agent.MyStats.Sight,
                      avoidAgentConditional,
                      (bite) =>
                      {
@@ -731,7 +721,7 @@ namespace RTSLockstep
         private Vector2d GetAdjustVector(Vector2d desiredVelocity)
         {
             //The velocity change we want
-            var velocityChange = desiredVelocity - cachedBody._velocity;
+            var velocityChange = desiredVelocity - Agent.Body._velocity;
             var adjustFastMag = velocityChange.FastMagnitude();
             //Cap acceleration vector magnitude
             long accel = decelerating ? timescaledDecceleration : timescaledAcceleration;
@@ -942,9 +932,9 @@ namespace RTSLockstep
             SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
         }
 
-        protected override void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)
+        protected override void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue)
         {
-            base.HandleLoadedProperty(reader, propertyName, readValue);
+            base.OnLoadProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
                 case "MyMovementGroupID":

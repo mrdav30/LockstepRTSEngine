@@ -10,7 +10,8 @@ namespace RTSLockstep
     {
         public MovementGroup ConstructMoveGroup;
         public Queue<RTSAgent> ConstructionQueue = new Queue<RTSAgent>();
-        public RTSAgent CurrentProject;
+
+        public RTSAgent CurrentGroupProject;
 
         public int indexID { get; set; }
 
@@ -41,12 +42,12 @@ namespace RTSLockstep
                 {
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
-                        CurrentProject = tempTarget;
+                        CurrentGroupProject = tempTarget;
                     }
                 }
             }
 
-            if (CurrentProject.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (CurrentGroupProject.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for constructors based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -54,7 +55,7 @@ namespace RTSLockstep
                     ControllerID = controllerID
                 };
 
-                moveCommand.Add(CurrentProject.Body.Position);
+                moveCommand.Add(CurrentGroupProject.Body.Position);
 
                 ConstructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
@@ -75,9 +76,9 @@ namespace RTSLockstep
                     {
                         _calculatedBehaviors = CalculateAndExecuteBehaviors();
                     }
-                    else if (!CurrentProject.GetAbility<Structure>().NeedsConstruction && ConstructionQueue.Count > 0)
+                    else if (!CurrentGroupProject.GetAbility<Structure>().NeedsConstruction && ConstructionQueue.Count > 0)
                     {
-                        CurrentProject = ConstructionQueue.Dequeue();
+                        CurrentGroupProject = ConstructionQueue.Dequeue();
                     }
                 }
 
@@ -100,7 +101,7 @@ namespace RTSLockstep
             constructors.Add(constructor);
 
             // add the constructor to our contructor move group too!
-            ConstructMoveGroup.Add(constructor.CachedMove);
+            ConstructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
         }
 
         public void Remove(Construct constructor)
@@ -109,14 +110,14 @@ namespace RTSLockstep
             {
                 constructors.Remove(constructor);
 
-                // Remove the constructor to our contructor move group too!
-                ConstructMoveGroup.Remove(constructor.CachedMove);
+                // Remove the constructor from our contructor move group too!
+                ConstructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (CurrentProject.IsNotNull())
+            if (CurrentGroupProject.IsNotNull())
             {
                 ExecuteConstruction();
             }
@@ -166,10 +167,10 @@ namespace RTSLockstep
                         // Set to transparent material until constructor is in range to start
                         ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
 
-                        if (CurrentProject.IsNull())
+                        if (CurrentGroupProject.IsNull())
                         {
                             //Set the current project if we don't have one
-                            CurrentProject = newRTSAgent;
+                            CurrentGroupProject = newRTSAgent;
                         }
                         else
                         {
@@ -196,7 +197,7 @@ namespace RTSLockstep
             }
             constructors.FastClear();
             ConstructionQueue.Clear();
-            CurrentProject = null;
+            CurrentGroupProject = null;
             ConstructMoveGroup = null;
             ConstructionGroupHelper.Pool(this);
             _calculatedBehaviors = false;
@@ -208,7 +209,7 @@ namespace RTSLockstep
             for (int i = 0; i < constructors.Count; i++)
             {
                 Construct constructor = constructors[i];
-                constructor.OnConstructGroupProcessed();
+                constructor.OnConstructGroupProcessed(CurrentGroupProject);
             }
         }
     }

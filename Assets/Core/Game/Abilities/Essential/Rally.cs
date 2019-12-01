@@ -13,8 +13,6 @@ namespace RTSLockstep
         public Vector3 rallyPoint { get; private set; }
         private FlagState _flagState;
 
-        private LSBody CachedBody { get { return Agent.Body; } }
-
         #region Serialized Values (Further description in properties)
         public Texture2D rallyPointImage;
         #endregion

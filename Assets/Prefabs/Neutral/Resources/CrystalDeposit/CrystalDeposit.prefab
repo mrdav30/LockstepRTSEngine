@@ -325,6 +325,7 @@ GameObject:
   - component: {fileID: 114251684514526896}
   - component: {fileID: 114066457341764114}
   - component: {fileID: 114155340167218942}
+  - component: {fileID: -210285474545085831}
   - component: {fileID: 114991101511973450}
   m_Layer: 10
   m_Name: CrystalDeposit
@@ -473,6 +474,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5bb6f8ba09bb3843b8abda7112a9371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-210285474545085831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911411376021232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _strikeRange: 393216
+  _sight: 655360
 --- !u!114 &114991101511973450
 MonoBehaviour:
   m_ObjectHideFlags: 0

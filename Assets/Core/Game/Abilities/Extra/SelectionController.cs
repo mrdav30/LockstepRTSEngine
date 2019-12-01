@@ -149,7 +149,7 @@ namespace RTSLockstep
         {
             if (Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building)
             {
-                healthPercentage = (float) cachedHealth.HealthAmount / (float)cachedHealth.MaxHealth;
+                healthPercentage = (float) cachedHealth.CurrentHealth / (float)cachedHealth.MaxHealth;
                 if (healthPercentage > highSplit)
                 {
                     healthStyle.normal.background = GameResourceManager.HealthyTexture;

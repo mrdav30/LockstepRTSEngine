@@ -5,24 +5,18 @@ namespace RTSLockstep
 {
     public class ConstructorAI : DeterminismAI
     {
-        protected Construct cachedConstruct;
-
-        #region Serialized Values (Further description in properties)
-        #endregion
-
         public override void OnInitialize()
         {
             base.OnInitialize();
             _targetAllegiance = AllegianceType.Friendly;
-            cachedConstruct = cachedAgent.GetAbility<Construct>();
         }
 
         public override bool ShouldMakeDecision()
         {
             if (cachedAgent.Tag != AgentTag.Builder
-                || cachedConstruct.IsBuildMoving
-                || cachedConstruct.IsFocused
-                || cachedConstruct.CurrentProject.IsNotNull())
+                || cachedAgent.MyStats.CachedConstruct.IsBuildMoving
+                || cachedAgent.MyStats.CachedConstruct.IsFocused
+                || cachedAgent.MyStats.CachedConstruct.CurrentProject.IsNotNull())
             {
                 searchCount -= 1;
                 return false;

@@ -5,27 +5,21 @@ namespace RTSLockstep
 {
     public class HarvesterAI : DeterminismAI
     {
-        protected Harvest cachedHarvest;
-
-        #region Serialized Values (Further description in properties)
-        #endregion
-
         public override void OnInitialize()
         {
             base.OnInitialize();
-            cachedHarvest = cachedAgent.GetAbility<Harvest>();
         }
 
         public override bool ShouldMakeDecision()
         {
             if (cachedAgent.Tag != AgentTag.Harvester
-                || (cachedHarvest.IsHarvesting || cachedHarvest.IsEmptying))
+                || (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
             {
                 searchCount -= 1;
                 return false;
             }
             else if (searchCount <= 0
-                && cachedHarvest.LoadAtCapacity())
+                && cachedAgent.MyStats.CachedHarvest.LoadAtCapacity())
             {
                 searchCount = SearchRate;
                 //we are not doing anything at the moment
@@ -77,7 +71,7 @@ namespace RTSLockstep
                 ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
                 Structure closestResourceStore = nearbyAgent.GetAbility<Structure>();
 
-                if (closestResource && closestResource.ResourceType == cachedHarvest.HarvestType
+                if (closestResource && closestResource.ResourceType == cachedAgent.MyStats.CachedHarvest.HarvestType
                     || closestResourceStore && nearbyAgent.GetAbility<Structure>().CanStoreResources(cachedAgent.GetAbility<Harvest>().HarvestType))
                 {
                     // send harvest command

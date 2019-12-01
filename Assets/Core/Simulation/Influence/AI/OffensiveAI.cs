@@ -6,8 +6,6 @@ namespace RTSLockstep
 {
     public class OffensiveAI : DeterminismAI
     {
-        protected Attack cachedAttack;
-
         #region Serialized Values (Further description in properties)
         #endregion
 
@@ -15,20 +13,13 @@ namespace RTSLockstep
         {
             base.OnInitialize();
             _targetAllegiance = AllegianceType.Enemy;
-
-            cachedAttack = cachedAgent.GetAbility<Attack>();
-
-            if (cachedAttack)
-            {
-                scanRange = cachedAttack.Sight;
-            }
         }
 
         private bool CanAttack()
         {
-            if (cachedAttack)
+            if (cachedAgent.MyStats.CachedAttack)
             {
-                if (cachedAttack.IsAttackMoving || cachedHealth.HealthAmount == 0)
+                if (cachedAgent.MyStats.CachedAttack.IsAttackMoving || cachedAgent.MyStats.CachedHealth.CurrentHealth == 0)
                 {
                     return false;
                 }
@@ -58,7 +49,7 @@ namespace RTSLockstep
             //determine what should be done by the agent at the current point in time
             //need sight from attack ability to be able to scan...
             base.DecideWhatToDo();
-            if (CanAttack() && (nearbyAgent != null || nearbyAgent != null && nearbyAgent == cachedAttack.CurrentTarget))
+            if (CanAttack() && (nearbyAgent.IsNotNull() || nearbyAgent.IsNotNull() && nearbyAgent == cachedAgent.MyStats.CachedAttack.CurrentTarget))
             {
                 InfluenceAttack();
             }
@@ -71,7 +62,7 @@ namespace RTSLockstep
             {
                 Func<RTSAgent, bool> agentConditional = null;
 
-                if (cachedAttack.Damage >= 0)
+                if (cachedAgent.MyStats.CachedAttack.Damage >= 0)
                 {
                     agentConditional = (other) =>
                     {
@@ -96,10 +87,10 @@ namespace RTSLockstep
         {
             // send attack command
             Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
-            attackCom.Add<DefaultData>(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+            attackCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
             attackCom.ControllerID = cachedAgent.Controller.ControllerID;
 
-            attackCom.Add<Influence>(new Influence(cachedAgent));
+            attackCom.Add(new Influence(cachedAgent));
 
             CommandManager.SendCommand(attackCom);
         }

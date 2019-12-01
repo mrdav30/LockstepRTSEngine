@@ -1981,6 +1981,7 @@ GameObject:
   - component: {fileID: 3376699215244896875}
   - component: {fileID: -169987879288948697}
   - component: {fileID: 7112886101434409646}
+  - component: {fileID: -2938075810342246947}
   - component: {fileID: 1789922619339295299}
   - component: {fileID: 4579221143017976705}
   - component: {fileID: -4388744408134774117}
@@ -2119,8 +2120,8 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  CanMove: 1
-  _speed: 327680
+  IsAvoidingLeft: 0
+  _movementSpeed: 262144
   _acceleration: 983040
   _canPathfind: 1
   DrawPath: 1
@@ -2152,12 +2153,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
+  MyAttackGroupID: 0
   _isOffensive: 1
   _projectileCode: Melee
-  _range: 65536
-  _sight: 655360
   _damage: 983040
-  _attackInterval: 65536
+  _attackSpeed: 65536
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
@@ -2197,6 +2197,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
+--- !u!114 &-2938075810342246947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4579221143010542061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _strikeRange: 65536
+  _sight: 655360
 --- !u!114 &1789922619339295299
 MonoBehaviour:
   m_ObjectHideFlags: 0

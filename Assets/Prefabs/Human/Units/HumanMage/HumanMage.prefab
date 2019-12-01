@@ -821,6 +821,7 @@ GameObject:
   - component: {fileID: 1497554063877391309}
   - component: {fileID: 2923709480762389938}
   - component: {fileID: 8574610396491221460}
+  - component: {fileID: 153510344514853558}
   - component: {fileID: 5041738750042490211}
   - component: {fileID: 3837881372378947234}
   - component: {fileID: 433888467335685440}
@@ -957,8 +958,8 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  CanMove: 1
-  _speed: 196608
+  IsAvoidingLeft: 0
+  _movementSpeed: 262144
   _acceleration: 983040
   _canPathfind: 1
   DrawPath: 1
@@ -1004,12 +1005,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
+  MyAttackGroupID: 0
   _isOffensive: 0
   _projectileCode: MagicBullet
-  _range: 655360
-  _sight: 655360
   _damage: 983040
-  _attackInterval: 65536
+  _attackSpeed: 65536
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
@@ -1035,6 +1035,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
+--- !u!114 &153510344514853558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3837881372369562816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _strikeRange: 983040
+  _sight: 983040
 --- !u!114 &5041738750042490211
 MonoBehaviour:
   m_ObjectHideFlags: 0

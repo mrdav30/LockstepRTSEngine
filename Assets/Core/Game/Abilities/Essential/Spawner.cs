@@ -11,7 +11,7 @@ namespace RTSLockstep
     {
         private Queue<string> spawnQueue;
         private long currentSpawnProgress;
-        private LSBody CachedBody { get { return Agent.Body; } }
+
         private Rally cachedRally;
 
         //Stuff for the logic
@@ -31,7 +31,6 @@ namespace RTSLockstep
         private long _windup;
         #endregion
 
-        public long Windup { get { return _windup; } }
         [Lockstep(true)]
         public bool IsWindingUp { get; set; }
 
@@ -41,7 +40,7 @@ namespace RTSLockstep
         {
             spawnQueue = new Queue<string>();
 
-            basePriority = CachedBody.Priority;
+            basePriority = Agent.Body.Priority;
         }
 
         protected override void OnInitialize()
@@ -133,7 +132,7 @@ namespace RTSLockstep
             {
                 //TODO: Do we need AgentConditional checks here?
                 windupCount += LockstepManager.DeltaTime;
-                if (windupCount >= Windup)
+                if (windupCount >= _windup)
                 {
                     windupCount = 0;
                     ProcessSpawnQueue();
@@ -142,7 +141,7 @@ namespace RTSLockstep
                         //resetting back down after attack is fired
                         this.spawnCount -= (this._spawnInterval);
                     }
-                    this.spawnCount += Windup;
+                    this.spawnCount += _windup;
                     IsWindingUp = false;
                 }
             }

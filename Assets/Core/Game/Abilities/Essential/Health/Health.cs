@@ -8,16 +8,14 @@ namespace RTSLockstep
     {
         [SerializeField, FixedNumber]
         private long _maxHealth = FixedMath.One * 100;
-
-        public long BaseHealth { get { return _maxHealth; } }
-
         public long MaxHealth
         {
             get { return _maxHealth + MaxHealthModifier; }
         }
 
-        private long _maxHealthModifier;
+        public long BaseHealth { get { return _maxHealth; } }
 
+        private long _maxHealthModifier;
         [Lockstep(true)]
         public long MaxHealthModifier
         {
@@ -39,14 +37,16 @@ namespace RTSLockstep
             }
         }
 
-        public event Action onHealthChange;
-        public event Action<long> onHealthDelta;
+        public event Action OnHealthChange;
+        public event Action<long> OnHealthDelta;
+        public event Action<Health, AttackerInfo> OnDie;
+        public event Action<LSProjectile> OnTakeProjectile;
 
         public bool CanLose
         {
             get
             {
-                return HealthAmount > 0;
+                return CurrentHealth > 0;
             }
         }
 
@@ -54,14 +54,14 @@ namespace RTSLockstep
         {
             get
             {
-                return HealthAmount < MaxHealth;
+                return CurrentHealth < MaxHealth;
             }
         }
 
         [SerializeField, FixedNumber]
         private long _currentHealth;
 
-        public long HealthAmount
+        public long CurrentHealth
         {
             get
             {
@@ -71,14 +71,10 @@ namespace RTSLockstep
             {
                 long delta = value - _currentHealth;
                 _currentHealth = value;
-                if (onHealthChange != null)
-                    onHealthChange();
-                if (onHealthDelta != null)
-                    onHealthDelta(delta);
+                OnHealthChange?.Invoke();
+                OnHealthDelta?.Invoke(delta);
             }
         }
-        // not used anywhere...
-        public int shieldIndex { get; set; }
 
         protected override void OnSetup()
         {
@@ -86,7 +82,8 @@ namespace RTSLockstep
 
         protected override void OnInitialize()
         {
-            HealthAmount = MaxHealth;
+            // Check if the agent starts with full health
+            CurrentHealth = CurrentHealth == 0 ? MaxHealth : CurrentHealth;
             OnTakeProjectile = null;
             MaxHealthModifier = 0;
             LastAttacker = null;
@@ -94,12 +91,13 @@ namespace RTSLockstep
 
         public void TakeProjectile(LSProjectile projectile)
         {
-            if (Agent.IsActive && HealthAmount >= 0)
+            if (Agent.IsActive && CurrentHealth >= 0)
             {
                 if (OnTakeProjectile.IsNotNull())
                 {
                     OnTakeProjectile(projectile);
                 }
+
                 TakeDamage(projectile.CheckExclusiveDamage(Agent.Tag));
             }
         }
@@ -109,45 +107,37 @@ namespace RTSLockstep
         {
             if (damage >= 0)
             {
-                HealthAmount -= damage;
+                CurrentHealth -= damage;
                 if (attackerInfo != null)
                 {
                     LastAttacker = attackerInfo;
                 }
                 // don't let the health go below zero
-                if (HealthAmount <= 0)
+                if (CurrentHealth <= 0)
                 {
-                    HealthAmount = 0;
+                    CurrentHealth = 0;
 
-                    if (HealthAmount <= 0)
-                    {
-
-                        Die();
-                        return;
-                    }
-
+                    Die();
+                    return;
                 }
             }
             else
             {
-                HealthAmount -= damage;
-                if (HealthAmount >= this.MaxHealth)
+                CurrentHealth -= damage;
+                if (CurrentHealth >= MaxHealth)
                 {
-                    HealthAmount = MaxHealth;
+                    CurrentHealth = MaxHealth;
                 }
             }
-
         }
-
-        public event Action<Health, AttackerInfo> onDie;
 
         public void Die()
         {
             if (Agent.IsActive)
             {
-                if (onDie != null)
+                if (OnDie.IsNotNull())
                 {
-                    this.onDie(this, this.LastAttacker);
+                    OnDie(this, LastAttacker);
                 }
 
                 Agent.Die();
@@ -158,8 +148,6 @@ namespace RTSLockstep
         {
             OnTakeProjectile = null;
         }
-
-        public event Action<LSProjectile> OnTakeProjectile;
 
         protected override void OnSaveDetails(JsonWriter writer)
         {

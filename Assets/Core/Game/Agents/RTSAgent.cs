@@ -84,6 +84,7 @@ namespace RTSLockstep
         public LSAnimatorBase Animator { get; private set; }
         public Transform CachedTransform { get; private set; }
         public GameObject CachedGameObject { get; private set; }
+        public AgentStats MyStats { get; private set; }
         #endregion
 
         //TODO: Put all this stuff in an extendible class
@@ -252,10 +253,7 @@ namespace RTSLockstep
             RegisterLockstep();
         }
 
-        public virtual void Initialize(
-         Vector2d position = default(Vector2d),
-         Vector2d rotation = default(Vector2d)
-            )
+        public virtual void Initialize(Vector2d position = default, Vector2d rotation = default)
         {
             IsActive = true;
             CheckCasting = true;
@@ -621,6 +619,7 @@ namespace RTSLockstep
             UnityBody = GetComponent<UnityLSBody>();
             Animator = GetComponent<LSAnimatorBase>();
             AttachedAbilities = GetComponents<Ability>();
+            MyStats = GetComponent<AgentStats>();
         }
 
         private void HandleLoadedProperty(JsonTextReader reader, string propertyName, object readValue)

@@ -15,10 +15,6 @@ namespace RTSLockstep
         private long currentDepositAmount = 0;
 
         private long fastRangeToTarget;
-        private Move cachedMove;
-        private Turn cachedTurn;
-        private Attack cachedAttack;
-        private LSBody CachedBody { get { return Agent.Body; } }
 
         //Stuff for the logic
         private bool inRange;
@@ -60,13 +56,12 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            cachedTurn = Agent.GetAbility<Turn>();
-            cachedMove = Agent.GetAbility<Move>();
-            cachedAttack = Agent.GetAbility<Attack>();
+            basePriority = Agent.Body.Priority;
 
-            cachedMove.onStartMove += HandleStartMove;
-
-            basePriority = CachedBody.Priority;
+            if (Agent.MyStats.CanMove)
+            {
+                Agent.MyStats.CachedMove.onStartMove += HandleStartMove;
+            }
         }
 
         private void HandleStartMove()
@@ -139,17 +134,17 @@ namespace RTSLockstep
 
                     if (IsHarvestMoving)
                     {
-                        cachedMove.StartLookingForStopPause();
+                        Agent.MyStats.CachedMove.StartLookingForStopPause();
                     }
                 }
 
-                if (!cachedMove.IsMoving && !IsHarvesting && !IsEmptying)
+                if (!Agent.MyStats.CachedMove.IsMoving && !IsHarvesting && !IsEmptying)
                 {
                     if (currentLoadAmount > 0)
                     {
                         Agent.Animator.SetIdleState(IdlingAnimState);
                     }
-                    else if (!cachedAttack.CurrentTarget)
+                    else if (!Agent.MyStats.CachedAttack.CurrentTarget)
                     {
                         Agent.Animator.SetIdleState(AnimState.Idling);
                     }
@@ -178,7 +173,7 @@ namespace RTSLockstep
 
                 if (!IsWindingUp)
                 {
-                    Vector2d targetDirection = resourceTarget.Body.Position - CachedBody.Position;
+                    Vector2d targetDirection = resourceTarget.Body.Position - Agent.Body.Position;
                     long fastMag = targetDirection.FastMagnitude();
 
                     if (CheckRange(resourceTarget.Body))
@@ -186,21 +181,21 @@ namespace RTSLockstep
                         IsHarvestMoving = false;
                         if (!inRange)
                         {
-                            cachedMove.StopMove();
+                            Agent.MyStats.CachedMove.StopMove();
                             inRange = true;
                         }
                         Agent.Animator.SetState(HarvestingAnimState);
 
                         long mag;
                         targetDirection.Normalize(out mag);
-                        bool withinTurn = cachedAttack.TrackAttackAngle == false ||
+                        bool withinTurn = Agent.MyStats.CachedAttack.TrackAttackAngle == false ||
                                           (fastMag != 0 &&
-                                          CachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                          && CachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+                                          Agent.Body.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && Agent.Body.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= Agent.MyStats.CachedAttack.AttackAngle);
                         bool needTurn = mag != 0 && !withinTurn;
                         if (needTurn)
                         {
-                            cachedTurn.StartTurnDirection(targetDirection);
+                            Agent.MyStats.CachedTurn.StartTurnDirection(targetDirection);
                         }
                         else
                         {
@@ -212,27 +207,27 @@ namespace RTSLockstep
                     }
                     else
                     {
-                        cachedMove.PauseAutoStop();
-                        cachedMove.PauseCollisionStop();
-                        if (cachedMove.IsMoving == false)
+                        Agent.MyStats.CachedMove.PauseAutoStop();
+                        Agent.MyStats.CachedMove.PauseCollisionStop();
+                        if (Agent.MyStats.CachedMove.IsMoving == false)
                         {
-                            cachedMove.StartMove(resourceTarget.Body.Position);
-                            CachedBody.Priority = basePriority;
+                            Agent.MyStats.CachedMove.StartMove(resourceTarget.Body.Position);
+                            Agent.Body.Priority = basePriority;
                         }
                         else
                         {
                             if (inRange)
                             {
-                                cachedMove.Destination = resourceTarget.Body.Position;
+                                Agent.MyStats.CachedMove.Destination = resourceTarget.Body.Position;
                             }
                             else
                             {
                                 if (repathTimer.AdvanceFrame())
                                 {
                                     if (resourceTarget.Body.PositionChangedBuffer &&
-                                        resourceTarget.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                        resourceTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                     {
-                                        cachedMove.StartMove(resourceTarget.Body.Position);
+                                        Agent.MyStats.CachedMove.StartMove(resourceTarget.Body.Position);
                                         //So units don't sync up and path on the same frame
                                         repathTimer.AdvanceFrames(repathRandom);
                                     }
@@ -273,8 +268,8 @@ namespace RTSLockstep
 
                 if (inRange)
                 {
-                    cachedMove.PauseAutoStop();
-                    cachedMove.PauseCollisionStop();
+                    Agent.MyStats.CachedMove.PauseAutoStop();
+                    Agent.MyStats.CachedMove.PauseCollisionStop();
                 }
             }
         }
@@ -292,14 +287,14 @@ namespace RTSLockstep
             {
                 if (!IsWindingUp)
                 {
-                    Vector2d targetDirection = resourceStorage.Body.Position - CachedBody.Position;
+                    Vector2d targetDirection = resourceStorage.Body.Position - Agent.Body.Position;
                     long fastMag = targetDirection.FastMagnitude();
 
                     if (CheckRange(resourceStorage.Body))
                     {
                         if (!inRange)
                         {
-                            cachedMove.StopMove();
+                            Agent.MyStats.CachedMove.StopMove();
                             inRange = true;
                         }
                         Agent.Animator.SetIdleState(IdlingAnimState);
@@ -310,14 +305,14 @@ namespace RTSLockstep
 
                         long mag;
                         targetDirection.Normalize(out mag);
-                        bool withinTurn = cachedAttack.TrackAttackAngle == false ||
+                        bool withinTurn = Agent.MyStats.CachedAttack.TrackAttackAngle == false ||
                                           (fastMag != 0 &&
-                                          CachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                          && CachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= cachedAttack.AttackAngle);
+                                          Agent.Body.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && Agent.Body.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= Agent.MyStats.CachedAttack.AttackAngle);
                         bool needTurn = mag != 0 && !withinTurn;
                         if (needTurn)
                         {
-                            cachedTurn.StartTurnDirection(targetDirection);
+                            Agent.MyStats.CachedTurn.StartTurnDirection(targetDirection);
                         }
                         else
                         {
@@ -329,27 +324,27 @@ namespace RTSLockstep
                     }
                     else
                     {
-                        cachedMove.PauseAutoStop();
-                        cachedMove.PauseCollisionStop();
-                        if (cachedMove.IsMoving == false)
+                        Agent.MyStats.CachedMove.PauseAutoStop();
+                        Agent.MyStats.CachedMove.PauseCollisionStop();
+                        if (Agent.MyStats.CachedMove.IsMoving == false)
                         {
-                            cachedMove.StartMove(resourceStorage.Body.Position);
-                            CachedBody.Priority = basePriority;
+                            Agent.MyStats.CachedMove.StartMove(resourceStorage.Body.Position);
+                            Agent.Body.Priority = basePriority;
                         }
                         else
                         {
                             if (inRange)
                             {
-                                cachedMove.Destination = resourceStorage.Body.Position;
+                                Agent.MyStats.CachedMove.Destination = resourceStorage.Body.Position;
                             }
                             else
                             {
                                 if (repathTimer.AdvanceFrame())
                                 {
                                     if (resourceStorage.Body.PositionChangedBuffer &&
-                                        resourceStorage.Body.Position.FastDistance(cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                        resourceStorage.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                     {
-                                        cachedMove.StartMove(resourceStorage.Body.Position);
+                                        Agent.MyStats.CachedMove.StartMove(resourceStorage.Body.Position);
                                         //So units don't sync up and path on the same frame
                                         repathTimer.AdvanceFrames(repathRandom);
                                     }
@@ -388,16 +383,16 @@ namespace RTSLockstep
 
                 if (inRange)
                 {
-                    cachedMove.PauseAutoStop();
-                    cachedMove.PauseCollisionStop();
+                    Agent.MyStats.CachedMove.PauseAutoStop();
+                    Agent.MyStats.CachedMove.PauseCollisionStop();
                 }
             }
         }
 
         private void Collect()
         {
-            cachedMove.StopMove();
-            CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+            Agent.MyStats.CachedMove.StopMove();
+            Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
             long collect = CollectionAmount;
             // make sure that the harvester cannot collect more than it can carry
@@ -422,8 +417,8 @@ namespace RTSLockstep
 
         private void Deposit()
         {
-            cachedMove.StopMove();
-            CachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+            Agent.MyStats.CachedMove.StopMove();
+            Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
             currentDepositAmount += DepositAmount;
             long deposit = DepositAmount;
@@ -458,10 +453,10 @@ namespace RTSLockstep
 
         bool CheckRange(LSBody targetBody)
         {
-            fastRangeToTarget = cachedAttack.Range + (targetBody.IsNotNull() ? targetBody.Radius : 0) + Agent.Body.Radius;
+            fastRangeToTarget = Agent.MyStats.StrikeRange + (targetBody.IsNotNull() ? targetBody.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
 
-            Vector2d targetDirection = targetBody._position - CachedBody._position;
+            Vector2d targetDirection = targetBody._position - Agent.Body._position;
             long fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -493,7 +488,7 @@ namespace RTSLockstep
             IsEmptying = false;
             IsCasting = false;
 
-            CachedBody.Priority = basePriority;
+            Agent.Body.Priority = basePriority;
 
             if (complete)
             {
@@ -505,13 +500,13 @@ namespace RTSLockstep
             {
                 if (IsHarvestMoving)
                 {
-                    cachedMove.StartMove(this.resourceTarget.Body.Position);
+                    Agent.MyStats.CachedMove.StartMove(this.resourceTarget.Body.Position);
                 }
                 else
                 {
                     if (resourceTarget && inRange == false)
                     {
-                        cachedMove.StopMove();
+                        Agent.MyStats.CachedMove.StopMove();
                     }
                 }
             }
@@ -564,7 +559,7 @@ namespace RTSLockstep
 
             IsHarvestMoving = true;
             //send move command
-            cachedMove.StartMove(destination);
+            Agent.MyStats.CachedMove.StartMove(destination);
         }
 
         protected override void OnExecute(Command com)

@@ -14,52 +14,9 @@ namespace RTSLockstep
         [HideInInspector]
         public int MyAttackGroupID;
 
-        public Move CachedMove { get; private set; }
-
         public bool IsAttackMoving { get; private set; }
 
-        private RTSAgent _currentTarget;
-        public RTSAgent CurrentTarget
-        {
-            get
-            {
-                if (MyAttackGroup.IsNotNull())
-                {
-                    return MyAttackGroup.CurrentTarget;
-                }
-                else
-                {
-                    return _currentTarget;
-                }
-            }
-            set
-            {
-                if (MyAttackGroup.IsNotNull())
-                {
-                    MyAttackGroup.CurrentTarget = value;
-                }
-                else
-                {
-                    _currentTarget = value;
-                }
-            }
-        }
-
-        public virtual bool IsOffensive { get { return _isOffensive; } }
-
-        //Range
-        public virtual long Range { get { return _range; } }
-        //Approximate radius that's scanned for targets
-        public virtual long Sight { get { return _sight; } }
-
-        //Damage of attack
-        public virtual long Damage { get { return _damage; } }
-        //Frames between each attack
-        public virtual long AttackInterval { get { return _attackInterval; } }
-        //Whether or not to require the unit to face the target for attacking
-        public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } }
-        //The angle in front of the unit that the target must be located in
-        public long AttackAngle { get { return _attackAngle; } }
+        public RTSAgent CurrentTarget { get; private set; }
 
         public virtual Vector3d[] ProjectileOffsets
         {
@@ -90,16 +47,10 @@ namespace RTSLockstep
         public event Action OnStopAttack;
 
         private Vector3d[] cachedProjectileOffsets;
-
-        private bool canMove;
-        private Turn cachedTurn;
-        private bool canTurn;
         private Health cachedTargetHealth;
-        private LSBody _cachedBody { get { return Agent.Body; } }
 
         //Stuff for the logic
         private bool inRange;
-
         private long fastMag;
         private Vector2d targetDirection;
         private long fastRangeToTarget;
@@ -135,24 +86,27 @@ namespace RTSLockstep
         #region Serialized Values (Further description in properties)
         [SerializeField]
         protected bool _isOffensive;
+        public virtual bool IsOffensive { get { return _isOffensive; } }
         [SerializeField, DataCode("Projectiles")]
         protected string _projectileCode;
-        [FixedNumber, SerializeField]
-        protected long _range = FixedMath.One * 6;
-        [FixedNumber, SerializeField]
-        protected long _sight = FixedMath.One * 10;
-        [FixedNumber, SerializeField]
+
+        [FixedNumber, SerializeField, Tooltip("Damage of attack")]
         protected long _damage = FixedMath.One;
-        [SerializeField, FixedNumber]
-        protected long _attackInterval = 1 * FixedMath.One;
+        public virtual long Damage { get { return _damage; } }
+        [SerializeField, FixedNumber, Tooltip("Frames between each attack")]
+        protected long _attackSpeed = 1 * FixedMath.One;
+        public virtual long AttackSpeed { get { return _attackSpeed; } }
         // Allegiance of the target
         [SerializeField, EnumMask]
         protected AllegianceType _targetAllegiance = AllegianceType.Enemy;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Whether or not to require the unit to face the target for attacking")]
         protected bool _trackAttackAngle = true;
-        [FixedNumberAngle, SerializeField]
+        public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } }
+        [FixedNumberAngle, SerializeField, Tooltip("The angle in front of the unit that the target must be located in")]
         protected long _attackAngle = FixedMath.TenDegrees;
+        public long AttackAngle { get { return _attackAngle; } }
+
         [SerializeField, Tooltip("Important: With Vector3d, the Z axis represents height!")]
         protected Vector3d _projectileOffset;
         [SerializeField]
@@ -168,40 +122,29 @@ namespace RTSLockstep
 
         protected override void OnSetup()
         {
-            CachedMove = Agent.GetAbility<Move>();
-            cachedTurn = Agent.GetAbility<Turn>();
+            basePriority = Agent.Body.Priority;
 
-            if (Sight < Range)
+            if (Agent.MyStats.CanMove)
             {
-                _sight = Range + FixedMath.One * 5;
+                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
             }
-
-            //fastRange = (Range * Range);
-            basePriority = _cachedBody.Priority;
-            canMove = CachedMove.IsNotNull();
-
-            if (canMove)
-            {
-                CachedMove.onArrive += HandleOnArrive;
-            }
-
-            canTurn = cachedTurn.IsNotNull();
         }
 
         protected override void OnInitialize()
         {
             attackCount = 0;
-            CurrentTarget = null;
 
             IsAttackMoving = false;
 
+            MyAttackGroup = null;
             MyAttackGroupID = -1;
+
+            CurrentTarget = null;
 
             inRange = false;
             IsFocused = false;
 
             CycleCount = 0;
-            //   Destination = Vector2d.zero;
 
             repathTimer.Reset(repathInterval);
             repathRandom = LSUtility.GetRandom(repathInterval);
@@ -225,12 +168,12 @@ namespace RTSLockstep
         {
             if (Agent.Tag == AgentTag.Offensive)
             {
-                if (attackCount > _attackInterval)
+                if (attackCount > _attackSpeed)
                 {
                     //reset attackCount overcharge if left idle
-                    attackCount = _attackInterval;
+                    attackCount = _attackSpeed;
                 }
-                else if (attackCount < _attackInterval)
+                else if (attackCount < _attackSpeed)
                 {
                     //charge up attack
                     attackCount += LockstepManager.DeltaTime;
@@ -238,15 +181,24 @@ namespace RTSLockstep
 
                 if (Agent && Agent.IsActive)
                 {
-                    if (CurrentTarget.IsNotNull())
+                    if (CurrentTarget.IsNotNull() && (IsFocused || IsAttackMoving))
                     {
                         BehaveWithTarget();
                     }
+                    else if (IsAttackMoving)
+                    {
+                        if (Agent.MyStats.CanMove && Agent.MyStats.CachedMove.IsMoving)
+                        {
+                            // we shouldn't be moving then!
+                            Agent.MyStats.CachedMove.StopMove();
+                            IsAttackMoving = false;
+                        }
+                    }
                 }
 
-                if (canMove && IsAttackMoving)
+                if (Agent.MyStats.CanMove && IsAttackMoving)
                 {
-                    CachedMove.StartLookingForStopPause();
+                    Agent.MyStats.CachedMove.StartLookingForStopPause();
                 }
             }
         }
@@ -259,20 +211,18 @@ namespace RTSLockstep
 
         protected virtual void OnStartAttackMove()
         {
-            cachedTargetHealth = CurrentTarget.GetAbility<Health>();
-            if (cachedTargetHealth.IsNotNull())
+            if (Agent.MyStats.CanMove && !CheckRange())
             {
-                if (!CheckRange())
+                cachedTargetHealth = CurrentTarget.GetAbility<Health>();
+                if (cachedTargetHealth.IsNotNull())
                 {
-                    if (canMove)
-                    {
-                        CachedMove.StartMove(CurrentTarget.Body.Position);
-                    }
-                }
-            }
 
-            IsAttackMoving = true;
-            IsFocused = false;
+                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
+                }
+
+                IsAttackMoving = true;
+                IsFocused = false;
+            }
         }
 
         protected virtual void OnStartWindup()
@@ -396,9 +346,11 @@ namespace RTSLockstep
             }
         }
 
-        public void OnAttackGroupProcessed()
+        public void OnAttackGroupProcessed(RTSAgent currentTarget)
         {
             Agent.Tag = AgentTag.Offensive;
+
+            CurrentTarget = currentTarget;
 
             IsFocused = true;
             IsAttackMoving = false;
@@ -406,7 +358,7 @@ namespace RTSLockstep
             targetVersion = CurrentTarget.SpawnVersion;
             IsCasting = true;
 
-            fastRangeToTarget = _range + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
+            fastRangeToTarget = Agent.MyStats.StrikeRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
         }
 
@@ -429,7 +381,7 @@ namespace RTSLockstep
 
         private void BehaveWithTarget()
         {
-            if (CurrentTarget.IsActive == false
+            if (!CurrentTarget.IsActive
                 || CurrentTarget.SpawnVersion != targetVersion
                 || (_targetAllegiance & Agent.GetAllegiance(CurrentTarget)) == 0)
             {
@@ -444,9 +396,9 @@ namespace RTSLockstep
                     {
                         if (!inRange)
                         {
-                            if (canMove)
+                            if (Agent.MyStats.CanMove)
                             {
-                                CachedMove.Arrive();
+                                Agent.MyStats.CachedMove.Arrive();
                             }
 
                             inRange = true;
@@ -455,44 +407,44 @@ namespace RTSLockstep
 
 
                         targetDirection.Normalize(out long mag);
-                        bool withinTurn = TrackAttackAngle == false ||
+                        bool withinTurn = _trackAttackAngle == false ||
                                           (fastMag != 0 &&
-                                          _cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                          && _cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                                          Agent.Body.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                          && Agent.Body.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                         bool needTurn = mag != 0 && !withinTurn;
-                        if (needTurn && canTurn)
+                        if (needTurn && Agent.MyStats.CanTurn)
                         {
-                            cachedTurn.StartTurnDirection(targetDirection);
+                            Agent.MyStats.CachedTurn.StartTurnDirection(targetDirection);
                         }
-                        else if (attackCount >= _attackInterval)
+                        else if (attackCount >= _attackSpeed)
                         {
                             StartWindup();
                         }
                     }
                     else
                     {
-                        if (canMove)
+                        if (Agent.MyStats.CanMove)
                         {
-                            CachedMove.PauseAutoStop();
-                            CachedMove.PauseCollisionStop();
-                            if (!CachedMove.IsMoving
-                                && !CachedMove.MoveOnGroupProcessed)
+                            Agent.MyStats.CachedMove.PauseAutoStop();
+                            Agent.MyStats.CachedMove.PauseCollisionStop();
+                            if (!Agent.MyStats.CachedMove.IsMoving
+                                && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
                             {
                                 OnStartAttackMove();
-                                _cachedBody.Priority = basePriority;
+                                Agent.Body.Priority = basePriority;
                             }
                             else
                             {
                                 if (inRange)
                                 {
-                                    CachedMove.Destination = CurrentTarget.Body.Position;
+                                    Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
                                 }
                                 else
                                 {
                                     if (repathTimer.AdvanceFrame())
                                     {
                                         if (CurrentTarget.Body.PositionChangedBuffer &&
-                                            CurrentTarget.Body.Position.FastDistance(CachedMove.Destination.x, CachedMove.Destination.y) >= (repathDistance * repathDistance))
+                                            CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                         {
                                             OnStartAttackMove(); ;
                                             //So units don't sync up and path on the same frame
@@ -514,20 +466,20 @@ namespace RTSLockstep
                 {
                     //TODO: Do we need AgentConditional checks here?
                     windupCount += LockstepManager.DeltaTime;
-                    if (canTurn)
+                    if (Agent.MyStats.CanTurn)
                     {
-                        Vector2d targetVector = CurrentTarget.Body.Position - _cachedBody.Position;
-                        cachedTurn.StartTurnVector(targetVector);
+                        Vector2d targetVector = CurrentTarget.Body.Position - Agent.Body.Position;
+                        Agent.MyStats.CachedTurn.StartTurnVector(targetVector);
                     }
 
                     if (windupCount >= _windup)
                     {
                         windupCount = 0;
                         StartAttack();
-                        while (attackCount >= _attackInterval)
+                        while (attackCount >= _attackSpeed)
                         {
                             //resetting back down after attack is fired
-                            attackCount -= (_attackInterval);
+                            attackCount -= (_attackSpeed);
                         }
                         attackCount += _windup;
                         IsWindingUp = false;
@@ -538,17 +490,17 @@ namespace RTSLockstep
                     windupCount = 0;
                 }
 
-                if (canMove && inRange)
+                if (Agent.MyStats.CanMove && inRange)
                 {
-                    CachedMove.PauseAutoStop();
-                    CachedMove.PauseCollisionStop();
+                    Agent.MyStats.CachedMove.PauseAutoStop();
+                    Agent.MyStats.CachedMove.PauseCollisionStop();
                 }
             }
         }
 
         private bool CheckRange()
         {
-            targetDirection = CurrentTarget.Body.Position - _cachedBody.Position;
+            targetDirection = CurrentTarget.Body.Position - Agent.Body.Position;
             fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -569,12 +521,12 @@ namespace RTSLockstep
 
         private void StartAttack()
         {
-            if (canMove)
+            if (Agent.MyStats.CanMove)
             {
                 // we don't want to be able to fire and move!
-                CachedMove.StopMove();
+                Agent.MyStats.CachedMove.StopMove();
             }
-            _cachedBody.Priority = _increasePriority ? basePriority + 1 : basePriority;
+            Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
             OnAttack(CurrentTarget);
         }
@@ -597,7 +549,7 @@ namespace RTSLockstep
                                                  (other) =>
                                                  {
                                                      Health healther = other.GetAbility<Health>();
-                                                     return healther.IsNotNull() && healther.HealthAmount > 0;
+                                                     return healther.IsNotNull() && healther.CurrentHealth > 0;
 
                                                  },
                                                  CachedOnHit);
@@ -633,7 +585,7 @@ namespace RTSLockstep
                                                  (other) =>
                                                  {
                                                      Health healther = other.GetAbility<Health>();
-                                                     return healther.IsNotNull() && healther.HealthAmount > 0;
+                                                     return healther.IsNotNull() && healther.CurrentHealth > 0;
 
                                                  },
                                                  CachedOnHit);
@@ -680,15 +632,17 @@ namespace RTSLockstep
             {
                 if (IsAttackMoving)
                 {
-                    CachedMove.StartMove(CurrentTarget.Body.Position);
+                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
                 }
-                else if (canMove && !inRange)
+                else if (Agent.MyStats.CanMove && !inRange)
                 {
-                    CachedMove.StopMove();
+                    Agent.MyStats.CachedMove.StopMove();
                 }
             }
 
-            _cachedBody.Priority = basePriority;
+            CurrentTarget = null;
+
+            Agent.Body.Priority = basePriority;
 
             IsCasting = false;
 
@@ -708,7 +662,7 @@ namespace RTSLockstep
                 Debug.Log(Agent.gameObject);
             }
 
-            Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : transform.position, Range.ToFloat());
+            Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : transform.position, Agent.MyStats.StrikeRange.ToFloat());
         }
 #endif
     }

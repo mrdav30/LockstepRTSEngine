@@ -41,12 +41,11 @@ namespace RTSLockstep
         private bool _needsRepair;
         private bool _provisioned;
         private int upgradeLevel;
-        private Health cachedHealth;
+
         private Rally cachedRally;
 
         protected override void OnSetup()
         {
-            cachedHealth = Agent.GetAbility<Health>();
             cachedRally = Agent.GetAbility<Rally>();
 
             upgradeLevel = 1;
@@ -61,12 +60,12 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            if (!NeedsConstruction && cachedHealth.HealthAmount != cachedHealth.MaxHealth)
+            if (!NeedsConstruction && Agent.MyStats.CachedHealth.CurrentHealth != Agent.MyStats.CachedHealth.MaxHealth)
             {
                 _needsRepair = true;
             }
 
-            if (cachedHealth.HealthAmount == cachedHealth.MaxHealth)
+            if (Agent.MyStats.CachedHealth.CurrentHealth == Agent.MyStats.CachedHealth.MaxHealth)
             {
                 if (provisioner && !_provisioned)
                 {
@@ -80,7 +79,7 @@ namespace RTSLockstep
         {
             NeedsConstruction = true;
             IsCasting = true;
-            cachedHealth.HealthAmount = FixedMath.Create(0);
+            Agent.MyStats.CachedHealth.CurrentHealth = FixedMath.Create(0);
 
             if (cachedRally)
             {
@@ -90,10 +89,10 @@ namespace RTSLockstep
 
         public void BuildUp(long amount)
         {
-            cachedHealth.HealthAmount += amount;
-            if (cachedHealth.HealthAmount >= cachedHealth.BaseHealth)
+            Agent.MyStats.CachedHealth.CurrentHealth += amount;
+            if (Agent.MyStats.CachedHealth.CurrentHealth >= Agent.MyStats.CachedHealth.BaseHealth)
             {
-                cachedHealth.HealthAmount = cachedHealth.BaseHealth;
+                Agent.MyStats.CachedHealth.CurrentHealth = Agent.MyStats.CachedHealth.BaseHealth;
                 NeedsConstruction = false;
                 IsCasting = false;
                 Agent.SetTeamColor();

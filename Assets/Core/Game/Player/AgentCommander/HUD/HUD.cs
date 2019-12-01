@@ -41,6 +41,7 @@ public class HUD : MonoBehaviour
     private float sliderValue;
     private const int BUILD_IMAGE_WIDTH = 64, BUILD_IMAGE_HEIGHT = 64;
     private int buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
+    private int statusAreaHeight = 0;
     private const int BUTTON_SPACING = 7;
     private const int SCROLL_BAR_WIDTH = 22;
     private const int BUILD_IMAGE_PADDING = 8;
@@ -149,8 +150,8 @@ public class HUD : MonoBehaviour
     // Update is called once per frame
     public void doGUI()
     {
-        if (cachedCommander 
-            && cachedCommander.human 
+        if (cachedCommander
+            && cachedCommander.human
             && PlayerManager.MainController.IsNotNull()
             && cachedCommander == PlayerManager.MainController.Commander)
         {
@@ -295,9 +296,14 @@ public class HUD : MonoBehaviour
         GUI.skin = ordersSkin;
         GUI.BeginGroup(new Rect(Screen.width - ORDERS_BAR_WIDTH - BUILD_IMAGE_WIDTH, RESOURCE_BAR_HEIGHT, ORDERS_BAR_WIDTH + BUILD_IMAGE_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT));
         GUI.Box(new Rect(BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH, 0, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT), "");
-        string selectionName = "";
+        string selectionName = selectedAgent.GetComponent<RTSAgent>().AgentDescription;
 
-        selectionName = selectedAgent.GetComponent<RTSAgent>().AgentDescription;
+        // reset height of agent status
+        statusAreaHeight = 0;
+        if (cachedCommander.GetController().SelectedAgents.Count == 1)
+        {
+            DrawStatusBar(selectedAgent.GetAbility<AgentStats>());
+        }
 
         if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
         {
@@ -328,13 +334,61 @@ public class HUD : MonoBehaviour
                 DrawStandardOptions(lastSelection as RTSAgent);
             }
         }
+
         if (!selectionName.Equals(""))
         {
             int leftPos = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH / 2;
             int topPos = buildAreaHeight + BUTTON_SPACING;
             GUI.Label(new Rect(leftPos, topPos, ORDERS_BAR_WIDTH, SELECTION_NAME_HEIGHT), selectionName);
         }
+
         GUI.EndGroup();
+    }
+
+    private void DrawStatusBar(AgentStats agentStats)
+    {
+        int leftPos = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH;
+        int topPos = 0;
+
+        if (agentStats.CachedHealth)
+        {
+            string healthStat = "Health: " + agentStats.CurrentHealth.CeilToInt() + " / " + agentStats.MaxHealth.CeilToInt();
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), healthStat);
+        }
+        else if (agentStats.CachedResourceDeposit)
+        {
+            string resourceStat = "Amount: " + agentStats.AmountLeft + " / " + agentStats.Capacity;
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), resourceStat);
+        }
+
+
+        if (agentStats.CachedMove)
+        {
+            topPos += TEXT_HEIGHT;
+            string speedStat = "Move Speed: " + agentStats.MovementSpeed.CeilToInt();
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), speedStat);
+        }
+
+        if (agentStats.CachedAttack)
+        {
+            topPos += TEXT_HEIGHT;
+            string damageStat = "Damage: " + agentStats.Damage.CeilToInt();
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), damageStat);
+
+            topPos += TEXT_HEIGHT;
+            string dpsStat = "DPS: " + agentStats.DPS.CeilToInt();
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), dpsStat);
+
+            topPos += TEXT_HEIGHT;
+            string rangeStat = "Range: " + agentStats.StrikeRange.CeilToInt();
+            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), rangeStat);
+        }
+
+        topPos += TEXT_HEIGHT;
+        string sightStat = "Sight: " + agentStats.Sight.CeilToInt();
+        GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), sightStat);
+
+        statusAreaHeight = topPos += TEXT_HEIGHT;
     }
 
     private void DrawBuildQueue(string[] buildQueue, float buildPercentage)
@@ -358,6 +412,7 @@ public class HUD : MonoBehaviour
         }
     }
 
+    // move this to call from agent, each ability should have it's own
     private void DrawStandardOptions(RTSAgent agent)
     {
         GUIStyle buttons = new GUIStyle();
@@ -402,7 +457,7 @@ public class HUD : MonoBehaviour
         GUI.skin = resourceSkin;
         GUI.BeginGroup(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT));
         GUI.Box(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT), "");
-        int topPos = 4, iconLeft = 4, textLeft = 20;
+        int topPos = 4, iconLeft = 4, textLeft = 15;
         DrawResourceIcon(ResourceType.Gold, iconLeft, textLeft, topPos);
         iconLeft += TEXT_WIDTH;
         textLeft += TEXT_WIDTH;
@@ -536,7 +591,7 @@ public class HUD : MonoBehaviour
         GUI.skin.button = buttons;
         int numActions = actions.Length;
         //define the area to draw the actions inside
-        GUI.BeginGroup(new Rect(BUILD_IMAGE_WIDTH, 0, ORDERS_BAR_WIDTH, buildAreaHeight));
+        GUI.BeginGroup(new Rect(BUILD_IMAGE_WIDTH, statusAreaHeight, ORDERS_BAR_WIDTH, buildAreaHeight));
         //draw scroll bar for the list of actions if need be
         if (numActions >= MaxNumRows(buildAreaHeight))
         {
@@ -560,13 +615,13 @@ public class HUD : MonoBehaviour
                     {
                         PlayClick();
 
-                        if (agent.MyAgentType == AgentType.Unit 
+                        if (agent.MyAgentType == AgentType.Unit
                             && agent.GetAbility<Construct>()
                             && !ConstructionHandler.IsFindingBuildingLocation())
                         {
                             ConstructionHandler.CreateStructure(actions[i], agent);
                         }
-                        else if (agent.MyAgentType == AgentType.Building 
+                        else if (agent.MyAgentType == AgentType.Building
                             && !agent.GetAbility<Structure>().NeedsConstruction
                             && agent.GetAbility<Spawner>())
                         {

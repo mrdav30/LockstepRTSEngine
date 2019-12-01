@@ -9,9 +9,9 @@ namespace RTSLockstep
     public class AttackGroup
     {
         public MovementGroup AttackMoveGroup;
-        public RTSAgent CurrentTarget;
+        public RTSAgent CurrentGroupTarget;
 
-        public int indexID { get; set; }
+        public int IndexID { get; set; }
 
         private byte controllerID;
 
@@ -30,11 +30,11 @@ namespace RTSLockstep
             {
                 if (AgentController.TryGetAgentInstance((ushort)target.Value, out RTSAgent tempTarget))
                 {
-                    CurrentTarget = tempTarget;
+                    CurrentGroupTarget = tempTarget;
                 }
             }
 
-            if (CurrentTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (CurrentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for constructors based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -42,7 +42,7 @@ namespace RTSLockstep
                     ControllerID = controllerID
                 };
 
-                moveCommand.Add(CurrentTarget.Body.Position);
+                moveCommand.Add(CurrentGroupTarget.Body.Position);
 
                 AttackMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
@@ -79,28 +79,28 @@ namespace RTSLockstep
                 attacker.MyAttackGroup.attackers.Remove(attacker);
             }
             attacker.MyAttackGroup = this;
-            attacker.MyAttackGroupID = indexID;
+            attacker.MyAttackGroupID = IndexID;
 
             attackers.Add(attacker);
 
-            // add the constructor to our contructor move group too!
-            AttackMoveGroup.Add(attacker.CachedMove);
+            // add the attacker to our attacker move group too!
+            AttackMoveGroup.Add(attacker.Agent.MyStats.CachedMove);
         }
 
         public void Remove(Attack attacker)
         {
-            if (attacker.MyAttackGroup.IsNotNull() && attacker.MyAttackGroupID == indexID)
+            if (attacker.MyAttackGroup.IsNotNull() && attacker.MyAttackGroupID == IndexID)
             {
                 attackers.Remove(attacker);
 
-                // Remove the constructor to our contructor move group too!
-                AttackMoveGroup.Remove(attacker.CachedMove);
+                // Remove the attacker from our attacker move group too!
+                AttackMoveGroup.Remove(attacker.Agent.MyStats.CachedMove);
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (CurrentTarget.IsNotNull())
+            if (CurrentGroupTarget.IsNotNull())
             {
                 ExecuteAttack();
             }
@@ -118,11 +118,11 @@ namespace RTSLockstep
                 attacker.MyAttackGroupID = -1;
             }
             attackers.FastClear();
-            CurrentTarget = null;
+            CurrentGroupTarget = null;
             AttackMoveGroup = null;
             AttackGroupHelper.Pool(this);
             _calculatedBehaviors = false;
-            indexID = -1;
+            IndexID = -1;
         }
 
         private void ExecuteAttack()
@@ -130,7 +130,7 @@ namespace RTSLockstep
             for (int i = 0; i < attackers.Count; i++)
             {
                 Attack attacker = attackers[i];
-                attacker.OnAttackGroupProcessed();
+                attacker.OnAttackGroupProcessed(CurrentGroupTarget);
             }
         }
     }

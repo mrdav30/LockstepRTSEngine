@@ -63,7 +63,7 @@ namespace RTSLockstep
 
         public virtual void Visualize()
         {
-            if (isImpulsing == false)
+            if (!isImpulsing)
             {
                 if (animStateChanged)
                 {

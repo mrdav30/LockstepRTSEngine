@@ -26,24 +26,28 @@ namespace RTSLockstep
             float percentLeft = AmountLeft / (float)Capacity;
             if (percentLeft <= .5f && percentLeft > .25f)
             {
-                percentLeft = .5f;
                 resourceFull.GetComponent<Renderer>().enabled = false;
                 if (resourceHalf.GetComponent<Renderer>().enabled == false)
+                {
                     resourceHalf.GetComponent<Renderer>().enabled = true;
+                }
             }
             else if (percentLeft <= .25f && percentLeft > 0)
             {
-                percentLeft = .25f;
                 resourceHalf.GetComponent<Renderer>().enabled = false;
                 if (resourceQuarter.GetComponent<Renderer>().enabled == false)
+                {
                     resourceQuarter.GetComponent<Renderer>().enabled = true;
+                }
             }
             else if (percentLeft <= 0)
             {
-                percentLeft = 0;
                 resourceQuarter.GetComponent<Renderer>().enabled = false;
                 if (resourceEmpty.GetComponent<Renderer>().enabled == false)
+                {
                     resourceEmpty.GetComponent<Renderer>().enabled = true;
+                }
+
                 // Resource is empty, delete object
                 Agent.Die();
                 return;

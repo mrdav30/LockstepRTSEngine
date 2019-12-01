@@ -9,11 +9,6 @@ namespace RTSLockstep
         public RTSAgent cachedAgent { get; private set; }
         public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
-        protected LSBody cachedBody;
-        protected Health cachedHealth;
-        protected Move cachedMove;
-        protected Turn cachedTurn;
-
         protected AllegianceType _targetAllegiance;
 
         // default scan range, overriden by cached attack sight
@@ -38,12 +33,12 @@ namespace RTSLockstep
 
         public virtual void OnInitialize()
         {
-            cachedBody = cachedAgent.Body;
-            cachedHealth = cachedAgent.GetAbility<Health>();
-            cachedMove = cachedAgent.GetAbility<Move>();
-            cachedTurn = cachedAgent.GetAbility<Turn>();
-
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
+
+            if (cachedAgent.MyStats)
+            {
+                scanRange = cachedAgent.MyStats.Sight;
+            }
         }
 
         public virtual void OnSimulate()
@@ -66,7 +61,7 @@ namespace RTSLockstep
                 searchCount = -1;
                 return false;
             }
-            else if (cachedMove && cachedMove.IsMoving)
+            else if (cachedAgent.MyStats.CachedMove && cachedAgent.MyStats.CachedMove.IsMoving)
             {
                 searchCount -= 8;
                 return false;
@@ -113,7 +108,7 @@ namespace RTSLockstep
             if (agentConditional.IsNotNull())
             {
                 agent = InfluenceManager.Scan(
-                     this.cachedBody.Position,
+                     cachedAgent.Body.Position,
                      scanRange,
                      agentConditional,
                      (bite) =>
