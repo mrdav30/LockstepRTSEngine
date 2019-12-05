@@ -89,7 +89,6 @@ namespace RTSLockstep
                                         long distance = (tempAgent.Body.Position - position).FastMagnitude();
                                         if (distance < fastRadius)
                                         {
-
                                             if (agentConditional(tempAgent))
                                             {
                                                 output.Add(tempAgent);

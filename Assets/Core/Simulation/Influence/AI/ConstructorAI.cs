@@ -8,7 +8,6 @@ namespace RTSLockstep
         public override void OnInitialize()
         {
             base.OnInitialize();
-            _targetAllegiance = AllegianceType.Friendly;
         }
 
         public override bool ShouldMakeDecision()
@@ -43,6 +42,18 @@ namespace RTSLockstep
                     };
 
                 return agentConditional;
+            }
+        }
+
+        protected override Func<byte, bool> AllianceConditional
+        {
+            get
+            {
+                Func<byte, bool> allianceConditional = (bite) =>
+                {
+                    return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0);
+                };
+                return allianceConditional;
             }
         }
 

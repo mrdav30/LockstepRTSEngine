@@ -50,8 +50,8 @@ namespace RTSLockstep
         }
 
         [FixedNumber, SerializeField, Tooltip("Distance that the agent can strike from; i.e. attack, harvest")]
-        protected long _strikeRange = FixedMath.One * 6;
-        public virtual long StrikeRange { get { return _strikeRange; } }
+        protected long _actionRange = FixedMath.One * 6;
+        public virtual long ActionRange { get { return _actionRange; } }
 
         [FixedNumber, SerializeField, Tooltip("Approximate radius that's scanned for targets")]
         protected long _sight = FixedMath.One * 10;
@@ -99,9 +99,9 @@ namespace RTSLockstep
             CachedConstruct = Agent.GetAbility<Construct>();
             CachedHarvest = Agent.GetAbility<Harvest>();
 
-            if (Sight < StrikeRange)
+            if (Sight < ActionRange)
             {
-                _sight = StrikeRange + FixedMath.One * 5;
+                _sight = ActionRange + FixedMath.One * 5;
             }
         }
     }

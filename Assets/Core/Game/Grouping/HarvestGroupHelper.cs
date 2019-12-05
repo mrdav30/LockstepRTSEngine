@@ -5,20 +5,20 @@ using UnityEngine;
 namespace RTSLockstep
 {
     [DisallowMultipleComponent]
-    public class AttackGroupHelper : BehaviourHelper
+    public class HarvestGroupHelper : BehaviourHelper
     {
         public override ushort ListenInput
         {
             get
             {
-                return AbilityDataItem.FindInterfacer(typeof(Attack)).ListenInputID;
+                return AbilityDataItem.FindInterfacer(typeof(Harvest)).ListenInputID;
             }
         }
-        public static AttackGroup LastCreatedGroup { get; private set; }
-        private static readonly FastBucket<AttackGroup> activeGroups = new FastBucket<AttackGroup>();
-        private static readonly FastStack<AttackGroup> pooledGroups = new FastStack<AttackGroup>();
+        public static HarvestGroup LastCreatedGroup { get; private set; }
+        private static readonly FastBucket<HarvestGroup> activeGroups = new FastBucket<HarvestGroup>();
+        private static readonly FastStack<HarvestGroup> pooledGroups = new FastStack<HarvestGroup>();
 
-        public static AttackGroupHelper Instance { get; private set; }
+        public static HarvestGroupHelper Instance { get; private set; }
 
         protected override void OnInitialize()
         {
@@ -32,8 +32,8 @@ namespace RTSLockstep
             {
                 if (activeGroups.arrayAllocation[i])
                 {
-                    AttackGroup attackGroup = activeGroups[i];
-                    attackGroup.LocalSimulate();
+                    HarvestGroup harvestGroup = activeGroups[i];
+                    harvestGroup.LocalSimulate();
                 }
             }
         }
@@ -44,8 +44,8 @@ namespace RTSLockstep
             {
                 if (activeGroups.arrayAllocation[i])
                 {
-                    AttackGroup attackGroup = activeGroups[i];
-                    attackGroup.LateSimulate();
+                    HarvestGroup harvestGroup = activeGroups[i];
+                    harvestGroup.LateSimulate();
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace RTSLockstep
                 return true;
             }
 
-            Debug.LogError("No instance of AttackGroupHelper found. Please configure the scene to have a AttackGroupHelper for the script that requires it.");
+            Debug.LogError("No instance of HarvestGroupHelper found. Please configure the scene to have a HarvestGroupHelper for the script that requires it.");
             return false;
         }
 
@@ -78,14 +78,14 @@ namespace RTSLockstep
 
         private static void CreateGroup(Command com)
         {
-            AttackGroup attackGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new AttackGroup();
+            HarvestGroup harvestGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new HarvestGroup();
 
-            attackGroup.IndexID = activeGroups.Add(attackGroup);
-            LastCreatedGroup = attackGroup;
-            attackGroup.Initialize(com);
+            harvestGroup.IndexID = activeGroups.Add(harvestGroup);
+            LastCreatedGroup = harvestGroup;
+            harvestGroup.Initialize(com);
         }
 
-        public static void Pool(AttackGroup group)
+        public static void Pool(HarvestGroup group)
         {
             int indexID = group.IndexID;
             activeGroups.RemoveAt(indexID);

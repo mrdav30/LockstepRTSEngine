@@ -235,7 +235,7 @@ MonoBehaviour:
   MyConstructGroupID: 0
   CurrentProject: {fileID: 0}
   constructAmount: 3276800
-  _constructInterval: 131072
+  _constructionSpeed: 65536
   _buildActions:
   - HumanBarracks
   - HumanTownHall
@@ -257,15 +257,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  CollectionAmount: 10
-  DepositAmount: 25
-  Capacity: 75
-  _harvestInterval: 65536
-  _windup: 131072
-  _increasePriority: 1
+  MyHarvestGroupID: 0
+  IsHarvesting: 0
+  IsEmptying: 0
   HarvestingAnimState: 0
   MovingAnimState: 0
   IdlingAnimState: 0
+  CollectionAmount: 10
+  DepositAmount: 25
+  Capacity: 75
+  _harvestSpeed: 65536
+  _windup: 131072
+  _increasePriority: 1
 --- !u!114 &114265760236710430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,8 +295,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strikeRange: 131072
-  _sight: 655360
+  _actionRange: 65536
+  _sight: 1310720
 --- !u!114 &114552794059523324
 MonoBehaviour:
   m_ObjectHideFlags: 0

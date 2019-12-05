@@ -2209,7 +2209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strikeRange: 65536
+  _actionRange: 131072
   _sight: 655360
 --- !u!114 &1789922619339295299
 MonoBehaviour:

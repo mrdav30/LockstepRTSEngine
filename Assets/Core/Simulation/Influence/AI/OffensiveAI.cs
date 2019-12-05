@@ -12,7 +12,6 @@ namespace RTSLockstep
         public override void OnInitialize()
         {
             base.OnInitialize();
-            _targetAllegiance = AllegianceType.Enemy;
         }
 
         private bool CanAttack()
@@ -80,6 +79,18 @@ namespace RTSLockstep
                 }
 
                 return agentConditional;
+            }
+        }
+
+        protected override Func<byte, bool> AllianceConditional
+        {
+            get
+            {
+                Func<byte, bool> allianceConditional = (bite) =>
+                {
+                    return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Enemy) != 0);
+                };
+                return allianceConditional;
             }
         }
 

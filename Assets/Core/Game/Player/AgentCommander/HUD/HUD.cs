@@ -380,7 +380,7 @@ public class HUD : MonoBehaviour
             GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), dpsStat);
 
             topPos += TEXT_HEIGHT;
-            string rangeStat = "Range: " + agentStats.StrikeRange.CeilToInt();
+            string rangeStat = "Range: " + agentStats.ActionRange.CeilToInt();
             GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), rangeStat);
         }
 

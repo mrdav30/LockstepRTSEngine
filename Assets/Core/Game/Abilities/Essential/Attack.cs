@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RTSLockstep
 {
-    [UnityEngine.DisallowMultipleComponent]
+    [DisallowMultipleComponent]
     public class Attack : ActiveAbility
     {
         #region Properties
@@ -211,18 +211,26 @@ namespace RTSLockstep
 
         protected virtual void OnStartAttackMove()
         {
-            if (Agent.MyStats.CanMove && !CheckRange())
-            {
-                cachedTargetHealth = CurrentTarget.GetAbility<Health>();
-                if (cachedTargetHealth.IsNotNull())
-                {
+            cachedTargetHealth = CurrentTarget.GetAbility<Health>();
 
+            if (Agent.MyStats.CanMove
+                && !CheckRange()
+                && cachedTargetHealth.IsNotNull()
+                )
+            {
+                if (Agent.MyStats.CachedMove.IsGroupMoving)
+                {
+                    // position is set by the movement group tied to attack group
+                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                }
+                else
+                {
                     Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
                 }
-
-                IsAttackMoving = true;
-                IsFocused = false;
             }
+
+            IsAttackMoving = true;
+            IsFocused = false;
         }
 
         protected virtual void OnStartWindup()
@@ -298,7 +306,6 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             base.SaveDetails(writer);
-            //    SaveManager.WriteVector2d(writer, "Destination", Destination);
             SaveManager.WriteUInt(writer, "TargetVersion", targetVersion);
             SaveManager.WriteBoolean(writer, "AttackMoving", IsAttackMoving);
             if (CurrentTarget)
@@ -317,10 +324,6 @@ namespace RTSLockstep
             base.OnLoadProperty(reader, propertyName, readValue);
             switch (propertyName)
             {
-
-                //case "Destination":
-                //    Destination = LoadManager.LoadVector2d(reader);
-                //    break;
                 case "TargetVersion":
                     targetVersion = (uint)readValue;
                     break;
@@ -354,11 +357,11 @@ namespace RTSLockstep
 
             IsFocused = true;
             IsAttackMoving = false;
-
-            targetVersion = CurrentTarget.SpawnVersion;
             IsCasting = true;
 
-            fastRangeToTarget = Agent.MyStats.StrikeRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
+            targetVersion = CurrentTarget.SpawnVersion;
+
+            fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
         }
 
@@ -405,7 +408,6 @@ namespace RTSLockstep
                         }
                         Agent.Animator.SetState(EngagingAnimState);
 
-
                         targetDirection.Normalize(out long mag);
                         bool withinTurn = _trackAttackAngle == false ||
                                           (fastMag != 0 &&
@@ -446,7 +448,7 @@ namespace RTSLockstep
                                         if (CurrentTarget.Body.PositionChangedBuffer &&
                                             CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                                         {
-                                            OnStartAttackMove(); ;
+                                            OnStartAttackMove();
                                             //So units don't sync up and path on the same frame
                                             repathTimer.AdvanceFrames(repathRandom);
                                         }
@@ -455,7 +457,7 @@ namespace RTSLockstep
                             }
                         }
 
-                        if (inRange == true)
+                        if (inRange)
                         {
                             inRange = false;
                         }
@@ -479,7 +481,7 @@ namespace RTSLockstep
                         while (attackCount >= _attackSpeed)
                         {
                             //resetting back down after attack is fired
-                            attackCount -= (_attackSpeed);
+                            attackCount -= _attackSpeed;
                         }
                         attackCount += _windup;
                         IsWindingUp = false;
@@ -662,7 +664,7 @@ namespace RTSLockstep
                 Debug.Log(Agent.gameObject);
             }
 
-            Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : transform.position, Agent.MyStats.StrikeRange.ToFloat());
+            Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : transform.position, Agent.MyStats.ActionRange.ToFloat());
         }
 #endif
     }

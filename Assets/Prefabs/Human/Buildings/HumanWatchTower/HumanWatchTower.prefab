@@ -360,6 +360,7 @@ GameObject:
   - component: {fileID: 114249994713392150}
   - component: {fileID: 114584152629258208}
   - component: {fileID: 114994551942518704}
+  - component: {fileID: 5414662841358408545}
   - component: {fileID: 114279839518768826}
   - component: {fileID: 114620342147660674}
   m_Layer: 0
@@ -508,12 +509,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
+  MyAttackGroupID: 0
   _isOffensive: 0
   _projectileCode: Arrow
-  _range: 983040
-  _sight: 1638400
   _damage: 1966080
-  _attackInterval: 65536
+  _attackSpeed: 65536
   _targetAllegiance: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
@@ -539,6 +539,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 22937600
   _currentHealth: 0
+--- !u!114 &5414662841358408545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1667462521772482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _strikeRange: 393216
+  _sight: 655360
 --- !u!114 &114279839518768826
 MonoBehaviour:
   m_ObjectHideFlags: 0

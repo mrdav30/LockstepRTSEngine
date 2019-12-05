@@ -60,12 +60,12 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            if (!NeedsConstruction && Agent.MyStats.CachedHealth.CurrentHealth != Agent.MyStats.CachedHealth.MaxHealth)
+            if (!NeedsConstruction && Agent.MyStats.CurrentHealth != Agent.MyStats.MaxHealth)
             {
                 _needsRepair = true;
             }
 
-            if (Agent.MyStats.CachedHealth.CurrentHealth == Agent.MyStats.CachedHealth.MaxHealth)
+            if (Agent.MyStats.CurrentHealth == Agent.MyStats.MaxHealth)
             {
                 if (provisioner && !_provisioned)
                 {
@@ -90,7 +90,7 @@ namespace RTSLockstep
         public void BuildUp(long amount)
         {
             Agent.MyStats.CachedHealth.CurrentHealth += amount;
-            if (Agent.MyStats.CachedHealth.CurrentHealth >= Agent.MyStats.CachedHealth.BaseHealth)
+            if (Agent.MyStats.CurrentHealth >= Agent.MyStats.CachedHealth.BaseHealth)
             {
                 Agent.MyStats.CachedHealth.CurrentHealth = Agent.MyStats.CachedHealth.BaseHealth;
                 NeedsConstruction = false;

@@ -9,10 +9,6 @@ namespace RTSLockstep
         public RTSAgent cachedAgent { get; private set; }
         public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
-        protected AllegianceType _targetAllegiance;
-
-        // default scan range, overriden by cached attack sight
-        protected long scanRange = FixedMath.One * 50;
         // we want to restrict how many decisions are made to help with game performance
         protected const int SearchRate = LockstepManager.FrameRate / 2;
         protected int searchCount;
@@ -34,11 +30,6 @@ namespace RTSLockstep
         public virtual void OnInitialize()
         {
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
-
-            if (cachedAgent.MyStats)
-            {
-                scanRange = cachedAgent.MyStats.Sight;
-            }
         }
 
         public virtual void OnSimulate()
@@ -99,22 +90,32 @@ namespace RTSLockstep
             }
         }
 
+        protected virtual Func<byte, bool> AllianceConditional
+        {
+            get
+            {
+                Func<byte, bool> allianceConditional = null;
+                return allianceConditional;
+            }
+        }
+
         protected virtual RTSAgent DoScan()
         {
             Func<RTSAgent, bool> agentConditional = AgentConditional;
+            Func<byte, bool> allianceConditional = AllianceConditional;
 
             RTSAgent agent = null;
+
+                    // default scan range, overriden by cached attack sight
+        //protected long scanRange = FixedMath.One * 50;
 
             if (agentConditional.IsNotNull())
             {
                 agent = InfluenceManager.Scan(
                      cachedAgent.Body.Position,
-                     scanRange,
+                     cachedAgent.MyStats.Sight,
                      agentConditional,
-                     (bite) =>
-                     {
-                         return ((cachedAgent.Controller.GetAllegiance(bite) & _targetAllegiance) != 0);
-                     }
+                     allianceConditional
                  );
             }
 

@@ -1006,7 +1006,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldown: 0
   MyAttackGroupID: 0
-  _isOffensive: 0
+  _isOffensive: 1
   _projectileCode: MagicBullet
   _damage: 983040
   _attackSpeed: 65536
@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strikeRange: 983040
+  _actionRange: 983040
   _sight: 983040
 --- !u!114 &5041738750042490211
 MonoBehaviour:

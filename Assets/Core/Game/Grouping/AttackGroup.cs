@@ -1,8 +1,5 @@
 ﻿using FastCollections;
 using RTSLockstep.Data;
-using RTSLockstep.Grid;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace RTSLockstep
 {
@@ -36,7 +33,7 @@ namespace RTSLockstep
 
             if (CurrentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
-                // create a movement group for constructors based on the current project
+                // create a movement group for attackers based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
                 {
                     ControllerID = controllerID
