@@ -86,6 +86,22 @@ namespace RTSLockstep
             }
         }
 
+        public override void SetIdleState(AnimState state = AnimState.None)
+        {
+            state = cachedAgent.MyStats.CachedHarvest.IsNotNull() && cachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0 ? cachedAgent.MyStats.CachedHarvest.IdlingAnimState
+                : state != AnimState.None ? state :  AnimState.Idling;
+
+            SetState(state);
+        }
+
+        public override void SetMovingState(AnimState state = AnimState.None)
+        {
+            state = cachedAgent.MyStats.CachedHarvest.IsNotNull() && cachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0 ? cachedAgent.MyStats.CachedHarvest.MovingAnimState
+                : state != AnimState.None ? state : AnimState.Moving;
+
+            SetState(state);
+        }
+
         protected override AnimationClip GetStateClip(AnimState state)
         {
             switch (state)

@@ -139,7 +139,6 @@ namespace RTSLockstep
             SetState(state);
         }
 
-
         public void SetState(AnimState animState)
         {
             CurrentAnimState = animState;

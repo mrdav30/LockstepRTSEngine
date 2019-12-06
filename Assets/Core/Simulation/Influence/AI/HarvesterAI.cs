@@ -18,17 +18,21 @@ namespace RTSLockstep
                 // were not even a harvester....
                 return false;
             }
-            else if ((cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.IsNotNull()))
+            else if (searchCount <= 0)
             {
-                // busy harvesting
+                if (cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.IsCasting == false
+                    || cachedAgent.MyStats.CachedHarvest.IsEmptying && cachedAgent.MyStats.CachedHarvest.IsCasting == false)
+                {
+                    searchCount = SearchRate;
+                    // We're ready but have no target
+                    return true;
+                }
+            }
+            else if (cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+            {
+                // busy harvesting or emptying
                 searchCount -= 1;
                 return false;
-            }
-            else if (searchCount <= 0 && cachedAgent.MyStats.CachedHarvest.IsEmptying && cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNull())
-            {
-                searchCount = SearchRate;
-                // We have a deposit but are not doing anything at the moment
-                return true;
             }
 
             return base.ShouldMakeDecision();
@@ -94,6 +98,13 @@ namespace RTSLockstep
                         return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0); ;
                     };
                 }
+                else if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+                {
+                    allianceConditional = (bite) =>
+                    {
+                        return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Neutral) != 0); ;
+                    };
+                }
 
                 return allianceConditional;
             }
@@ -101,12 +112,18 @@ namespace RTSLockstep
 
         private void InfluenceHarvest()
         {
-            if (!nearbyAgent
-                && cachedAgent.MyStats.CachedHarvest.IsEmptying
-                && cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNull())
+            if (!nearbyAgent)
             {
-                // double check one doesn't exist somewhere on the map
-                nearbyAgent = ClosestResourceStorage();
+                // if we can't find one within sight, check one doesn't exist on the map
+                if (cachedAgent.MyStats.CachedHarvest.IsEmptying)
+                {
+                    nearbyAgent = cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget
+                        : ClosestResourceStorage();
+                }
+                else if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+                {
+                    nearbyAgent = cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget : null;
+                }
             }
 
             if (nearbyAgent.IsNotNull())

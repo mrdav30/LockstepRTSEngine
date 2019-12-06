@@ -32,7 +32,6 @@ namespace RTSLockstep
 
         private const int searchRate = LockstepManager.FrameRate / 2;
         private long currentLoadAmount = 0;
-        private long currentDepositAmount = 0;
 
         //Stuff for the logic
         private bool inRange;
@@ -76,12 +75,6 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             basePriority = Agent.Body.Priority;
-
-            if (Agent.MyStats.CanMove)
-            {
-                Agent.MyStats.CachedMove.onStartMove += HandleStartMove;
-                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
-            }
         }
 
         protected override void OnInitialize()
@@ -100,6 +93,11 @@ namespace RTSLockstep
 
             inRange = false;
             IsFocused = false;
+
+            if (Agent.MyStats.CanMove)
+            {
+                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
+            }
 
             repathTimer.Reset(repathInterval);
             repathRandom = LSUtility.GetRandom(repathInterval);
@@ -152,17 +150,6 @@ namespace RTSLockstep
                 {
                     Agent.MyStats.CachedMove.StartLookingForStopPause();
                 }
-                else if (!IsHarvesting && !IsEmptying)
-                {
-                    if (currentLoadAmount > 0)
-                    {
-                        Agent.Animator.SetIdleState(IdlingAnimState);
-                    }
-                    else if (!Agent.MyStats.CachedAttack.CurrentTarget)
-                    {
-                        Agent.Animator.SetIdleState(AnimState.Idling);
-                    }
-                }
             }
         }
 
@@ -181,15 +168,7 @@ namespace RTSLockstep
                 && !CheckRange(currentTarget.Body)
                 )
             {
-                if (Agent.MyStats.CachedMove.IsGroupMoving)
-                {
-                    // position is set by the movement group tied to harvest group
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(currentTarget.Body.Position);
-                }
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination, false);
 
                 IsHarvestMoving = true;
                 IsFocused = false;
@@ -217,19 +196,21 @@ namespace RTSLockstep
                 Agent.Animator.SetIdleState(IdlingAnimState);
                 IsHarvesting = false;
                 IsEmptying = true;
+
+                // The harvest AI will determine what to do next
+                StopHarvesting();
             }
         }
 
         protected virtual void OnDeposit()
         {
-            currentDepositAmount += DepositAmount;
             long deposit = DepositAmount;
 
             if (deposit > currentLoadAmount)
             {
                 deposit = currentLoadAmount;
             }
-            currentDepositAmount -= deposit;
+
             currentLoadAmount -= deposit;
 
             ResourceType depositType = HarvestType;
@@ -237,18 +218,10 @@ namespace RTSLockstep
 
             if (currentLoadAmount <= 0)
             {
-                if (!CurrentResourceTarget
-                    || CurrentResourceTarget.IsActive == false
-                    || TargetResource.IsEmpty())
-                {
-                    //Target's lifecycle has ended
-                    StopHarvesting();
-                }
-                else
-                {
-                    IsHarvesting = true;
-                    IsEmptying = false;
-                }
+                IsHarvesting = true;
+                IsEmptying = false;
+                // The harvest AI will determine what to do next
+                StopHarvesting();
             }
         }
 
@@ -268,7 +241,6 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Harvesting", IsHarvesting);
             SaveManager.WriteBoolean(writer, "Emptying", IsEmptying);
             SaveManager.WriteFloat(writer, "CurrentLoad", currentLoadAmount);
-            SaveManager.WriteFloat(writer, "CurrentDeposit", currentDepositAmount);
             SaveManager.WriteBoolean(writer, "HarvestMoving", IsHarvestMoving);
             SaveManager.WriteString(writer, "HarvestType", HarvestType.ToString());
             if (CurrentResourceTarget)
@@ -298,14 +270,11 @@ namespace RTSLockstep
                 case "CurrentLoad":
                     currentLoadAmount = (long)readValue;
                     break;
-                case "CurrentDeposit":
-                    currentDepositAmount = (long)readValue;
-                    break;
                 case "HarvestType":
                     HarvestType = WorkManager.GetResourceType((string)readValue);
                     break;
                 case "ResourceDepositId":
-                    loadedDepositId = (int)(System.Int64)readValue;
+                    loadedDepositId = (int)(long)readValue;
                     break;
                 case "Focused":
                     IsFocused = (bool)readValue;
@@ -376,18 +345,6 @@ namespace RTSLockstep
             if (HarvestGroupHelper.CheckValidAndAlert())
             {
                 HarvestGroupHelper.LastCreatedGroup.Add(this);
-            }
-        }
-
-        private void HandleStartMove()
-        {
-            if (currentLoadAmount > 0)
-            {
-                Agent.Animator.SetState(MovingAnimState);
-            }
-            else
-            {
-                Agent.Animator.SetState(AnimState.Moving);
             }
         }
 
@@ -647,7 +604,7 @@ namespace RTSLockstep
             fastRangeToTarget = Agent.MyStats.ActionRange + (targetBody.IsNotNull() ? targetBody.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
 
-            targetDirection = targetBody._position - Agent.Body._position;
+            targetDirection = targetBody.Position - Agent.Body.Position;
             fastMag = targetDirection.FastMagnitude();
 
             return fastMag <= fastRangeToTarget;
@@ -707,28 +664,24 @@ namespace RTSLockstep
                 MyHarvestGroup.Remove(this);
             }
 
+            IsHarvestMoving = false;
+
             if (complete)
             {
-                IsHarvestMoving = false;
                 IsHarvesting = false;
                 IsEmptying = false;
                 Agent.Tag = AgentTag.None;
+
+                CurrentResourceTarget = null;
+                CurrentStorageTarget = null;
             }
             else if (CurrentResourceTarget.IsNotNull() || CurrentStorageTarget.IsNotNull())
             {
-                if (IsHarvestMoving)
-                {
-                    Vector2d destination = IsHarvesting ? CurrentResourceTarget.Body.Position : CurrentStorageTarget.Body.Position;
-                    Agent.MyStats.CachedMove.StartMove(destination);
-                }
-                else if (Agent.MyStats.CanMove && !inRange)
+                if (Agent.MyStats.CanMove && !inRange)
                 {
                     Agent.MyStats.CachedMove.StopMove();
                 }
             }
-
-            CurrentResourceTarget = null;
-            CurrentStorageTarget = null;
 
             Agent.Body.Priority = basePriority;
 

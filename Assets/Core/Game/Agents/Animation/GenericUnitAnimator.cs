@@ -113,6 +113,12 @@ namespace RTSLockstep
             Play(AnimState.Idling);
         }
 
+        public override void SetMovingState(AnimState state = AnimState.None)
+        {
+            state = state != AnimState.None ? state : AnimState.Moving;
+            SetState(state);
+        }
+
         protected override string GetImpulseName(AnimImpulse impulse)
         {
             switch (impulse)
