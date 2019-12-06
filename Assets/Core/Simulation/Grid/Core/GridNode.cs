@@ -183,6 +183,7 @@ namespace RTSLockstep.Grid
             UpdateClearance();
         }
 
+        //Prepare Unpassable check optimizations
         internal static void PrepareUnpassableCheck(int size)
         {
             CachedUnpassableCheckSize = size;

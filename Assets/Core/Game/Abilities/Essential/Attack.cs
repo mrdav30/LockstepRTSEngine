@@ -123,11 +123,6 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             basePriority = Agent.Body.Priority;
-
-            if (Agent.MyStats.CanMove)
-            {
-                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
-            }
         }
 
         protected override void OnInitialize()
@@ -143,6 +138,11 @@ namespace RTSLockstep
 
             inRange = false;
             IsFocused = false;
+
+            if (Agent.MyStats.CanMove)
+            {
+                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
+            }
 
             CycleCount = 0;
 
@@ -218,15 +218,8 @@ namespace RTSLockstep
                 && cachedTargetHealth.IsNotNull()
                 )
             {
-                if (Agent.MyStats.CachedMove.IsGroupMoving)
-                {
-                    // position is set by the movement group tied to attack group
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
-                }
+                // position is set by the movement group tied to attack group
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
 
             IsAttackMoving = true;
@@ -625,24 +618,21 @@ namespace RTSLockstep
                 MyAttackGroup.Remove(this);
             }
 
+            IsAttackMoving = false;
+
             if (complete)
             {
-                IsAttackMoving = false;
                 Agent.Tag = AgentTag.None;
+
+                CurrentTarget = null;
             }
             else if (CurrentTarget.IsNotNull())
             {
-                if (IsAttackMoving)
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
-                }
-                else if (Agent.MyStats.CanMove && !inRange)
+                if (Agent.MyStats.CanMove && !inRange)
                 {
                     Agent.MyStats.CachedMove.StopMove();
                 }
             }
-
-            CurrentTarget = null;
 
             Agent.Body.Priority = basePriority;
 

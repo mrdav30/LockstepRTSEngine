@@ -35,7 +35,6 @@ namespace RTSLockstep
         }
 
         private const int searchRate = LockstepManager.FrameRate / 2;
-        private long currentAmountBuilt = 0;
 
         //Stuff for the logic
         private bool inRange;
@@ -82,12 +81,6 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             basePriority = Agent.Body.Priority;
-
-            if (Agent.MyStats.CanMove)
-            {
-                Agent.MyStats.CachedMove.onStartMove += HandleStartMove;
-                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
-            }
         }
 
         protected override void OnInitialize()
@@ -103,6 +96,11 @@ namespace RTSLockstep
 
             inRange = false;
             IsFocused = false;
+
+            if (Agent.MyStats.CanMove)
+            {
+                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
+            }
 
             repathTimer.Reset(repathInterval);
             repathRandom = LSUtility.GetRandom(repathInterval);
@@ -173,15 +171,8 @@ namespace RTSLockstep
                 && ProjectStructure.IsNotNull()
                 )
             {
-                if (Agent.MyStats.CachedMove.IsGroupMoving)
-                {
-                    // position is set by the movement group tied to harvest group
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentProject.Body.Position);
-                }
+                // position is set by the movement group tied to harvest group
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
 
             IsBuildMoving = true;
@@ -219,7 +210,6 @@ namespace RTSLockstep
         protected override void OnSaveDetails(JsonWriter writer)
         {
             SaveDetails(writer);
-            SaveManager.WriteFloat(writer, "AmountBuilt", currentAmountBuilt);
             SaveManager.WriteBoolean(writer, "BuildMoving", IsBuildMoving);
             if (ProjectStructure)
             {
@@ -239,11 +229,8 @@ namespace RTSLockstep
                 case "BuildMoving":
                     IsBuildMoving = (bool)readValue;
                     break;
-                case "AmountBuilt":
-                    currentAmountBuilt = (long)readValue;
-                    break;
                 case "currentProjectId":
-                    loadedProjectId = (int)(System.Int64)readValue;
+                    loadedProjectId = (int)(long)readValue;
                     break;
                 case "Focused":
                     IsFocused = (bool)readValue;
@@ -283,14 +270,6 @@ namespace RTSLockstep
             if (ConstructionGroupHelper.CheckValidAndAlert())
             {
                 ConstructionGroupHelper.LastCreatedGroup.Add(this);
-            }
-        }
-
-        private void HandleStartMove()
-        {
-            if (Agent.Tag == AgentTag.Builder)
-            {
-                currentAmountBuilt = 0;
             }
         }
 
@@ -483,24 +462,21 @@ namespace RTSLockstep
                 }
             }
 
+            IsBuildMoving = false;
+
             if (complete)
             {
-                IsBuildMoving = false;
                 Agent.Tag = AgentTag.None;
+
+                CurrentProject = null;
             }
             else if (CurrentProject.IsNotNull())
             {
-                if (IsBuildMoving)
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentProject.Body.Position);
-                }
-                else if (Agent.MyStats.CanMove && !inRange)
+                if (Agent.MyStats.CanMove && !inRange)
                 {
                     Agent.MyStats.CachedMove.StopMove();
                 }
             }
-
-            CurrentProject = null;
 
             Agent.Body.Priority = basePriority;
 

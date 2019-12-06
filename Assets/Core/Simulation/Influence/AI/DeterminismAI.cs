@@ -106,9 +106,6 @@ namespace RTSLockstep
 
             RTSAgent agent = null;
 
-                    // default scan range, overriden by cached attack sight
-        //protected long scanRange = FixedMath.One * 50;
-
             if (agentConditional.IsNotNull())
             {
                 agent = InfluenceManager.Scan(
