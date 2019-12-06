@@ -89,60 +89,61 @@ namespace RTSLockstep.Pathfinding
             rawMarkedNodes.Add(flowFieldPath.EndNode);
             closedSet.Add(flowFieldPath.EndNode);
 
-            //Prepare Unpassable check optimizations
-            GridNode.PrepareUnpassableCheck(_unitHalfSize);
-
             destinationIsReached = false;
             SearchCount = 0;
             //for each node we need to visit, starting with the pathStart
-            while (SearchCount <= GridManager.Grid.Length)
+            while (SearchCount < GridManager.Grid.Length)
             {
+                if (SearchCount >= rawMarkedNodes.Count)
+                {
+                    break;
+                }
+
                 rawNode = rawMarkedNodes[SearchCount];
 
-                if (rawNode.IsNull())
+                if (rawNode.IsNotNull())              
                 {
-                    continue;
-                }
+                    rawNode.FlowField.HasLOS = false;
 
-                rawNode.FlowField.HasLOS = false;
-
-                if (rawNode.gridIndex != flowFieldPath.EndNodeIndex)
-                {
-                    rawNode.FlowField.HasLOS = Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize) ? false : true;
-                }
-
-                // for each straight line neighbour of this node (no diagonals)
-                for (int i = 0; i < 4; i++)
-                {
-                    neighbor = rawNode.NeighborNodes[i];
-
-                    //We will only ever visit every node once as we are always visiting nodes in the most efficient order
-                    if (neighbor.IsNotNull() && !closedSet.Contains(neighbor))
+                    if (rawNode.gridIndex != flowFieldPath.EndNodeIndex)
                     {
-                        if (!neighbor.Unpassable())
+                        rawNode.FlowField.HasLOS = Pathfinder.NeedsPath(rawNode, flowFieldPath.EndNode, _unitHalfSize) ? false : true;
+                    }
+
+                    // for each straight line neighbour of this node (no diagonals)
+                    for (int i = 0; i < 4; i++)
+                    {
+                        neighbor = rawNode.NeighborNodes[i];
+
+                        //We will only ever visit every node once as we are always visiting nodes in the most efficient order
+                        if (neighbor.IsNotNull() && !closedSet.Contains(neighbor))
                         {
-                            neighbor.FlowField.Distance = rawNode.FlowField.Distance + 1;
-
-                            rawMarkedNodes.Add(neighbor);
-                            closedSet.Add(neighbor);
-
-                            if (neighbor.gridIndex == flowFieldPath.StartNodeIndex)
+                            // if neighbor is passable or is start node, add to marked nodes
+                            if (!neighbor.Unpassable() || neighbor.gridIndex == flowFieldPath.StartNodeIndex)
                             {
-                                //We found our way to the start node!
-                                destinationIsReached = true;
+                                neighbor.FlowField.Distance = rawNode.FlowField.Distance + 1;
+
+                                rawMarkedNodes.Add(neighbor);
+                                closedSet.Add(neighbor);
+
+                                if (neighbor.gridIndex == flowFieldPath.StartNodeIndex)
+                                {
+                                    //We found our way to the start node!
+                                    destinationIsReached = true;
+                                }
                             }
                         }
                     }
-                }
 
-                // no need to capture entire grid if start point reached
-                // go a bit further past the start node
-                if (destinationIsReached
-                    && rawNode.FlowField.Distance > (flowFieldPath.StartNode.FlowField.Distance + 10))
-                {
-                    //sw.Stop();
-                    //UnityEngine.Debug.Log("Path found: " + sw.ElapsedMilliseconds + " ms");
-                    break;
+                    // no need to capture entire grid if start point reached
+                    // go a bit further past the start node
+                    if (destinationIsReached
+                        && rawNode.FlowField.Distance > (flowFieldPath.StartNode.FlowField.Distance + 10))
+                    {
+                        //sw.Stop();
+                        //UnityEngine.Debug.Log("Path found: " + sw.ElapsedMilliseconds + " ms");
+                        break;
+                    }
                 }
 
                 SearchCount++;

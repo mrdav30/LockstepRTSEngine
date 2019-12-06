@@ -29,7 +29,7 @@ namespace RTSLockstep
         public bool SlowArrival { get; set; }
         public Vector2d AveragePosition { get; set; }
 
-        // add a little padding to manevour around structures
+        // add a little padding to manevour around blockers
         public int GridSize { get { return (int)Math.Round(Agent.Body.Radius.CeilToInt() * 1.5f, MidpointRounding.AwayFromZero); } }
 
         public Vector2d Position { get { return Agent.Body.Position; } }
@@ -124,8 +124,8 @@ namespace RTSLockstep
         protected override void OnSetup()
         {
             CanMove = true;
-          //  Agent.Body.onContact += HandleCollision;
- 
+            //  Agent.Body.onContact += HandleCollision;
+
             DrawPath = false;
 
             timescaledAcceleration = Acceleration.Mul(MovementSpeed) / LockstepManager.FrameRate;
@@ -213,7 +213,7 @@ namespace RTSLockstep
         private void GetMovementPath()
         {
             if (Pathfinder.GetStartNode(Position, out currentNode)
-                || Pathfinder.GetClosestViableNode(Position, Position, this.GridSize, out currentNode))
+                || Pathfinder.GetClosestViableNode(Position, Position, GridSize, out currentNode))
             {
                 if (DoPathfind)
                 {
@@ -254,19 +254,27 @@ namespace RTSLockstep
                     straightPath = false;
                 }
 
-                PathRequestManager.RequestPath(currentNode, destinationNode, GridSize, (flowFields, success) =>
-                {
-                    if (success)
+                PathRequestManager.RequestPath(currentNode, destinationNode, GridSize,
+                    (flowFields, success) =>
                     {
-                        hasPath = true;
                         _flowFields.Clear();
-                        _flowFields = flowFields;
+                        if (success)
+                        {
+                            hasPath = true;
+                            _flowFields = flowFields;
+                        }
+                        else
+                        {
+                            hasPath = false;
+                        }
                     }
-                });
+                );
+                return;
             }
             else
             {
                 straightPath = true;
+                return;
             }
         }
 
@@ -310,7 +318,7 @@ namespace RTSLockstep
                     if (movementDirection.Equals(Vector2d.zero))
                     {
                         //we need to keep moving on...
-                        movementDirection = lastDirection.IsNotNull() ? lastDirection :  Destination - Agent.Body.Position;
+                        movementDirection = lastDirection.IsNotNull() ? lastDirection : Destination - Agent.Body.Position;
                     }
                 }
             }
@@ -381,12 +389,12 @@ namespace RTSLockstep
                         if (RepathTries < StuckRepathTries)
                         {
                             Debug.Log("Stuck Agent");
-                        //    if (!IsGroupMoving)
-                         //   {
-                                // attempt to repath if agent is by themselves
-                                // otherwise we already have the best path based on the group
-                                DoPathfind = true;
-                         //   }
+                            //    if (!IsGroupMoving)
+                            //   {
+                            // attempt to repath if agent is by themselves
+                            // otherwise we already have the best path based on the group
+                            DoPathfind = true;
+                            //   }
 
                             RepathTries++;
                         }
@@ -740,7 +748,6 @@ namespace RTSLockstep
         {
             if (com.ContainsData<Vector2d>())
             {
-                Agent.StopCast(ID);
                 IsCasting = true;
                 RegisterGroup();
             }
@@ -782,6 +789,7 @@ namespace RTSLockstep
 
             Destination = _destination;
 
+            // handle override with onStartMove action
             Agent.Animator.SetMovingState(AnimState.Moving);
 
             //TODO: If next-best-node, autostop more easily
