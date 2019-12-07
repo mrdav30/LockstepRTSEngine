@@ -226,7 +226,7 @@ namespace RTSLockstep
                 Move mover = Movers[i];
                 mover.MyMovementType = MovementType.Individual;
                 mover.StopMultiplier = Move.DirectStop;
-                mover.OnGroupProcessed(Destination);
+                mover.MoveGroupProcessed(Destination);
             }
         }
 
@@ -239,7 +239,7 @@ namespace RTSLockstep
                 Move mover = Movers[i];
                 mover.MyMovementType = MovementType.Group;
                 mover.StopMultiplier = Move.GroupStop;
-                mover.OnGroupProcessed(mover.Position + groupDirection);
+                mover.MoveGroupProcessed(mover.Position + groupDirection);
             }
         }
 
@@ -250,7 +250,7 @@ namespace RTSLockstep
                 Move mover = Movers[i];
                 mover.MyMovementType = MovementType.GroupIndividual;
                 mover.StopMultiplier = Move.GroupDirectStop;
-                mover.OnGroupProcessed(Destination);
+                mover.MoveGroupProcessed(Destination);
             }
         }
     }

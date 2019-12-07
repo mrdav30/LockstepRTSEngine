@@ -20,10 +20,13 @@ namespace RTSLockstep
         public bool Arrived { get; private set; }
 
         //Called when unit arrives at destination
-        public event Action onArrive;
-        public event Action onStartMove;
+        public event Action OnArrive;
+        public event Action OnStartMove;
         //Called whenever movement is stopped... i.e. to attack
         public event Action OnStopMove;
+        public event Action OnMoveGroupProcessed;
+
+        public bool MoveOnGroupProcessed { get; private set; }
 
         [Lockstep(true)]
         public bool SlowArrival { get; set; }
@@ -82,9 +85,6 @@ namespace RTSLockstep
 
         private bool _allowUnwalkableEndNode;
 
-        private Vector2d movementDirection;
-        private Vector2d lastDirection;
-
         // How far we move each update
         private long distanceToMove;
         // How far away the agent stops from the target
@@ -116,15 +116,12 @@ namespace RTSLockstep
         private bool _canPathfind = true;
         public bool CanPathfind { get { return _canPathfind; } set { _canPathfind = value; } }
         public bool DrawPath;
-
-        public event Action onGroupProcessed;
-        public bool MoveOnGroupProcessed { get; private set; }
         #endregion
 
         protected override void OnSetup()
         {
             CanMove = true;
-            //  Agent.Body.onContact += HandleCollision;
+         //   Agent.Body.onContact += HandleCollision;
 
             DrawPath = false;
 
@@ -180,7 +177,8 @@ namespace RTSLockstep
                     // we only need to set velocity if we're going somewhere
                     if (hasPath || straightPath)
                     {
-                        SetMovementVelocity();
+                        Vector2d movementDirection = SetMovementDirection();
+                        SetDesiredVelocity(movementDirection);
                     }
                     else
                     {
@@ -278,10 +276,9 @@ namespace RTSLockstep
             }
         }
 
-        private void SetMovementVelocity()
+        private Vector2d SetMovementDirection()
         {
-            movementDirection = Vector2d.zero;
-            desiredVelocity = Vector2d.zero;
+            Vector2d movementDirection = Vector2d.zero;
 
             if (straightPath)
             {
@@ -308,17 +305,15 @@ namespace RTSLockstep
                     {
                         movementDirection = SteeringBehaviorFlowField();
                     }
-
-                    lastDirection = movementDirection;
                 }
                 else
                 {
-                    //vector not found
-                    //If we are centered on a grid square with no flow vector this will happen
+                    //vector not found, if we are centered on a grid square with no flow vector this will happen
                     if (movementDirection.Equals(Vector2d.zero))
                     {
-                        //we need to keep moving on...
-                        movementDirection = lastDirection.IsNotNull() ? lastDirection : Destination - Agent.Body.Position;
+                        DoPathfind = true;
+                        hasPath = false;
+                        return Vector2d.zero;
                     }
                 }
             }
@@ -334,6 +329,13 @@ namespace RTSLockstep
 
             // avoid any intersection agents!
             movementDirection += SteeringBehaviourAvoid();
+
+            return movementDirection;
+        }
+
+        private void SetDesiredVelocity(Vector2d movementDirection)
+        {
+            desiredVelocity = Vector2d.zero;
 
             long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
             long slowDistance = Agent.Body.VelocityMagnitude.Div(timescaledDecceleration);
@@ -762,7 +764,7 @@ namespace RTSLockstep
             }
         }
 
-        public void OnGroupProcessed(Vector2d _destination)
+        public void MoveGroupProcessed(Vector2d _destination)
         {
             if (MoveOnGroupProcessed)
             {
@@ -774,7 +776,7 @@ namespace RTSLockstep
                 Destination = _destination;
             }
 
-            onGroupProcessed?.Invoke();
+            OnMoveGroupProcessed?.Invoke();
         }
 
         public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false)
@@ -809,7 +811,7 @@ namespace RTSLockstep
                 hasPath = true;
             }
 
-            onStartMove?.Invoke();
+            OnStartMove?.Invoke();
         }
 
         public void Arrive()
@@ -818,7 +820,7 @@ namespace RTSLockstep
 
             Arrived = true;
 
-            onArrive?.Invoke();
+            OnArrive?.Invoke();
         }
 
         public void StopMove()
@@ -873,11 +875,12 @@ namespace RTSLockstep
                 if (MyMovementGroupID >= 0 && otherMover.MyMovementGroupID == MyMovementGroupID
                     || otherMover.Destination.FastDistance(Destination) <= (closingDistance * closingDistance))
                 {
-                    if (!otherMover.IsMoving)
+                    if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)
                     {
                         if (otherMover.Arrived
                             && otherMover.StoppedTime > MinimumOtherStopTime)
                         {
+                            Debug.Log("Arrive after collision");
                             Arrive();
                         }
                     }
@@ -936,7 +939,6 @@ namespace RTSLockstep
             SaveManager.WriteBoolean(writer, "Arrived", Arrived);
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
             SaveManager.WriteBoolean(writer, "Decelerating", decelerating);
-            SaveManager.WriteVector2d(writer, "MovementDirection", movementDirection);
         }
 
         protected override void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue)
@@ -970,9 +972,6 @@ namespace RTSLockstep
                     break;
                 case "Decelerating":
                     decelerating = (bool)readValue;
-                    break;
-                case "MovementDirection":
-                    movementDirection = LoadManager.LoadVector2d(reader);
                     break;
                 default: break;
             }

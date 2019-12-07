@@ -141,7 +141,7 @@ namespace RTSLockstep
 
             if (Agent.MyStats.CanMove)
             {
-                Agent.MyStats.CachedMove.onArrive += HandleOnArrive;
+                Agent.MyStats.CachedMove.OnArrive += HandleOnArrive;
             }
 
             CycleCount = 0;
