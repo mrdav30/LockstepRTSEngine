@@ -157,7 +157,7 @@ namespace RTSLockstep
             if (Agent.GetCommander() && loadedSavedValues && loadedTargetId >= 0)
             {
                 RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedTargetId);
-                if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Building)
+                if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Structure)
                 {
                     CurrentTarget = obj;
                 }

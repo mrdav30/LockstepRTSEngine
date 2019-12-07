@@ -35,11 +35,11 @@ namespace RTSLockstep
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = (other) =>
-                    {
-                        Structure structure = other.GetAbility<Structure>();
-                        return structure != null && structure.NeedsConstruction && other.IsActive;
-                    };
+                bool agentConditional(RTSAgent other)
+                {
+                    Structure structure = other.GetAbility<Structure>();
+                    return structure.IsNotNull() && structure.NeedsConstruction && other.IsActive;
+                }
 
                 return agentConditional;
             }
@@ -49,10 +49,10 @@ namespace RTSLockstep
         {
             get
             {
-                Func<byte, bool> allianceConditional = (bite) =>
+                bool allianceConditional(byte bite)
                 {
                     return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0);
-                };
+                }
                 return allianceConditional;
             }
         }

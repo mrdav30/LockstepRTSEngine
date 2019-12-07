@@ -82,7 +82,7 @@ namespace RTSLockstep
         {
             MovementGroup moveGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new MovementGroup();
 
-            moveGroup.indexID = activeGroups.Add(moveGroup);
+            moveGroup.IndexID = activeGroups.Add(moveGroup);
             LastCreatedGroup = moveGroup;
             moveGroup.Initialize(com);
             return moveGroup;
@@ -90,7 +90,7 @@ namespace RTSLockstep
 
         public static void Pool(MovementGroup group)
         {
-            int indexID = group.indexID;
+            int indexID = group.IndexID;
             activeGroups.RemoveAt(indexID);
             pooledGroups.Add(group);
         }

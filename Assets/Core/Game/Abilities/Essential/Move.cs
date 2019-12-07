@@ -39,7 +39,7 @@ namespace RTSLockstep
         public MovementGroup MyMovementGroup { get; set; }
         public int MyMovementGroupID { get; set; }
 
-        public bool IsGroupMoving { get; set; }
+        public MovementType MyMovementType { get; set; }
 
         public bool IsMoving { get; private set; }
 
@@ -142,7 +142,7 @@ namespace RTSLockstep
         {
             StoppedTime = 0;
 
-            IsGroupMoving = false;
+            MyMovementType = MovementType.Individual;
             MyMovementGroupID = -1;
 
             AutoStopPauser = 0;
@@ -294,7 +294,7 @@ namespace RTSLockstep
                 // work out the force to apply to us based on the flow field grid squares we are on.
                 // http://en.wikipedia.org/wiki/Bilinear_interpolation#Nonlinear
 
-                _flowFieldBuffer = !IsGroupMoving ? _flowFields : MyMovementGroup.GroupFlowFields;
+                _flowFieldBuffer = MyMovementType == MovementType.Individual ? _flowFields : MyMovementGroup.GroupFlowFields;
 
                 if (_flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
                 {
@@ -327,7 +327,7 @@ namespace RTSLockstep
             // needs to be normalized
             movementDirection.Normalize(out distanceToMove);
 
-            if (IsGroupMoving)
+            if (MyMovementType != MovementType.Individual)
             {
                 movementDirection += CalculateGroupBehaviors();
             }
@@ -798,7 +798,7 @@ namespace RTSLockstep
             RepathTries = 0;
             IsCasting = true;
 
-            if (!IsGroupMoving)
+            if (MyMovementType == MovementType.Individual)
             {
                 DoPathfind = true;
                 hasPath = false;
@@ -928,7 +928,6 @@ namespace RTSLockstep
         {
             base.SaveDetails(writer);
             SaveManager.WriteInt(writer, "MyMovementGroupID", MyMovementGroupID);
-            SaveManager.WriteBoolean(writer, "GroupMoving", IsGroupMoving);
             SaveManager.WriteBoolean(writer, "Moving", IsMoving);
             SaveManager.WriteBoolean(writer, "HasPath", hasPath);
             SaveManager.WriteBoolean(writer, "StraightPath", straightPath);
@@ -947,9 +946,6 @@ namespace RTSLockstep
             {
                 case "MyMovementGroupID":
                     MyMovementGroupID = (int)readValue;
-                    break;
-                case "GroupMoving":
-                    IsGroupMoving = (bool)readValue;
                     break;
                 case "Moving":
                     IsMoving = (bool)readValue;

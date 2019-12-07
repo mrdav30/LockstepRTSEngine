@@ -438,7 +438,7 @@ namespace RTSLockstep
 
             if (RotationalTransform != null)
             {
-                CanSetvisualRotation = Agent.MyAgentType != AgentType.Building ? true : false;
+                CanSetvisualRotation = Agent.MyAgentType != AgentType.Structure ? true : false;
 
                 if (Forward != Vector2d.zero)
                 {

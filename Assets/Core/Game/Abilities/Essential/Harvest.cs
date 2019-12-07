@@ -21,12 +21,13 @@ namespace RTSLockstep
 
         public ResourceType HarvestType { get; private set; }
         public RTSAgent CurrentResourceTarget { get; private set; }
-        private ResourceDeposit TargetResource
+        public ResourceDeposit TargetResource
         {
             get
             {
                 return CurrentResourceTarget.IsNotNull() ? CurrentResourceTarget.GetAbility<ResourceDeposit>() : null;
             }
+            private set { }
         }
         public RTSAgent CurrentStorageTarget { get; private set; }
 

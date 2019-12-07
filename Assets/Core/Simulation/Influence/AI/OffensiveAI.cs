@@ -86,10 +86,10 @@ namespace RTSLockstep
         {
             get
             {
-                Func<byte, bool> allianceConditional = (bite) =>
+                bool allianceConditional(byte bite)
                 {
                     return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Enemy) != 0);
-                };
+                }
                 return allianceConditional;
             }
         }

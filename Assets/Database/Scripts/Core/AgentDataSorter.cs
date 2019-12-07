@@ -5,7 +5,7 @@ public static class AgentDataSorter {
         return SortByType (item, AgentType.Unit);
     }
     static int OrderBuildingsFirst (DataItem item) {
-        return SortByType (item, AgentType.Building);
+        return SortByType (item, AgentType.Structure);
     }
     static int SortByType (DataItem item, AgentType agentType) {
         AgentDataItem agentInterfacer = item as AgentDataItem;

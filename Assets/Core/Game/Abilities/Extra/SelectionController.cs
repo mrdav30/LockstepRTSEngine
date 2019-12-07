@@ -65,7 +65,7 @@ namespace RTSLockstep
                             //agent belongs to current player
                             if (Selector.MainSelectedAgent.GetAbility<Construct>())
                             {
-                                if (Agent.MyAgentType == AgentType.Building && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().NeedsConstruction)
+                                if (Agent.MyAgentType == AgentType.Structure && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().NeedsConstruction)
                                 {
                                     PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Construct);
                                 }
@@ -78,7 +78,7 @@ namespace RTSLockstep
                         else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.MainController.SelectedAgents.Count > 0
                             && Agent.MyAgentType != AgentType.Resource)
                         {
-                            if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building) && Selector.MainSelectedAgent.IsActive
+                            if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Structure) && Selector.MainSelectedAgent.IsActive
                                 && Selector.MainSelectedAgent.GetAbility<Attack>())
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Attack);
@@ -90,7 +90,7 @@ namespace RTSLockstep
                             {
                                 PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Harvest);
                             }
-                            else if (Agent.MyAgentType == AgentType.Building 
+                            else if (Agent.MyAgentType == AgentType.Structure 
                                 && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().CanStoreResources(Selector.MainSelectedAgent.GetAbility<Harvest>().HarvestType)
                                 && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
                             {
@@ -147,7 +147,7 @@ namespace RTSLockstep
 
         public void CalculateCurrentHealth(float lowSplit, float highSplit)
         {
-            if (Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Building)
+            if (Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Structure)
             {
                 healthPercentage = (float) cachedHealth.CurrentHealth / (float)cachedHealth.MaxHealth;
                 if (healthPercentage > highSplit)

@@ -433,7 +433,7 @@ public class UserInputHelper : BehaviourHelper
                         ProcessInterfacer((QuickHarvest));
                     }
                     // moused agent is a building and owned by current player
-                    else if (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Building
+                    else if (RTSInterfacing.MousedAgent.MyAgentType == AgentType.Structure
                         && RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.MainController))
                     {
                         // moused agent isn't under construction

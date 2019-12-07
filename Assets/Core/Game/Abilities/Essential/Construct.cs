@@ -109,7 +109,7 @@ namespace RTSLockstep
             if (Agent.GetCommander() && loadedSavedValues && loadedProjectId >= 0)
             {
                 RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedProjectId);
-                if (obj.MyAgentType == AgentType.Building)
+                if (obj.MyAgentType == AgentType.Structure)
                 {
                     CurrentProject = obj;
                 }

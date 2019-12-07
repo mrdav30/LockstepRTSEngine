@@ -107,7 +107,7 @@ public static class ConstructionHandler
         Vector2d buildPoint = new Vector2d(constructingAgent.transform.position.x, constructingAgent.transform.position.z + 10);
         RTSAgent buildingTemplate = GameResourceManager.GetAgentTemplate(buildingName);
 
-        if (buildingTemplate.MyAgentType == AgentType.Building && buildingTemplate.GetComponent<Structure>())
+        if (buildingTemplate.MyAgentType == AgentType.Structure && buildingTemplate.GetComponent<Structure>())
         {
             // check that the Player has the resources available before allowing them to create a new structure
             if (!_cachedCommander.CachedResourceManager.CheckResources(buildingTemplate))

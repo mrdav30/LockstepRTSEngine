@@ -316,20 +316,20 @@ public class HUD : MonoBehaviour
             {
                 DrawActions(selectedAgent.GetAbility<Construct>().BuildActions);
             }
-            else if (selectedAgent.MyAgentType == AgentType.Building && selectedAgent.GetAbility<Spawner>() && !selectedAgent.GetAbility<Structure>().NeedsConstruction)
+            else if (selectedAgent.MyAgentType == AgentType.Structure && selectedAgent.GetAbility<Spawner>() && !selectedAgent.GetAbility<Structure>().NeedsConstruction)
             {
                 DrawActions(selectedAgent.GetAbility<Spawner>().GetSpawnActions());
             }
             // store the current selection
             lastSelection = selectedAgent;
-            if (lastSelection.MyAgentType == AgentType.Building)
+            if (lastSelection.MyAgentType == AgentType.Structure)
             {
                 if (lastSelection.GetAbility<Spawner>())
                 {
                     DrawBuildQueue(lastSelection.GetAbility<Spawner>().getBuildQueueValues(), lastSelection.GetAbility<Spawner>().getBuildPercentage());
                 }
             }
-            if (lastSelection.MyAgentType == AgentType.Building || lastSelection.MyAgentType == AgentType.Unit)
+            if (lastSelection.MyAgentType == AgentType.Structure || lastSelection.MyAgentType == AgentType.Unit)
             {
                 DrawStandardOptions(lastSelection as RTSAgent);
             }
@@ -621,7 +621,7 @@ public class HUD : MonoBehaviour
                         {
                             ConstructionHandler.CreateStructure(actions[i], agent);
                         }
-                        else if (agent.MyAgentType == AgentType.Building
+                        else if (agent.MyAgentType == AgentType.Structure
                             && !agent.GetAbility<Structure>().NeedsConstruction
                             && agent.GetAbility<Spawner>())
                         {

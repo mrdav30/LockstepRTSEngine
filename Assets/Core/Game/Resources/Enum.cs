@@ -13,7 +13,7 @@
     public enum AgentType
     {
         Unit,
-        Building,
+        Structure,
         Resource
     }
 
@@ -75,7 +75,7 @@
         None
     }
 
-    public enum MovementType : long
+    public enum MovementType
     {
         Group,
         GroupIndividual,
