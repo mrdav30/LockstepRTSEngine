@@ -6,6 +6,8 @@ namespace RTSLockstep
 {
     public class HarvesterAI : DeterminismAI
     {
+        private AgentTag action;
+
         public override void OnInitialize()
         {
             base.OnInitialize();
@@ -20,8 +22,8 @@ namespace RTSLockstep
             }
             else if (searchCount <= 0)
             {
-                if (cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.IsCasting == false
-                    || cachedAgent.MyStats.CachedHarvest.IsEmptying && cachedAgent.MyStats.CachedHarvest.IsCasting == false)
+                if (!cachedAgent.MyStats.CachedHarvest.IsCasting
+                    && (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     searchCount = SearchRate;
                     // We're ready but have no target
@@ -110,22 +112,54 @@ namespace RTSLockstep
             }
         }
 
-        private void InfluenceHarvest()
+        protected override RTSAgent DoScan()
         {
-            if (!nearbyAgent)
+            Func<RTSAgent, bool> agentConditional = AgentConditional;
+            Func<byte, bool> allianceConditional = AllianceConditional;
+
+            RTSAgent agent = null;
+
+            if (agentConditional.IsNotNull())
             {
-                // if we can't find one within sight, check one doesn't exist on the map
-                if (cachedAgent.MyStats.CachedHarvest.IsEmptying)
+                Vector2d scanPos = cachedAgent.Body.Position;
+                if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
                 {
-                    nearbyAgent = cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget
-                        : ClosestResourceStorage();
+                    if(cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.IsNotNull())
+                    {
+                        if (!cachedAgent.MyStats.CachedHarvest.TargetResource.IsEmpty())
+                        {
+                            // no need to search, we still got some goods
+                            return cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget;
+                        }
+                        else
+                        {
+                            // Search where the last resource target was for new goods
+                            scanPos = cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.Body.Position;
+                        }
+                    }
                 }
-                else if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+
+                agent = InfluenceManager.Scan(
+                     scanPos,
+                     cachedAgent.MyStats.Sight,
+                     agentConditional,
+                     allianceConditional
+                 );
+
+                // If we couldn't find storage within sight
+                // Double check storage doesn't exist somewhere, anywhere!
+                if (agent.IsNull() && cachedAgent.MyStats.CachedHarvest.IsEmptying)
                 {
-                    nearbyAgent = cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget : null;
+                    agent = cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget
+                        : ClosestResourceStorage();
                 }
             }
 
+            return agent;
+        }
+
+        private void InfluenceHarvest()
+        {
             if (nearbyAgent.IsNotNull())
             {
                 ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
