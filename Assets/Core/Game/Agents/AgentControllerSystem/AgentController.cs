@@ -462,10 +462,10 @@ namespace RTSLockstep
         {
             if (!GameResourceManager.IsValidAgentCode(agentCode))
             {
-                throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
+                throw new ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
             FastStack<RTSAgent> cache = CachedAgents[agentCode];
-            RTSAgent curAgent = null;
+            RTSAgent curAgent;
 
             if (cache.IsNotNull() && cache.Count > 0)
             {
@@ -494,7 +494,7 @@ namespace RTSLockstep
         {
             var agentCodeID = GameResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
             FastList<bool> typeActive;
-            if (!AgentController.TypeAgentsActive.TryGetValue(agentCodeID, out typeActive))
+            if (!TypeAgentsActive.TryGetValue(agentCodeID, out typeActive))
             {
                 typeActive = new FastList<bool>();
                 TypeAgentsActive.Add(agentCodeID, typeActive);

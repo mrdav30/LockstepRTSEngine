@@ -69,6 +69,8 @@ namespace RTSLockstep
                 for (int j = 0; j < info.Count; j++)
                 {
                     RTSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
+                    // remove the clone tag and replace with global ID
+                    agent.gameObject.name = agent.gameObject.name.Replace("(Clone)","") + "_" + agent.GlobalID;
                     if (AutoCommand)
                     {
                         Selector.Add(agent);
