@@ -465,8 +465,6 @@ public class UserInputHelper : BehaviourHelper
                 else
                 {
                     // If there is no agent under the mouse or the selected agent doesn't have Attack, send a Move command - right clicking on terrain
-                    // stop casting all abilities
-                    Selector.MainSelectedAgent.StopCast();
                     ProcessInterfacer((QuickMove));
                 }
             }

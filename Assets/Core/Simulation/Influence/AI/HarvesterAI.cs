@@ -26,11 +26,12 @@ namespace RTSLockstep
                     && (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     searchCount = SearchRate;
-                    // We're ready but have no target
+                    // We're ready to go but have no target
                     return true;
                 }
             }
-            else if (cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+
+            if (cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
             {
                 // busy harvesting or emptying
                 searchCount -= 1;
@@ -124,17 +125,17 @@ namespace RTSLockstep
                 Vector2d scanPos = cachedAgent.Body.Position;
                 if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
                 {
-                    if(cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.IsNotNull())
+                    if(cachedAgent.MyStats.CachedHarvest.LastResourceTarget.IsNotNull())
                     {
-                        if (!cachedAgent.MyStats.CachedHarvest.TargetResource.IsEmpty())
+                        if (!cachedAgent.MyStats.CachedHarvest.LastResourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
                         {
                             // no need to search, we still got some goods
-                            return cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget;
+                            return cachedAgent.MyStats.CachedHarvest.LastResourceTarget;
                         }
                         else
                         {
                             // Search where the last resource target was for new goods
-                            scanPos = cachedAgent.MyStats.CachedHarvest.CurrentResourceTarget.Body.Position;
+                            scanPos = cachedAgent.MyStats.CachedHarvest.LastResourceTarget.Body.Position;
                         }
                     }
                 }
@@ -150,7 +151,7 @@ namespace RTSLockstep
                 // Double check storage doesn't exist somewhere, anywhere!
                 if (agent.IsNull() && cachedAgent.MyStats.CachedHarvest.IsEmptying)
                 {
-                    agent = cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.CurrentStorageTarget
+                    agent = cachedAgent.MyStats.CachedHarvest.LastStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.LastStorageTarget
                         : ClosestResourceStorage();
                 }
             }

@@ -83,8 +83,6 @@ namespace RTSLockstep
         public GridNode currentNode;
         private GridNode destinationNode;
 
-        private bool _allowUnwalkableEndNode;
-
         // How far we move each update
         private long distanceToMove;
         // How far away the agent stops from the target
@@ -178,7 +176,15 @@ namespace RTSLockstep
                     if (hasPath || straightPath)
                     {
                         Vector2d movementDirection = SetMovementDirection();
-                        SetDesiredVelocity(movementDirection);
+                        if (movementDirection != Vector2d.zero)
+                        {
+                            SetDesiredVelocity(movementDirection);
+                        }
+                        else
+                        {
+                            //agent shouldn't be moving then and is stuck...
+                            StopMove();
+                        }
                     }
                     else
                     {
@@ -335,8 +341,6 @@ namespace RTSLockstep
 
         private void SetDesiredVelocity(Vector2d movementDirection)
         {
-            desiredVelocity = Vector2d.zero;
-
             long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
             long slowDistance = Agent.Body.VelocityMagnitude.Div(timescaledDecceleration);
 
@@ -750,6 +754,7 @@ namespace RTSLockstep
         {
             if (com.ContainsData<Vector2d>())
             {
+                Agent.StopCast(ID);
                 IsCasting = true;
                 RegisterGroup();
             }
@@ -783,7 +788,6 @@ namespace RTSLockstep
         {
             _flowFields.Clear();
             straightPath = false;
-            _allowUnwalkableEndNode = allowUnwalkableEndNode;
 
             IsMoving = true;
             StoppedTime = 0;
@@ -798,7 +802,6 @@ namespace RTSLockstep
             //Also implement stopping sooner based on distanceToMove
             stuckTime = 0;
             RepathTries = 0;
-            IsCasting = true;
 
             if (MyMovementType == MovementType.Individual)
             {
@@ -845,6 +848,9 @@ namespace RTSLockstep
                 StoppedTime = 0;
 
                 _flowFields.Clear();
+
+                DoPathfind = false;
+                hasPath = false;
                 straightPath = false;
 
                 IsCasting = false;
