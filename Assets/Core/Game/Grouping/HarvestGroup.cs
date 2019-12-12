@@ -27,11 +27,8 @@ namespace RTSLockstep
             {
                 if (AgentController.TryGetAgentInstance((ushort)target.Value, out RTSAgent tempTarget))
                 {
-                    if (tempTarget.MyAgentType == AgentType.Resource)
-                    {
-                        currentTarget = tempTarget;
-                    }
-                    else if (tempTarget.MyAgentType == AgentType.Structure)
+                    if (tempTarget.MyAgentType == AgentType.Resource
+                        || tempTarget.MyAgentType == AgentType.Structure)
                     {
                         currentTarget = tempTarget;
                     }

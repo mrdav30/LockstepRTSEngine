@@ -7,6 +7,7 @@
 //=======================================================================
 
 using RTSLockstep.Grid;
+using System.Collections.Generic;
 
 namespace RTSLockstep.Pathfinding
 {
@@ -151,11 +152,14 @@ namespace RTSLockstep.Pathfinding
         public static bool GetStartNode(Vector2d dest, out GridNode returnNode)
         {
             returnNode = GridManager.GetNode(dest.x, dest.y);
-            if (returnNode == null || (returnNode.Unwalkable))
+            if (returnNode.IsNull() || returnNode.Unwalkable)
             {
                 return StarCast(dest, out returnNode);
             }
-            return true;
+            else
+            {
+                return true;
+            }
         }
 
         public static bool StarCast(Vector2d dest, out GridNode returnNode)
@@ -237,6 +241,23 @@ namespace RTSLockstep.Pathfinding
             {
                 return true;
             }
+        }
+
+        public static Vector2d ClosestFlowFieldPostion(Vector2d gridPos, Dictionary<Vector2d, FlowField> _flowFieldBuffer)
+        {
+            foreach (KeyValuePair<Vector2d, FlowField> keyValuePair in _flowFieldBuffer)
+            {
+                long closeEnough = FixedMath.One * 3;
+                Vector2d flowFieldPos = keyValuePair.Key;
+                bool xInPos = gridPos.x > flowFieldPos.x - closeEnough && gridPos.x < flowFieldPos.x + closeEnough;
+                bool yInPos = gridPos.y > flowFieldPos.y - closeEnough && gridPos.y < flowFieldPos.y + closeEnough;
+                if (xInPos && yInPos)
+                {
+                    return flowFieldPos;
+                }
+            }
+
+            return Vector2d.zero;
         }
     }
 }

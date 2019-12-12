@@ -22,7 +22,7 @@ namespace RTSLockstep
             }
             else if (searchCount <= 0)
             {
-                if (!cachedAgent.MyStats.CachedHarvest.IsCasting
+                if ((!cachedAgent.MyStats.CachedHarvest.IsFocused && !cachedAgent.MyStats.CachedHarvest.IsHarvestMoving)
                     && (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     searchCount = SearchRate;
@@ -31,14 +31,17 @@ namespace RTSLockstep
                 }
             }
 
-            if (cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+            if ((cachedAgent.MyStats.CachedHarvest.IsFocused && cachedAgent.MyStats.CachedHarvest.IsHarvestMoving)
+                && cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
             {
                 // busy harvesting or emptying
                 searchCount -= 1;
                 return false;
             }
-
-            return base.ShouldMakeDecision();
+            else
+            {
+                return base.ShouldMakeDecision();
+            }
         }
 
         public override void DecideWhatToDo()
@@ -57,10 +60,12 @@ namespace RTSLockstep
                 {
                     agentConditional = (other) =>
                     {
-                        if (other != cachedAgent)
+                        if (other != cachedAgent && other.IsActive)
                         {
                             Structure structure = other.GetAbility<Structure>();
-                            return structure.IsNotNull() && structure.CanStoreResources(cachedAgent.MyStats.CachedHarvest.HarvestType) && !structure.NeedsConstruction;
+                            return structure.IsNotNull() 
+                                    && structure.CanStoreResources(cachedAgent.MyStats.CachedHarvest.HarvestType) 
+                                    && !structure.NeedsConstruction;
                         }
                         else
                         {
@@ -72,10 +77,12 @@ namespace RTSLockstep
                 {
                     agentConditional = (other) =>
                     {
-                        if (other != cachedAgent)
+                        if (other != cachedAgent && other.IsActive)
                         {
                             ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
-                            return resourceDeposit.IsNotNull() && !resourceDeposit.IsEmpty() && other.IsActive;
+                            return resourceDeposit.IsNotNull() 
+                                    && resourceDeposit.ResourceType == cachedAgent.MyStats.CachedHarvest.HarvestType 
+                                    && !resourceDeposit.IsEmpty();
                         }
                         else
                         {
@@ -147,9 +154,13 @@ namespace RTSLockstep
                      allianceConditional
                  );
 
-                // If we couldn't find storage within sight
-                // Double check storage doesn't exist somewhere, anywhere!
-                if (agent.IsNull() && cachedAgent.MyStats.CachedHarvest.IsEmptying)
+                // agent was harvesting but no longer has target resource in sight
+                // send them back to deposit
+                // or
+                // agent couldn't find storage within sight
+                // double check storage doesn't exist somewhere, anywhere!
+                if ((agent.IsNull() && cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0)
+                    || (agent.IsNull() && cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     agent = cachedAgent.MyStats.CachedHarvest.LastStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.LastStorageTarget
                         : ClosestResourceStorage();

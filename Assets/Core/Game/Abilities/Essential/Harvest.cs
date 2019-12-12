@@ -109,8 +109,7 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            if (Agent.Tag == AgentTag.Harvester
-                && MyHarvestGroup.IsNotNull())
+            if (Agent.Tag == AgentTag.Harvester)
             {
                 if (harvestCount > _harvestSpeed)
                 {
@@ -125,14 +124,9 @@ namespace RTSLockstep
 
                 if (Agent && Agent.IsActive)
                 {
-                    if (CurrentTarget.IsNotNull() && (IsFocused || IsHarvestMoving))
+                    if ((IsFocused || IsHarvestMoving))
                     {
                         BehaveWithTarget();
-                    }
-                    else
-                    {
-                        // We're not harvesting then!
-                        StopHarvesting();
                     }
                 }
 
@@ -159,7 +153,7 @@ namespace RTSLockstep
                 IsHarvestMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination, false);
+                Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position, false);
             }
         }
 
@@ -181,7 +175,6 @@ namespace RTSLockstep
 
             if (LoadAtCapacity())
             {
-                Agent.Animator.SetIdleState(IdlingAnimState);
                 IsHarvesting = false;
                 IsEmptying = true;
 
@@ -207,7 +200,6 @@ namespace RTSLockstep
 
             if (currentLoadAmount <= 0)
             {
-                Agent.Animator.SetIdleState(IdlingAnimState);
                 IsHarvesting = true;
                 IsEmptying = false;
 
@@ -537,7 +529,7 @@ namespace RTSLockstep
             IsWindingUp = false;
             IsFocused = false;
 
-            if (MyHarvestGroup.IsNotNull() && complete)
+            if (MyHarvestGroup.IsNotNull())
             {
                 MyHarvestGroup.Remove(this);
             }
@@ -560,9 +552,9 @@ namespace RTSLockstep
 
             CurrentTarget = null;
 
-            Agent.Body.Priority = basePriority;
-
             IsCasting = false;
+
+            Agent.Body.Priority = basePriority;
         }
     }
 }
