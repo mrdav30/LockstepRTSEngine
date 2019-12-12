@@ -118,8 +118,7 @@ namespace RTSLockstep
 
         protected override void OnSimulate()
         {
-            if (Agent.Tag == AgentTag.Builder
-                && MyConstructGroup.IsNotNull())
+            if (Agent.Tag == AgentTag.Builder)
             {
                 if (constructCount > _constructionSpeed)
                 {
@@ -134,14 +133,9 @@ namespace RTSLockstep
 
                 if (Agent && Agent.IsActive)
                 {
-                    if (CurrentProject.IsNotNull() && (IsFocused || IsBuildMoving))
+                    if ((IsFocused || IsBuildMoving))
                     {
                         BehaveWithTarget();
-                    }
-                    else
-                    {
-                        // We're not constructing then!
-                        StopConstruction();
                     }
                 }
 
@@ -160,6 +154,7 @@ namespace RTSLockstep
                 && (bool)target.Value)
             {
                 Agent.StopCast(ID);
+                IsCasting = true;
                 RegisterConstructGroup();
             }
         }
@@ -167,16 +162,14 @@ namespace RTSLockstep
         protected virtual void OnStartConstructMove()
         {
             if (Agent.MyStats.CanMove
-                && !CheckRange()
                 && ProjectStructure.IsNotNull()
-                )
+                && !CheckRange())
             {
-                // position is set by the movement group tied to harvest group
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-            }
+                IsBuildMoving = true;
+                IsFocused = false;
 
-            IsBuildMoving = true;
-            IsFocused = false;
+                Agent.MyStats.CachedMove.StartMove(CurrentProject.Body.Position);
+            }
         }
 
         protected virtual void OnConstruct(Structure target)
@@ -259,7 +252,6 @@ namespace RTSLockstep
             IsBuildMoving = false;
 
             targetVersion = CurrentProject.SpawnVersion;
-            IsCasting = true;
 
             fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
             fastRangeToTarget *= fastRangeToTarget;
@@ -454,12 +446,10 @@ namespace RTSLockstep
             IsWindingUp = false;
             IsFocused = false;
 
-            if (MyConstructGroup.IsNotNull())
+            if (MyConstructGroup.IsNotNull()
+                && MyConstructGroup.ConstructionQueue.Count == 0)
             {
-                if (MyConstructGroup.ConstructionQueue.Count == 0 || complete)
-                {
-                    MyConstructGroup.Remove(this);
-                }
+                MyConstructGroup.Remove(this);
             }
 
             IsBuildMoving = false;
@@ -467,8 +457,6 @@ namespace RTSLockstep
             if (complete)
             {
                 Agent.Tag = AgentTag.None;
-
-                CurrentProject = null;
             }
             else if (CurrentProject.IsNotNull())
             {
@@ -478,9 +466,11 @@ namespace RTSLockstep
                 }
             }
 
-            Agent.Body.Priority = basePriority;
+            CurrentProject = null;
 
             IsCasting = false;
+
+            Agent.Body.Priority = basePriority;
 
             OnStopConstruct?.Invoke();
         }
