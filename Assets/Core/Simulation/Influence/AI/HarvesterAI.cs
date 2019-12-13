@@ -22,11 +22,11 @@ namespace RTSLockstep
             }
             else if (searchCount <= 0)
             {
+                searchCount = SearchRate;
                 if (!cachedAgent.MyStats.CachedHarvest.IsCasting
                     && (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     // We're ready to go but have no target
-                    searchCount = SearchRate;
                     return true;
                 }
             }

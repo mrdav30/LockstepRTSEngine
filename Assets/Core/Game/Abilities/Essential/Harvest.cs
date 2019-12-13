@@ -488,6 +488,7 @@ namespace RTSLockstep
             if (Agent.MyStats.CanMove)
             {
                 // we don't want to be able to construct and move!
+                IsHarvestMoving = false;
                 Agent.MyStats.CachedMove.StopMove();
             }
             Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;

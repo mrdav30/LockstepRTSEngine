@@ -183,9 +183,11 @@ namespace RTSLockstep
                     }
                     else
                     {
-                        //  agent is lost...
-                        MyMovementType = MovementType.Individual;
-                        StartMove(Destination);
+                        //  agent is either lost or arrived after repath
+                        if (!Arrived)
+                        {
+                            StartMove(Destination);
+                        }
                     }
                 }
                 else
@@ -373,14 +375,18 @@ namespace RTSLockstep
                         {
                             // attempt to repath agent by themselves
                             Debug.Log("Stuck Agent");
-                            MyMovementType = MovementType.Individual;
+                            if (MyMovementGroup.IsNotNull())
+                            {
+                                MyMovementGroup.Remove(this);
+                            }
                             DoPathfind = true;
+                            hasPath = false;
+                            straightPath = false;
                             RepathTries++;
                         }
                         else
                         {
                             // we've tried to many times, we stuck stuck
-                            Debug.Log("Stuck Agent Stopping");
                             Arrive();
                         }
                         stuckTime = 0;
@@ -764,24 +770,24 @@ namespace RTSLockstep
             RepathTries = 0;
             IsCasting = true;
 
+            // still need to check for viable destination for agents in group
+            // if size requires consideration, use old next-best-node system
+            // also a catch in case GetEndNode returns null
+            viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out destinationNode)
+                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out destinationNode));
+
+            Destination = destinationNode.IsNotNull() ? destinationNode.WorldPos : Vector2d.zero;
+
             if (MyMovementType == MovementType.Individual)
             {
                 DoPathfind = true;
                 hasPath = false;
-
-                // if size requires consideration, use old next-best-node system
-                // also a catch in case GetEndNode returns null
-                viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out destinationNode)
-                    || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out destinationNode));
-
-                Destination = destinationNode.IsNotNull() ? destinationNode.WorldPos : Vector2d.zero;
             }
             else
             {
+                // we must be group moving
                 DoPathfind = false;
                 hasPath = true;
-
-                Destination = _destination;
             }
 
             OnStartMove?.Invoke();
@@ -791,8 +797,6 @@ namespace RTSLockstep
         {
             StopMove();
 
-            OnArrive?.Invoke();
-
             //TODO: Reset these variables when changing destination/command
             AutoStopPauser = 0;
             CollisionStopPauser = 0;
@@ -800,14 +804,14 @@ namespace RTSLockstep
             StopPauseLayer = 0;
 
             Arrived = true;
+
+            OnArrive?.Invoke();
         }
 
         public void StopMove()
         {
             if (IsMoving)
             {
-                //RepathTries = 0;
-
                 if (MyMovementGroup.IsNotNull())
                 {
                     MyMovementGroup.Remove(this);

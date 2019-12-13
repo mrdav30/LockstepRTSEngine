@@ -20,11 +20,11 @@ namespace RTSLockstep
             {
                 if (searchCount <= 0)
                 {
+                    searchCount = SearchRate;
                     if ((!cachedAgent.MyStats.CachedAttack.IsFocused && !cachedAgent.MyStats.CachedAttack.IsAttackMoving)
                         && cachedAgent.MyStats.CachedHealth.CurrentHealth > 0)
                     {
                         // We're ready to go but have no target
-                        searchCount = SearchRate;
                         return true;
                     }
                 }
@@ -64,8 +64,8 @@ namespace RTSLockstep
                         Health health = other.GetAbility<Health>();
                         return other.GlobalID != cachedAgent.GlobalID
                                 && other.IsActive
-                                && health.IsNotNull() 
-                                && health.CanLose 
+                                && health.IsNotNull()
+                                && health.CanLose
                                 && CachedAgentValid(other);
                     };
                 }
@@ -76,8 +76,8 @@ namespace RTSLockstep
                         Health health = other.GetAbility<Health>();
                         return other.GlobalID != cachedAgent.GlobalID
                                 && CachedAgentValid(other)
-                                && health.IsNotNull() 
-                                && health.CanGain ;
+                                && health.IsNotNull()
+                                && health.CanGain;
                     };
                 }
 

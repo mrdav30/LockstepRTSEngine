@@ -212,8 +212,7 @@ namespace RTSLockstep
                 IsAttackMoving = true;
                 IsFocused = false;
 
-                // position is set by the movement group tied to attack group
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
             }
         }
 
@@ -279,7 +278,6 @@ namespace RTSLockstep
                 }
                 else
                 {
-                    Debug.Log("asdf");
                     return health.CanGain;
                 }
             }
@@ -509,6 +507,7 @@ namespace RTSLockstep
             if (Agent.MyStats.CanMove)
             {
                 // we don't want to be able to fire and move!
+                IsAttackMoving = false;
                 Agent.MyStats.CachedMove.StopMove();
             }
             Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;

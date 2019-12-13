@@ -82,7 +82,6 @@ public static class ConstructionHandler
                     // only constructing 1 object, place it in the agents construct queue
                     SetConstructionQueue(tempObject);
                     SendConstructCommand();
-
                 }
             }
             else
@@ -219,13 +218,10 @@ public static class ConstructionHandler
         constructionQueue.Add(qStructure);
     }
 
-    public static void SendConstructCommand(bool startConstruction = true)
+    public static void SendConstructCommand()
     {
         // send construct command for selected agent to start construction queue
         Command constructCom = new Command(AbilityDataItem.FindInterfacer("Construct").ListenInputID);
-
-        // send a flag to start or cancel construction
-        constructCom.Add(new DefaultData(DataType.Bool, startConstruction));
 
         for (int i = 0; i < constructionQueue.Count; i++)
         {

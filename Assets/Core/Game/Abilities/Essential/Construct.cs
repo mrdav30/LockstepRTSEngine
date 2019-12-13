@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Data;
 using RTSLockstep.Grid;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTSLockstep
 {
-    [UnityEngine.DisallowMultipleComponent]
+    [DisallowMultipleComponent]
     public class Construct : ActiveAbility
     {
         #region Properties
@@ -148,15 +146,9 @@ namespace RTSLockstep
 
         protected override void OnExecute(Command com)
         {
-            // flag sent to signal agent to register with group
-            if (com.TryGetData(out DefaultData target, 0)
-                && target.Is(DataType.Bool)
-                && (bool)target.Value)
-            {
                 Agent.StopCast(ID);
                 IsCasting = true;
                 RegisterConstructGroup();
-            }
         }
 
         protected virtual void OnStartConstructMove()
@@ -277,7 +269,7 @@ namespace RTSLockstep
         private void BehaveWithTarget()
         {
             // only stop construct when groups queue is empty
-            if (CurrentProject.IsActive == false
+            if (!CurrentProject.IsActive
                 || CurrentProject.SpawnVersion != targetVersion
                 || !ProjectStructure.NeedsConstruction && MyConstructGroup.ConstructionQueue.Count == 0)
             {

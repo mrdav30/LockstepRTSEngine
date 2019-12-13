@@ -19,10 +19,10 @@ namespace RTSLockstep
             }
             else if (searchCount <= 0)
             {
+                searchCount = SearchRate;
                 if (!cachedAgent.MyStats.CachedConstruct.IsFocused && !cachedAgent.MyStats.CachedConstruct.IsBuildMoving)
                 {
                     // We're ready to go but have no target
-                    searchCount = SearchRate;
                     return true;
                 }
             }
