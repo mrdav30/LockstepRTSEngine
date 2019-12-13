@@ -89,6 +89,8 @@ namespace RTSLockstep
             if (harvester.MyHarvestGroup.IsNotNull() && harvester.MyHarvestGroupID == IndexID)
             {
                 harvesters.Remove(harvester);
+                harvester.MyHarvestGroup = null;
+                harvester.MyHarvestGroupID = -1;
 
                 // Remove the harvester from our harvester move group too!
                 harvestMoveGroup.Remove(harvester.Agent.MyStats.CachedMove);

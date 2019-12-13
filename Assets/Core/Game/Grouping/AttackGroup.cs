@@ -89,6 +89,8 @@ namespace RTSLockstep
             if (attacker.MyAttackGroup.IsNotNull() && attacker.MyAttackGroupID == IndexID)
             {
                 attackers.Remove(attacker);
+                attacker.MyAttackGroup = null;
+                attacker.MyAttackGroupID = -1;
 
                 // Remove the attacker from our attacker move group too!
                 AttackMoveGroup.Remove(attacker.Agent.MyStats.CachedMove);

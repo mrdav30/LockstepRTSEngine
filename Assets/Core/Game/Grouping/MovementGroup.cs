@@ -91,6 +91,8 @@ namespace RTSLockstep
             if (mover.MyMovementGroup.IsNotNull() && mover.MyMovementGroupID == IndexID)
             {
                 Movers.Remove(mover);
+                mover.MyMovementGroup = null;
+                mover.MyMovementGroupID = -1;
                 mover.MyMovementType = MovementType.Individual;
             }
         }
