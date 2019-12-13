@@ -12,11 +12,24 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.Tag != AgentTag.Builder
-                || cachedAgent.MyStats.CachedConstruct.IsBuildMoving
-                || cachedAgent.MyStats.CachedConstruct.IsFocused
-                || cachedAgent.MyStats.CachedConstruct.CurrentProject.IsNotNull())
+            if (cachedAgent.Tag != AgentTag.Builder)
             {
+                // agent isn't a constructor....
+                return false;
+            }
+            else if (searchCount <= 0)
+            {
+                if (!cachedAgent.MyStats.CachedConstruct.IsFocused && !cachedAgent.MyStats.CachedConstruct.IsBuildMoving)
+                {
+                    // We're ready to go but have no target
+                    searchCount = SearchRate;
+                    return true;
+                }
+            }
+
+            if (cachedAgent.MyStats.CachedConstruct.IsFocused || cachedAgent.MyStats.CachedConstruct.IsBuildMoving)
+            {
+                // busy building
                 searchCount -= 1;
                 return false;
             }
@@ -38,7 +51,11 @@ namespace RTSLockstep
                 bool agentConditional(RTSAgent other)
                 {
                     Structure structure = other.GetAbility<Structure>();
-                    return structure.IsNotNull() && structure.NeedsConstruction && other.IsActive;
+                    return other.GlobalID != cachedAgent.GlobalID
+                            && CachedAgentValid(other)
+                            && cachedAgent.GlobalID != other.GlobalID
+                            && structure.IsNotNull()
+                            && structure.NeedsConstruction;
                 }
 
                 return agentConditional;

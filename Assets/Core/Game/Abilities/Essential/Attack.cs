@@ -181,18 +181,9 @@ namespace RTSLockstep
 
                 if (Agent && Agent.IsActive)
                 {
-                    if (CurrentTarget.IsNotNull() && (IsFocused || IsAttackMoving))
+                    if ((IsFocused || IsAttackMoving))
                     {
                         BehaveWithTarget();
-                    }
-                    else if (IsAttackMoving)
-                    {
-                        if (Agent.MyStats.CanMove && Agent.MyStats.CachedMove.IsMoving)
-                        {
-                            // we shouldn't be moving then!
-                            Agent.MyStats.CachedMove.StopMove();
-                            IsAttackMoving = false;
-                        }
                     }
                 }
 
@@ -206,6 +197,7 @@ namespace RTSLockstep
         protected override void OnExecute(Command com)
         {
             Agent.StopCast(ID);
+            IsCasting = true;
             RegisterAttackGroup();
         }
 
@@ -214,16 +206,15 @@ namespace RTSLockstep
             cachedTargetHealth = CurrentTarget.GetAbility<Health>();
 
             if (Agent.MyStats.CanMove
-                && !CheckRange()
                 && cachedTargetHealth.IsNotNull()
-                )
+                && !CheckRange())
             {
+                IsAttackMoving = true;
+                IsFocused = false;
+
                 // position is set by the movement group tied to attack group
                 Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
-
-            IsAttackMoving = true;
-            IsFocused = false;
         }
 
         protected virtual void OnStartWindup()
@@ -350,7 +341,6 @@ namespace RTSLockstep
 
             IsFocused = true;
             IsAttackMoving = false;
-            IsCasting = true;
 
             targetVersion = CurrentTarget.SpawnVersion;
 
@@ -613,7 +603,7 @@ namespace RTSLockstep
             IsWindingUp = false;
             IsFocused = false;
 
-            if (MyAttackGroup.IsNotNull() && complete)
+            if (MyAttackGroup.IsNotNull())
             {
                 MyAttackGroup.Remove(this);
             }
@@ -623,8 +613,6 @@ namespace RTSLockstep
             if (complete)
             {
                 Agent.Tag = AgentTag.None;
-
-                CurrentTarget = null;
             }
             else if (CurrentTarget.IsNotNull())
             {
@@ -634,9 +622,11 @@ namespace RTSLockstep
                 }
             }
 
-            Agent.Body.Priority = basePriority;
+            CurrentTarget = null;
 
             IsCasting = false;
+
+            Agent.Body.Priority = basePriority;
 
             OnStopAttack?.Invoke();
         }

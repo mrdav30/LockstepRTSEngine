@@ -24,7 +24,7 @@ namespace RTSLockstep
         {
             cachedAgent = agent;
 
-            CachedAgentValid = this.AgentValid;
+            CachedAgentValid = AgentValid;
         }
 
         public virtual void OnInitialize()

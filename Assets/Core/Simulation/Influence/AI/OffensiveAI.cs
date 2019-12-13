@@ -14,31 +14,30 @@ namespace RTSLockstep
             base.OnInitialize();
         }
 
-        private bool CanAttack()
-        {
-            if (cachedAgent.MyStats.CachedAttack)
-            {
-                if (cachedAgent.MyStats.CachedAttack.IsAttackMoving || cachedAgent.MyStats.CachedHealth.CurrentHealth == 0)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-
-
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.IsCasting)
+            if (cachedAgent.Tag == AgentTag.Offensive)
             {
-                searchCount -= 1;
-                return false;
+                if (searchCount <= 0)
+                {
+                    if ((!cachedAgent.MyStats.CachedAttack.IsFocused && !cachedAgent.MyStats.CachedAttack.IsAttackMoving)
+                        && cachedAgent.MyStats.CachedHealth.CurrentHealth > 0)
+                    {
+                        // We're ready to go but have no target
+                        searchCount = SearchRate;
+                        return true;
+                    }
+                }
+
+                if (cachedAgent.MyStats.CachedAttack.IsFocused || cachedAgent.MyStats.CachedHealth.CurrentHealth == 0)
+                {
+                    // busy attacking or being dead
+                    searchCount -= 1;
+                    return false;
+                }
             }
 
+            // We still have the potential to be offensive
             return base.ShouldMakeDecision();
         }
 
@@ -48,10 +47,7 @@ namespace RTSLockstep
             //determine what should be done by the agent at the current point in time
             //need sight from attack ability to be able to scan...
             base.DecideWhatToDo();
-            if (CanAttack() && (nearbyAgent.IsNotNull() || nearbyAgent.IsNotNull() && nearbyAgent == cachedAgent.MyStats.CachedAttack.CurrentTarget))
-            {
-                InfluenceAttack();
-            }
+            InfluenceAttack();
         }
 
         //TODO: Consolidate the checks in LSInfluencer
@@ -66,7 +62,11 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return cachedAgent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
+                        return other.GlobalID != cachedAgent.GlobalID
+                                && other.IsActive
+                                && health.IsNotNull() 
+                                && health.CanLose 
+                                && CachedAgentValid(other);
                     };
                 }
                 else
@@ -74,7 +74,10 @@ namespace RTSLockstep
                     agentConditional = (other) =>
                     {
                         Health health = other.GetAbility<Health>();
-                        return cachedAgent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
+                        return other.GlobalID != cachedAgent.GlobalID
+                                && CachedAgentValid(other)
+                                && health.IsNotNull() 
+                                && health.CanGain ;
                     };
                 }
 
@@ -96,14 +99,17 @@ namespace RTSLockstep
 
         public virtual void InfluenceAttack()
         {
-            // send attack command
-            Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
-            attackCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-            attackCom.ControllerID = cachedAgent.Controller.ControllerID;
+            if (nearbyAgent.IsNotNull())
+            {
+                // send attack command
+                Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
+                attackCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
+                attackCom.ControllerID = cachedAgent.Controller.ControllerID;
 
-            attackCom.Add(new Influence(cachedAgent));
+                attackCom.Add(new Influence(cachedAgent));
 
-            CommandManager.SendCommand(attackCom);
+                CommandManager.SendCommand(attackCom);
+            }
         }
     }
 }
