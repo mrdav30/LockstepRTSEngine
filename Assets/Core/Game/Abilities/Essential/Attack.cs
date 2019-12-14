@@ -367,7 +367,8 @@ namespace RTSLockstep
         {
             if (!CurrentTarget.IsActive
                 || CurrentTarget.SpawnVersion != targetVersion
-                || (_targetAllegiance & Agent.GetAllegiance(CurrentTarget)) == 0)
+                || (_targetAllegiance & Agent.GetAllegiance(CurrentTarget)) == 0
+                || CurrentTarget.MyStats.CachedHealth.CurrentHealth == 0)
             {
                 // Target's lifecycle has ended
                 StopAttack();
