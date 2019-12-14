@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
 using FastCollections;
 using System;
 using RTSLockstep.Data;
 using System.Collections.Generic;
+
 namespace RTSLockstep
 {
     public static class ProjectileManager
@@ -12,11 +12,14 @@ namespace RTSLockstep
         private static string[] AllProjCodes;
         private static readonly Dictionary<string, IProjectileData> CodeDataMap = new Dictionary<string, IProjectileData>();
 
+        private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
+
+        private static readonly Dictionary<string, FastStack<LSProjectile>> ProjectilePool = new Dictionary<string, FastStack<LSProjectile>>();
+        private static FastBucket<LSProjectile> ProjectileBucket = new FastBucket<LSProjectile>();
 
         public static void Setup()
         {
-            IProjectileDataProvider prov;
-            if (LSDatabaseManager.TryGetDatabase<IProjectileDataProvider>(out prov))
+            if (LSDatabaseManager.TryGetDatabase<IProjectileDataProvider>(out IProjectileDataProvider prov))
             {
                 IProjectileData[] projectileData = prov.ProjectileData;
                 for (int i = 0; i < projectileData.Length; i++)
@@ -27,9 +30,11 @@ namespace RTSLockstep
                 }
             }
         }
+
         public static void Initialize()
         {
         }
+
         public static void Simulate()
         {
             for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
@@ -48,13 +53,14 @@ namespace RTSLockstep
                 }
             }
         }
+
         public static void Visualize()
         {
             for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
             {
                 if (ProjectileBucket.arrayAllocation[i])
                 {
-                    if (ProjectileBucket[i] != null)
+                    if (ProjectileBucket[i].IsNotNull())
                     {
                         ProjectileBucket[i].Visualize();
                     }
@@ -62,6 +68,7 @@ namespace RTSLockstep
             }
             VisualizeBucket(NDProjectileBucket);
         }
+
         private static void VisualizeBucket(FastBucket<LSProjectile> bucket)
         {
             for (int i = bucket.PeakCount - 1; i >= 0; i--)
@@ -82,6 +89,7 @@ namespace RTSLockstep
                     EndProjectile(ProjectileBucket[i]);
                 }
             }
+
             for (int i = NDProjectileBucket.PeakCount - 1; i >= 0; i--)
             {
                 if (NDProjectileBucket.arrayAllocation[i])
@@ -98,27 +106,34 @@ namespace RTSLockstep
             {
                 if (ProjectileBucket.arrayAllocation[i])
                 {
-                    LSProjectile proj = ProjectileManager.ProjectileBucket[i];
+                    LSProjectile proj = ProjectileBucket[i];
                     hash ^= proj.GetStateHash();
                 }
             }
+
             return hash;
         }
 
         private static LSProjectile NewProjectile(string projCode)
         {
             IProjectileData projData = CodeDataMap[projCode];
-            if (projData.GetProjectile().gameObject != null)
+            if (projData.GetProjectile().gameObject.IsNotNull())
             {
-                var curProj = ((GameObject)GameObject.Instantiate<GameObject>(projData.GetProjectile().gameObject)).GetComponent<LSProjectile>();
-                if (curProj != null)
+                var curProj = UnityEngine.Object.Instantiate(projData.GetProjectile().gameObject).GetComponent<LSProjectile>();
+                if (curProj.IsNotNull())
                 {
                     curProj.Setup(projData);
                     return curProj;
                 }
-                else return null;
+                else
+                {
+                    return null;
+                }
             }
-            else return null;
+            else
+            {
+                return null;
+            }
         }
         public static LSProjectile Create(string projCode, RTSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<RTSAgent, bool> agentConditional, Action<RTSAgent> hitEffect)
         {
@@ -133,9 +148,9 @@ namespace RTSLockstep
                 (bite) =>
                 {
                     return ((sourceController.GetAllegiance(bite) & targetAllegiance) != 0);
-                }
-                ,
+                },
                 hitEffect);
+
             return proj;
         }
 
@@ -144,22 +159,24 @@ namespace RTSLockstep
             var curProj = RawCreate(projCode);
 
             int id = ProjectileBucket.Add(curProj);
-            if (curProj != null)
+            if (curProj.IsNotNull())
             {
                 curProj.Prepare(id, position, agentConditional, bucketConditional, onHit, true);
             }
+
             return curProj;
         }
 
         private static LSProjectile RawCreate(string projCode)
         {
-            if (ProjectilePool.ContainsKey(projCode) == false)
+            if (!ProjectilePool.ContainsKey(projCode))
             {
                 Debug.Log(projCode + " fired by " + Attack.LastAttack + " Caused boom");
                 return null;
             }
+
             FastStack<LSProjectile> pool = ProjectilePool[projCode];
-            LSProjectile curProj = null;
+            LSProjectile curProj;
             if (pool.Count > 0)
             {
                 curProj = pool.Pop();
@@ -168,17 +185,18 @@ namespace RTSLockstep
             {
                 curProj = NewProjectile(projCode);
             }
+
             return curProj;
         }
+
         public static void Fire(LSProjectile projectile)
         {
-            if (projectile != null)
+            if (projectile.IsNotNull())
             {
                 projectile.LateInit();
             }
         }
 
-        private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
         /// <summary>
         /// Non-deterministic
         /// </summary>
@@ -190,12 +208,11 @@ namespace RTSLockstep
         /// <param name="gravity">If set to <c>true</c> gravity.</param>
         public static LSProjectile NDCreateAndFire(string projCode, Vector3d position, Vector3d direction, bool gravity = false)
         {
-
-            var curProj = RawCreate(projCode);
+            LSProjectile curProj = RawCreate(projCode);
             int id = NDProjectileBucket.Add(curProj);
             curProj.Prepare(id, position, (a) => false, (a) => false, (a) => { }, false);
             curProj.InitializeFree(direction, (a) => false, gravity);
-            ProjectileManager.Fire(curProj);
+            Fire(curProj);
             return curProj;
         }
 
@@ -221,9 +238,6 @@ namespace RTSLockstep
         }
 
         #region ID and allocation management
-        private static readonly Dictionary<string, FastStack<LSProjectile>> ProjectilePool = new Dictionary<string, FastStack<LSProjectile>>();
-        private static FastBucket<LSProjectile> ProjectileBucket = new FastBucket<LSProjectile>();
-
         private static void CacheProjectile(LSProjectile projectile)
         {
             ProjectilePool[projectile.MyProjCode].Add(projectile);
@@ -243,7 +257,5 @@ namespace RTSLockstep
 			}*/
         }
         #endregion
-
     }
-
 }
