@@ -16,15 +16,6 @@ namespace RTSLockstep
 
         private const long circleCastRadius = FixedMath.One * 16;
 
-        public static void Initialize()
-        {
-        }
-
-        public static void Simulate()
-        {
-
-        }
-
         #region Scanning
         // find single unit
         public static RTSAgent Scan(Vector2d position, long radius, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional)

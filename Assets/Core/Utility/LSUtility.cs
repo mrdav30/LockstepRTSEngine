@@ -15,14 +15,13 @@ namespace RTSLockstep
 
         public static System.Diagnostics.Stopwatch DebugSW = new System.Diagnostics.Stopwatch();
 
-        const uint Y = 842502087, Z = 3579807591, W = 273326509;
+        private const uint Y = 842502087, Z = 3579807591, W = 273326509;
         public static uint Seed = 1;
-        private static uint y = Y, z = Z, w;
+        private static uint y, z, w;
 
-        static LSUtility()
-        {
+        private static FastList<Component> componentBuffer = new FastList<Component>();
 
-        }
+        public static System.Text.StringBuilder StringBuilder { get; } = new System.Text.StringBuilder();
 
         public static void Initialize(uint seed)
         {
@@ -32,20 +31,8 @@ namespace RTSLockstep
             w = W;
         }
 
-        /*public static uint GetRandom (uint Count)
-		{
-			Debug.Log ("a");
-			uint t = (Seed ^ (Seed << 11));
-			Seed = y;
-			y = z;
-			z = w;
-			return ((0xFFFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
-		}*/
-
-
         public static uint GetRawRandom()
         {
-
             uint t = (Seed ^ (Seed << 11));
             Seed = y;
             y = z;
@@ -55,23 +42,31 @@ namespace RTSLockstep
 
         public static int GetRandom(int count = int.MaxValue)
         {
-            if (count == 0) return 0;
+            if (count == 0)
+            {
+                return 0;
+            }
             //TODO: Improve uniform distribution within count range
             return (int)(GetRawRandom() % count);
         }
+
         /// <summary>
         /// Note: Untested
         /// </summary>
         /// <returns></returns>
         public static long GetRandomLong(long count = long.MaxValue)
         {
-            if (count == 0) return 0;
+            if (count == 0)
+            {
+                return 0;
+            }
             //Combines 2 random uints
             ulong combined = GetRawRandom();
             combined <<= 32;
             combined |= GetRawRandom();
             return (long)(combined % (ulong)count);
         }
+
         public static long GetRandomOne()
         {
             return GetRandomLong(FixedMath.One);
@@ -80,18 +75,19 @@ namespace RTSLockstep
         public static GameObject CreateEmpty()
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            GameObject.Destroy(go.GetComponent<Collider>());
-            GameObject.Destroy(go.GetComponent<Renderer>());
+            UnityEngine.Object.Destroy(go.GetComponent<Collider>());
+            UnityEngine.Object.Destroy(go.GetComponent<Renderer>());
             return go;
         }
 
         public static Vector2d GenerateRandomPointOnCircle(bool evenDistribution = false)
         {
-
-            long angle = LSUtility.GetRandomOne().Mul(FixedMath.TwoPi);
-            long distance = LSUtility.GetRandomOne();
+            long angle = GetRandomOne().Mul(FixedMath.TwoPi);
+            long distance = GetRandomOne();
             if (evenDistribution)
+            {
                 distance = FixedMath.Sqrt(distance);
+            }
 
             Vector2d randomOffset = new Vector2d(
                 FixedMath.Trig.Cos(angle),
@@ -117,7 +113,7 @@ namespace RTSLockstep
 
         public static GameObject ResourceInstantiate(string path)
         {
-            return GameObject.Instantiate(Resources.Load<GameObject>(path));
+            return UnityEngine.Object.Instantiate(Resources.Load<GameObject>(path));
         }
 
         public static GameObject ResourceLoadGO(string path)
@@ -169,7 +165,6 @@ namespace RTSLockstep
         }
 
         #endregion
-        static FastList<Component> componentBuffer = new FastList<Component>();
 
         public static T GetComponentInChildrenOrderered<T>(this MonoBehaviour mb) where T : Component
         {
@@ -178,7 +173,10 @@ namespace RTSLockstep
             foreach (Transform tf in mb.transform)
             {
                 temp = tf.GetComponent<T>();
-                if (temp.IsNotNull()) return temp;
+                if (temp.IsNotNull())
+                {
+                    return temp;
+                }
             }
             return temp;
         }
@@ -200,29 +198,32 @@ namespace RTSLockstep
             foreach (Transform tf in transform)
             {
                 T temp = tf.GetComponent<T>();
-                if (temp.IsNotNull()) componentBuffer.Add(temp);
+                if (temp.IsNotNull())
+                {
+                    componentBuffer.Add(temp);
+                }
                 RecursiveComponentsSearch<T>(tf);
             }
         }
 
         public static void Clear(this Array array)
         {
-            System.Array.Clear(array, 0, array.Length);
+            Array.Clear(array, 0, array.Length);
         }
 
-        public static bool RefEquals(this System.Object obj, object other)
+        public static bool RefEquals(this object obj, object other)
         {
-            return System.Object.ReferenceEquals(obj, other);
+            return ReferenceEquals(obj, other);
         }
 
-        public static bool IsNull(this System.Object obj)
+        public static bool IsNull(this object obj)
         {
-            return System.Object.ReferenceEquals(obj, null);
+            return obj is null;
         }
 
-        public static bool IsNotNull(this System.Object obj)
+        public static bool IsNotNull(this object obj)
         {
-            return System.Object.ReferenceEquals(obj, null) == false;
+            return obj is null == false;
         }
 
         public static float V3SqrDistance(this Vector3 vec, Vector3 other)
@@ -234,8 +235,6 @@ namespace RTSLockstep
             return temp1 + temp2;
         }
 
-        private static System.Text.StringBuilder _stringBuilder = new System.Text.StringBuilder();
-        public static System.Text.StringBuilder StringBuilder { get { return _stringBuilder; } }
 
         public static string CharString(this Enum val)
         {
@@ -244,10 +243,10 @@ namespace RTSLockstep
 
         public static UnityEngine.Coroutine WaitRealTime(float wait)
         {
-            return UnityInstance.Instance.StartCoroutine(waitRealTime(wait));
+            return UnityInstance.Instance.StartCoroutine(IWaitRealTime(wait));
         }
 
-        private static IEnumerator waitRealTime(float wait)
+        private static IEnumerator IWaitRealTime(float wait)
         {
             float accumulator = 0f;
             while (accumulator < wait)
@@ -259,7 +258,10 @@ namespace RTSLockstep
 
         public static void Shift(this Array array, int min, int max, int shiftAmount)
         {
-            if (shiftAmount == 0) return;
+            if (shiftAmount == 0)
+            {
+                return;
+            }
             Array.Copy(array, min, array, min + shiftAmount, max - min);
 
         }

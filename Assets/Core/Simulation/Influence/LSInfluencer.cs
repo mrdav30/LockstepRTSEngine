@@ -32,12 +32,12 @@ namespace RTSLockstep
             Agent = agent;
             Body = agent.Body;
 
-            if(Agent.GetAbility<Attack>() && Agent.GetAbility<Attack>().IsOffensive)
+            if (Agent.GetAbility<Attack>() && Agent.GetAbility<Attack>().IsOffensive)
             {
                 AgentAI.Add(new OffensiveAI());
             }
 
-            if(Agent.GetAbility<Harvest>())
+            if (Agent.GetAbility<Harvest>())
             {
                 AgentAI.Add(new HarvesterAI());
             }
@@ -47,7 +47,7 @@ namespace RTSLockstep
                 AgentAI.Add(new ConstructorAI());
             }
 
-            foreach(var AI in AgentAI)
+            foreach (var AI in AgentAI)
             {
                 AI.OnSetup(agent);
             }
@@ -88,6 +88,7 @@ namespace RTSLockstep
                 }
             }
 
+            // we don't need influence for simulations!
             if (!ReplayManager.IsPlayingBack)
             {
                 foreach (var AI in AgentAI)

@@ -231,7 +231,6 @@ namespace RTSLockstep
             SpawnVersion = 1;
             CheckCasting = true;
 
-            Influencer = new LSInfluencer();
             if (_visualCenter == null)
             {
                 _visualCenter = CachedTransform;
@@ -246,6 +245,7 @@ namespace RTSLockstep
             Body.Setup(this);
             abilityManager.Setup(this);
 
+            Influencer = new LSInfluencer();
             Influencer.Setup(this);
 
             SelectionRadiusSquared = SelectionRadius * SelectionRadius;

@@ -56,8 +56,8 @@ namespace RTSLockstep
         //for testing purposes
         public static bool PoolingEnabled = true;
 
-        public static event Action onSetup;
-        public static event Action onInitialize;
+        public static event Action OnSetup;
+        public static event Action OnInitialize;
 
         public static int PauseCount { get; private set; }
 
@@ -77,7 +77,7 @@ namespace RTSLockstep
 
         public static void Reset()
         {
-            LockstepManager.Deactivate();
+            Deactivate();
         }
 
         internal static void Setup()
@@ -88,12 +88,10 @@ namespace RTSLockstep
             Command.Setup();
 
             GridManager.Setup();
-
             InputCodeManager.Setup();
             AbilityDataItem.Setup();
 
             GameResourceManager.Setup();
-            //AgentController.Setup ();
 
             ProjectileManager.Setup();
             EffectManager.Setup();
@@ -104,12 +102,8 @@ namespace RTSLockstep
             Time.fixedDeltaTime = DeltaTimeF;
             Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 
-
             DefaultMessageRaiser.LateSetup();
-            if (onSetup != null)
-            {
-                onSetup();
-            }
+            OnSetup?.Invoke();
         }
 
         private static long _playRate = FixedMath.One;
@@ -176,21 +170,14 @@ namespace RTSLockstep
 
             CommandManager.Initialize();
 
-
             PhysicsManager.Initialize();
             PlayerManager.Initialize();
 
-            //   GridBuilder.Initialize();
-
-            //Initialized in UserInputHelper
-            //	SelectionManager.Initialize ();
-            InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
             DefaultMessageRaiser.LateInitialize();
             BehaviourHelperManager.LateInitialize();
-            if (onInitialize != null)
-                onInitialize();
+            OnInitialize?.Invoke();
         }
 
         static bool Stalled;
@@ -230,12 +217,10 @@ namespace RTSLockstep
             AgentController.Simulate();
             PhysicsManager.Simulate();
             CoroutineManager.Simulate();
-            InfluenceManager.Simulate();
             ProjectileManager.Simulate();
 
             LateSimulate();
             FrameCount++;
-
         }
 
         //Called on the first frame of the game
@@ -284,7 +269,10 @@ namespace RTSLockstep
         internal static void Visualize()
         {
             if (!GameStarted)
+            {
                 return;
+            }
+
             DefaultMessageRaiser.EarlyVisualize();
             PlayerManager.Visualize();
             BehaviourHelperManager.Visualize();

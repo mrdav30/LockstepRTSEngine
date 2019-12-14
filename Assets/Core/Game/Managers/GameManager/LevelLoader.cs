@@ -62,15 +62,15 @@ namespace RTSLockstep
 
         public void LaunchSpawns()
         {
-            foreach(SpawnInfo info in Spawns)
+            foreach (SpawnInfo info in Spawns)
             {
-                var controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
+                AgentController controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
 
                 for (int j = 0; j < info.Count; j++)
                 {
                     RTSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
                     // remove the clone tag and replace with global ID
-                    agent.gameObject.name = agent.gameObject.name.Replace("(Clone)","") + "_" + agent.GlobalID;
+                    agent.gameObject.name = agent.gameObject.name.Replace("(Clone)", "") + "_" + agent.GlobalID;
                     if (AutoCommand)
                     {
                         Selector.Add(agent);
@@ -82,7 +82,7 @@ namespace RTSLockstep
             {
                 //Find average of spawn positions
                 Vector2d battlePos = Vector2d.zero;
-                foreach(SpawnInfo info in Spawns)
+                foreach (SpawnInfo info in Spawns)
                 {
                     battlePos += info.Position;
                 }

@@ -214,7 +214,6 @@ namespace RTSLockstep
 
                     newCont.AddAgent(agent);
                     agent.Influencer.Initialize();
-
                 }
             }
         }

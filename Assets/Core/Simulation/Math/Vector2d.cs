@@ -11,58 +11,63 @@ namespace RTSLockstep
         [FixedNumber]
         public long y;
 
+        private static long temp1;
+        private static long temp2;
+        private static long temp3;
+        private static long tempMag;
+
+        private static Vector2d retVec = Vector2d.zero;
+
         #region Constructors
         public Vector2d(long xFixed, long yFixed)
         {
-            this.x = xFixed;
-            this.y = yFixed;
+            x = xFixed;
+            y = yFixed;
         }
 
         public Vector2d(int xInt, int yInt)
         {
-            this.x = xInt << FixedMath.SHIFT_AMOUNT;
-            this.y = yInt << FixedMath.SHIFT_AMOUNT;
+            x = xInt << FixedMath.SHIFT_AMOUNT;
+            y = yInt << FixedMath.SHIFT_AMOUNT;
         }
 
         public Vector2d(Vector2 vec2)
         {
-            this.x = FixedMath.Create(vec2.x);
-            this.y = FixedMath.Create(vec2.y);
+            x = FixedMath.Create(vec2.x);
+            y = FixedMath.Create(vec2.y);
         }
 
         public Vector2d(float xFloat, float yFloat)
         {
-            this.x = FixedMath.Create(xFloat);
-            this.y = FixedMath.Create(yFloat);
+            x = FixedMath.Create(xFloat);
+            y = FixedMath.Create(yFloat);
         }
 
         public Vector2d(double xDoub, double yDoub)
         {
-            this.x = FixedMath.Create(xDoub);
-            this.y = FixedMath.Create(yDoub);
+            x = FixedMath.Create(xDoub);
+            y = FixedMath.Create(yDoub);
         }
 
         public Vector2d(Vector3 vec)
         {
-            this.x = FixedMath.Create(vec.x);
-            this.y = FixedMath.Create(vec.z);
+            x = FixedMath.Create(vec.x);
+            y = FixedMath.Create(vec.z);
         }
 
         #endregion
 
-
         #region Local Math
-
         public void Subtract(ref Vector2d other)
         {
-            this.x -= other.x;
-            this.y -= other.y;
+            x -= other.x;
+            y -= other.y;
         }
 
         public void Add(ref Vector2d other)
         {
-            this.x += other.x;
-            this.y += other.y;
+            x += other.x;
+            y += other.y;
         }
 
 
@@ -72,7 +77,7 @@ namespace RTSLockstep
         /// <returns>The magnitude.</returns>
         public long SqrMagnitude()
         {
-            return (this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT;
+            return (x * x + y * y) >> FixedMath.SHIFT_AMOUNT;
         }
 
         /// <summary>
@@ -80,7 +85,7 @@ namespace RTSLockstep
         /// </summary>
         public long Magnitude()
         {
-            temp1 = (this.x * this.x + this.y * this.y);
+            temp1 = (x * x + y * y);
             if (temp1 == 0)
             {
                 return 0;
@@ -96,7 +101,7 @@ namespace RTSLockstep
         /// <returns>The magnitude.</returns>
         public long FastMagnitude()
         {
-            return this.x * this.x + this.y * this.y;
+            return x * x + y * y;
         }
 
         /// <summary>
@@ -104,7 +109,7 @@ namespace RTSLockstep
         /// </summary>
         public void Normalize()
         {
-            tempMag = this.Magnitude();
+            tempMag = Magnitude();
             if (tempMag == 0)
             {
                 return;
@@ -113,13 +118,13 @@ namespace RTSLockstep
             {
                 return;
             }
-            this.x = (this.x << FixedMath.SHIFT_AMOUNT) / tempMag;
-            this.y = (this.y << FixedMath.SHIFT_AMOUNT) / tempMag;
+            x = (x << FixedMath.SHIFT_AMOUNT) / tempMag;
+            y = (y << FixedMath.SHIFT_AMOUNT) / tempMag;
         }
 
         public void Normalize(out long mag)
         {
-            mag = this.Magnitude();
+            mag = Magnitude();
             if (mag == 0)
             {
                 return;
@@ -128,8 +133,8 @@ namespace RTSLockstep
             {
                 return;
             }
-            this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
-            this.y = (this.y << FixedMath.SHIFT_AMOUNT) / mag;
+            x = (x << FixedMath.SHIFT_AMOUNT) / mag;
+            y = (y << FixedMath.SHIFT_AMOUNT) / mag;
         }
 
         public void FastNormalize()
@@ -138,8 +143,8 @@ namespace RTSLockstep
             tempMag = x > y ? x + y / 2 : x / 2 + y;
             const long errorFactor = 1000 * FixedMath.One / 1118;
 
-            this.x = ((this.x << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
-            this.y = ((this.y << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
+            x = ((x << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
+            y = ((y << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
         }
 
         public void Lerp(Vector2d target, long amount)
@@ -156,16 +161,16 @@ namespace RTSLockstep
         {
             if (amount >= FixedMath.One)
             {
-                this.x = targetx;
-                this.y = targety;
+                x = targetx;
+                y = targety;
                 return;
             }
             else if (amount <= 0)
             {
                 return;
             }
-            this.x = (targetx * amount + this.x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
-            this.y = (targety * amount + this.y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
+            x = (targetx * amount + x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
+            y = (targety * amount + y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
         }
 
         public Vector2d Lerped(Vector2d target, long amount)
@@ -177,9 +182,9 @@ namespace RTSLockstep
 
         public void Rotate(long cos, long sin)
         {
-            temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
-            this.y = (this.x * -sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
-            this.x = temp1;
+            temp1 = (x * cos + y * sin) >> FixedMath.SHIFT_AMOUNT;
+            y = (x * -sin + y * cos) >> FixedMath.SHIFT_AMOUNT;
+            x = temp1;
         }
 
         public Vector2d Rotated(long cos, long sin)
@@ -201,12 +206,10 @@ namespace RTSLockstep
 
         public void RotateRight()
         {
-            temp1 = this.x;
-            this.x = this.y;
-            this.y = -temp1;
+            temp1 = x;
+            x = y;
+            y = -temp1;
         }
-
-        static Vector2d retVec = Vector2d.zero;
 
         public Vector2d rotatedRight
         {
@@ -230,19 +233,19 @@ namespace RTSLockstep
 
         public void Reflect(long axisX, long axisY)
         {
-            temp3 = this.Dot(axisX, axisY);
+            temp3 = Dot(axisX, axisY);
             temp1 = (axisX * temp3) >> FixedMath.SHIFT_AMOUNT;
             temp2 = (axisY * temp3) >> FixedMath.SHIFT_AMOUNT;
-            this.x = temp1 + temp1 - this.x;
-            this.y = temp2 + temp2 - this.y;
+            x = temp1 + temp1 - x;
+            y = temp2 + temp2 - y;
         }
 
         public void Reflect(long axisX, long axisY, long projection)
         {
             temp1 = (axisX * projection) >> FixedMath.SHIFT_AMOUNT;
             temp2 = (axisY * projection) >> FixedMath.SHIFT_AMOUNT;
-            this.x = temp1 + temp1 - this.x;
-            this.y = temp2 + temp2 - this.y;
+            x = temp1 + temp1 - x;
+            y = temp2 + temp2 - y;
         }
 
         public Vector2d Reflected(long axisX, long axisY)
@@ -254,18 +257,18 @@ namespace RTSLockstep
 
         public long Dot(long otherX, long otherY)
         {
-            return (this.x * otherX + this.y * otherY) >> FixedMath.SHIFT_AMOUNT;
+            return (x * otherX + y * otherY) >> FixedMath.SHIFT_AMOUNT;
         }
 
         public long Dot(Vector2d other)
         {
-            return this.Dot(other.x, other.y);
+            return Dot(other.x, other.y);
         }
 
 
         public long Cross(long otherX, long otherY)
         {
-            return (this.x * otherY - this.y * otherX) >> FixedMath.SHIFT_AMOUNT;
+            return (x * otherY - y * otherX) >> FixedMath.SHIFT_AMOUNT;
         }
 
         public long Cross(Vector2d vec)
@@ -273,16 +276,11 @@ namespace RTSLockstep
             return Cross(vec.x, vec.y);
         }
 
-        static long temp1;
-        static long temp2;
-        static long temp3;
-        static long tempMag;
-
         public long Distance(long otherX, long otherY)
         {
-            temp1 = this.x - otherX;
+            temp1 = x - otherX;
             temp1 *= temp1;
-            temp2 = this.y - otherY;
+            temp2 = y - otherY;
             temp2 *= temp2;
             return (FixedMath.Sqrt((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT));
         }
@@ -295,9 +293,9 @@ namespace RTSLockstep
         public long SqrDistance(long otherX, long otherY)
         {
 
-            temp1 = this.x - otherX;
+            temp1 = x - otherX;
             temp1 *= temp1;
-            temp2 = this.y - otherY;
+            temp2 = y - otherY;
             temp2 *= temp2;
             return ((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT);
         }
@@ -308,17 +306,17 @@ namespace RTSLockstep
         /// <returns>The FastDistance.</returns>
         public long FastDistance(long otherX, long otherY)
         {
-            temp1 = this.x - otherX;
+            temp1 = x - otherX;
             temp1 *= temp1;
-            temp2 = this.y - otherY;
+            temp2 = y - otherY;
             temp2 *= temp2;
             return (temp1 + temp2);
         }
         public long FastDistance(Vector2d other)
         {
-            temp1 = this.x - other.x;
+            temp1 = x - other.x;
             temp1 *= temp1;
-            temp2 = this.y - other.y;
+            temp2 = y - other.y;
             temp2 *= temp2;
             return (temp1 + temp2);
         }
@@ -338,11 +336,9 @@ namespace RTSLockstep
         {
             return x.MoreThanEpsilon() || y.MoreThanEpsilon();
         }
-
         #endregion
 
         #region Static Math
-
         public static readonly Vector2d defaultRotation = new Vector2d(1, 0);
         public static readonly Vector2d up = new Vector2d(0, 1);
         public static readonly Vector2d right = new Vector2d(1, 0);
@@ -410,9 +406,9 @@ namespace RTSLockstep
         {
             return (
                     "(" +
-                    Math.Round(FixedMath.ToDouble(this.x), 2, MidpointRounding.AwayFromZero).ToString() +
+                    Math.Round(FixedMath.ToDouble(x), 2, MidpointRounding.AwayFromZero).ToString() +
                     ", " +
-                    Math.Round(FixedMath.ToDouble(this.y), 2, MidpointRounding.AwayFromZero) +
+                    Math.Round(FixedMath.ToDouble(y), 2, MidpointRounding.AwayFromZero) +
                     ")"
             );
         }
@@ -420,8 +416,8 @@ namespace RTSLockstep
         public Vector2 ToVector2()
         {
             return new Vector2(
-                (float)FixedMath.ToDouble(this.x),
-                (float)FixedMath.ToDouble(this.y)
+                (float)FixedMath.ToDouble(x),
+                (float)FixedMath.ToDouble(y)
             );
         }
 
@@ -432,7 +428,7 @@ namespace RTSLockstep
 
         public Vector3 ToVector3(float z = 0f)
         {
-            return new Vector3((float)FixedMath.ToDouble(this.x), z, (float)FixedMath.ToDouble(this.y));
+            return new Vector3((float)FixedMath.ToDouble(x), z, (float)FixedMath.ToDouble(y));
         }
 
 
@@ -453,6 +449,11 @@ namespace RTSLockstep
         public static Vector2d operator +(Vector2d v1, Vector2d v2)
         {
             return new Vector2d(v1.x + v2.x, v1.y + v2.y);
+        }
+
+        public static Vector2d operator +(Vector2d v1, long mag)
+        {
+            return new Vector2d(v1.x + mag, v1.y + mag);
         }
 
         public static Vector2d operator -(Vector2d v1, Vector2d v2)
@@ -514,19 +515,19 @@ namespace RTSLockstep
 
         public override int GetHashCode()
         {
-            return this.GetStateHash();
+            return GetStateHash();
         }
 
         public void Write(Writer writer)
         {
-            writer.Write(this.x);
-            writer.Write(this.y);
+            writer.Write(x);
+            writer.Write(y);
         }
 
         public void Read(Reader reader)
         {
-            this.x = reader.ReadLong();
-            this.y = reader.ReadLong();
+            x = reader.ReadLong();
+            y = reader.ReadLong();
         }
     }
 }
