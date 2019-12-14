@@ -1,35 +1,20 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using RTSLockstep.Data;
-using System.Collections.Generic;
 using FastCollections;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 namespace RTSLockstep
 {
     public sealed class LSProjectile : CerealBehaviour
     {
         public const int DefaultTickRate = LockstepManager.FrameRate / 4;
         private const long Gravity = FixedMath.One * 98 / 10;
-        //
-        // Static Fields
-        //
+
         private static Vector2d agentPos;
-
         private static Vector3 newPos;
-
         private static Vector2d tempDirection;
-
         private const int defaultMaxDuration = LockstepManager.FrameRate * 16;
-
-        //
-        // Fields
-        //
         private GameObject cachedGameObject;
-
         private Transform cachedTransform;
 
         public Vector3d Position;
@@ -42,7 +27,6 @@ namespace RTSLockstep
         public Vector3d Velocity { get; private set; }
 
         public Vector3d Direction { get; set; }
-
 
         private Vector2d lastDirection;
 
@@ -114,10 +98,6 @@ namespace RTSLockstep
         [SerializeField, FrameCount]
         private int _tickRate = DefaultTickRate;
 
-        //
-        // Properties
-        //
-
         public uint SpawnVersion { get; private set; }
         public bool TargetCurrent { get; private set; }
         //PAPPS ADDED THIS:	it detaches the children particle effects inside the projectile, and siwtches em off.. REALLY NECESSARY
@@ -147,7 +127,7 @@ namespace RTSLockstep
         {
             get
             {
-                return this.Target.CachedTransform.position;
+                return Target.CachedTransform.position;
             }
         }
 
@@ -163,10 +143,16 @@ namespace RTSLockstep
             set;
         }
 
-        private bool HeightReached
+        private bool heightReached;
+
+        private bool GetHeightReached()
         {
-            get;
-            set;
+            return heightReached;
+        }
+
+        private void SetHeightReached(bool value)
+        {
+            heightReached = value;
         }
 
         public int ID
@@ -185,7 +171,7 @@ namespace RTSLockstep
         {
             get
             {
-                int minTime = this.Delay + this.LastingDuration;
+                int minTime = Delay + LastingDuration;
                 return (LockstepManager.FrameRate * 16 <= minTime) ? minTime : LockstepManager.FrameRate * 16;
             }
         }
@@ -202,8 +188,7 @@ namespace RTSLockstep
             set { _radius = value; }
         }
 
-        public long Speed
-        { get; set; }
+        public long Speed { get; set; }
 
         public RTSAgent Target
         {
@@ -216,7 +201,6 @@ namespace RTSLockstep
             get;
             set;
         }
-
 
         public Vector2d TargetPosition
         {
@@ -234,6 +218,34 @@ namespace RTSLockstep
 
         private Action<RTSAgent> HitEffect { get; set; }
 
+        static FastList<RTSAgent> ScanOutput = new FastList<RTSAgent>();
+
+        public Func<byte, bool> BucketConditional { get; private set; }
+
+        public Func<RTSAgent, bool> AgentConditional { get; private set; }
+
+        public bool Deterministic { get; private set; }
+
+        Func<LSBody, bool> BodyConditional;
+
+        private bool IsLasting;
+        private int tickTimer;
+
+        public IProjectileData MyData { get; private set; }
+
+        private FastList<LSBody> HitBodies = new FastList<LSBody>();
+
+
+        public event Action OnDeactivate;
+
+        public event Action OnHit;
+        public event Action<RTSAgent> OnHitAgent;
+
+        public event Action OnInitialize;
+
+        public event Action OnSetup;
+        public event Action OnVisualize;
+
         public int GetStateHash()
         {
             int hash = 13;
@@ -241,9 +253,6 @@ namespace RTSLockstep
             return hash;
         }
 
-        //
-        // Static Methods
-        //
         private void ApplyArea(Vector2d center, long radius)
         {
             long num = radius * radius;
@@ -260,19 +269,16 @@ namespace RTSLockstep
 
         void HitAgent(RTSAgent agent)
         {
-            if (this.UseEffects && this.AttachEndEffectToTarget)
+            if (UseEffects && AttachEndEffectToTarget)
             {
-                LSEffect lSEffect = EffectManager.CreateEffect(this.HitFX);
+                LSEffect lSEffect = EffectManager.CreateEffect(HitFX);
                 lSEffect.CachedTransform.parent = agent.VisualCenter;
                 lSEffect.CachedTransform.localPosition = Vector3.up;
-                lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
+                lSEffect.CachedTransform.rotation = cachedTransform.rotation;
                 lSEffect.Initialize();
             }
-            this.HitEffect(agent);
-            if (onHitAgent != null)
-            {
-                onHitAgent(agent);
-            }
+            HitEffect(agent);
+            OnHitAgent?.Invoke(agent);
         }
 
         private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle)
@@ -290,6 +296,7 @@ namespace RTSLockstep
                 {
                     continue;
                 }
+
                 if (forward.Dot(difference) < 0)
                 {
                     continue;
@@ -303,10 +310,8 @@ namespace RTSLockstep
                     continue;
                 }
                 HitAgent(agent);
-
             }
         }
-
 
         private bool CheckCollision()
         {
@@ -318,132 +323,118 @@ namespace RTSLockstep
             return target._position.FastDistance(Position.x, Position.y) <= target.FastRadius;
         }
 
-
-        static FastList<RTSAgent> ScanOutput = new FastList<RTSAgent>();
-
         private void Scan(Vector2d center, long radius)
         {
             InfluenceManager.ScanAll(
                 center,
                 radius,
-                this.AgentConditional,
-                this.BucketConditional,
+                AgentConditional,
+                BucketConditional,
                 ScanOutput
             );
 
         }
 
-        private void SetupCachedActions()
-        {
-        }
-
         internal void Deactivate()
         {
             SpawnVersion = 0;
-            this.TargetVersion = 0;
-            this.IsActive = false;
+            TargetVersion = 0;
+            IsActive = false;
             if (cachedGameObject.IsNotNull())
-                this.cachedGameObject.SetActive(false);
-            if (this.cachedTransform.IsNotNull())
+                cachedGameObject.SetActive(false);
+            if (cachedTransform.IsNotNull())
             {
-                this.cachedTransform.parent = null;
+                cachedTransform.parent = null;
             }
-            if (this.OnDeactivate.IsNotNull())
-            {
-                this.OnDeactivate.Invoke();
-            }
+
+            OnDeactivate?.Invoke();
         }
 
         public bool IsExclusiveTarget(AgentTag AgentTag)
         {
-            return this.ExclusiveTargetType != AgentTag.None && AgentTag == this.ExclusiveTargetType;
+            return ExclusiveTargetType != AgentTag.None && AgentTag == ExclusiveTargetType;
         }
 
         public long CheckExclusiveDamage(AgentTag AgentTag)
         {
-            return IsExclusiveTarget(AgentTag) ? Damage.Mul(this.ExclusiveDamageModifier) : Damage;
+            return IsExclusiveTarget(AgentTag) ? Damage.Mul(ExclusiveDamageModifier) : Damage;
         }
 
         private void Hit(bool destroy = true)
         {
 
-            this.OnHit();
-            if (this.onHit.IsNotNull())
+            OnProjectileHit();
+            if (OnHit.IsNotNull())
             {
-                this.onHit();
+                OnHit();
             }
-            if (this.TargetCurrent)
+
+            if (TargetCurrent)
             {
-                if (this.UseEffects)
+                if (UseEffects)
                 {
-                    if (this.AttachEndEffectToTarget)
+                    if (AttachEndEffectToTarget)
                     {
-                        LSEffect lSEffect = EffectManager.CreateEffect(this.HitFX);
-                        lSEffect.CachedTransform.parent = this.Target.VisualCenter;
+                        LSEffect lSEffect = EffectManager.CreateEffect(HitFX);
+                        lSEffect.CachedTransform.parent = Target.VisualCenter;
                         lSEffect.CachedTransform.localPosition = Vector3.up;
-                        lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
+                        lSEffect.CachedTransform.rotation = cachedTransform.rotation;
                         lSEffect.Initialize();
                     }
                     else
                     {
                         //Certain targeting types collide with a target
-                        if (this.TargetingBehavior == TargetingType.Homing)
+                        if (TargetingBehavior == TargetingType.Homing)
                         {
-                            EffectManager.CreateCollisionEffect(this.HitFX, this, Target.Body);
+                            EffectManager.CreateCollisionEffect(HitFX, this, Target.Body);
                         }
                         else
                         {
-                            EffectManager.CreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
-
+                            EffectManager.CreateEffect(HitFX, cachedTransform.position, cachedTransform.rotation);
                         }
                     }
                 }
             }
+
             if (destroy)
+            {
                 ProjectileManager.EndProjectile(this);
+            }
         }
-
-        public Func<byte, bool> BucketConditional { get; private set; }
-
-        public Func<RTSAgent, bool> AgentConditional { get; private set; }
-
-        public bool Deterministic { get; private set; }
 
         internal void Prepare(int id, Vector3d projectilePosition, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<RTSAgent> onHit, bool deterministic)
         {
-            this.Deterministic = deterministic;
+            Deterministic = deterministic;
 
-            this.IsActive = true;
-            this.cachedGameObject.SetActive(true);
+            IsActive = true;
+            cachedGameObject.SetActive(true);
 
-            this.ResetVariables();
+            ResetVariables();
 
-            this.Position = projectilePosition;
-            this.HitEffect = onHit;
-            this.ID = id;
+            Position = projectilePosition;
+            HitEffect = onHit;
+            ID = id;
 
-            this.AliveTime = 0;
-            this.IsLasting = false;
+            AliveTime = 0;
+            IsLasting = false;
 
+            BucketConditional = bucketConditional;
 
-            this.BucketConditional = bucketConditional;
-
-            this.AgentConditional = agentConditional;
+            AgentConditional = agentConditional;
 
             Forward = Vector2d.up;
         }
 
         public void InitializeHoming(RTSAgent target)
         {
-            this.HeightReached = false;
-            this.Target = target;
-            this.TargetVersion = this.Target.SpawnVersion;
+            SetHeightReached(false);
+            Target = target;
+            TargetVersion = Target.SpawnVersion;
 
-            this.TargetPosition = this.Target.Body.Position;
-            this.TargetHeight = this.Target.Body.HeightPos + this.Target.Body.Height / 2;
+            TargetPosition = Target.Body.Position;
+            TargetHeight = Target.Body.HeightPos + Target.Body.Height / 2;
 
-            this.cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - this.Position.ToVector3());
-
+            cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - Position.ToVector3());
         }
 
         public void InitializeTimed(Vector2d forward)
@@ -452,96 +443,92 @@ namespace RTSLockstep
             Direction = forward.ToVector3d();
         }
 
-        Func<LSBody, bool> BodyConditional;
-
         public void InitializeFree(Vector3d direction, Func<LSBody, bool> bodyConditional, bool useGravity = false)
         {
 
-            this.BodyConditional = bodyConditional;
-            this.Direction = direction;
-            this.Forward = Direction.ToVector2d();
+            BodyConditional = bodyConditional;
+            Direction = direction;
+            Forward = Direction.ToVector2d();
 
-            this.cachedTransform.rotation = Quaternion.LookRotation(direction.ToVector3());
+            cachedTransform.rotation = Quaternion.LookRotation(direction.ToVector3());
         }
 
         public void InitializePositional(Vector3d position)
         {
-            this.TargetPosition = position.ToVector2d();
-            this.TargetHeight = position.z;
+            TargetPosition = position.ToVector2d();
+            TargetHeight = position.z;
 
         }
 
         public void UpdateVisuals()
         {
             if (!Forward.EqualsZero())
+            {
                 cachedTransform.rotation = Quaternion.LookRotation(Forward.ToVector3());
-            cachedTransform.position = this.Position.ToVector3();
-        }
+            }
 
-        private bool IsLasting;
-        private int tickTimer;
+            cachedTransform.position = Position.ToVector3();
+        }
 
         public void LateInit()
         {
 
-            if (this.TargetingBehavior != TargetingType.Timed)
+            if (TargetingBehavior != TargetingType.Timed)
             {
-                this.cachedTransform.position = this.Position.ToVector3();
-                this.speedPerFrame = this.Speed / 32L;
+                cachedTransform.position = Position.ToVector3();
+                speedPerFrame = Speed / 32L;
             }
 
-            switch (this.TargetingBehavior)
+            switch (TargetingBehavior)
             {
                 case TargetingType.Timed:
-                    this.CountDown = this.Delay;
+                    CountDown = Delay;
                     break;
                 case TargetingType.Positional:
                 case TargetingType.Homing:
-                    long f = this.Position.ToVector2d().Distance(this.TargetPosition);
-                    long timeToHit = f.Div(this.Speed);
-                    if (this._visualArc)
+                    long f = Position.ToVector2d().Distance(TargetPosition);
+                    long timeToHit = f.Div(Speed);
+                    if (_visualArc)
                     {
-                        this.arcStartHeight = this.Position.z;
+                        arcStartHeight = Position.z;
                         if (timeToHit > 0)
                         {
-                            this.arcStartVerticalSpeed = (this.TargetHeight - this.Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
+                            arcStartVerticalSpeed = (TargetHeight - Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
                         }
                     }
                     else
                     {
                         if (timeToHit > 0)
                         {
-                            this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs() / LockstepManager.FrameRate;
+                            linearHeightSpeed = (TargetHeight - Position.z).Div(timeToHit).Abs() / LockstepManager.FrameRate;
                         }
                     }
-                    Forward = TargetPosition - this.Position.ToVector2d();
+                    Forward = TargetPosition - Position.ToVector2d();
                     Forward.Normalize();
                     break;
                 case TargetingType.Directional:
-                    Vector3d vel = this.Direction;
+                    Vector3d vel = Direction;
                     vel.Mul(speedPerFrame);
-                    this.Velocity = vel;
+                    Velocity = vel;
                     break;
             }
-            if (this.CanRotate)
-            {
-                this.cachedTransform.LookAt(this.Direction.ToVector3());
-            }
-            this.UpdateVisuals();
 
-            if (this.onInitialize.IsNotNull())
+            if (CanRotate)
             {
-                this.onInitialize.Invoke();
+                cachedTransform.LookAt(Direction.ToVector3());
             }
+            UpdateVisuals();
+
+            OnInitialize?.Invoke();
 
             if (UseEffects)
             {
-                LSEffect effect = EffectManager.CreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
-                if (effect != null)
+                LSEffect effect = EffectManager.CreateEffect(StartFX, Position.ToVector3(), cachedTransform.rotation);
+                if (effect.IsNotNull())
                 {
-                    effect.StartPos = this.Position.ToVector3();
-                    effect.EndPos = this.TargetPosition.ToVector3(this.TargetHeight.ToFloat());
-                    if (this.Target != null)
+                    effect.StartPos = Position.ToVector3();
+                    effect.EndPos = TargetPosition.ToVector3(TargetHeight.ToFloat());
+                    if (Target.IsNotNull())
                     {
                         effect.Target = Target.transform;
                     }
@@ -549,11 +536,11 @@ namespace RTSLockstep
             }
         }
 
-        private void OnHit()
+        private void OnProjectileHit()
         {
-            if (this.TargetingBehavior == TargetingType.Directional)
+            if (TargetingBehavior == TargetingType.Directional)
             {
-                switch (this.HitBehavior)
+                switch (HitBehavior)
                 {
                     case HitType.Single:
                         //todo: Implement
@@ -562,23 +549,23 @@ namespace RTSLockstep
             }
             else
             {
-                switch (this.HitBehavior)
+                switch (HitBehavior)
                 {
                     case HitType.None:
                         break;
                     case HitType.Single:
-                        if (Target == null)
+                        if (Target.IsNull())
                         {
                             break;
                         }
-                        this.HitAgent(Target);
+                        HitAgent(Target);
                         break;
                     case HitType.Area:
-                        ApplyArea(this.Position.ToVector2d(), this.Radius);
+                        ApplyArea(Position.ToVector2d(), Radius);
                         break;
                     case HitType.Cone:
-                        Debug.Log(this.Forward);
-                        ApplyCone(this.Position, this.Forward, this.Radius, this.Angle);
+                        Debug.Log(Forward);
+                        ApplyCone(Position, Forward, Radius, Angle);
                         break;
                 }
             }
@@ -586,19 +573,20 @@ namespace RTSLockstep
 
         private void ResetVariables()
         {
-            this.ResetEffects();
-            this.ResetTrajectory();
-            this.ResetHit();
-            this.ResetTargeting();
-            this.ResetHelpers();
+            ResetEffects();
+            ResetTrajectory();
+            ResetHit();
+            ResetTargeting();
+            ResetHelpers();
         }
+
         private void ResetHit()
         {
-            this.ExclusiveTargetType = this._exclusiveTargetType;
-            this.onHit = null;
-            this.onHitAgent = null;
-            this.Target = null;
-            this.HitBehavior = _hitBehavior;
+            ExclusiveTargetType = _exclusiveTargetType;
+            OnHit = null;
+            OnHitAgent = null;
+            Target = null;
+            HitBehavior = _hitBehavior;
             TargetCurrent = true;
         }
 
@@ -608,60 +596,53 @@ namespace RTSLockstep
 
         private void ResetHelpers()
         {
-            this.lastDirection = Vector2d.zero;
-            this.Velocity = default(Vector3d);
-            this.Direction = Vector2d.up.ToVector3d();
+            lastDirection = Vector2d.zero;
+            Velocity = default;
+            Direction = Vector2d.up.ToVector3d();
         }
 
         private void ResetTargeting()
         {
-            this.Delay = this._delay;
-            this.Speed = this._speed;
-            this.LastingDuration = this._lastingDuration;
-            this.TickRate = this._tickRate;
-            this.TargetingBehavior = _targetingBehavior;
+            Delay = _delay;
+            Speed = _speed;
+            LastingDuration = _lastingDuration;
+            TickRate = _tickRate;
+            TargetingBehavior = _targetingBehavior;
         }
 
         private void ResetTrajectory()
         {
         }
 
-
-        public IProjectileData MyData { get; private set; }
-
         public void Setup(IProjectileData dataItem)
         {
-            this.SpawnVersion = 1u;
-            this.MyData = dataItem;
-            this.MyProjCode = dataItem.Name;
-            this.cachedGameObject = base.gameObject;
-            this.cachedTransform = base.transform;
-            GameObject.DontDestroyOnLoad(this.cachedGameObject);
-            if (this.onSetup.IsNotNull())
-            {
-                this.onSetup.Invoke();
-            }
-        }
+            SpawnVersion = 1u;
+            MyData = dataItem;
+            MyProjCode = dataItem.Name;
+            cachedGameObject = gameObject;
+            cachedTransform = transform;
+            DontDestroyOnLoad(cachedGameObject);
 
-        private FastList<LSBody> HitBodies = new FastList<LSBody>();
+            OnSetup?.Invoke();
+        }
 
         public void Simulate()
         {
-            this.AliveTime++;
+            AliveTime++;
 
-            if (this.AliveTime > this.MaxDuration)
+            if (AliveTime > MaxDuration)
             {
                 ProjectileManager.EndProjectile(this);
                 return;
             }
-            switch (this.TargetingBehavior)
+            switch (TargetingBehavior)
             {
                 case TargetingType.Timed:
-                    this.CountDown--;
+                    CountDown--;
 
                     if (!IsLasting)
                     {
-                        if (this.CountDown <= 0)
+                        if (CountDown <= 0)
                         {
                             IsLasting = true;
                             tickTimer = 0;
@@ -673,34 +654,34 @@ namespace RTSLockstep
                         if (tickTimer <= 0)
                         {
                             tickTimer = TickRate;
-                            this.Hit((this.AliveTime + TickRate - this.Delay) >= this.LastingDuration);
+                            Hit((AliveTime + TickRate - Delay) >= LastingDuration);
                         }
                     }
                     break;
                 case TargetingType.Homing:
-                    if (this.TargetingBehavior == TargetingType.Homing && this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
+                    if (TargetingBehavior == TargetingType.Homing && HitBehavior == HitType.Single && Target.SpawnVersion != TargetVersion)
                     {
                         //Switch to positional to move to target's last position and not seek deceased target
-                        this.TargetingBehavior = TargetingType.Positional;
+                        TargetingBehavior = TargetingType.Positional;
                         Target = null;
                         TargetCurrent = false;
                         goto case TargetingType.Positional;
                     }
-                    if (this.CheckCollision())
+                    if (CheckCollision())
                     {
-                        this.TargetPosition = this.Target.Body.Position;
-                        this.Hit();
+                        TargetPosition = Target.Body.Position;
+                        Hit();
                     }
                     else
                     {
                         TargetPosition = Target.Body.Position;
-                        this.TargetHeight = this.Target.Body.HeightPos + Target.Body.Height / 2;
+                        TargetHeight = Target.Body.HeightPos + Target.Body.Height / 2;
 
                         MoveToTargetPosition();
                     }
                     break;
                 case TargetingType.Directional:
-                    RaycastMove(this.Velocity);
+                    RaycastMove(Velocity);
                     break;
                 case TargetingType.Positional:
                     MoveToTargetPosition();
@@ -711,89 +692,76 @@ namespace RTSLockstep
 
         void MoveToTargetPosition()
         {
-            if (this._visualArc)
+            if (_visualArc)
             {
-                long progress = FixedMath.Create(this.AliveTime) / 32;
-                long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
-                this.Position.z = height;
+                long progress = FixedMath.Create(AliveTime) / 32;
+                long height = arcStartHeight + arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
+                Position.z = height;
             }
             else
             {
-                this.Position.z = FixedMath.MoveTowards(this.Position.z, TargetHeight, this.linearHeightSpeed);
+                Position.z = FixedMath.MoveTowards(Position.z, TargetHeight, linearHeightSpeed);
             }
 
-            LSProjectile.tempDirection = TargetPosition - this.Position.ToVector2d();
-            if (LSProjectile.tempDirection.Dot(this.lastDirection.x, this.lastDirection.y) < 0L || tempDirection == Vector2d.zero)
+            tempDirection = TargetPosition - Position.ToVector2d();
+            if (tempDirection.Dot(lastDirection.x, lastDirection.y) < 0L || tempDirection == Vector2d.zero)
             {
-                this.Hit();
+                Hit();
             }
             else
             {
-                LSProjectile.tempDirection.Normalize();
+                tempDirection.Normalize();
                 Forward = tempDirection;
-                this.lastDirection = LSProjectile.tempDirection;
-                LSProjectile.tempDirection *= this.speedPerFrame;
-                this.Position.Add(LSProjectile.tempDirection.ToVector3d());
+                lastDirection = tempDirection;
+                tempDirection *= speedPerFrame;
+                Position.Add(tempDirection.ToVector3d());
             }
         }
 
         public void RaycastMove(Vector3d delta)
         {
 #if true
-            Vector3d nextPosition = this.Position;
+            Vector3d nextPosition = Position;
             nextPosition.Add(ref delta);
             HitBodies.FastClear();
-            foreach (LSBody body in Raycaster.RaycastAll(this.Position, nextPosition))
+            foreach (LSBody body in Raycaster.RaycastAll(Position, nextPosition))
             {
-                if (this.BodyConditional(body))
+                if (BodyConditional(body))
                 {
                     HitBodies.Add(body);
                 }
             }
+
             if (HitBodies.Count > 0)
+            {
                 Hit();
-            this.Position = nextPosition;
+            }
+
+            Position = nextPosition;
 #endif
         }
 
         public void Visualize()
         {
-            if (this.IsActive)
+            if (IsActive)
             {
-                if (this.CanVisualize)
+                if (CanVisualize)
                 {
-
-                    LSProjectile.newPos = this.Position.ToVector3();
-                    Vector3 shiftVelocity = LSProjectile.newPos - this.cachedTransform.position;
-                    this.cachedTransform.position = LSProjectile.newPos;
+                    newPos = Position.ToVector3();
+                    Vector3 shiftVelocity = LSProjectile.newPos - cachedTransform.position;
+                    cachedTransform.position = LSProjectile.newPos;
                     if (shiftVelocity.sqrMagnitude > 0)
                     {
-                        this.cachedTransform.rotation = Quaternion.LookRotation(shiftVelocity);
+                        cachedTransform.rotation = Quaternion.LookRotation(shiftVelocity);
                     }
                 }
-                if (this.onVisualize.IsNotNull())
-                {
-                    this.onVisualize.Invoke();
-                }
+
+                OnVisualize?.Invoke();
             }
             else
             {
-                this.cachedGameObject.SetActive(false);
+                cachedGameObject.SetActive(false);
             }
         }
-
-        //
-        // Events
-        //
-        public event Action OnDeactivate;
-
-        public event Action onHit;
-        public event Action<RTSAgent> onHitAgent;
-
-        public event Action onInitialize;
-
-        public event Action onSetup;
-        public event Action onVisualize;
-
     }
 }

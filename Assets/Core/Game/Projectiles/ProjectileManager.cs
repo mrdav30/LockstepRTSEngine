@@ -19,7 +19,7 @@ namespace RTSLockstep
 
         public static void Setup()
         {
-            if (LSDatabaseManager.TryGetDatabase<IProjectileDataProvider>(out IProjectileDataProvider prov))
+            if (LSDatabaseManager.TryGetDatabase(out IProjectileDataProvider prov))
             {
                 IProjectileData[] projectileData = prov.ProjectileData;
                 for (int i = 0; i < projectileData.Length; i++)
