@@ -29,7 +29,7 @@ namespace RTSLockstep
                     }
                 }
 
-                if (cachedAgent.MyStats.CachedAttack.IsFocused || cachedAgent.MyStats.CachedAttack.IsAttackMoving || cachedAgent.MyStats.CachedHealth.CurrentHealth == 0)
+                if (cachedAgent.MyStats.CachedAttack.IsFocused || cachedAgent.MyStats.CachedAttack.IsAttackMoving || cachedAgent.MyStats.CachedHealth.CurrentHealth <= 0)
                 {
                     // busy attacking or being dead
                     searchCount -= 1;
