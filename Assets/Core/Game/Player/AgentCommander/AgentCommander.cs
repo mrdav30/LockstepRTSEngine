@@ -58,9 +58,9 @@ public class AgentCommander : BehaviourHelper
         }
     }
 
-    protected override void doGUI()
+    protected override void DoGUI()
     {
-        CachedHud.doGUI();
+        CachedHud.DoGUI();
     }
     #endregion
 

@@ -7,8 +7,8 @@ namespace RTSLockstep
         public string IP = "127.0.0.1";
         public int RoomSize = 1;
 
-
-        void OnGUI () {
+        protected override void DoGUI()
+        {
 			GUILayout.Label("State Hash: " + AgentController.GetStateHash());
 
 			if (LockstepManager.MainNetworkHelper != null && LockstepManager.MainNetworkHelper.IsConnected)

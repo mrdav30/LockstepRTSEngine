@@ -148,7 +148,7 @@ public class HUD : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void doGUI()
+    public void DoGUI()
     {
         if (cachedCommander
             && cachedCommander.human

@@ -84,10 +84,10 @@ namespace RTSLockstep
 
         public void OnGUI()
         {
-            doGUI();
+            DoGUI();
         }
 
-        protected virtual void doGUI()
+        protected virtual void DoGUI()
         {
         }
 

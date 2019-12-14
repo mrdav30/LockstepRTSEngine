@@ -250,7 +250,7 @@ public class UserInputHelper : BehaviourHelper
         }
     }
 
-    protected override void doGUI()
+    protected override void DoGUI()
     {
         if (_boxStyle == null)
         {
