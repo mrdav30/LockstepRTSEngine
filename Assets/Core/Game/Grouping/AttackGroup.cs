@@ -5,8 +5,8 @@ namespace RTSLockstep
 {
     public class AttackGroup
     {
-        public MovementGroup AttackMoveGroup;
-        public RTSAgent CurrentGroupTarget;
+        private MovementGroup attackMoveGroup;
+        private RTSAgent currentGroupTarget;
 
         public int IndexID { get; set; }
 
@@ -23,15 +23,15 @@ namespace RTSLockstep
             Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
             attackers = new FastList<Attack>(selection.selectedAgentLocalIDs.Count);
 
-           if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
+            if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
             {
                 if (AgentController.TryGetAgentInstance((ushort)target.Value, out RTSAgent tempTarget))
                 {
-                    CurrentGroupTarget = tempTarget;
+                    currentGroupTarget = tempTarget;
                 }
             }
 
-            if (CurrentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for attackers based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -39,9 +39,9 @@ namespace RTSLockstep
                     ControllerID = controllerID
                 };
 
-                moveCommand.Add(CurrentGroupTarget.Body.Position);
+                moveCommand.Add(currentGroupTarget.Body.Position);
 
-                AttackMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                attackMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
         }
 
@@ -75,13 +75,20 @@ namespace RTSLockstep
             {
                 attacker.MyAttackGroup.attackers.Remove(attacker);
             }
-            attacker.MyAttackGroup = this;
-            attacker.MyAttackGroupID = IndexID;
 
-            attackers.Add(attacker);
+            if (currentGroupTarget.IsNotNull())
+            {
+                attacker.MyAttackGroup = this;
+                attacker.MyAttackGroupID = IndexID;
 
-            // add the attacker to our attacker move group too!
-            AttackMoveGroup.Add(attacker.Agent.MyStats.CachedMove);
+                attackers.Add(attacker);
+
+                if (attackMoveGroup.IsNotNull())
+                {
+                    // add the attacker to our attacker move group too!
+                    attackMoveGroup.Add(attacker.Agent.MyStats.CachedMove);
+                }
+            }
         }
 
         public void Remove(Attack attacker)
@@ -92,18 +99,17 @@ namespace RTSLockstep
                 attacker.MyAttackGroup = null;
                 attacker.MyAttackGroupID = -1;
 
-                // Remove the attacker from our attacker move group too!
-                AttackMoveGroup.Remove(attacker.Agent.MyStats.CachedMove);
+                if (attackMoveGroup.IsNotNull())
+                {
+                    // Remove the attacker from our attacker move group too!
+                    attackMoveGroup.Remove(attacker.Agent.MyStats.CachedMove);
+                }
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (CurrentGroupTarget.IsNotNull())
-            {
-                ExecuteAttack();
-            }
-
+            ExecuteAttack();
             return true;
         }
 
@@ -117,8 +123,8 @@ namespace RTSLockstep
                 attacker.MyAttackGroupID = -1;
             }
             attackers.FastClear();
-            CurrentGroupTarget = null;
-            AttackMoveGroup = null;
+            currentGroupTarget = null;
+            attackMoveGroup = null;
             AttackGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;
@@ -129,7 +135,7 @@ namespace RTSLockstep
             for (int i = 0; i < attackers.Count; i++)
             {
                 Attack attacker = attackers[i];
-                attacker.OnAttackGroupProcessed(CurrentGroupTarget);
+                attacker.OnAttackGroupProcessed(currentGroupTarget);
             }
         }
     }

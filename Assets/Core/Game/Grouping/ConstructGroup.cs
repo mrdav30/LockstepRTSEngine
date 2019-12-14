@@ -8,10 +8,10 @@ namespace RTSLockstep
 {
     public class ConstructGroup
     {
-        public MovementGroup ConstructMoveGroup;
-        public Queue<RTSAgent> ConstructionQueue = new Queue<RTSAgent>();
+        private MovementGroup constructMoveGroup;
+        public Queue<RTSAgent> GroupConstructionQueue = new Queue<RTSAgent>();
 
-        public RTSAgent CurrentGroupProject;
+        private RTSAgent currentGroupTarget;
 
         public int indexID { get; set; }
 
@@ -42,12 +42,12 @@ namespace RTSLockstep
                 {
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
-                        CurrentGroupProject = tempTarget;
+                        currentGroupTarget = tempTarget;
                     }
                 }
             }
 
-            if (CurrentGroupProject.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for constructors based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -55,9 +55,9 @@ namespace RTSLockstep
                     ControllerID = controllerID
                 };
 
-                moveCommand.Add(CurrentGroupProject.Body.Position);
+                moveCommand.Add(currentGroupTarget.Body.Position);
 
-                ConstructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                constructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
         }
 
@@ -76,9 +76,10 @@ namespace RTSLockstep
                     {
                         _calculatedBehaviors = CalculateAndExecuteBehaviors();
                     }
-                    else if (!CurrentGroupProject.GetAbility<Structure>().NeedsConstruction && ConstructionQueue.Count > 0)
+                    else if ((currentGroupTarget.IsNull() || !currentGroupTarget.GetAbility<Structure>().NeedsConstruction) && GroupConstructionQueue.Count > 0)
                     {
-                        CurrentGroupProject = ConstructionQueue.Dequeue();
+                        currentGroupTarget = GroupConstructionQueue.Dequeue();
+                        _calculatedBehaviors = false;
                     }
                 }
 
@@ -95,13 +96,20 @@ namespace RTSLockstep
             {
                 constructor.MyConstructGroup.constructors.Remove(constructor);
             }
-            constructor.MyConstructGroup = this;
-            constructor.MyConstructGroupID = indexID;
 
-            constructors.Add(constructor);
+            if (currentGroupTarget.IsNotNull())
+            {
+                constructor.MyConstructGroup = this;
+                constructor.MyConstructGroupID = indexID;
 
-            // add the constructor to our contructor move group too!
-            ConstructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
+                constructors.Add(constructor);
+
+                if (constructMoveGroup.IsNotNull())
+                {
+                    // add the constructor to our contructor move group too!
+                    constructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
+                }
+            }
         }
 
         public void Remove(Construct constructor)
@@ -110,18 +118,18 @@ namespace RTSLockstep
             {
                 constructors.Remove(constructor);
 
-                // Remove the constructor from our contructor move group too!
-                ConstructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
+                if (constructMoveGroup.IsNotNull())
+                {
+                    // Remove the constructor from our contructor move group too!
+                    constructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
+                }
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (CurrentGroupProject.IsNotNull())
-            {
-                ExecuteConstruction();
-            }
 
+            ExecuteConstruction();
             return true;
         }
 
@@ -167,14 +175,14 @@ namespace RTSLockstep
                         // Set to transparent material until constructor is in range to start
                         ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
 
-                        if (CurrentGroupProject.IsNull())
+                        if (currentGroupTarget.IsNull())
                         {
                             //Set the current project if we don't have one
-                            CurrentGroupProject = newRTSAgent;
+                            currentGroupTarget = newRTSAgent;
                         }
                         else
                         {
-                            ConstructionQueue.Enqueue(newRTSAgent);
+                            GroupConstructionQueue.Enqueue(newRTSAgent);
                         }
                     }
                     else
@@ -196,9 +204,9 @@ namespace RTSLockstep
                 constructor.MyConstructGroupID = -1;
             }
             constructors.FastClear();
-            ConstructionQueue.Clear();
-            CurrentGroupProject = null;
-            ConstructMoveGroup = null;
+            GroupConstructionQueue.Clear();
+            currentGroupTarget = null;
+            constructMoveGroup = null;
             ConstructionGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             indexID = -1;
@@ -209,7 +217,7 @@ namespace RTSLockstep
             for (int i = 0; i < constructors.Count; i++)
             {
                 Construct constructor = constructors[i];
-                constructor.OnConstructGroupProcessed(CurrentGroupProject);
+                constructor.OnConstructGroupProcessed(currentGroupTarget);
             }
         }
     }

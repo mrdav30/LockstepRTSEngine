@@ -32,11 +32,7 @@ namespace RTSLockstep
 
         public void Initialize(Command com)
         {
-            // we might have to create a movement group without an initial destination, i.e. construction
-            if (com.ContainsData<Vector2d>())
-            {
-                Destination = com.GetData<Vector2d>();
-            }
+            Destination = com.GetData<Vector2d>();
             _calculatedBehaviors = false;
             Selection selection = AgentController.InstanceManagers[com.ControllerID].GetSelection(com);
             Movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
@@ -69,7 +65,6 @@ namespace RTSLockstep
                         mover = Movers[i];
                         mover.IsAvoidingLeft = false;
                     }
-
                 }
             }
         }

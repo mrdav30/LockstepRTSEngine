@@ -178,18 +178,18 @@ namespace RTSLockstep
             else
             {
                 // what are we building for then?
-                StopConstruction();
+                StopConstruct();
             }
         }
 
         protected override void OnDeactivate()
         {
-            StopConstruction(true);
+            StopConstruct(true);
         }
 
         protected sealed override void OnStopCast()
         {
-            StopConstruction(true);
+            StopConstruct(true);
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
@@ -234,19 +234,26 @@ namespace RTSLockstep
             }
         }
 
-        public void OnConstructGroupProcessed(RTSAgent currentProject)
+        public void OnConstructGroupProcessed(RTSAgent currentTarget)
         {
             Agent.Tag = AgentTag.Builder;
 
-            CurrentProject = currentProject;
+            if (currentTarget.IsNotNull())
+            {
+                CurrentProject = currentTarget;
 
-            IsFocused = true;
-            IsBuildMoving = false;
+                IsFocused = true;
+                IsBuildMoving = false;
 
-            targetVersion = CurrentProject.SpawnVersion;
+                targetVersion = CurrentProject.SpawnVersion;
 
-            fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
-            fastRangeToTarget *= fastRangeToTarget;
+                fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
+                fastRangeToTarget *= fastRangeToTarget;
+            }
+            else
+            {
+                StopConstruct();
+            }
         }
 
         private void RegisterConstructGroup()
@@ -271,10 +278,10 @@ namespace RTSLockstep
             // only stop construct when groups queue is empty
             if (!CurrentProject.IsActive
                 || CurrentProject.SpawnVersion != targetVersion
-                || !ProjectStructure.NeedsConstruction && MyConstructGroup.ConstructionQueue.Count == 0)
+                || !ProjectStructure.NeedsConstruction)
             {
                 // Target's lifecycle has ended
-                StopConstruction();
+                StopConstruct();
             }
             else
             {
@@ -432,15 +439,16 @@ namespace RTSLockstep
             OnConstruct(ProjectStructure);
         }
 
-        private void StopConstruction(bool complete = false)
+        private void StopConstruct(bool complete = false)
         {
             inRange = false;
             IsWindingUp = false;
             IsFocused = false;
 
             if (MyConstructGroup.IsNotNull()
-                && MyConstructGroup.ConstructionQueue.Count == 0)
+                && MyConstructGroup.GroupConstructionQueue.Count == 0)
             {
+                // Only remove from construction group if their queue is empty
                 MyConstructGroup.Remove(this);
             }
 

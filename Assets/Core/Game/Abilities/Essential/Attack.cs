@@ -335,15 +335,22 @@ namespace RTSLockstep
         {
             Agent.Tag = AgentTag.Offensive;
 
-            CurrentTarget = currentTarget;
+            if (currentTarget.IsNotNull())
+            {
+                CurrentTarget = currentTarget;
 
-            IsFocused = true;
-            IsAttackMoving = false;
+                IsFocused = true;
+                IsAttackMoving = false;
 
-            targetVersion = CurrentTarget.SpawnVersion;
+                targetVersion = CurrentTarget.SpawnVersion;
 
-            fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
-            fastRangeToTarget *= fastRangeToTarget;
+                fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
+                fastRangeToTarget *= fastRangeToTarget;
+            }
+            else
+            {
+                StopAttack();
+            }
         }
 
         private void RegisterAttackGroup()

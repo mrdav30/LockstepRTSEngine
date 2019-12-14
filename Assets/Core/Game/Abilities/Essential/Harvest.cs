@@ -180,7 +180,7 @@ namespace RTSLockstep
 
                 // The harvest AI will determine what to do next
                 LastResourceTarget = CurrentTarget;
-                StopHarvesting();
+                StopHarvest();
             }
         }
 
@@ -205,20 +205,20 @@ namespace RTSLockstep
 
                 // The harvest AI will determine what to do next
                 LastStorageTarget = CurrentTarget;
-                StopHarvesting();
+                StopHarvest();
             }
         }
 
         protected override void OnDeactivate()
         {
-            StopHarvesting(true);
+            StopHarvest(true);
         }
 
         protected sealed override void OnStopCast()
         {
             if(IsHarvesting || IsEmptying)
             {
-                StopHarvesting(true);
+                StopHarvest(true);
             }
         }
 
@@ -284,26 +284,33 @@ namespace RTSLockstep
         {
             Agent.Tag = AgentTag.Harvester;
 
-            CurrentTarget = currentTarget;
-
-            if (IsHarvesting)
+            if (currentTarget.IsNotNull())
             {
-                ResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
+                CurrentTarget = currentTarget;
 
-                // we can only collect one resource at a time, other resources are lost
-                if (resourceType == ResourceType.Unknown || resourceType != HarvestType)
+                if (IsHarvesting)
                 {
-                    HarvestType = resourceType;
-                    currentLoadAmount = 0;
+                    ResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
+
+                    // we can only collect one resource at a time, other resources are lost
+                    if (resourceType == ResourceType.Unknown || resourceType != HarvestType)
+                    {
+                        HarvestType = resourceType;
+                        currentLoadAmount = 0;
+                    }
+
+                    SetHarvestAnimState();
                 }
 
-                SetHarvestAnimState();
+                IsFocused = true;
+                IsHarvestMoving = false;
+
+                targetVersion = currentTarget.SpawnVersion;
             }
-
-            IsFocused = true;
-            IsHarvestMoving = false;
-
-            targetVersion = currentTarget.SpawnVersion;
+            else
+            {
+                StopHarvest();
+            }
         }
 
         public long GetCurrentLoad()
@@ -349,7 +356,7 @@ namespace RTSLockstep
                 && CurrentTarget.GetAbility<ResourceDeposit>().IsEmpty())
             {
                 //  Target's lifecycle has ended
-                StopHarvesting();
+                StopHarvest();
             }
             else
             {
@@ -524,7 +531,7 @@ namespace RTSLockstep
         }
 
         // send complete command to stop harvesting cycle, i.e. a move command issued by player
-        private void StopHarvesting(bool complete = false)
+        private void StopHarvest(bool complete = false)
         {
             inRange = false;
             IsWindingUp = false;

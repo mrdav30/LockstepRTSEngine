@@ -146,7 +146,7 @@ namespace RTSLockstep
                 // or
                 // agent couldn't find storage within sight
                 // double check storage doesn't exist somewhere, anywhere!
-                if (agent.IsNull() 
+                if (agent.IsNull()
                     && (cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0
                     || cachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
