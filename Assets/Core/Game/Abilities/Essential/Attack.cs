@@ -212,7 +212,7 @@ namespace RTSLockstep
                 IsAttackMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
         }
 

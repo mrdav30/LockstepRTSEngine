@@ -160,7 +160,7 @@ namespace RTSLockstep
                 IsBuildMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(CurrentProject.Body.Position);
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
         }
 

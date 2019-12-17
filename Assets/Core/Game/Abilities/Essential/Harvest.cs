@@ -153,7 +153,7 @@ namespace RTSLockstep
                 IsHarvestMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position, false);
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
         }
 
@@ -216,7 +216,7 @@ namespace RTSLockstep
 
         protected sealed override void OnStopCast()
         {
-            if(IsHarvesting || IsEmptying)
+            if (IsHarvesting || IsEmptying)
             {
                 StopHarvest(true);
             }
@@ -500,16 +500,13 @@ namespace RTSLockstep
             }
             Agent.Body.Priority = _increasePriority ? basePriority + 1 : basePriority;
 
-            if (CheckRange(CurrentTarget.Body))
+            if (IsHarvesting)
             {
-                if (IsHarvesting)
-                {
-                    OnCollect();
-                }
-                else if (IsEmptying)
-                {
-                    OnDeposit();
-                }
+                OnCollect();
+            }
+            else if (IsEmptying)
+            {
+                OnDeposit();
             }
         }
 

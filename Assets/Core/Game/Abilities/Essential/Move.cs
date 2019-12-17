@@ -175,20 +175,8 @@ namespace RTSLockstep
                         ValidateMovementPath();
                     }
 
-                    // we only need to set velocity if we're going somewhere
-                    if (hasPath || straightPath)
-                    {
-                        movementDirection = SetMovementDirection();
-                        SetDesiredVelocity();
-                    }
-                    else
-                    {
-                        //  agent is either lost or arrived after repath
-                        if (!Arrived)
-                        {
-                            StartMove(Destination);
-                        }
-                    }
+                    movementDirection = SetMovementDirection();
+                    SetDesiredVelocity();
                 }
                 else
                 {
@@ -273,7 +261,7 @@ namespace RTSLockstep
                 // no need to check flow field, we got LOS
                 movementDirection = Destination - Agent.Body.Position;
             }
-            else
+            else if (hasPath)
             {
                 _flowFieldBuffer = MyMovementType == MovementType.Individual ? _flowFields : MyMovementGroup.GroupFlowFields;
 
