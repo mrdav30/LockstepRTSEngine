@@ -1,5 +1,6 @@
 ﻿using RTSLockstep.Data;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RTSLockstep
@@ -38,7 +39,7 @@ namespace RTSLockstep
 
         public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
-            if (facer == null)
+            if (facer.IsNull())
             {
                 Debug.LogError("Interfacer does not exist. Can't generate command.");
                 return null;
@@ -49,25 +50,25 @@ namespace RTSLockstep
             {
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+                    curCom.Add(GetWorldPosD(Input.mousePosition));
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent.IsNotNull())
+                    if (MousedAgent.IsNotNull())
                     {
-                        curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
+                        curCom.SetData(new DefaultData(DataType.UShort, MousedAgent.LocalID));
                     }
                     break;
                 case InformationGatherType.PositionOrTarget:
                     curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent.IsNotNull())
+                    if (MousedAgent.IsNotNull())
                     {
-                        curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
+                        curCom.Add(new DefaultData(DataType.UShort, MousedAgent.GlobalID));
                     }
                     break;
                 case InformationGatherType.PositionOrAction:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+                    curCom.Add(GetWorldPosD(Input.mousePosition));
                     break;
                 case InformationGatherType.None:
                     curCom = new Command(facer.ListenInputID);
@@ -80,49 +81,72 @@ namespace RTSLockstep
         //change screenPos to Vector3?
         public static RTSAgent GetScreenAgent(Vector2 screenPos, Func<RTSAgent, bool> conditional = null)
         {
-            if (conditional == null)
+            if (conditional.IsNull())
             {
                 conditional = (agent) =>
                 {
                     return true;
                 };
             }
+
             agentFound = false;
             Ray ray = Camera.main.ScreenPointToRay(screenPos);
             checkDir = ray.direction;
             checkOrigin = ray.origin;
-            for (int i = 0; i < AgentController.PeakGlobalID; i++)
+
+            //Raycast to plane Z-0
+            var start = new Vector3d(ray.origin);
+            Vector3d end;
+            end = new Vector3d(ray.origin + ray.direction * 50);
+
+            if (ray.direction.y < -.05f)
             {
-                if (AgentController.GlobalAgentActive[i])
+                float planeDist = ray.origin.y / -ray.direction.y;
+                if (planeDist < 100)
                 {
-                    RTSAgent agent = AgentController.GlobalAgents[i];
-                    if (agent.IsVisible)
+                    end = new Vector3d(ray.origin + ray.direction * planeDist);
+                }
+            }
+            IEnumerable<LSBody> raycast = Raycaster.RaycastAll(start, end);
+
+            foreach (var body in raycast)
+            {
+                if (body.Agent.IsNull())
+                {
+                    continue;
+                }
+
+                RTSAgent agent = body.Agent;
+
+                if (agent.IsVisible)
+                {
+                    if (conditional(agent))
                     {
-                        if (conditional(agent))
+                        if (AgentIntersects(agent))
                         {
-                            if (AgentIntersects(agent))
+                            if (agentFound)
                             {
-                                if (agentFound)
+                                if (heightDif < closestDistance)
                                 {
-                                    if (heightDif < closestDistance)
-                                    {
-                                        closestDistance = heightDif;
-                                        closestAgent = agent;
-                                    }
-                                }
-                                else
-                                {
-                                    agentFound = true;
-                                    closestAgent = agent;
                                     closestDistance = heightDif;
+                                    closestAgent = agent;
                                 }
+                            }
+                            else
+                            {
+                                agentFound = true;
+                                closestAgent = agent;
+                                closestDistance = heightDif;
                             }
                         }
                     }
                 }
             }
             if (agentFound)
+            {
                 return closestAgent;
+            }
+
             return null;
         }
 
@@ -164,7 +188,7 @@ namespace RTSLockstep
                 return new Vector2(hit.point.x, hit.point.z);
             }
             Vector3 hitPoint = ray.origin - ray.direction * (ray.origin.y / ray.direction.y);
-        //    return new Vector2(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
+            //    return new Vector2(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
             return new Vector2(hitPoint.x, hitPoint.z);
         }
 
