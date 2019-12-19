@@ -128,7 +128,8 @@ namespace RTSLockstep
         {
             for (int iterator = 0; iterator < PeakGlobalID; iterator++)
             {
-                if (GlobalAgentActive[iterator])
+                RTSAgent agent = GlobalAgents[iterator];
+                if (agent.IsLive)
                 {
                     GlobalAgents[iterator].Visualize();
                 }
@@ -139,7 +140,8 @@ namespace RTSLockstep
         {
             for (int iterator = 0; iterator < PeakGlobalID; iterator++)
             {
-                if (GlobalAgentActive[iterator])
+                RTSAgent agent = GlobalAgents[iterator];
+                if (agent.IsLive)
                 {
                     GlobalAgents[iterator].LateVisualize();
                 }
@@ -162,7 +164,7 @@ namespace RTSLockstep
                 if (DeathingAgents.arrayAllocation[i])
                 {
                     RTSAgent agent = DeathingAgents[i];
-                    AgentController.CompleteLife(agent);
+                    EndLife(agent);
                 }
             }
             DeathingAgents.FastClear();
@@ -227,19 +229,23 @@ namespace RTSLockstep
         /// Completes the life of the agent and pools or destroys it.
         /// </summary>
         /// <param name="agent">Agent.</param>
-        public static void CompleteLife(RTSAgent agent)
+        public static void EndLife(RTSAgent agent)
         {
-            if (agent.CachedGameObject != null)
+            if (agent.CachedGameObject.IsNotNull())
+            {
                 agent.CachedGameObject.SetActive(false);
+            }
+
+            agent._EndLife();
+
             if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX)
             {
-                AgentController.CacheAgent(agent);
-
+                CacheAgent(agent);
             }
             else
             {
                 //This agent was not registered for pooling. Let's destroy it
-                GameObject.Destroy(agent.gameObject);
+                UnityEngine.Object.Destroy(agent.gameObject);
             }
         }
 
@@ -254,7 +260,7 @@ namespace RTSLockstep
         public static int GetStateHash()
         {
             int operationToggle = 0;
-            int hash = LSUtility.PeekRandom(int.MaxValue);
+            int hash = 33; // LSUtility.PeekRandom(int.MaxValue);
             for (int i = 0; i < PeakGlobalID; i++)
             {
                 if (GlobalAgentActive[i])
@@ -590,11 +596,14 @@ namespace RTSLockstep
         private static void DestroyAgentBuffer(DeactivationData data)
         {
             RTSAgent agent = data.Agent;
-            if (agent.IsActive == false)
+            if (!agent.IsActive)
+            {
                 return;
+            }
+
             bool immediate = data.Immediate;
 
-            agent.Deactivate(immediate);
+            agent._Deactivate(immediate);
             ChangeController(agent, null);
 
             //Pool if the agent is registered

@@ -22,7 +22,7 @@ namespace RTSLockstep
             cachedStructure = Agent.GetAbility<Structure>();
         }
 
-        protected override void doGUI()
+        protected override void DoGUI()
         {
             if (Agent && !GameResourceManager.MenuOpen)
             {

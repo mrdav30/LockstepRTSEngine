@@ -88,7 +88,8 @@ namespace RTSLockstep
         #endregion
 
         //TODO: Put all this stuff in an extendible class
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
+        public bool IsLive { get; private set; }
         public event Action<RTSAgent> OnDeactivate;
 
         public bool CheckCasting { get; set; }
@@ -256,6 +257,7 @@ namespace RTSLockstep
         public virtual void Initialize(Vector2d position = default, Vector2d rotation = default)
         {
             IsActive = true;
+            IsLive = true;
             CheckCasting = true;
 
             // place game object under it's agent commander
@@ -381,6 +383,7 @@ namespace RTSLockstep
         public void InitializeBare()
         {
             IsActive = true;
+            IsLive = true;
             abilityManager.Initialize();
         }
 
@@ -408,21 +411,18 @@ namespace RTSLockstep
         /// Do not call this to destroy the agent. Use AgentController.DestroyAgent().
         /// </summary>
         /// <param name="Immediate"></param>
-        internal void Deactivate(bool Immediate = false)
+        internal void _Deactivate(bool Immediate = false)
         {
             if (IsActive == false)
             {
                 Debug.Log("NOASER");
             }
 
-            if (OnDeactivate != null)
-            {
-                OnDeactivate(this);
-            }
+            OnDeactivate?.Invoke(this);
 
-            _Deactivate();
+            DeactivateCore();
 
-            if (Immediate == false)
+            if (!Immediate)
             {
                 if (Animator.IsNotNull())
                 {
@@ -433,11 +433,11 @@ namespace RTSLockstep
             }
             else
             {
-                AgentController.CompleteLife(this);
+                AgentController.EndLife(this);
             }
         }
 
-        private void _Deactivate()
+        private void DeactivateCore()
         {
             StopCast();
 
@@ -463,7 +463,16 @@ namespace RTSLockstep
             yield return _deathTime;
             AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-            AgentController.CompleteLife(this);
+            AgentController.EndLife(this);
+        }
+
+        internal void _EndLife()
+        {
+            IsLive = false;
+            for (var k = 0; k < abilityManager.Abilities.Length; k++)
+            {
+                abilityManager.Abilities[k].EndLife();
+            }
         }
 
         public void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)

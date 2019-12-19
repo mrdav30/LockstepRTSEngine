@@ -101,7 +101,7 @@ namespace RTSLockstep
 
             if (Sight < ActionRange)
             {
-                _sight = ActionRange + FixedMath.One * 5;
+                _sight = ActionRange + FixedMath.One * 10;
             }
         }
     }

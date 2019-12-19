@@ -225,10 +225,10 @@ namespace RTSLockstep
 
         public void OnGUI()
         {
-            doGUI();
+            DoGUI();
         }
 
-        protected virtual void doGUI() { }
+        protected virtual void DoGUI() { }
 
         public void BeginCast()
         {
@@ -248,7 +248,7 @@ namespace RTSLockstep
         {
         }
 
-        public void Deactivate()
+        internal void Deactivate()
         {
             IsCasting = false;
             OnDeactivate();
@@ -256,6 +256,16 @@ namespace RTSLockstep
 
         protected virtual void OnDeactivate()
         {
+        }
+
+        internal void EndLife()
+        {
+            OnCompleteLife();
+        }
+
+        protected virtual void OnCompleteLife()
+        {
+
         }
 
         public void SaveDetails(JsonWriter writer)
