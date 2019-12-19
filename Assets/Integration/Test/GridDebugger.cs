@@ -86,7 +86,7 @@ namespace RTSLockstep
                 Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
 
 #if UNITY_EDITOR
-                if (node.ClearanceSource != GridNode.DEFAULT_SOURCE)
+                if (node.ClearanceDegree != GridNode.DEFAULT_DEGREE)
                 {
                     UnityEditor.Handles.color = Color.red;
                     UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());

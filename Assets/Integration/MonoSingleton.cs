@@ -68,6 +68,5 @@ namespace RTSLockstep
         Application.Quit();
 #endif
         }
-
     }
 }

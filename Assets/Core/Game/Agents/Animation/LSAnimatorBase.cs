@@ -47,7 +47,7 @@ namespace RTSLockstep
             animStateChanged = false;
             lastAnimState = currentAnimState = AnimState.Idling;
 
-            // update to you more modern Animator component
+            // update to use more modern Animator component
             // Animation will become depreciated soon
             animator = GetComponent<Animator>();
             if (animator == null)

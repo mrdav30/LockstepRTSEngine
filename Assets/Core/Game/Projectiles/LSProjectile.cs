@@ -437,10 +437,17 @@ namespace RTSLockstep
             cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - Position.ToVector3());
         }
 
-        public void InitializeTimed(Vector2d forward)
+        public void InitializeTimed(RTSAgent target)
         {
-            Forward = forward;
-            Direction = forward.ToVector3d();
+            Target = target;
+            TargetVersion = Target.SpawnVersion;
+        }
+
+        public void InitializeTimed(Vector3d targetPos)
+        {
+            TargetPosition = targetPos.ToVector2d();
+            Position = targetPos;
+            TargetVersion = Target.SpawnVersion;
         }
 
         public void InitializeFree(Vector3d direction, Func<LSBody, bool> bodyConditional, bool useGravity = false)
@@ -639,6 +646,11 @@ namespace RTSLockstep
             {
                 case TargetingType.Timed:
                     CountDown--;
+                    if (HitBehavior == HitType.Single && Target.SpawnVersion != TargetVersion)
+                    {
+                        ProjectileManager.EndProjectile(this);
+                        break;
+                    }
 
                     if (!IsLasting)
                     {
@@ -659,10 +671,10 @@ namespace RTSLockstep
                     }
                     break;
                 case TargetingType.Homing:
-                    if (TargetingBehavior == TargetingType.Homing && HitBehavior == HitType.Single && Target.SpawnVersion != TargetVersion)
+                    if (HitBehavior == HitType.Single && Target.SpawnVersion != TargetVersion)
                     {
                         //Switch to positional to move to target's last position and not seek deceased target
-                        TargetingBehavior = TargetingType.Positional;
+                        this.TargetingBehavior = TargetingType.Positional;
                         Target = null;
                         TargetCurrent = false;
                         goto case TargetingType.Positional;
