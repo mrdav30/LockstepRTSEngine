@@ -25,11 +25,6 @@ namespace RTSLockstep
 
         #region Lockstep variables
         private bool _forwardNeedsSet = false;
-        private bool ForwardNeedsSet
-        {
-            get { return _forwardNeedsSet; }
-            set { _forwardNeedsSet = value; }
-        }
 
         private Vector2d _forward;
         public Vector2d Forward
@@ -58,7 +53,7 @@ namespace RTSLockstep
             set
             {
                 _position = value;
-                this.PositionChanged = true;
+                PositionChanged = true;
             }
         }
 
@@ -74,7 +69,7 @@ namespace RTSLockstep
             {
                 if (value)
                 {
-                    ForwardNeedsSet = true;
+                    _forwardNeedsSet = true;
                 }
 
                 _rotationChanged = value;
@@ -92,7 +87,7 @@ namespace RTSLockstep
             set
             {
                 _rotation = value;
-                this.RotationChanged = true;
+                RotationChanged = true;
             }
         }
 
@@ -136,9 +131,9 @@ namespace RTSLockstep
 
         #endregion
 
-        public event CollisionFunction onContact;
-        public event CollisionFunction onContactEnter;
-        public event CollisionFunction onContactExit;
+        public event CollisionFunction OnContact;
+        public event CollisionFunction OnContactEnter;
+        public event CollisionFunction OnContactExit;
         public int Priority { get; set; }
         public int ID { get; private set; }
         public RTSAgent Agent { get; private set; }
@@ -210,25 +205,24 @@ namespace RTSLockstep
             {
                 if (isChanged)
                 {
-                    if (onContactEnter.IsNotNull())
-                        onContactEnter(other);
+                    if (OnContactEnter.IsNotNull())
+                        OnContactEnter(other);
                 }
-                if (onContact != null)
-                    onContact(other);
+                if (OnContact != null)
+                    OnContact(other);
 
             }
             else
             {
                 if (isChanged)
                 {
-                    if (onContactExit != null)
-                        onContactExit(other);
+                    if (OnContactExit != null)
+                        OnContactExit(other);
                 }
             }
         }
 
-        private int _dynamicID = -1;
-        internal int DynamicID { get { return _dynamicID; } set { _dynamicID = value; } }
+        internal int DynamicID = -1;
 
         #region Serialized
 
@@ -255,7 +249,7 @@ namespace RTSLockstep
             set
             {
                 _halfWidth = value;
-                this.WidthChanged = true;
+                WidthChanged = true;
             }
         }
         [Lockstep]
@@ -269,7 +263,7 @@ namespace RTSLockstep
             set
             {
                 _halfLength = value;
-                this.LengthChanged = true;
+                LengthChanged = true;
             }
         }
 
@@ -348,10 +342,10 @@ namespace RTSLockstep
         {
             get
             {
-                return this._position.ToVector3d(this.HeightPos);
+                return _position.ToVector3d(HeightPos);
             }
         }
-        public Transform transform { get; internal set; }
+        public Transform Transform { get; internal set; }
         public bool OutMoreThan { get; private set; }
 
         private Vector2d[] RotatedPoints;
@@ -359,11 +353,23 @@ namespace RTSLockstep
         private bool OutMoreThanSet { get; set; }
         #endregion
 
+        private Quaternion GetVisualRotation()
+        {
+            return Quaternion.LookRotation(Forward.ToVector3(0));
+        }
+
+        private Vector3 lastVisualPos;
+
+        //Testing out vectors instead of quaternions for interpolation
+        private Quaternion lastvisualRotationation;
+        private Quaternion visualRotation;
+
         #region Behavior
         public void Setup(RTSAgent agent)
         {
             if (Shape == ColliderType.Polygon)
             {
+                // TODO
             }
             if (Shape != ColliderType.None)
             {
@@ -373,7 +379,7 @@ namespace RTSLockstep
             Agent = agent;
             Setted = true;
 
-            Immovable = _immovable || (this.Shape != ColliderType.Circle) || this.Shape == ColliderType.None;
+            Immovable = _immovable || (Shape != ColliderType.Circle) || Shape == ColliderType.None;
         }
 
         public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
@@ -383,13 +389,12 @@ namespace RTSLockstep
             RotationalTransform = _rotationalTransform;
             if (!Setted)
             {
-                this.Setup(null);
+                Setup(null);
             }
-            this.RaycastVersion = 0;
 
-            this.HeightPosChanged = true;
+            RaycastVersion = 0;
 
-            CheckVariables();
+            HeightPosChanged = true;
 
             PositionChanged = true;
             RotationChanged = true;
@@ -403,8 +408,8 @@ namespace RTSLockstep
             LastPosition = _position = StartPosition.ToVector2d();
             _heightPos = StartPosition.z;
             _rotation = StartRotation;
-            ForwardNeedsSet = true;
-            FastRadius = this.Radius * this.Radius;
+            _forwardNeedsSet = true;
+            FastRadius = Radius * Radius;
 
             XMin = 0;
             XMax = 0;
@@ -455,7 +460,7 @@ namespace RTSLockstep
             SetVisuals();
 
             velocityPosition = Vector3.zero;
-            this.ImmovableCollisionDirection = Vector2d.zero;
+            ImmovableCollisionDirection = Vector2d.zero;
             PartitionChanged = true;
         }
 
@@ -495,7 +500,7 @@ namespace RTSLockstep
 
         private void AddChild(LSBody child)
         {
-            if (Children == null)
+            if (Children.IsNull())
             {
                 Children = new FastBucket<LSBody>();
             }
@@ -541,31 +546,26 @@ namespace RTSLockstep
                     }
                 }
                 _radius = FixedMath.Sqrt(BiggestSqrRadius);
-                FastRadius = this.Radius * this.Radius;
+                FastRadius = Radius * Radius;
             }
         }
 
-        void CheckVariables()
-        {
-
-        }
-
-        void BuildChangedValues()
+        private void BuildChangedValues()
         {
             if (PositionChanged || RotationChanged)
             {
                 BuildPoints();
                 BuildBounds();
                 //Reset this value so we're not permanently considered colliding against wall
-                this.ImmovableCollisionDirection = Vector2d.zero;
+                ImmovableCollisionDirection = Vector2d.zero;
             }
 
             if (PositionChanged || HeightPosChanged)
             {
                 PositionChangedBuffer = PositionChanged ? true : false;
                 PositionChanged = false;
-                this.HeightPosChanged = false;
-                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
+                HeightPosChanged = false;
+                _settingVisualsCounter = SETTING_VISUALS_COUNT;
             }
             else
             {
@@ -577,7 +577,7 @@ namespace RTSLockstep
                 _rotation.Normalize();
                 RotationChangedBuffer = true;
                 RotationChanged = false;
-                this._settingVisualsCounter = SETTING_VISUALS_COUNT;
+                _settingVisualsCounter = SETTING_VISUALS_COUNT;
             }
             else
             {
@@ -612,7 +612,7 @@ namespace RTSLockstep
                     {
                         OutMoreThanSet = true;
                         long dot = Edges[0].Cross(Edges[1]);
-                        this.OutMoreThan = dot < 0;
+                        OutMoreThan = dot < 0;
                     }
                 }
 
@@ -672,14 +672,9 @@ namespace RTSLockstep
             }
         }
 
-        Quaternion GetVisualRotation()
-        {
-            return Quaternion.LookRotation(Forward.ToVector3(0));
-        }
-
         public void SetVisuals()
         {
-            if (this.SettingVisuals)
+            if (SettingVisuals)
             {
                 if (PhysicsManager.ResetAccumulation)
                 {
@@ -701,9 +696,8 @@ namespace RTSLockstep
 
         private void DoSetVisualPosition(Vector3 pos)
         {
-            if (this.CanSetVisualPosition)
+            if (CanSetVisualPosition)
             {
-
                 lastVisualPos = PositionalTransform.position;
                 _visualPosition = pos;
             }
@@ -711,7 +705,7 @@ namespace RTSLockstep
 
         private void DoSetVisualRotation(Vector2d rot)
         {
-            if (this.CanSetvisualRotation)
+            if (CanSetvisualRotation)
             {
                 lastvisualRotationation = RotationalTransform.rotation;
                 if (Forward != Vector2d.zero)
@@ -720,12 +714,6 @@ namespace RTSLockstep
                 }
             }
         }
-
-        Vector3 lastVisualPos;
-
-        //Testing out vectors instead of quaternions for interpolation
-        Quaternion lastvisualRotationation;
-        Quaternion visualRotation;
 
         public void Rotate(long cos, long sin)
         {
@@ -750,8 +738,11 @@ namespace RTSLockstep
         public void Deactivate()
         {
             //Don't double deactivate
-            if (this.Active == false)
+            if (!Active)
+            {
                 return;
+            }
+
             Partition.UpdateObject(this, false);
 
             foreach (var collisionPair in CollisionPairs.Values)
@@ -760,18 +751,17 @@ namespace RTSLockstep
                 DeactivatePair(collisionPair);
 
             }
+
             CollisionPairs.Clear();
             foreach (var id in CollisionPairHolders)
             {
                 LSBody other = PhysicsManager.SimObjects[id];
                 if (other.IsNotNull())
                 {
-                    CollisionPair collisionPair;
-                    if (other.CollisionPairs.TryGetValue(ID, out collisionPair))
+                    if (other.CollisionPairs.TryGetValue(ID, out CollisionPair collisionPair))
                     {
-                        other.CollisionPairs.Remove(this.ID);
+                        other.CollisionPairs.Remove(ID);
                         DeactivatePair(collisionPair);
-
                     }
                     else
                     {
@@ -795,23 +785,23 @@ namespace RTSLockstep
             return heightMax >= HeightMin && heightMin <= HeightMax;
         }
 
-        long GetCeiledSnap(long f, long snap)
+        private long GetCeiledSnap(long f, long snap)
         {
             return (f + snap - 1) / snap * snap;
         }
 
-        long GetFlooredSnap(long f, long snap)
+        private long GetFlooredSnap(long f, long snap)
         {
             return (f / snap) * snap;
         }
 
         public void GetCoveredNodePositions(long resolution, FastList<Vector2d> output)
         {
-            long xmin = GetFlooredSnap(this.XMin - FixedMath.Half, FixedMath.One);
-            long ymin = GetFlooredSnap(this.YMin - FixedMath.Half, FixedMath.One);
+            long xmin = GetFlooredSnap(XMin - FixedMath.Half, FixedMath.One);
+            long ymin = GetFlooredSnap(YMin - FixedMath.Half, FixedMath.One);
 
-            long xmax = GetCeiledSnap(this.XMax + FixedMath.Half - xmin, FixedMath.One) + xmin;
-            long ymax = GetCeiledSnap(this.YMax + FixedMath.Half - ymin, FixedMath.One) + ymin;
+            long xmax = GetCeiledSnap(XMax + FixedMath.Half - xmin, FixedMath.One) + xmin;
+            long ymax = GetCeiledSnap(YMax + FixedMath.Half - ymin, FixedMath.One) + ymin;
 
             long xAcc = 0;
             long yAcc = 0;
@@ -887,8 +877,7 @@ namespace RTSLockstep
                     {
                         Vector2d norm = EdgeNorms[i];
                         long posProj = norm.Dot(position);
-                        long polyMin, polyMax;
-                        CollisionPair.ProjectPolygon(norm.x, norm.y, this, out polyMin, out polyMax);
+                        CollisionPair.ProjectPolygon(norm.x, norm.y, this, out long polyMin, out long polyMax);
                         if (posProj <= polyMin && posProj >= polyMax)
                         {
                             return false;
@@ -902,32 +891,35 @@ namespace RTSLockstep
 
         internal void Reset()
         {
-            this._positionalTransform = this.transform;
-            this._rotationalTransform = this.transform;
+            _positionalTransform = Transform;
+            _rotationalTransform = Transform;
         }
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             //return;
             //Don't draw gizmos before initialization
-            if (Application.isPlaying == false)
+            if (!Application.isPlaying)
+            {
                 return;
-            switch (this.Shape)
+            }
+
+            switch (Shape)
             {
                 case ColliderType.Circle:
-                    Gizmos.DrawWireSphere(this._position.ToVector3(this.HeightPos.ToFloat()), this.Radius.ToFloat());
+                    Gizmos.DrawWireSphere(_position.ToVector3(HeightPos.ToFloat()), Radius.ToFloat());
                     break;
                 case ColliderType.AABox:
                     Gizmos.DrawWireCube(
-                        this._position.ToVector3(this.HeightPos.ToFloat() + this.Height.ToFloat() / 2),
-                        new Vector3(this.HalfWidth.ToFloat() * 2, this.Height.ToFloat(), this.HalfLength.ToFloat() * 2));
+                        _position.ToVector3(HeightPos.ToFloat() + Height.ToFloat() / 2),
+                        new Vector3(HalfWidth.ToFloat() * 2, Height.ToFloat(), HalfLength.ToFloat() * 2));
                     break;
                 case ColliderType.Polygon:
                     if (RealPoints.Length > 1)
                     {
-                        for (int i = 0; i < this.RealPoints.Length; i++)
+                        for (int i = 0; i < RealPoints.Length; i++)
                         {
-                            Gizmos.DrawLine(this.RealPoints[i].ToVector3(), this.RealPoints[i + 1 < RealPoints.Length ? i + 1 : 0].ToVector3());
+                            Gizmos.DrawLine(RealPoints[i].ToVector3(), RealPoints[i + 1 < RealPoints.Length ? i + 1 : 0].ToVector3());
                         }
                     }
                     break;
@@ -942,12 +934,12 @@ namespace RTSLockstep
         {
             get
             {
-                switch (this.Shape)
+                switch (Shape)
                 {
                     case ColliderType.Circle:
-                        return this.Radius * 2;
+                        return Radius * 2;
                     case ColliderType.AABox:
-                        if (this.HalfWidth > this.HalfLength)
+                        if (HalfWidth > HalfLength)
                         {
                             return HalfWidth * 2;
                         }
@@ -965,21 +957,24 @@ namespace RTSLockstep
         {
             return Clone<LSBody>();
         }
+
         public TLSBody Clone<TLSBody>() where TLSBody : LSBody, new()
         {
-            TLSBody body = new TLSBody();
-            body._shape = this._shape;
-            body._isTrigger = this._isTrigger;
-            body._layer = this._layer;
-            body._halfWidth = this._halfWidth;
-            body._halfLength = this._halfLength;
-            body._radius = this._radius;
-            body._immovable = this._immovable;
-            body._basePriority = this._basePriority;
-            body._vertices = this._vertices;
-            body._height = this._height;
-            body._positionalTransform = this._positionalTransform;
-            body._rotationalTransform = this._rotationalTransform;
+            TLSBody body = new TLSBody
+            {
+                _shape = _shape,
+                _isTrigger = _isTrigger,
+                _layer = _layer,
+                _halfWidth = _halfWidth,
+                _halfLength = _halfLength,
+                _radius = _radius,
+                _immovable = _immovable,
+                _basePriority = _basePriority,
+                _vertices = _vertices,
+                _height = _height,
+                _positionalTransform = _positionalTransform,
+                _rotationalTransform = _rotationalTransform
+            };
 
             return body;
         }

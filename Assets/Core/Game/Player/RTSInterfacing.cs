@@ -33,7 +33,7 @@ namespace RTSLockstep
                 CachedRay = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
                 CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
 
-                MousedAgent = GetScreenAgent(Input.mousePosition, (agent) => { return true; });
+                MousedAgent = GetScreenAgent(Input.mousePosition);
             }
         }
 

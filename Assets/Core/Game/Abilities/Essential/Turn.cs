@@ -31,7 +31,7 @@ namespace RTSLockstep
 
             collisionTurnThreshold = Agent.Body.Radius / (LockstepManager.FrameRate / 2);
             collisionTurnThreshold *= collisionTurnThreshold;
-            Agent.Body.onContact += HandleContact;
+            Agent.Body.OnContact += HandleContact;
         }
 
         protected override void OnInitialize()

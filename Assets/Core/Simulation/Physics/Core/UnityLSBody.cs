@@ -24,13 +24,13 @@ namespace RTSLockstep
             InternalBody.Initialize(StartPosition, StartRotation, isDynamic);
         }
 
-        void Reset()
+        private void Reset()
         {
             if (InternalBody.IsNull())
             {
                 _internalBody = new LSBody();
             }
-            InternalBody.transform = this.transform;
+            InternalBody.Transform = transform;
             InternalBody.Reset();
         }
     }
