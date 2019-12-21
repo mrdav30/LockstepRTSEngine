@@ -63,11 +63,13 @@ namespace RTSLockstep.Grid
 
         }
 
-        void BlockNode(long x, long y)
+        private void BlockNode(long x, long y)
         {
             var node = GridManager.GetNode(x, y);
             if (node.IsNotNull())
+            {
                 node.AddObstacle();
+            }
         }
     }
 }

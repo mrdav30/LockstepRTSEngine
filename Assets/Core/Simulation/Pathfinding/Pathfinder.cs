@@ -95,7 +95,7 @@ namespace RTSLockstep.Pathfinding
                     return false;
                 }
 
-                error = error - dy;
+                error -= dy;
                 if (error < 0)
                 {
                     y += ystep;

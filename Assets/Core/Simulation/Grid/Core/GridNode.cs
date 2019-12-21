@@ -91,13 +91,13 @@ namespace RTSLockstep.Grid
             LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
             ClearanceDegree = DEFAULT_DEGREE;
             ClearanceSource = DEFAULT_SOURCE;
-            this.FastInitialize();
+            FastInitialize();
         }
 
         public void FastInitialize()
         {
-            this.GridVersion = 0;
-            this._obstacleCount = 0;
+            GridVersion = 0;
+            _obstacleCount = 0;
         }
         #endregion
 
@@ -129,7 +129,7 @@ namespace RTSLockstep.Grid
                 {
                     //refresh source in case the map changed
                     var source = NeighborNodes[ClearanceSource];
-                    if (source.IsNull() == false)
+                    if (source.IsNotNull())
                     {
                         var prevSourceDegree = source.ClearanceDegree;
                         if (source.ClearanceDegree < ClearanceDegree)
@@ -371,12 +371,12 @@ namespace RTSLockstep.Grid
 
         public override int GetHashCode()
         {
-            return (int)this.gridIndex;
+            return (int)gridIndex;
         }
 
         public bool DoesEqual(GridNode obj)
         {
-            return obj.gridIndex == this.gridIndex;
+            return obj.gridIndex == gridIndex;
         }
 
         public override string ToString()
