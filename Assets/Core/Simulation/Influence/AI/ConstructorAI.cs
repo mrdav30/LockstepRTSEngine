@@ -93,6 +93,8 @@ namespace RTSLockstep
                     constructCom.Add(new Influence(CachedAgent));
 
                     CommandManager.SendCommand(constructCom);
+
+                    base.ResetAwareness();
                 }
             }
         }

@@ -6,9 +6,6 @@ namespace RTSLockstep
 {
     public class OffensiveAI : DeterminismAI
     {
-        #region Serialized Values (Further description in properties)
-        #endregion
-
         public override void OnInitialize()
         {
             base.OnInitialize();
@@ -16,20 +13,20 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.Tag == AgentTag.Offensive)
+            if (CachedAgent.Tag == AgentTag.Offensive)
             {
                 if (searchCount <= 0)
                 {
                     searchCount = SearchRate;
-                    if ((!cachedAgent.MyStats.CachedAttack.IsFocused && !cachedAgent.MyStats.CachedAttack.IsAttackMoving)
-                        && cachedAgent.MyStats.CachedHealth.CurrentHealth > 0)
+                    if ((!CachedAgent.MyStats.CachedAttack.IsFocused && !CachedAgent.MyStats.CachedAttack.IsAttackMoving)
+                        && CachedAgent.MyStats.CachedHealth.CurrentHealth > 0)
                     {
                         // We're ready to go but have no target
                         return true;
                     }
                 }
 
-                if (cachedAgent.MyStats.CachedAttack.IsFocused || cachedAgent.MyStats.CachedAttack.IsAttackMoving || cachedAgent.MyStats.CachedHealth.CurrentHealth <= 0)
+                if (CachedAgent.MyStats.CachedAttack.IsFocused || CachedAgent.MyStats.CachedAttack.IsAttackMoving || CachedAgent.MyStats.CachedHealth.CurrentHealth <= 0)
                 {
                     // busy attacking or being dead
                     searchCount -= 1;
@@ -57,15 +54,15 @@ namespace RTSLockstep
             {
                 Func<RTSAgent, bool> agentConditional = null;
 
-                if (cachedAgent.MyStats.CachedAttack.Damage >= 0)
+                if (CachedAgent.MyStats.CachedAttack.Damage >= 0)
                 {
                     agentConditional = (other) =>
                     {
-                        Health health = other.GetAbility<Health>();
-                        return other.GlobalID != cachedAgent.GlobalID
+                        Health targetHealth = other.GetAbility<Health>();
+                        return other.GlobalID != CachedAgent.GlobalID
                                 && other.IsActive
-                                && health.IsNotNull()
-                                && health.CanLose
+                                && targetHealth.IsNotNull()
+                                && targetHealth.CanLose
                                 && CachedAgentValid(other);
                     };
                 }
@@ -73,11 +70,11 @@ namespace RTSLockstep
                 {
                     agentConditional = (other) =>
                     {
-                        Health health = other.GetAbility<Health>();
-                        return other.GlobalID != cachedAgent.GlobalID
+                        Health targetHealth = other.GetAbility<Health>();
+                        return other.GlobalID != CachedAgent.GlobalID
                                 && CachedAgentValid(other)
-                                && health.IsNotNull()
-                                && health.CanGain;
+                                && targetHealth.IsNotNull()
+                                && targetHealth.CanGain;
                     };
                 }
 
@@ -91,7 +88,7 @@ namespace RTSLockstep
             {
                 bool allianceConditional(byte bite)
                 {
-                    return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Enemy) != 0);
+                    return ((CachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Enemy) != 0);
                 }
                 return allianceConditional;
             }
@@ -104,11 +101,13 @@ namespace RTSLockstep
                 // send attack command
                 Command attackCom = new Command(AbilityDataItem.FindInterfacer("Attack").ListenInputID);
                 attackCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                attackCom.ControllerID = cachedAgent.Controller.ControllerID;
+                attackCom.ControllerID = CachedAgent.Controller.ControllerID;
 
-                attackCom.Add(new Influence(cachedAgent));
+                attackCom.Add(new Influence(CachedAgent));
 
                 CommandManager.SendCommand(attackCom);
+
+                base.ResetAwareness();
             }
         }
     }

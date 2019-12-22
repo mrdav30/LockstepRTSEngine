@@ -165,11 +165,7 @@ namespace RTSLockstep
                 ResourceDeposit closestResource = nearbyAgent.GetAbility<ResourceDeposit>();
                 Structure closestResourceStore = nearbyAgent.GetAbility<Structure>();
 
-                if (closestResource.IsNotNull()
-                    && closestResource.ResourceType == CachedAgent.MyStats.CachedHarvest.HarvestType
-                    || closestResourceStore.IsNotNull()
-                    && nearbyAgent.GetAbility<Structure>().CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)
-                )
+                if (closestResource.IsNotNull()|| closestResourceStore.IsNotNull())
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
@@ -179,6 +175,8 @@ namespace RTSLockstep
                     harvestCom.Add(new Influence(CachedAgent));
 
                     CommandManager.SendCommand(harvestCom);
+
+                    base.ResetAwareness();
                 }
             }
         }
