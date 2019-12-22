@@ -6,15 +6,14 @@ namespace RTSLockstep
 {
     public class DeterminismAI
     {
-        public RTSAgent cachedAgent { get; private set; }
-        public Func<RTSAgent, bool> CachedAgentValid { get; private set; }
+        protected RTSAgent CachedAgent { get; private set; }
+        protected Func<RTSAgent, bool> CachedAgentValid { get; private set; }
 
         // we want to restrict how many decisions are made to help with game performance
         protected const int SearchRate = LockstepManager.FrameRate / 2;
         protected int searchCount;
 
         // convert to fast list...
-        protected List<RTSAgent> nearbyObjects;
         protected RTSAgent nearbyAgent;
 
         #region Serialized Values (Further description in properties)
@@ -22,7 +21,7 @@ namespace RTSLockstep
 
         public virtual void OnSetup(RTSAgent agent)
         {
-            cachedAgent = agent;
+            CachedAgent = agent;
 
             CachedAgentValid = AgentValid;
         }
@@ -47,12 +46,12 @@ namespace RTSLockstep
         */
         public virtual bool ShouldMakeDecision()
         {
-            if (cachedAgent.IsCasting)
+            if (CachedAgent.IsCasting)
             {
                 searchCount = -1;
                 return false;
             }
-            else if (cachedAgent.MyStats.CachedMove && cachedAgent.MyStats.CachedMove.IsMoving)
+            else if (CachedAgent.MyStats.CachedMove && CachedAgent.MyStats.CachedMove.IsMoving)
             {
                 searchCount -= 8;
                 return false;
@@ -109,14 +108,19 @@ namespace RTSLockstep
             if (agentConditional.IsNotNull())
             {
                 agent = InfluenceManager.Scan(
-                     cachedAgent.Body.Position,
-                     cachedAgent.MyStats.Sight,
+                     CachedAgent.Body.Position,
+                     CachedAgent.MyStats.Sight,
                      agentConditional,
                      allianceConditional
                  );
             }
 
             return agent;
+        }
+
+        protected virtual void ResetAwareness()
+        {
+            nearbyAgent = null;
         }
 
         protected virtual bool AgentValid(RTSAgent agent)

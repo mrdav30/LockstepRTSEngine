@@ -9,11 +9,11 @@
 
         public FlowField(Vector2d _worldPos, int _distance, Vector2d _direction, bool _hasLOS = false)
         {
-            this.WorldPos = _worldPos;
-            this.Distance = _distance;
-            this.Direction = _direction;
+            WorldPos = _worldPos;
+            Distance = _distance;
+            Direction = _direction;
 
-            this.HasLOS = _hasLOS;
+            HasLOS = _hasLOS;
         }
     }
 }

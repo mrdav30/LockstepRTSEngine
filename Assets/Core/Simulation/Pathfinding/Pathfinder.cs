@@ -164,8 +164,7 @@ namespace RTSLockstep.Pathfinding
 
         public static bool StarCast(Vector2d dest, out GridNode returnNode)
         {
-            int xGrid, yGrid;
-            GridManager.GetCoordinates(dest.x, dest.y, out xGrid, out yGrid);
+            GridManager.GetCoordinates(dest.x, dest.y, out int xGrid, out int yGrid);
             // set to the highest height or width value of any game object
             const int maxTestDistance = 3;
             AlternativeNodeFinder.Instance.SetValues(dest, xGrid, yGrid, maxTestDistance);

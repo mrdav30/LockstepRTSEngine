@@ -12,7 +12,7 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.Tag != AgentTag.Builder)
+            if (CachedAgent.Tag != AgentTag.Builder)
             {
                 // agent isn't a constructor....
                 return false;
@@ -20,14 +20,14 @@ namespace RTSLockstep
             else if (searchCount <= 0)
             {
                 searchCount = SearchRate;
-                if (!cachedAgent.MyStats.CachedConstruct.IsFocused && !cachedAgent.MyStats.CachedConstruct.IsBuildMoving)
+                if (!CachedAgent.MyStats.CachedConstruct.IsFocused && !CachedAgent.MyStats.CachedConstruct.IsBuildMoving)
                 {
                     // We're ready to go but have no target
                     return true;
                 }
             }
 
-            if (cachedAgent.MyStats.CachedConstruct.IsFocused || cachedAgent.MyStats.CachedConstruct.IsBuildMoving)
+            if (CachedAgent.MyStats.CachedConstruct.IsFocused || CachedAgent.MyStats.CachedConstruct.IsBuildMoving)
             {
                 // busy building
                 searchCount -= 1;
@@ -51,9 +51,9 @@ namespace RTSLockstep
                 bool agentConditional(RTSAgent other)
                 {
                     Structure structure = other.GetAbility<Structure>();
-                    return other.GlobalID != cachedAgent.GlobalID
+                    return other.GlobalID != CachedAgent.GlobalID
                             && CachedAgentValid(other)
-                            && cachedAgent.GlobalID != other.GlobalID
+                            && CachedAgent.GlobalID != other.GlobalID
                             && structure.IsNotNull()
                             && structure.NeedsConstruction;
                 }
@@ -68,7 +68,7 @@ namespace RTSLockstep
             {
                 bool allianceConditional(byte bite)
                 {
-                    return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0);
+                    return ((CachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0);
                 }
                 return allianceConditional;
             }
@@ -88,9 +88,9 @@ namespace RTSLockstep
                     constructCom.Add(new DefaultData(DataType.Bool, true));
 
                     constructCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
-                    constructCom.ControllerID = cachedAgent.Controller.ControllerID;
+                    constructCom.ControllerID = CachedAgent.Controller.ControllerID;
 
-                    constructCom.Add(new Influence(cachedAgent));
+                    constructCom.Add(new Influence(CachedAgent));
 
                     CommandManager.SendCommand(constructCom);
                 }

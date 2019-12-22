@@ -101,7 +101,7 @@ namespace RTSLockstep.Pathfinding
 
                 rawNode = rawMarkedNodes[SearchCount];
 
-                if (rawNode.IsNotNull())              
+                if (rawNode.IsNotNull())
                 {
                     rawNode.FlowField.HasLOS = false;
 
@@ -168,7 +168,7 @@ namespace RTSLockstep.Pathfinding
                     {
                         neighbors = rawNode.UnblockedNeighboursOf();
 
-                        // exclude LOS from a node is it has blockers for neighbors
+                        // exclude LOS from a node if it has blockers for neighbors
                         if (neighbors.Count < 8)
                         {
                             rawNode.FlowField.HasLOS = false;

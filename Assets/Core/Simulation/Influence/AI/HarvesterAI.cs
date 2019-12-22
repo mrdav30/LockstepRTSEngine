@@ -15,7 +15,7 @@ namespace RTSLockstep
 
         public override bool ShouldMakeDecision()
         {
-            if (cachedAgent.Tag != AgentTag.Harvester)
+            if (CachedAgent.Tag != AgentTag.Harvester)
             {
                 // were not even a harvester....
                 return false;
@@ -23,15 +23,15 @@ namespace RTSLockstep
             else if (searchCount <= 0)
             {
                 searchCount = SearchRate;
-                if (!cachedAgent.MyStats.CachedHarvest.IsCasting
-                    && (cachedAgent.MyStats.CachedHarvest.IsHarvesting || cachedAgent.MyStats.CachedHarvest.IsEmptying))
+                if (!CachedAgent.MyStats.CachedHarvest.IsCasting
+                    && (CachedAgent.MyStats.CachedHarvest.IsHarvesting || CachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     // We're ready to go but have no target
                     return true;
                 }
             }
 
-            if (cachedAgent.MyStats.CachedHarvest.IsEmptying || cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+            if (CachedAgent.MyStats.CachedHarvest.IsEmptying || CachedAgent.MyStats.CachedHarvest.IsHarvesting)
             {
                 // busy harvesting or emptying
                 searchCount -= 1;
@@ -53,27 +53,27 @@ namespace RTSLockstep
             {
                 Func<RTSAgent, bool> agentConditional = null;
 
-                if (cachedAgent.MyStats.CachedHarvest.IsEmptying)
+                if (CachedAgent.MyStats.CachedHarvest.IsEmptying)
                 {
                     agentConditional = (other) =>
                     {
                         Structure structure = other.GetAbility<Structure>();
-                        return other.GlobalID != cachedAgent.GlobalID
+                        return other.GlobalID != CachedAgent.GlobalID
                                 && CachedAgentValid(other)
                                 && structure.IsNotNull()
-                                && structure.CanStoreResources(cachedAgent.MyStats.CachedHarvest.HarvestType)
+                                && structure.CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)
                                 && !structure.NeedsConstruction;
                     };
                 }
-                else if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+                else if (CachedAgent.MyStats.CachedHarvest.IsHarvesting)
                 {
                     agentConditional = (other) =>
                     {
                         ResourceDeposit resourceDeposit = other.GetAbility<ResourceDeposit>();
-                        return other.GlobalID != cachedAgent.GlobalID
+                        return other.GlobalID != CachedAgent.GlobalID
                                 && CachedAgentValid(other)
                                 && resourceDeposit.IsNotNull()
-                                && resourceDeposit.ResourceType == cachedAgent.MyStats.CachedHarvest.HarvestType
+                                && resourceDeposit.ResourceType == CachedAgent.MyStats.CachedHarvest.HarvestType
                                 && !resourceDeposit.IsEmpty();
                     };
                 }
@@ -88,18 +88,18 @@ namespace RTSLockstep
             {
                 Func<byte, bool> allianceConditional = null;
 
-                if (cachedAgent.MyStats.CachedHarvest.IsEmptying)
+                if (CachedAgent.MyStats.CachedHarvest.IsEmptying)
                 {
                     allianceConditional = (bite) =>
                     {
-                        return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0); ;
+                        return ((CachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Friendly) != 0); ;
                     };
                 }
-                else if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+                else if (CachedAgent.MyStats.CachedHarvest.IsHarvesting)
                 {
                     allianceConditional = (bite) =>
                     {
-                        return ((cachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Neutral) != 0); ;
+                        return ((CachedAgent.Controller.GetAllegiance(bite) & AllegianceType.Neutral) != 0); ;
                     };
                 }
 
@@ -116,27 +116,27 @@ namespace RTSLockstep
 
             if (agentConditional.IsNotNull())
             {
-                Vector2d scanPos = cachedAgent.Body.Position;
-                if (cachedAgent.MyStats.CachedHarvest.IsHarvesting)
+                Vector2d scanPos = CachedAgent.Body.Position;
+                if (CachedAgent.MyStats.CachedHarvest.IsHarvesting)
                 {
-                    if (cachedAgent.MyStats.CachedHarvest.LastResourceTarget.IsNotNull())
+                    if (CachedAgent.MyStats.CachedHarvest.LastResourceTarget.IsNotNull())
                     {
-                        if (!cachedAgent.MyStats.CachedHarvest.LastResourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
+                        if (!CachedAgent.MyStats.CachedHarvest.LastResourceTarget.GetAbility<ResourceDeposit>().IsEmpty())
                         {
                             // no need to search, we still got some goods
-                            return cachedAgent.MyStats.CachedHarvest.LastResourceTarget;
+                            return CachedAgent.MyStats.CachedHarvest.LastResourceTarget;
                         }
                         else
                         {
                             // Search where the last resource target was for new goods
-                            scanPos = cachedAgent.MyStats.CachedHarvest.LastResourceTarget.Body.Position;
+                            scanPos = CachedAgent.MyStats.CachedHarvest.LastResourceTarget.Body.Position;
                         }
                     }
                 }
 
                 agent = InfluenceManager.Scan(
                      scanPos,
-                     cachedAgent.MyStats.Sight,
+                     CachedAgent.MyStats.Sight,
                      agentConditional,
                      allianceConditional
                  );
@@ -147,10 +147,10 @@ namespace RTSLockstep
                 // agent couldn't find storage within sight
                 // double check storage doesn't exist somewhere, anywhere!
                 if (agent.IsNull()
-                    && (cachedAgent.MyStats.CachedHarvest.IsHarvesting && cachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0
-                    || cachedAgent.MyStats.CachedHarvest.IsEmptying))
+                    && (CachedAgent.MyStats.CachedHarvest.IsHarvesting && CachedAgent.MyStats.CachedHarvest.GetCurrentLoad() > 0
+                    || CachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
-                    agent = cachedAgent.MyStats.CachedHarvest.LastStorageTarget.IsNotNull() ? cachedAgent.MyStats.CachedHarvest.LastStorageTarget
+                    agent = CachedAgent.MyStats.CachedHarvest.LastStorageTarget.IsNotNull() ? CachedAgent.MyStats.CachedHarvest.LastStorageTarget
                         : ClosestResourceStorage();
                 }
             }
@@ -166,17 +166,17 @@ namespace RTSLockstep
                 Structure closestResourceStore = nearbyAgent.GetAbility<Structure>();
 
                 if (closestResource.IsNotNull()
-                    && closestResource.ResourceType == cachedAgent.MyStats.CachedHarvest.HarvestType
+                    && closestResource.ResourceType == CachedAgent.MyStats.CachedHarvest.HarvestType
                     || closestResourceStore.IsNotNull()
-                    && nearbyAgent.GetAbility<Structure>().CanStoreResources(cachedAgent.MyStats.CachedHarvest.HarvestType)
+                    && nearbyAgent.GetAbility<Structure>().CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)
                 )
                 {
                     // send harvest command
                     Command harvestCom = new Command(AbilityDataItem.FindInterfacer("Harvest").ListenInputID);
                     harvestCom.Add(new DefaultData(DataType.UShort, nearbyAgent.GlobalID));
 
-                    harvestCom.ControllerID = cachedAgent.Controller.ControllerID;
-                    harvestCom.Add(new Influence(cachedAgent));
+                    harvestCom.ControllerID = CachedAgent.Controller.ControllerID;
+                    harvestCom.Add(new Influence(CachedAgent));
 
                     CommandManager.SendCommand(harvestCom);
                 }
@@ -190,10 +190,10 @@ namespace RTSLockstep
             //change list to fastarray
             List<RTSAgent> playerBuildings = new List<RTSAgent>();
             // use RTS influencer?
-            foreach (RTSAgent child in cachedAgent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
+            foreach (RTSAgent child in CachedAgent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
             {
                 if (child.GetAbility<Structure>()
-                    && child.GetAbility<Structure>().CanStoreResources(cachedAgent.MyStats.CachedHarvest.HarvestType)
+                    && child.GetAbility<Structure>().CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)
                     && !child.GetAbility<Structure>().NeedsConstruction)
                 {
                     playerBuildings.Add(child);
@@ -201,7 +201,7 @@ namespace RTSLockstep
             }
             if (playerBuildings.Count > 0)
             {
-                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, cachedAgent.transform.position) as RTSAgent;
+                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, CachedAgent.transform.position) as RTSAgent;
                 return nearestObject;
             }
             else

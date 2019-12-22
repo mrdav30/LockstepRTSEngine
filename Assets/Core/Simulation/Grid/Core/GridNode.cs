@@ -208,22 +208,22 @@ namespace RTSLockstep.Grid
         public void AddObstacle()
         {
 #if DEBUG
-            if (this._obstacleCount == byte.MaxValue)
+            if (_obstacleCount == byte.MaxValue)
             {
-                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(this.gridX, this.gridY));
+                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(gridX, gridY));
             }
 #endif
-            this._obstacleCount++;
+            _obstacleCount++;
             GridManager.NotifyGridChanged();
         }
 
         public void RemoveObstacle()
         {
-            if (this._obstacleCount == 0)
+            if (_obstacleCount == 0)
             {
-                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(this.gridX, this.gridY));
+                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(gridX, gridY));
             }
-            this._obstacleCount--;
+            _obstacleCount--;
             GridManager.NotifyGridChanged();
         }
 
