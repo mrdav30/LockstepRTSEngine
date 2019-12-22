@@ -33,7 +33,7 @@ namespace RTSLockstep
         public Vector2d AveragePosition { get; set; }
 
         // add a little padding to manevour around blockers
-        public int GridSize { get { return Agent.Body.Radius.CeilToInt(); } } // (int)Math.Round(Agent.Body.Radius.CeilToInt(), MidpointRounding.AwayFromZero); } }// * 1.5f
+        public int GridSize { get { return Agent.Body.Radius.CeilToInt(); } }
 
         public Vector2d Position { get { return Agent.Body.Position; } }
 
@@ -88,9 +88,10 @@ namespace RTSLockstep
         private long distanceToMove;
         // How far away the agent stops from the target
         private long closingDistance;
-        private long stuckTolerance;
 
         private int stuckTime;
+        public bool IsStuck;
+        private long stuckTolerance;
 
         private int RepathTries;
         private bool DoPathfind;
@@ -154,6 +155,7 @@ namespace RTSLockstep
             hasPath = false;
             IsMoving = false;
             IsAvoidingLeft = false;
+            IsStuck = false;
             stuckTime = 0;
             RepathTries = 0;
 
@@ -166,7 +168,6 @@ namespace RTSLockstep
         {
             if (CanMove)
             {
-                //TODO: Organize/split this function
                 if (IsMoving)
                 {
                     // check if agent has to pathfind, otherwise straight path to rely on destination
@@ -351,45 +352,7 @@ namespace RTSLockstep
                 }
             }
 
-            //If unit has not moved stuckThreshold in a frame, it's stuck
-            stuckTime++;
-            if (GetCanAutoStop())
-            {
-                if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold))
-                {
-                    if (stuckTime > StuckTimeThreshold)
-                    {
-                        if (RepathTries < StuckRepathTries)
-                        {
-                            // attempt to repath agent by themselves
-                            Debug.Log("Stuck Agent");
-                            if (MyMovementGroup.IsNotNull())
-                            {
-                                MyMovementGroup.Remove(this);
-                            }
-                            DoPathfind = true;
-                            hasPath = false;
-                            straightPath = false;
-                            RepathTries++;
-                        }
-                        else
-                        {
-                            // we've tried to many times, we stuck stuck
-                            Arrive();
-                        }
-                        stuckTime = 0;
-                    }
-                }
-                else
-                {
-                    if (stuckTime > 0)
-                    {
-                        stuckTime -= 1;
-                    }
-
-                    RepathTries = 0;
-                }
-            }
+            CheckMovementStatus(stuckThreshold);
 
             // cap accelateration
             long currentVelocity = desiredVelocity.SqrMagnitude();
@@ -410,6 +373,53 @@ namespace RTSLockstep
 
             //Apply the force
             Agent.Body.Velocity += GetAdjustVector(desiredVelocity);
+        }
+
+        private void CheckMovementStatus(long stuckThreshold)
+        {
+            stuckTime++;
+            // if auto stopping is paused (i.e. attack moving), the abili
+            if (GetCanAutoStop())
+            {
+                //If unit has not moved stuckThreshold in a frame, it's stuck
+                if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold))
+                {
+                    if (stuckTime > StuckTimeThreshold)
+                    {
+                        if (RepathTries < StuckRepathTries)
+                        {
+                            // attempt to repath agent by themselves
+                            if (MyMovementGroup.IsNotNull())
+                            {
+                                MyMovementGroup.Remove(this);
+                            }
+                            DoPathfind = true;
+                            hasPath = false;
+                            straightPath = false;
+                            RepathTries++;
+                        }
+                        else
+                        {
+                            // we've tried to many times, we stuck stuck
+                            IsStuck = true;
+                            Arrive();
+                        }
+
+                        stuckTime = 0;
+                    }
+                }
+                else
+                {
+                    IsStuck = false;
+
+                    if (stuckTime > 0)
+                    {
+                        stuckTime -= 1;
+                    }
+
+                    RepathTries = 0;
+                }
+            }
         }
 
         private Vector2d SteeringBehaviorFlowField(Vector2d gridPos)
@@ -552,8 +562,7 @@ namespace RTSLockstep
                 {
                     // check to make sure we didn't find ourselves and that the other agent can move
                     if (Agent.GlobalID != other.GlobalID
-                    && other.GetAbility<Move>()
-                    && (other.GetAbility<Move>().IsMoving || other.GetAbility<Move>().Arrived))
+                    && other.GetAbility<Move>())
                     {
                         (other.Body.Position - Position).Normalize(out long distanceMag);
 
@@ -791,6 +800,8 @@ namespace RTSLockstep
             StopPauseLooker = 0;
             StopPauseLayer = 0;
 
+            stuckTime = 0;
+
             Arrived = true;
 
             OnArrive?.Invoke();
@@ -843,7 +854,7 @@ namespace RTSLockstep
             if (otherMover.IsNotNull() && IsMoving)
             {
                 //if agent is assigned move group and the other mover is moving to a similar point
-                if (MyMovementGroupID >= 0 && otherMover.MyMovementGroupID == MyMovementGroupID
+                if (otherMover.MyMovementGroupID == MyMovementGroupID
                     || otherMover.Destination.FastDistance(Destination) <= (closingDistance * closingDistance))
                 {
                     if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)
