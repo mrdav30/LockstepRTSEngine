@@ -86,7 +86,7 @@ namespace RTSLockstep.Pathfinding
                 retY = (steep ? x : y);
 
                 currentNode = GridManager.Grid[GridManager.GetGridIndex(retX, retY)];
-                if (currentNode.IsNotNull() && currentNode.Unpassable())
+                if (currentNode.IsNotNull() && (currentNode.Unpassable() || currentNode.LinkedScanNode.AgentCount > 0))
                 {
                     break;
                 }
