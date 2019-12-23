@@ -346,6 +346,8 @@ namespace RTSLockstep
 
                 fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
                 fastRangeToTarget *= fastRangeToTarget;
+
+                OnStartAttackMove();
             }
             else
             {
@@ -412,44 +414,33 @@ namespace RTSLockstep
                             StartWindup();
                         }
                     }
-                    else
+                    else if (Agent.MyStats.CanMove)
                     {
-                        if (Agent.MyStats.CanMove)
+                        if (!Agent.MyStats.CachedMove.IsMoving
+                            && !Agent.MyStats.CachedMove.MoveOnGroupProcessed
+                            && Agent.MyStats.CachedMove.IsStuck)
                         {
-                            Agent.MyStats.CachedMove.PauseAutoStop();
-                            Agent.MyStats.CachedMove.PauseCollisionStop();
-                            if (!Agent.MyStats.CachedMove.IsMoving
-                                && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
+                            Agent.StopCast();
+                            Agent.Body.Priority = basePriority;
+                        }
+                        else if (!inRange && repathTimer.AdvanceFrame())
+                        {
+                            if (CurrentTarget.Body.PositionChangedBuffer &&
+                                CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                             {
+                                Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
+                                Agent.MyStats.CachedMove.PauseAutoStop();
+                                Agent.MyStats.CachedMove.PauseCollisionStop();
                                 OnStartAttackMove();
-                                Agent.Body.Priority = basePriority;
-                            }
-                            else
-                            {
-                                if (inRange)
-                                {
-                                    Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
-                                }
-                                else
-                                {
-                                    if (repathTimer.AdvanceFrame())
-                                    {
-                                        if (CurrentTarget.Body.PositionChangedBuffer &&
-                                            CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
-                                        {
-                                            OnStartAttackMove();
-                                            //So units don't sync up and path on the same frame
-                                            repathTimer.AdvanceFrames(repathRandom);
-                                        }
-                                    }
-                                }
+                                //So units don't sync up and path on the same frame
+                                repathTimer.AdvanceFrames(repathRandom);
                             }
                         }
+                    }
 
-                        if (inRange)
-                        {
-                            inRange = false;
-                        }
+                    if (inRange)
+                    {
+                        inRange = false;
                     }
                 }
 

@@ -146,9 +146,9 @@ namespace RTSLockstep
 
         protected override void OnExecute(Command com)
         {
-                Agent.StopCast(ID);
-                IsCasting = true;
-                RegisterConstructGroup();
+            Agent.StopCast(ID);
+            IsCasting = true;
+            RegisterConstructGroup();
         }
 
         protected virtual void OnStartConstructMove()
@@ -249,6 +249,8 @@ namespace RTSLockstep
 
                 fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentProject.Body.IsNotNull() ? CurrentProject.Body.Radius : 0) + Agent.Body.Radius;
                 fastRangeToTarget *= fastRangeToTarget;
+
+                OnStartConstructMove();
             }
             else
             {
@@ -335,44 +337,33 @@ namespace RTSLockstep
                             StartWindup();
                         }
                     }
-                    else
+                    else if (Agent.MyStats.CanMove)
                     {
-                        if (Agent.MyStats.CanMove)
+                        if (!Agent.MyStats.CachedMove.IsMoving
+                            && !Agent.MyStats.CachedMove.MoveOnGroupProcessed
+                            && Agent.MyStats.CachedMove.IsStuck)
                         {
-                            Agent.MyStats.CachedMove.PauseAutoStop();
-                            Agent.MyStats.CachedMove.PauseCollisionStop();
-                            if (!Agent.MyStats.CachedMove.IsMoving
-                                && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
+                            Agent.StopCast();
+                            Agent.Body.Priority = basePriority;
+                        }
+                        else if (!inRange && repathTimer.AdvanceFrame())
+                        {
+                            if (CurrentProject.Body.PositionChangedBuffer &&
+                                CurrentProject.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                             {
+                                Agent.MyStats.CachedMove.Destination = CurrentProject.Body.Position;
+                                Agent.MyStats.CachedMove.PauseAutoStop();
+                                Agent.MyStats.CachedMove.PauseCollisionStop();
                                 OnStartConstructMove();
-                                Agent.Body.Priority = basePriority;
-                            }
-                            else
-                            {
-                                if (inRange)
-                                {
-                                    Agent.MyStats.CachedMove.Destination = CurrentProject.Body.Position;
-                                }
-                                else
-                                {
-                                    if (repathTimer.AdvanceFrame())
-                                    {
-                                        if (CurrentProject.Body.PositionChangedBuffer &&
-                                            CurrentProject.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
-                                        {
-                                            OnStartConstructMove();
-                                            //So units don't sync up and path on the same frame
-                                            repathTimer.AdvanceFrames(repathRandom);
-                                        }
-                                    }
-                                }
+                                //So units don't sync up and path on the same frame
+                                repathTimer.AdvanceFrames(repathRandom);
                             }
                         }
+                    }
 
-                        if (inRange)
-                        {
-                            inRange = false;
-                        }
+                    if (inRange)
+                    {
+                        inRange = false;
                     }
                 }
 

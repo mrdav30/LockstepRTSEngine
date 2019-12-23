@@ -288,6 +288,9 @@ namespace RTSLockstep
             {
                 CurrentTarget = currentTarget;
 
+                IsFocused = true;
+                IsHarvestMoving = false;
+
                 if (IsHarvesting)
                 {
                     ResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
@@ -302,10 +305,9 @@ namespace RTSLockstep
                     SetHarvestAnimState();
                 }
 
-                IsFocused = true;
-                IsHarvestMoving = false;
-
                 targetVersion = currentTarget.SpawnVersion;
+
+                OnStartHarvestMove();
             }
             else
             {
@@ -394,44 +396,33 @@ namespace RTSLockstep
                             StartWindup();
                         }
                     }
-                    else
+                    else if (Agent.MyStats.CanMove)
                     {
-                        if (Agent.MyStats.CanMove)
+                        if (!Agent.MyStats.CachedMove.IsMoving
+                            && !Agent.MyStats.CachedMove.MoveOnGroupProcessed
+                            && Agent.MyStats.CachedMove.IsStuck)
                         {
-                            Agent.MyStats.CachedMove.PauseAutoStop();
-                            Agent.MyStats.CachedMove.PauseCollisionStop();
-                            if (!Agent.MyStats.CachedMove.IsMoving
-                                && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
+                            Agent.StopCast();
+                            Agent.Body.Priority = basePriority;
+                        }
+                        else if (!inRange && repathTimer.AdvanceFrame())
+                        {
+                            if (CurrentTarget.Body.PositionChangedBuffer &&
+                                CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                             {
+                                Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
+                                Agent.MyStats.CachedMove.PauseAutoStop();
+                                Agent.MyStats.CachedMove.PauseCollisionStop();
                                 OnStartHarvestMove();
-                                Agent.Body.Priority = basePriority;
-                            }
-                            else
-                            {
-                                if (inRange)
-                                {
-                                    Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
-                                }
-                                else
-                                {
-                                    if (repathTimer.AdvanceFrame())
-                                    {
-                                        if (CurrentTarget.Body.PositionChangedBuffer &&
-                                            CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
-                                        {
-                                            OnStartHarvestMove();
-                                            //So units don't sync up and path on the same frame
-                                            repathTimer.AdvanceFrames(repathRandom);
-                                        }
-                                    }
-                                }
+                                //So units don't sync up and path on the same frame
+                                repathTimer.AdvanceFrames(repathRandom);
                             }
                         }
+                    }
 
-                        if (inRange)
-                        {
-                            inRange = false;
-                        }
+                    if (inRange)
+                    {
+                        inRange = false;
                     }
                 }
 
