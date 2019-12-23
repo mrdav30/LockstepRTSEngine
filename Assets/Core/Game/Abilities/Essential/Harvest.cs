@@ -398,11 +398,19 @@ namespace RTSLockstep
                     }
                     else if (Agent.MyStats.CanMove)
                     {
+                        bool needsRepath = false;
                         if (!Agent.MyStats.CachedMove.IsMoving
-                            && !Agent.MyStats.CachedMove.MoveOnGroupProcessed
-                            && Agent.MyStats.CachedMove.IsStuck)
+                            && !Agent.MyStats.CachedMove.MoveOnGroupProcessed)
                         {
-                            Agent.StopCast();
+                            if (Agent.MyStats.CachedMove.IsStuck)
+                            {
+                                StopHarvest();
+                            }
+                            else
+                            {
+                                needsRepath = true;
+                            }
+
                             Agent.Body.Priority = basePriority;
                         }
                         else if (!inRange && repathTimer.AdvanceFrame())
@@ -410,13 +418,18 @@ namespace RTSLockstep
                             if (CurrentTarget.Body.PositionChangedBuffer &&
                                 CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (repathDistance * repathDistance))
                             {
-                                Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
-                                Agent.MyStats.CachedMove.PauseAutoStop();
-                                Agent.MyStats.CachedMove.PauseCollisionStop();
-                                OnStartHarvestMove();
+                                needsRepath = true;
                                 //So units don't sync up and path on the same frame
                                 repathTimer.AdvanceFrames(repathRandom);
                             }
+                        }
+
+                        if (needsRepath)
+                        {
+                            Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
+                            Agent.MyStats.CachedMove.PauseAutoStop();
+                            Agent.MyStats.CachedMove.PauseCollisionStop();
+                            OnStartHarvestMove();
                         }
                     }
 

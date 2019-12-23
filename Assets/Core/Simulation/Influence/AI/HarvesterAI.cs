@@ -23,7 +23,7 @@ namespace RTSLockstep
             else if (searchCount <= 0)
             {
                 searchCount = SearchRate;
-                if (!CachedAgent.MyStats.CachedHarvest.IsCasting
+                if (!CachedAgent.MyStats.CachedHarvest.IsFocused && !CachedAgent.MyStats.CachedHarvest.IsHarvestMoving
                     && (CachedAgent.MyStats.CachedHarvest.IsHarvesting || CachedAgent.MyStats.CachedHarvest.IsEmptying))
                 {
                     // We're ready to go but have no target
@@ -31,7 +31,7 @@ namespace RTSLockstep
                 }
             }
 
-            if (CachedAgent.MyStats.CachedHarvest.IsEmptying || CachedAgent.MyStats.CachedHarvest.IsHarvesting)
+            if (CachedAgent.MyStats.CachedHarvest.IsEmptying || CachedAgent.MyStats.CachedHarvest.IsHarvesting || CachedAgent.MyStats.CachedHarvest.IsHarvestMoving)
             {
                 // busy harvesting or emptying
                 searchCount -= 1;

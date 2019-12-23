@@ -87,7 +87,7 @@ namespace RTSLockstep
         // How far we move each update
         private long distanceToMove;
         // How far away the agent stops from the target
-        private long closingDistance;
+        private long _closingDistance;
 
         private int stuckTime;
         public bool IsStuck;
@@ -131,7 +131,7 @@ namespace RTSLockstep
             //Cleaner stops with more decelleration
             timescaledDecceleration = timescaledAcceleration * 4;
             //Fatter objects can afford to land imprecisely
-            closingDistance = Agent.Body.Radius;
+            _closingDistance = Agent.Body.Radius;
             stuckTolerance = ((Agent.Body.Radius * MovementSpeed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
             SlowArrival = true;
@@ -315,44 +315,29 @@ namespace RTSLockstep
             if (distanceToMove > slowDistance)
             {
                 desiredVelocity = movementDirection;
-                if (Agent.MyStats.CanTurn)
-                {
-                    Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
-                }
             }
-            else
+            else if (distanceToMove <= slowDistance && distanceToMove > FixedMath.Mul(_closingDistance, StopMultiplier))
             {
-                if (distanceToMove < FixedMath.Mul(closingDistance, StopMultiplier))
-                {
-                    Arrive();
-                    //TODO: Don't skip this frame of slowing down
-                    return;
-                }
+                long closingSpeed = distanceToMove.Div(slowDistance);
 
-                if (distanceToMove > closingDistance)
-                {
-                    if (Agent.MyStats.CanTurn)
-                    {
-                        Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
-                    }
-                }
-
-                if (distanceToMove <= slowDistance)
-                {
-                    long closingSpeed = distanceToMove.Div(slowDistance);
-                    if (Agent.MyStats.CanTurn)
-                    {
-                        Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
-                    }
-
-                    desiredVelocity = movementDirection * closingSpeed;
-                    decelerating = true;
-                    //Reduce occurence of units preventing other units from reaching destination
-                    stuckThreshold *= 5;
-                }
+                desiredVelocity = movementDirection * closingSpeed;
+                decelerating = true;
+                //Reduce occurence of units preventing other units from reaching destination
+                stuckThreshold *= 5;
             }
 
             CheckMovementStatus(stuckThreshold);
+
+            if (distanceToMove < FixedMath.Mul(_closingDistance, StopMultiplier))
+            {
+                Arrive();
+                //TODO: Don't skip this frame of slowing down
+                return;
+            }
+            else if (Agent.MyStats.CanTurn)
+            {
+                Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
+            }
 
             // cap accelateration
             long currentVelocity = desiredVelocity.SqrMagnitude();
@@ -388,6 +373,7 @@ namespace RTSLockstep
                     {
                         if (RepathTries < StuckRepathTries)
                         {
+                            Debug.Log("Stuck Agent!");
                             // attempt to repath agent by themselves
                             if (MyMovementGroup.IsNotNull())
                             {
@@ -400,6 +386,7 @@ namespace RTSLockstep
                         }
                         else
                         {
+                            Debug.Log("Stuck Agent arriving!");
                             // we've tried to many times, we stuck stuck
                             IsStuck = true;
                             Arrive();
@@ -831,6 +818,8 @@ namespace RTSLockstep
 
                 IsCasting = false;
 
+                Agent.Animator.SetIdleState();
+
                 OnStopMove?.Invoke();
             }
         }
@@ -855,7 +844,7 @@ namespace RTSLockstep
             {
                 //if agent is assigned move group and the other mover is moving to a similar point
                 if (otherMover.MyMovementGroupID == MyMovementGroupID
-                    || otherMover.Destination.FastDistance(Destination) <= (closingDistance * closingDistance))
+                    || otherMover.Destination.FastDistance(Destination) <= (_closingDistance * _closingDistance))
                 {
                     if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)
                     {
@@ -892,7 +881,7 @@ namespace RTSLockstep
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (DrawPath && _flowFieldBuffer.IsNotNull() && !straightPath)
+            if (DrawPath && _flowFieldBuffer.IsNotNull()) // && !straightPath
             {
                 const float height = 0.25f;
                 foreach (KeyValuePair<Vector2d, FlowField> flow in _flowFieldBuffer)
