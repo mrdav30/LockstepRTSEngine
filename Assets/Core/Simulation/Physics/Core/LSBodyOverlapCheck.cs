@@ -91,9 +91,9 @@ namespace RTSLockstep
                     }
                 case ColliderType.AABox:
                     {
-
+                        // use circle overlap check for now
+                        goto case ColliderType.Circle;
                     }
-                    break;
                 case ColliderType.Polygon:
                     {
                         bool intersected = false;

@@ -75,13 +75,13 @@ namespace RTSLockstep
                     for (int p = Body.PastGridYMin; p <= Body.PastGridYMax; p++)
                     {
                         PartitionNode node = GetNode(o, p);
-                        if (Body.Immovable)
+                        if (Body.Immovable && !Body.Agent.Selectable)
                         {
-                            node.RemoveImmovable(Body.ID);
+                            node.RemoveStaticObject(Body.ID);
                         }
                         else
                         {
-                            node.Remove(Body.ID);
+                            node.RemoveDynamicObject(Body.ID);
                         }
                     }
                 }
@@ -182,13 +182,13 @@ namespace RTSLockstep
                 {
                     PartitionNode node = GetNode(i, j);
                     Body.PartitionChanged = true;
-                    if (Body.Immovable)
+                    if (Body.Immovable && !Body.Agent.Selectable)
                     {
-                        node.AddImmovable(Body.ID);
+                        node.AddStaticObject(Body.ID);
                     }
                     else
                     {
-                        node.Add(Body.ID);
+                        node.AddDynamicObject(Body.ID);
                     }
                 }
             }
