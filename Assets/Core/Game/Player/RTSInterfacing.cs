@@ -95,56 +95,35 @@ namespace RTSLockstep
             checkOrigin = ray.origin;
 
             //Raycast to plane Z-0
-            var start = new Vector3d(ray.origin);
-            Vector3d end;
-            end = new Vector3d(ray.origin + ray.direction * 50);
+            Vector3d start = new Vector3d(checkOrigin);
+            Vector3d end = new Vector3d(checkOrigin + checkDir * 5000);
 
-            if (ray.direction.y < -.05f)
+            if (checkDir.y < -.05f)
             {
-                float planeDist = ray.origin.y / -ray.direction.y;
+                float planeDist = checkOrigin.y / -checkDir.y;
                 if (planeDist < 100)
                 {
-                    end = new Vector3d(ray.origin + ray.direction * planeDist);
+                    end = new Vector3d(checkOrigin + checkDir * planeDist);
                 }
             }
             IEnumerable<LSBody> raycast = Raycaster.RaycastAll(start, end);
 
             foreach (var body in raycast)
-            {
-                if (body.Agent.IsNull())
-                {
-                    continue;
-                }
-
-                RTSAgent agent = body.Agent;
-
-                if (agent.IsVisible)
-                {
-                    if (conditional(agent))
+            { 
+                    if (body.Agent.IsNull())
                     {
-                        if (AgentIntersects(agent))
+                        continue;
+                    }
+
+                    RTSAgent agent = body.Agent;
+
+                    if (agent.IsVisible)
+                    {
+                        if (conditional(agent))
                         {
-                            if (agentFound)
-                            {
-                                if (heightDif < closestDistance)
-                                {
-                                    closestDistance = heightDif;
-                                    closestAgent = agent;
-                                }
-                            }
-                            else
-                            {
-                                agentFound = true;
-                                closestAgent = agent;
-                                closestDistance = heightDif;
-                            }
+                            return agent;
                         }
                     }
-                }
-            }
-            if (agentFound)
-            {
-                return closestAgent;
             }
 
             return null;

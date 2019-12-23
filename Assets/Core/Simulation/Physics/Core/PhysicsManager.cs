@@ -161,7 +161,7 @@ namespace RTSLockstep
                 SimObjects[i] = null;
             }
             DynamicSimObjects.FastClear();
-            Raycaster._Version = 0;
+            Raycaster.Version = 0;
             PeakCount = 0;
             CachedIDs.FastClear();
 

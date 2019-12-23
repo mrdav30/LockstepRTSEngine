@@ -1,17 +1,15 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using FastCollections;
 using System.Collections.Generic;
 using PanLineAlgorithm;
 using System;
 
 namespace RTSLockstep
 {
-
     public static class Raycaster
     {
-        internal static uint _Version { get; set; }
+        internal static uint Version { get; set; }
 
-        public static readonly FastList<Vector2d> bufferIntersectionPoints = new FastList<Vector2d>();
+        private static readonly FastList<Vector2d> bufferIntersectionPoints = new FastList<Vector2d>();
 
         /// <summary>
         /// Conditional for raycasting. Reset after every raycast. Access Raycaster.CurBody for the current body being checked.
@@ -19,13 +17,12 @@ namespace RTSLockstep
         /// <value>The conditional.</value>
         public static Func<bool> Conditional { get; set; }
 
-
         public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end)
         {
-            _Version++;
+            Version++;
             LSBody.PrepareAxisCheck(start, end);
             foreach (FractionalLineAlgorithm.Coordinate coor in
-                GetRelevantNodeCoordinates (start,end))
+                GetRelevantNodeCoordinates(start, end))
             {
                 int indexX = coor.X;
                 int indexY = coor.Y;
@@ -36,12 +33,12 @@ namespace RTSLockstep
                 PartitionNode node = Partition.GetNode(indexX, indexY);
                 for (int i = node.ContainedDynamicObjects.Count - 1; i >= 0; i--)
                 {
-                    LSBody body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [i]];
-					if (body.IsNotNull() && body.RaycastVersion != _Version)
+                    LSBody body = PhysicsManager.SimObjects[node.ContainedDynamicObjects[i]];
+                    if (body.IsNotNull() && body.RaycastVersion != Version)
                     {
                         if (Conditional.IsNull() || Conditional())
                         {
-                            body.RaycastVersion = _Version;
+                            body.RaycastVersion = Version;
                             if (body.Overlaps(bufferIntersectionPoints))
                             {
                                 yield return body;
@@ -53,7 +50,6 @@ namespace RTSLockstep
             Conditional = null;
             yield break;
         }
-
 
         public static LSBody CurBody { get; private set; }
 
@@ -69,28 +65,31 @@ namespace RTSLockstep
                 Vector2d end = end3d.ToVector2d();
                 if (heightSlope == 0)
                 {
-                
-                } else
+                    yield return null;
+                }
+                else
                 {
                     //TODO: return bodies based on hit order
-                    foreach (LSBody body in RaycastAll(start,end))
+                    foreach (LSBody body in RaycastAll(start, end))
                     {
                         bool heightIntersects = false;
                         bool mined = false;
                         bool maxed = false;
                         for (int i = bufferIntersectionPoints.Count - 1; i >= 0; i--)
                         {
-                            long dist = bufferIntersectionPoints [i].Distance(start);
+                            long dist = bufferIntersectionPoints[i].Distance(start);
                             long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
 
                             //TODO: Make this more accurate
                             if (heightAtBodyPosition < body.HeightMin)
                             {
                                 mined = true;
-                            } else if (heightAtBodyPosition > body.HeightMax)
+                            }
+                            else if (heightAtBodyPosition > body.HeightMax)
                             {
                                 maxed = true;
-                            } else
+                            }
+                            else
                             {
                                 heightIntersects = true;
                                 break;
@@ -101,9 +100,11 @@ namespace RTSLockstep
                                 break;
                             }
                         }
+
                         if (heightIntersects)
+                        {
                             yield return body;
-                    
+                        }
                     }
                 }
             }
@@ -118,8 +119,6 @@ namespace RTSLockstep
                 Partition.GetRelativeY(end.x).ToDouble(),
                 Partition.GetRelativeY(end.y).ToDouble()))
             {
-                //int indexX = coor.X;
-                //int indexY = coor.Y;
                 yield return coor;
             }
         }

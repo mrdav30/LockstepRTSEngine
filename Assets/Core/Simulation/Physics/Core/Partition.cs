@@ -193,6 +193,7 @@ namespace RTSLockstep
                 }
             }
         }
+       
         /// <summary>
         /// Returns true if size changed. False if not.
         /// </summary>
@@ -261,6 +262,7 @@ namespace RTSLockstep
         {
             return (xPos >> AdditionalShiftSize) - (FixedMath.Create(BoundX));
         }
+
         public static long GetRelativeY(long yPos)
         {
             return (yPos >> AdditionalShiftSize) - (FixedMath.Create(BoundY));
