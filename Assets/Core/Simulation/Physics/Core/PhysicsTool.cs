@@ -41,9 +41,9 @@ namespace RTSLockstep
                             output.Add(body);
                         }
                     }
-                    for (int l = node.ContainedImmovableObjects.Count - 1; l >= 0; l--)
+                    for (int l = node.ContainedStaticObjects.Count - 1; l >= 0; l--)
                     {
-                        var body = PhysicsManager.SimObjects[node.ContainedImmovableObjects[l]];
+                        var body = PhysicsManager.SimObjects[node.ContainedStaticObjects[l]];
                         long minFastDist = body.Radius + radius;
                         //unnormalized distance value for comparison
                         minFastDist *= minFastDist;
