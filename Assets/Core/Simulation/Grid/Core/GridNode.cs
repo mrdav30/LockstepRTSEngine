@@ -47,6 +47,14 @@ namespace RTSLockstep.Grid
             }
         }
 
+        public bool Occupied
+        {
+            get
+            {
+                return LinkedScanNode.IsNotNull() && LinkedScanNode.AgentCount > 0;
+            }
+        }
+
         public byte ClearanceSource;
         /// <summary>
         /// How many connections until the closest unwalkable node.

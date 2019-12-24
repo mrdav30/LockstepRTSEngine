@@ -207,6 +207,7 @@ namespace RTSLockstep.Pathfinding
                             cacheCoord = coordinate;
                         }
                     }
+
                     if (validTriggered)
                     {
                         if (currentNode.IsNotNull() || !currentNode.Unwalkable)
@@ -242,14 +243,13 @@ namespace RTSLockstep.Pathfinding
             }
         }
 
-        public static Vector2d ClosestFlowFieldPostion(Vector2d gridPos, Dictionary<Vector2d, FlowField> _flowFieldBuffer)
+        public static Vector2d ClosestFlowFieldPostion(Vector2d gridPos, Dictionary<Vector2d, FlowField> _flowFieldBuffer, long withinSight)
         {
             foreach (KeyValuePair<Vector2d, FlowField> keyValuePair in _flowFieldBuffer)
             {
-                long closeEnough = FixedMath.One * 3;
                 Vector2d flowFieldPos = keyValuePair.Key;
-                bool xInPos = gridPos.x > flowFieldPos.x - closeEnough && gridPos.x < flowFieldPos.x + closeEnough;
-                bool yInPos = gridPos.y > flowFieldPos.y - closeEnough && gridPos.y < flowFieldPos.y + closeEnough;
+                bool xInPos = gridPos.x > flowFieldPos.x - withinSight && gridPos.x < flowFieldPos.x + withinSight;
+                bool yInPos = gridPos.y > flowFieldPos.y - withinSight && gridPos.y < flowFieldPos.y + withinSight;
                 if (xInPos && yInPos)
                 {
                     return flowFieldPos;

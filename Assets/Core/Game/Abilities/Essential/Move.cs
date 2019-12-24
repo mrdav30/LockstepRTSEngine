@@ -286,7 +286,7 @@ namespace RTSLockstep
                     {
                         // agent landed on a spot with no flow, 
                         // try to course correct by finding clostest flow field to move towards
-                        movementDirection = Pathfinder.ClosestFlowFieldPostion(currentNode.GridPos, _flowFieldBuffer) - Agent.Body.Position;
+                        movementDirection = Pathfinder.ClosestFlowFieldPostion(currentNode.GridPos, _flowFieldBuffer, Agent.MyStats.Sight) - Agent.Body.Position;
                     }
                 }
             }

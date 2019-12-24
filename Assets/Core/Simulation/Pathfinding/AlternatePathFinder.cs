@@ -9,23 +9,36 @@ namespace RTSLockstep.Pathfinding
     public class AlternativeNodeFinder
     {
         public static AlternativeNodeFinder Instance = new AlternativeNodeFinder();
-        private int XGrid, YGrid, MaxTestDistance;
-        private GridNode closestNode;
-        private bool castNodeFound;
-        private Vector2d WorldPos;
-        private Vector2d OffsettedPos;
+        private int _xGrid, _yGrid, _maxTestDistance;
+        private GridNode _closestNode;
+        private bool _castNodeFound;
+        private Vector2d _worldPos;
+        private Vector2d _offsettedPos;
 
-        private int dirX, dirY;
-        private int layer;
+        private int _dirX, _dirY;
+        private int _layer;
 
-        private long closestDistance;
+
+        private long _closestDistance;
+
+        public void SetValues(Vector2d worldPos, int xGrid, int yGrid, int maxTestDistance)
+        {
+            _xGrid = xGrid;
+            _yGrid = yGrid;
+            _maxTestDistance = maxTestDistance;
+            _worldPos = worldPos;
+            _offsettedPos = GridManager.GetOffsettedPos(worldPos);
+            _closestNode = null;
+            _castNodeFound = false;
+            _layer = 1;
+        }
 
         public bool CheckValidNeighbor(GridNode node)
         {
             for (int i = 0; i < 8; i++)
             {
                 var temp = node.NeighborNodes[i];
-                if (temp.IsNotNull() && temp.Unwalkable == false)
+                if (temp.IsNotNull() && !temp.Unwalkable)
                 {
                     return true;
                 }
@@ -34,89 +47,80 @@ namespace RTSLockstep.Pathfinding
             return false;
         }
 
-        public void SetValues(Vector2d worldPos, int xGrid, int yGrid, int maxTestDistance)
-        {
-            XGrid = xGrid;
-            YGrid = yGrid;
-            MaxTestDistance = maxTestDistance;
-            WorldPos = worldPos;
-            OffsettedPos = GridManager.GetOffsettedPos(worldPos);
-            closestNode = null;
-            castNodeFound = false;
-            layer = 1;
-        }
-
         public GridNode GetNode()
         {
             //Calculated closest side to raycast in first
-            long xDif = OffsettedPos.x - XGrid;
+            long xDif = _offsettedPos.x - _xGrid;
             xDif = xDif.ClampOne();
-            long yDif = OffsettedPos.y - YGrid;
+            long yDif = _offsettedPos.y - _yGrid;
             yDif = yDif.ClampOne();
             long nodeHalfWidth = FixedMath.One / 2;
+
             //Check to see if we should raycast towards corner first
             if ((xDif.Abs() >= nodeHalfWidth / 2)
                 && (yDif.Abs() >= nodeHalfWidth / 2))
             {
-                dirX = FixedMath.RoundToInt(xDif);
-                dirY = FixedMath.RoundToInt(yDif);
+                _dirX = FixedMath.RoundToInt(xDif);
+                _dirY = FixedMath.RoundToInt(yDif);
             }
             else
             {
                 if (xDif.Abs() < yDif.Abs())
                 {
-                    dirX = 0;
-                    dirY = yDif.RoundToInt();
+                    _dirX = 0;
+                    _dirY = yDif.RoundToInt();
                 }
                 else
                 {
-                    dirX = xDif.RoundToInt();
-                    dirY = 0;
+                    _dirX = xDif.RoundToInt();
+                    _dirY = 0;
                 }
             }
 
-            int layerStartX = dirX,
-                layerStartY = dirY;
+            int layerStartX = _dirX,
+                layerStartY = _dirY;
             int iterations = 0; // <- this is for debugging
 
-            for (layer = 1; layer <= this.MaxTestDistance;)
+            for (_layer = 1; _layer <= _maxTestDistance;)
             {
-                GridNode checkNode = GridManager.GetNode(XGrid + dirX, YGrid + dirY);
-                if (checkNode != null)
+                GridNode checkNode = GridManager.GetNode(_xGrid + _dirX, _yGrid + _dirY);
+                if (checkNode.IsNotNull())
                 {
-                    this.CheckPathNode(checkNode);
-                    if (this.castNodeFound)
+                    CheckPathNode(checkNode);
+                    if (_castNodeFound)
                     {
-                        return this.closestNode;
+                        return _closestNode;
                     }
                 }
+
                 AdvanceRotation();
                 //If we make a full loop
-                if (layerStartX == dirX && layerStartY == dirY)
+                if (layerStartX == _dirX && layerStartY == _dirY)
                 {
-                    layer++;
+                    _layer++;
                     //Advance a layer instead of rotation
-                    if (dirX > 0)
+                    if (_dirX > 0)
                     {
-                        dirX = layer;
+                        _dirX = _layer;
                     }
-                    else if (dirX < 0)
+                    else if (_dirX < 0)
                     {
-                        dirX = -layer;
-                    }
-
-                    if (dirY > 0)
-                    {
-                        dirY = layer;
-                    }
-                    else if (dirY < 0)
-                    {
-                        dirY = -layer;
+                        _dirX = -_layer;
                     }
 
-                    layerStartX = dirX;
-                    layerStartY = dirY;
+                    if (_dirY > 0)
+                    {
+                        _dirY = _layer;
+                    }
+                    else if (_dirY < 0)
+                    {
+                        _dirY = -_layer;
+                    }
+
+                    layerStartX = _dirX;
+                    layerStartY = _dirY;
                 }
+
                 iterations++;
                 if (iterations > 500)
                 {
@@ -126,87 +130,87 @@ namespace RTSLockstep.Pathfinding
             }
 
             //If the cast node is found or the side has been checked, do not raycast on that side
-            if (!castNodeFound)
+            if (!_castNodeFound)
             {
                 return null;
             }
             else
             {
-                return closestNode;
+                return _closestNode;
             }
         }
         //Advances the rotation clockwise
         private void AdvanceRotation()
         {
             //sides
-            if (dirX == 0)
+            if (_dirX == 0)
             {
                 //up
-                if (dirY == 1)
+                if (_dirY == 1)
                 {
-                    dirX = layer;
+                    _dirX = _layer;
                 }
                 //down
                 else
                 {
-                    dirX = -layer;
+                    _dirX = -_layer;
                 }
             }
-            else if (dirY == 0)
+            else if (_dirY == 0)
             {
                 //right
-                if (dirX == 1)
+                if (_dirX == 1)
                 {
-                    dirY = -layer;
+                    _dirY = -_layer;
                 }
                 //left
                 else
                 {
-                    dirY = layer;
+                    _dirY = _layer;
                 }
             }
             //corners
-            else if (dirX > 0)
+            else if (_dirX > 0)
             {
                 //top-right
-                if (dirY > 0)
+                if (_dirY > 0)
                 {
-                    dirY = 0;
+                    _dirY = 0;
                 }
                 //bot-right
                 else
                 {
-                    dirX = 0;
+                    _dirX = 0;
                 }
             }
             else
             {
                 //top-left
-                if (dirY > 0)
+                if (_dirY > 0)
                 {
-                    dirX = 0;
+                    _dirX = 0;
                 }
                 else
                 {
-                    dirY = 0;
+                    _dirY = 0;
                 }
             }
         }
 
         private void CheckPathNode(GridNode node)
         {
-            if (node != null && node.Unwalkable == false)
+            if (node.IsNotNull() && !node.Unwalkable)
             {
-                long distance = node.WorldPos.FastDistance(this.WorldPos);
-                if (closestNode == null || distance < closestDistance)
+                long distance = node.WorldPos.FastDistance(_worldPos);
+                if (_closestNode.IsNull() || distance < _closestDistance)
                 {
-                    closestNode = node;
-                    closestDistance = distance;
-                    castNodeFound = true;
+                    _closestNode = node;
+                    _closestDistance = distance;
+                    _castNodeFound = true;
                 }
                 else
                 {
-                    castNodeFound = false;
+                    _castNodeFound = false;
                 }
             }
         }
