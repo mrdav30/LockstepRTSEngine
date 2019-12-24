@@ -8,25 +8,25 @@ namespace RTSLockstep
 {
     public class ConstructGroup
     {
-        private MovementGroup constructMoveGroup;
+        private MovementGroup _constructMoveGroup;
         public Queue<RTSAgent> GroupConstructionQueue = new Queue<RTSAgent>();
 
-        private RTSAgent currentGroupTarget;
+        private RTSAgent _currentGroupTarget;
 
-        public int indexID { get; set; }
+        public int IndexID { get; set; }
 
-        private byte controllerID;
+        private byte _controllerID;
 
-        private FastList<Construct> constructors;
+        private FastList<Construct> _constructors;
 
         private bool _calculatedBehaviors;
 
         public void Initialize(Command com)
         {
             _calculatedBehaviors = false;
-            controllerID = com.ControllerID;
-            Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
-            constructors = new FastList<Construct>(selection.selectedAgentLocalIDs.Count);
+            _controllerID = com.ControllerID;
+            Selection selection = AgentController.InstanceManagers[_controllerID].GetSelection(com);
+            _constructors = new FastList<Construct>(selection.selectedAgentLocalIDs.Count);
 
             // check if we're queueing structures to construct
             if (com.ContainsData<QueueStructure>())
@@ -42,22 +42,26 @@ namespace RTSLockstep
                 {
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
-                        currentGroupTarget = tempTarget;
+                        _currentGroupTarget = tempTarget;
                     }
                 }
             }
 
-            if (currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (_currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for constructors based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
                 {
-                    ControllerID = controllerID
+                    ControllerID = _controllerID
                 };
 
-                moveCommand.Add(currentGroupTarget.Body.Position);
+                moveCommand.Add(_currentGroupTarget.Body.Position);
 
-                constructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                _constructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                if (_constructMoveGroup.IsNotNull())
+                {
+                    _constructMoveGroup.AllowUnwalkableEndNode = true;
+                }
             }
         }
 
@@ -68,22 +72,22 @@ namespace RTSLockstep
 
         public void LateSimulate()
         {
-            if (constructors.IsNotNull())
+            if (_constructors.IsNotNull())
             {
-                if (constructors.Count > 0)
+                if (_constructors.Count > 0)
                 {
                     if (!_calculatedBehaviors)
                     {
                         _calculatedBehaviors = CalculateAndExecuteBehaviors();
                     }
-                    else if ((currentGroupTarget.IsNull() || !currentGroupTarget.GetAbility<Structure>().NeedsConstruction) && GroupConstructionQueue.Count > 0)
+                    else if ((_currentGroupTarget.IsNull() || !_currentGroupTarget.GetAbility<Structure>().NeedsConstruction) && GroupConstructionQueue.Count > 0)
                     {
-                        currentGroupTarget = GroupConstructionQueue.Dequeue();
+                        _currentGroupTarget = GroupConstructionQueue.Dequeue();
                         _calculatedBehaviors = false;
                     }
                 }
 
-                if (constructors.Count == 0)
+                if (_constructors.Count == 0)
                 {
                     Deactivate();
                 }
@@ -94,34 +98,34 @@ namespace RTSLockstep
         {
             if (constructor.MyConstructGroup.IsNotNull())
             {
-                constructor.MyConstructGroup.constructors.Remove(constructor);
+                constructor.MyConstructGroup._constructors.Remove(constructor);
             }
 
-            if (currentGroupTarget.IsNotNull())
+            if (_currentGroupTarget.IsNotNull())
             {
                 constructor.MyConstructGroup = this;
-                constructor.MyConstructGroupID = indexID;
+                constructor.MyConstructGroupID = IndexID;
 
-                constructors.Add(constructor);
+                _constructors.Add(constructor);
 
-                if (constructMoveGroup.IsNotNull())
+                if (_constructMoveGroup.IsNotNull())
                 {
                     // add the constructor to our contructor move group too!
-                    constructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
+                    _constructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
                 }
             }
         }
 
         public void Remove(Construct constructor)
         {
-            if (constructor.MyConstructGroup.IsNotNull() && constructor.MyConstructGroupID == indexID)
+            if (constructor.MyConstructGroup.IsNotNull() && constructor.MyConstructGroupID == IndexID)
             {
-                constructors.Remove(constructor);
+                _constructors.Remove(constructor);
 
-                if (constructMoveGroup.IsNotNull())
+                if (_constructMoveGroup.IsNotNull())
                 {
                     // Remove the constructor from our contructor move group too!
-                    constructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
+                    _constructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
                 }
             }
         }
@@ -140,7 +144,7 @@ namespace RTSLockstep
                 QStructure qStructure = _queueStructures[i].Value;
                 if (qStructure.IsNotNull())
                 {
-                    RTSAgent newRTSAgent = AgentController.InstanceManagers[controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
+                    RTSAgent newRTSAgent = AgentController.InstanceManagers[_controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
                     Structure newStructure = newRTSAgent.GetAbility<Structure>();
 
                     // remove the bounds so we can get to the temp structure from any angle
@@ -163,9 +167,9 @@ namespace RTSLockstep
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        AgentController.InstanceManagers[controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
+                        AgentController.InstanceManagers[_controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
 
-                        newRTSAgent.SetCommander(AgentController.InstanceManagers[controllerID].Commander);
+                        newRTSAgent.SetCommander(AgentController.InstanceManagers[_controllerID].Commander);
 
                         newRTSAgent.gameObject.name = newRTSAgent.objectName;
                         newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
@@ -175,10 +179,10 @@ namespace RTSLockstep
                         // Set to transparent material until constructor is in range to start
                         ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);
 
-                        if (currentGroupTarget.IsNull())
+                        if (_currentGroupTarget.IsNull())
                         {
                             //Set the current project if we don't have one
-                            currentGroupTarget = newRTSAgent;
+                            _currentGroupTarget = newRTSAgent;
                         }
                         else
                         {
@@ -197,27 +201,27 @@ namespace RTSLockstep
         private void Deactivate()
         {
             Construct constructor;
-            for (int i = 0; i < constructors.Count; i++)
+            for (int i = 0; i < _constructors.Count; i++)
             {
-                constructor = constructors[i];
+                constructor = _constructors[i];
                 constructor.MyConstructGroup = null;
                 constructor.MyConstructGroupID = -1;
             }
-            constructors.FastClear();
+            _constructors.FastClear();
             GroupConstructionQueue.Clear();
-            currentGroupTarget = null;
-            constructMoveGroup = null;
+            _currentGroupTarget = null;
+            _constructMoveGroup = null;
             ConstructionGroupHelper.Pool(this);
             _calculatedBehaviors = false;
-            indexID = -1;
+            IndexID = -1;
         }
 
         private void ExecuteConstruction()
         {
-            for (int i = 0; i < constructors.Count; i++)
+            for (int i = 0; i < _constructors.Count; i++)
             {
-                Construct constructor = constructors[i];
-                constructor.OnConstructGroupProcessed(currentGroupTarget);
+                Construct constructor = _constructors[i];
+                constructor.OnConstructGroupProcessed(_currentGroupTarget);
             }
         }
     }

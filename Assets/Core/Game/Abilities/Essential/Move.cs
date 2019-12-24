@@ -44,7 +44,9 @@ namespace RTSLockstep
 
         public MovementType MyMovementType { get; set; }
 
+        public bool CanMove { get; private set; }
         public bool IsMoving { get; private set; }
+        public bool IsStuck { get; private set; }
 
         [HideInInspector]
         public Vector2d Destination;
@@ -52,12 +54,12 @@ namespace RTSLockstep
         public bool IsAvoidingLeft;
         private long _minAvoidanceDistance;
 
-        private const int MinimumOtherStopTime = LockstepManager.FrameRate / 4;
-        private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
-        private const int StuckRepathTries = 4;
+        private const int _minimumOtherStopTime = LockstepManager.FrameRate / 4;
+        private const int _stuckTimeThreshold = LockstepManager.FrameRate / 4;
+        private const int _stuckRepathTries = 4;
 
-        private bool hasPath;
-        private bool straightPath;
+        private bool _hasPath;
+        private bool _straightPath;
 
         // key = world position, value = vector flow field
         private Dictionary<Vector2d, FlowField> _flowFields = new Dictionary<Vector2d, FlowField>();
@@ -66,46 +68,44 @@ namespace RTSLockstep
         private int StoppedTime;
 
         #region Auto stopping properites
-        private const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
-        private int AutoStopPauser;
+        private const int _autoStopPauseTime = LockstepManager.FrameRate / 8;
+        private int _autoStopPauser;
 
-        private int StopPauseLayer;
+        private int _stopPauseLayer;
 
-        private int CollisionStopPauser;
+        private int _collisionStopPauser;
 
-        private int StopPauseLooker;
+        private int _stopPauseLooker;
         #endregion
 
-        private long timescaledAcceleration;
-        private long timescaledDecceleration;
-        private bool decelerating;
+        private long _timescaledAcceleration;
+        private long _timescaledDecceleration;
+        private bool _decelerating;
 
-        public GridNode currentNode;
-        private GridNode destinationNode;
-        private bool viableDestination;
+        private GridNode _currentNode;
+        private GridNode _destinationNode;
+        private bool _allowUnwalkableEndNode;
+        private bool _viableDestination;
 
         // How far we move each update
-        private long distanceToMove;
+        private long _distanceToMove;
         // How far away the agent stops from the target
         private long _closingDistance;
 
-        private int stuckTime;
-        public bool IsStuck;
-        private long stuckTolerance;
+        private int _stuckTime;
+        private long _stuckTolerance;
 
-        private int RepathTries;
-        private bool DoPathfind;
+        private int _repathTries;
+        private bool _doPathfind;
 
-        private readonly int collidedCount;
-        private readonly ushort collidedID;
+        private readonly int _collidedCount;
+        private readonly ushort _collidedID;
 
-        private RTSAgent tempAgent;
-        private readonly bool paused;
+        private RTSAgent _tempAgent;
+        private readonly bool _paused;
 
-        private Vector2d movementDirection;
-        private Vector2d desiredVelocity;
-
-        public bool CanMove { get; private set; }
+        private Vector2d _movementDirection;
+        private Vector2d _desiredVelocity;
 
         #region Serialized
         [SerializeField, FixedNumber]
@@ -127,13 +127,13 @@ namespace RTSLockstep
 
             DrawPath = false;
 
-            timescaledAcceleration = Acceleration.Mul(MovementSpeed) / LockstepManager.FrameRate;
+            _timescaledAcceleration = Acceleration.Mul(MovementSpeed) / LockstepManager.FrameRate;
             //Cleaner stops with more decelleration
-            timescaledDecceleration = timescaledAcceleration * 4;
+            _timescaledDecceleration = _timescaledAcceleration * 4;
             //Fatter objects can afford to land imprecisely
             _closingDistance = Agent.Body.Radius;
-            stuckTolerance = ((Agent.Body.Radius * MovementSpeed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
-            stuckTolerance *= stuckTolerance;
+            _stuckTolerance = ((Agent.Body.Radius * MovementSpeed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
+            _stuckTolerance *= _stuckTolerance;
             SlowArrival = true;
         }
 
@@ -144,24 +144,24 @@ namespace RTSLockstep
             MyMovementType = MovementType.Individual;
             MyMovementGroupID = -1;
 
-            AutoStopPauser = 0;
-            CollisionStopPauser = 0;
-            StopPauseLooker = 0;
-            StopPauseLayer = 0;
+            _autoStopPauser = 0;
+            _collisionStopPauser = 0;
+            _stopPauseLooker = 0;
+            _stopPauseLayer = 0;
 
             StopMultiplier = DirectStop;
 
             Destination = Vector2d.zero;
-            hasPath = false;
+            _hasPath = false;
             IsMoving = false;
             IsAvoidingLeft = false;
             IsStuck = false;
-            stuckTime = 0;
-            RepathTries = 0;
+            _stuckTime = 0;
+            _repathTries = 0;
 
             Arrived = true;
             AveragePosition = Agent.Body.Position;
-            DoPathfind = false;
+            _doPathfind = false;
         }
 
         protected override void OnSimulate()
@@ -176,13 +176,13 @@ namespace RTSLockstep
                         ValidateMovementPath();
                     }
 
-                    movementDirection = SetMovementDirection();
+                    _movementDirection = SetMovementDirection();
                     SetDesiredVelocity();
                 }
                 else
                 {
                     // agent is not moving
-                    decelerating = true;
+                    _decelerating = true;
 
                     //Slowin' down
                     if (Agent.Body.VelocityMagnitude > 0)
@@ -192,64 +192,73 @@ namespace RTSLockstep
 
                     StoppedTime++;
                 }
-                decelerating = false;
+                _decelerating = false;
 
-                AutoStopPauser--;
-                CollisionStopPauser--;
-                StopPauseLooker--;
+                _autoStopPauser--;
+                _collisionStopPauser--;
+                _stopPauseLooker--;
                 AveragePosition = AveragePosition.Lerped(Agent.Body.Position, FixedMath.One / 2);
             }
         }
 
         private void ValidateMovementPath()
         {
-            if (GridSize <= 1 && Pathfinder.GetStartNode(Position, out currentNode)
-                || Pathfinder.GetClosestViableNode(Position, Position, GridSize, out currentNode))
+            if (GridSize <= 1 && Pathfinder.GetStartNode(Position, out _currentNode)
+                || Pathfinder.GetClosestViableNode(Position, Position, GridSize, out _currentNode))
             {
-                if (DoPathfind)
+                if (_doPathfind)
                 {
-                    DoPathfind = false;
-                    if (viableDestination)
+                    _doPathfind = false;
+                    if (_viableDestination)
                     {
-                        if (currentNode.DoesEqual(destinationNode))
+                        if (_currentNode.DoesEqual(_destinationNode))
                         {
-                            if (RepathTries >= 1)
+                            if (_repathTries >= 1)
                             {
                                 Arrive();
                             }
                         }
                         else
                         {
-                            if (Pathfinder.NeedsPath(currentNode, destinationNode, GridSize))
+                            GridNode targetNode = _destinationNode;
+                            // If agent is moving towards an unwalkable node, we can't use that to determine
+                            // if they need a path.  Flowfield LOS will pick up the straight path.
+                            if (_allowUnwalkableEndNode
+                                && Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out GridNode closestViableNode))
                             {
-                                straightPath = false;
+                                targetNode = closestViableNode;
+                            }
 
-                                PathRequestManager.RequestPath(currentNode, destinationNode, GridSize, (flowFields, success) =>
+                            if (Pathfinder.NeedsPath(_currentNode, targetNode, GridSize))
+                            {
+                                _straightPath = false;
+
+                                PathRequestManager.RequestPath(_currentNode, targetNode, GridSize, (flowFields, success) =>
                                 {
                                     _flowFields.Clear();
                                     if (success)
                                     {
-                                        hasPath = true;
+                                        _hasPath = true;
                                         _flowFields = flowFields;
                                     }
                                     else
                                     {
                                         // no path found, will have to start over
-                                        hasPath = false;
+                                        _hasPath = false;
                                     }
                                 });
                             }
                             else
                             {
                                 // no path required
-                                straightPath = true;
+                                _straightPath = true;
                             }
                         }
                     }
                     else
                     {
                         // can't get to destination
-                        hasPath = false;
+                        _hasPath = false;
                     }
                 }
             }
@@ -257,78 +266,78 @@ namespace RTSLockstep
 
         private Vector2d SetMovementDirection()
         {
-            if (straightPath)
+            if (_straightPath)
             {
                 // no need to check flow field, we got LOS
-                movementDirection = Destination - Agent.Body.Position;
+                _movementDirection = Destination - Agent.Body.Position;
             }
-            else if (hasPath)
+            else if (_hasPath)
             {
                 _flowFieldBuffer = MyMovementType == MovementType.Individual ? _flowFields : MyMovementGroup.GroupFlowFields;
 
                 if (_flowFieldBuffer.Count > 0)
                 {
-                    if (_flowFieldBuffer.TryGetValue(currentNode.GridPos, out FlowField flowField))
+                    if (_flowFieldBuffer.TryGetValue(_currentNode.GridPos, out FlowField flowField))
                     {
                         if (flowField.HasLOS)
                         {
                             // we have no more use for flow fields if the agent has line of sight to destination
-                            straightPath = true;
-                            movementDirection = Destination - Agent.Body.Position;
+                            _straightPath = true;
+                            _movementDirection = Destination - Agent.Body.Position;
                         }
                         else
                         {
                             //  Calculate steering for agent
-                            movementDirection = SteeringBehaviorFlowField(currentNode.GridPos);
+                            _movementDirection = SteeringBehaviorFlowField(_currentNode.GridPos);
                         }
                     }
                     else
                     {
                         // agent landed on a spot with no flow, 
                         // try to course correct by finding clostest flow field to move towards
-                        movementDirection = Pathfinder.ClosestFlowFieldPostion(currentNode.GridPos, _flowFieldBuffer, Agent.MyStats.Sight) - Agent.Body.Position;
+                        _movementDirection = Pathfinder.ClosestFlowFieldPostion(_currentNode.GridPos, _flowFieldBuffer, Agent.MyStats.Sight) - Agent.Body.Position;
                     }
                 }
             }
 
             // This is now the direction we want to be travelling in 
             // needs to be normalized
-            movementDirection.Normalize(out distanceToMove);
+            _movementDirection.Normalize(out _distanceToMove);
 
             if (MyMovementType != MovementType.Individual)
             {
                 // Calculate steering and flocking forces for all agents
-                movementDirection += CalculateGroupBehaviors();
+                _movementDirection += CalculateGroupBehaviors();
             }
 
             // avoid any intersection agents!
-            movementDirection += SteeringBehaviourAvoid();
+            _movementDirection += SteeringBehaviourAvoid();
 
-            return movementDirection;
+            return _movementDirection;
         }
 
         private void SetDesiredVelocity()
         {
-            long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
-            long slowDistance = Agent.Body.VelocityMagnitude.Div(timescaledDecceleration);
+            long stuckThreshold = _timescaledAcceleration / LockstepManager.FrameRate;
+            long slowDistance = Agent.Body.VelocityMagnitude.Div(_timescaledDecceleration);
 
-            if (distanceToMove > slowDistance)
+            if (_distanceToMove > slowDistance)
             {
-                desiredVelocity = movementDirection;
+                _desiredVelocity = _movementDirection;
             }
-            else if (distanceToMove <= slowDistance && distanceToMove > FixedMath.Mul(_closingDistance, StopMultiplier))
+            else if (_distanceToMove <= slowDistance && _distanceToMove > FixedMath.Mul(_closingDistance, StopMultiplier))
             {
-                long closingSpeed = distanceToMove.Div(slowDistance);
+                long closingSpeed = _distanceToMove.Div(slowDistance);
 
-                desiredVelocity = movementDirection * closingSpeed;
-                decelerating = true;
+                _desiredVelocity = _movementDirection * closingSpeed;
+                _decelerating = true;
                 //Reduce occurence of units preventing other units from reaching destination
                 stuckThreshold *= 5;
             }
 
             CheckMovementStatus(stuckThreshold);
 
-            if (distanceToMove < FixedMath.Mul(_closingDistance, StopMultiplier))
+            if (_distanceToMove < FixedMath.Mul(_closingDistance, StopMultiplier))
             {
                 Arrive();
                 //TODO: Don't skip this frame of slowing down
@@ -336,42 +345,42 @@ namespace RTSLockstep
             }
             else if (Agent.MyStats.CanTurn)
             {
-                Agent.MyStats.CachedTurn.StartTurnDirection(movementDirection);
+                Agent.MyStats.CachedTurn.StartTurnDirection(_movementDirection);
             }
 
             // cap accelateration
-            long currentVelocity = desiredVelocity.SqrMagnitude();
+            long currentVelocity = _desiredVelocity.SqrMagnitude();
             if (currentVelocity > Acceleration)
             {
-                desiredVelocity *= (Acceleration / FixedMath.Sqrt(currentVelocity)).CeilToInt();
+                _desiredVelocity *= (Acceleration / FixedMath.Sqrt(currentVelocity)).CeilToInt();
             }
 
             //Multiply our direction by speed for our desired speed
-            desiredVelocity *= MovementSpeed;
+            _desiredVelocity *= MovementSpeed;
 
             // Cap speed as required
             var currentSpeed = Agent.Body.Velocity.Magnitude();
             if (currentSpeed > MovementSpeed)
             {
-                desiredVelocity *= (MovementSpeed / currentSpeed).CeilToInt();
+                _desiredVelocity *= (MovementSpeed / currentSpeed).CeilToInt();
             }
 
             //Apply the force
-            Agent.Body.Velocity += GetAdjustVector(desiredVelocity);
+            Agent.Body.Velocity += GetAdjustVector(_desiredVelocity);
         }
 
         private void CheckMovementStatus(long stuckThreshold)
         {
-            stuckTime++;
+            _stuckTime++;
             // if auto stopping is paused (i.e. attack moving), the abili
             if (GetCanAutoStop())
             {
                 //If unit has not moved stuckThreshold in a frame, it's stuck
                 if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold))
                 {
-                    if (stuckTime > StuckTimeThreshold)
+                    if (_stuckTime > _stuckTimeThreshold)
                     {
-                        if (RepathTries < StuckRepathTries)
+                        if (_repathTries < _stuckRepathTries)
                         {
                             Debug.Log("Stuck Agent!");
                             // attempt to repath agent by themselves
@@ -379,10 +388,10 @@ namespace RTSLockstep
                             {
                                 MyMovementGroup.Remove(this);
                             }
-                            DoPathfind = true;
-                            hasPath = false;
-                            straightPath = false;
-                            RepathTries++;
+                            _doPathfind = true;
+                            _hasPath = false;
+                            _straightPath = false;
+                            _repathTries++;
                         }
                         else
                         {
@@ -392,19 +401,19 @@ namespace RTSLockstep
                             Arrive();
                         }
 
-                        stuckTime = 0;
+                        _stuckTime = 0;
                     }
                 }
                 else
                 {
                     IsStuck = false;
 
-                    if (stuckTime > 0)
+                    if (_stuckTime > 0)
                     {
-                        stuckTime -= 1;
+                        _stuckTime -= 1;
                     }
 
-                    RepathTries = 0;
+                    _repathTries = 0;
                 }
             }
         }
@@ -651,28 +660,28 @@ namespace RTSLockstep
         #region Autostopping
         public bool GetCanAutoStop()
         {
-            return AutoStopPauser <= 0;
+            return _autoStopPauser <= 0;
         }
 
         public bool GetCanCollisionStop()
         {
-            return CollisionStopPauser <= 0;
+            return _collisionStopPauser <= 0;
         }
 
         public void PauseAutoStop()
         {
-            AutoStopPauser = AUTO_STOP_PAUSE_TIME;
+            _autoStopPauser = _autoStopPauseTime;
         }
 
         public void PauseCollisionStop()
         {
-            CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
+            _collisionStopPauser = _autoStopPauseTime;
         }
 
         //TODO: Improve the naming
         private bool GetLookingForStopPause()
         {
-            return StopPauseLooker >= 0;
+            return _stopPauseLooker >= 0;
         }
 
         /// <summary>
@@ -680,7 +689,7 @@ namespace RTSLockstep
         /// </summary>
         public void StartLookingForStopPause()
         {
-            StopPauseLooker = AUTO_STOP_PAUSE_TIME;
+            _stopPauseLooker = _autoStopPauseTime;
         }
         #endregion
 
@@ -690,7 +699,7 @@ namespace RTSLockstep
             var velocityChange = desiredVelocity - Agent.Body._velocity;
             var adjustFastMag = velocityChange.FastMagnitude();
             //Cap acceleration vector magnitude
-            long accel = decelerating ? timescaledDecceleration : timescaledAcceleration;
+            long accel = _decelerating ? _timescaledDecceleration : _timescaledAcceleration;
 
             if (adjustFastMag > accel * (accel))
             {
@@ -739,7 +748,7 @@ namespace RTSLockstep
         public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false)
         {
             _flowFields.Clear();
-            straightPath = false;
+            _straightPath = false;
 
             IsMoving = true;
             StoppedTime = 0;
@@ -750,28 +759,30 @@ namespace RTSLockstep
 
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distanceToMove
-            stuckTime = 0;
-            RepathTries = 0;
+            _stuckTime = 0;
+            _repathTries = 0;
             IsCasting = true;
+
+            _allowUnwalkableEndNode = allowUnwalkableEndNode;
 
             // still need to check for viable destination for agents in group
             // if size requires consideration, use old next-best-node system
             // also a catch in case GetEndNode returns null
-            viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out destinationNode)
-                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out destinationNode));
+            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode)
+                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode));
 
-            Destination = destinationNode.IsNotNull() ? destinationNode.WorldPos : Vector2d.zero;
+            Destination = _destinationNode.IsNotNull() ? _destinationNode.WorldPos : Vector2d.zero;
 
             if (MyMovementType == MovementType.Individual)
             {
-                DoPathfind = true;
-                hasPath = false;
+                _doPathfind = true;
+                _hasPath = false;
             }
             else
             {
                 // we must be group moving
-                DoPathfind = false;
-                hasPath = true;
+                _doPathfind = false;
+                _hasPath = true;
             }
 
             OnStartMove?.Invoke();
@@ -782,12 +793,12 @@ namespace RTSLockstep
             StopMove();
 
             //TODO: Reset these variables when changing destination/command
-            AutoStopPauser = 0;
-            CollisionStopPauser = 0;
-            StopPauseLooker = 0;
-            StopPauseLayer = 0;
+            _autoStopPauser = 0;
+            _collisionStopPauser = 0;
+            _stopPauseLooker = 0;
+            _stopPauseLayer = 0;
 
-            stuckTime = 0;
+            _stuckTime = 0;
 
             Arrived = true;
 
@@ -809,12 +820,12 @@ namespace RTSLockstep
 
                 _flowFields.Clear();
 
-                movementDirection = Vector2d.zero;
-                desiredVelocity = Vector2d.zero;
+                _movementDirection = Vector2d.zero;
+                _desiredVelocity = Vector2d.zero;
 
-                DoPathfind = false;
-                hasPath = false;
-                straightPath = false;
+                _doPathfind = false;
+                _hasPath = false;
+                _straightPath = false;
 
                 IsCasting = false;
 
@@ -837,9 +848,9 @@ namespace RTSLockstep
                 return;
             }
 
-            tempAgent = other.Agent;
+            _tempAgent = other.Agent;
 
-            Move otherMover = tempAgent.GetAbility<Move>();
+            Move otherMover = _tempAgent.GetAbility<Move>();
             if (otherMover.IsNotNull() && IsMoving)
             {
                 //if agent is assigned move group and the other mover is moving to a similar point
@@ -849,7 +860,7 @@ namespace RTSLockstep
                     if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)
                     {
                         if (otherMover.Arrived
-                            && otherMover.StoppedTime > MinimumOtherStopTime)
+                            && otherMover.StoppedTime > _minimumOtherStopTime)
                         {
                             Debug.Log("Arrive after collision");
                             Arrive();
@@ -862,14 +873,14 @@ namespace RTSLockstep
                     //As soon as the original collision stop unit is released, units will start breaking out of pauses
                     if (!otherMover.GetCanCollisionStop())
                     {
-                        StopPauseLayer = -1;
+                        _stopPauseLayer = -1;
                         PauseAutoStop();
                     }
                     else if (!otherMover.GetCanAutoStop())
                     {
-                        if (otherMover.StopPauseLayer < StopPauseLayer)
+                        if (otherMover._stopPauseLayer < _stopPauseLayer)
                         {
-                            StopPauseLayer = otherMover.StopPauseLayer + 1;
+                            _stopPauseLayer = otherMover._stopPauseLayer + 1;
                             PauseAutoStop();
                         }
                     }
@@ -903,13 +914,13 @@ namespace RTSLockstep
             base.SaveDetails(writer);
             SaveManager.WriteInt(writer, "MyMovementGroupID", MyMovementGroupID);
             SaveManager.WriteBoolean(writer, "Moving", IsMoving);
-            SaveManager.WriteBoolean(writer, "HasPath", hasPath);
-            SaveManager.WriteBoolean(writer, "StraightPath", straightPath);
+            SaveManager.WriteBoolean(writer, "HasPath", _hasPath);
+            SaveManager.WriteBoolean(writer, "StraightPath", _straightPath);
             SaveManager.WriteInt(writer, "StoppedTime", StoppedTime);
             SaveManager.WriteVector2d(writer, "Destination", Destination);
             SaveManager.WriteBoolean(writer, "Arrived", Arrived);
             SaveManager.WriteVector2d(writer, "AveragePosition", AveragePosition);
-            SaveManager.WriteBoolean(writer, "Decelerating", decelerating);
+            SaveManager.WriteBoolean(writer, "Decelerating", _decelerating);
         }
 
         protected override void OnLoadProperty(JsonTextReader reader, string propertyName, object readValue)
@@ -924,10 +935,10 @@ namespace RTSLockstep
                     IsMoving = (bool)readValue;
                     break;
                 case "HasPath":
-                    hasPath = (bool)readValue;
+                    _hasPath = (bool)readValue;
                     break;
                 case "StraightPath":
-                    straightPath = (bool)readValue;
+                    _straightPath = (bool)readValue;
                     break;
                 case "StoppedTime":
                     StoppedTime = (int)readValue;
@@ -942,7 +953,7 @@ namespace RTSLockstep
                     AveragePosition = LoadManager.LoadVector2d(reader);
                     break;
                 case "Decelerating":
-                    decelerating = (bool)readValue;
+                    _decelerating = (bool)readValue;
                     break;
                 default: break;
             }

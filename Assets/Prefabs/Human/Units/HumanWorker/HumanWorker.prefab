@@ -157,6 +157,7 @@ MonoBehaviour:
     x: 0
     y: 0
   IsAvoidingLeft: 0
+  IsStuck: 0
   _movementSpeed: 262144
   _acceleration: 983040
   _canPathfind: 1
@@ -234,7 +235,7 @@ MonoBehaviour:
   _cooldown: 0
   MyConstructGroupID: 0
   CurrentProject: {fileID: 0}
-  constructAmount: 3276800
+  _constructAmount: 655360
   _constructionSpeed: 65536
   _buildActions:
   - HumanBarracks

@@ -132,7 +132,7 @@ namespace RTSLockstep.Pathfinding
             }
             else if (outputNode.Unwalkable)
             {
-                if (allowUnwalkableEndNode && AlternativeNodeFinder.Instance.CheckValidNeighbor(outputNode))
+                if (allowUnwalkableEndNode) // && AlternativeNodeFinder.Instance.CheckValidNeighbor(outputNode)
                 {
                     return true;
                 }
@@ -180,11 +180,16 @@ namespace RTSLockstep.Pathfinding
             }
         }
 
-        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode)
+        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false)
         {
             returnNode = GridManager.GetNode(dest.x, dest.y);
 
-            if (returnNode.Unwalkable)
+            if (returnNode.IsNull())
+            {
+                return false;
+            }
+
+            if (!allowUnwalkableEndNode && returnNode.Unwalkable)
             {
                 bool valid = false;
                 PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();

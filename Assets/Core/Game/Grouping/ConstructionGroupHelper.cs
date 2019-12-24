@@ -80,14 +80,14 @@ namespace RTSLockstep
         {
             ConstructGroup constructGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new ConstructGroup();
 
-            constructGroup.indexID = activeGroups.Add(constructGroup);
+            constructGroup.IndexID = activeGroups.Add(constructGroup);
             LastCreatedGroup = constructGroup;
             constructGroup.Initialize(com);
         }
 
         public static void Pool(ConstructGroup group)
         {
-            int indexID = group.indexID;
+            int indexID = group.IndexID;
             activeGroups.RemoveAt(indexID);
             pooledGroups.Add(group);
         }

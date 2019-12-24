@@ -5,8 +5,8 @@ namespace RTSLockstep
 {
     public class HarvestGroup
     {
-        private MovementGroup harvestMoveGroup;
-        private RTSAgent currentGroupTarget;
+        private MovementGroup _harvestMoveGroup;
+        private RTSAgent _currentGroupTarget;
 
         public int IndexID { get; set; }
 
@@ -30,12 +30,12 @@ namespace RTSLockstep
                     if (tempTarget.MyAgentType == AgentType.Resource
                         || tempTarget.MyAgentType == AgentType.Structure)
                     {
-                        currentGroupTarget = tempTarget;
+                        _currentGroupTarget = tempTarget;
                     }
                 }
             }
 
-            if (currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
+            if (_currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
             {
                 // create a movement group for harvesters based on the current project
                 Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
@@ -43,9 +43,13 @@ namespace RTSLockstep
                     ControllerID = controllerID
                 };
 
-                moveCommand.Add(currentGroupTarget.Body.Position);
+                moveCommand.Add(_currentGroupTarget.Body.Position);
 
-                harvestMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                _harvestMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
+                if (_harvestMoveGroup.IsNotNull())
+                {
+                    _harvestMoveGroup.AllowUnwalkableEndNode = true;
+                }
             }
         }
 
@@ -76,17 +80,17 @@ namespace RTSLockstep
                 harvester.MyHarvestGroup.harvesters.Remove(harvester);
             }
 
-            if (currentGroupTarget.IsNotNull())
+            if (_currentGroupTarget.IsNotNull())
             {
                 harvester.MyHarvestGroup = this;
                 harvester.MyHarvestGroupID = IndexID;
 
                 harvesters.Add(harvester);
 
-                if (harvestMoveGroup.IsNotNull())
+                if (_harvestMoveGroup.IsNotNull())
                 {
                     // add the harvester to our harvester move group too!
-                    harvestMoveGroup.Add(harvester.Agent.MyStats.CachedMove);
+                    _harvestMoveGroup.Add(harvester.Agent.MyStats.CachedMove);
                 }
             }
         }
@@ -99,21 +103,21 @@ namespace RTSLockstep
                 harvester.MyHarvestGroup = null;
                 harvester.MyHarvestGroupID = -1;
 
-                if (harvestMoveGroup.IsNotNull())
+                if (_harvestMoveGroup.IsNotNull())
                 {
                     // Remove the harvester from our harvester move group too!
-                    harvestMoveGroup.Remove(harvester.Agent.MyStats.CachedMove);
+                    _harvestMoveGroup.Remove(harvester.Agent.MyStats.CachedMove);
                 }
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (currentGroupTarget.MyAgentType == AgentType.Resource)
+            if (_currentGroupTarget.MyAgentType == AgentType.Resource)
             {
                 ExecuteHarvest();
             }
-            else if (currentGroupTarget.MyAgentType == AgentType.Structure || currentGroupTarget.IsNull())
+            else if (_currentGroupTarget.MyAgentType == AgentType.Structure || _currentGroupTarget.IsNull())
             {
                 // if current group target is null, execute a null deposit to stop harvest
                 ExecuteDeposit();
@@ -132,8 +136,8 @@ namespace RTSLockstep
                 harvester.MyHarvestGroupID = -1;
             }
             harvesters.FastClear();
-            currentGroupTarget = null;
-            harvestMoveGroup = null;
+            _currentGroupTarget = null;
+            _harvestMoveGroup = null;
             HarvestGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;
@@ -146,7 +150,7 @@ namespace RTSLockstep
                 Harvest harvester = harvesters[i];
                 harvester.IsHarvesting = true;
                 harvester.IsEmptying = false;
-                harvester.OnHarvestGroupProcessed(currentGroupTarget);
+                harvester.OnHarvestGroupProcessed(_currentGroupTarget);
             }
         }
 
@@ -157,7 +161,7 @@ namespace RTSLockstep
                 Harvest harvester = harvesters[i];
                 harvester.IsHarvesting = false;
                 harvester.IsEmptying = true;
-                harvester.OnHarvestGroupProcessed(currentGroupTarget);
+                harvester.OnHarvestGroupProcessed(_currentGroupTarget);
             }
         }
     }
