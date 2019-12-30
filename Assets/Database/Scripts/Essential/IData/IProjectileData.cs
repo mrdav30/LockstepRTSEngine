@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using RTSLockstep.Projectiles;
 
 namespace RTSLockstep.Data
 {

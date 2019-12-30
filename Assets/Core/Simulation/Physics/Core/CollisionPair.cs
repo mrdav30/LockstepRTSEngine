@@ -5,7 +5,11 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-namespace RTSLockstep
+using RTSLockstep.Managers;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public class CollisionPair
     {
@@ -262,11 +266,11 @@ namespace RTSLockstep
                 case CollisionType.Circle_Polygon:
                     if (Body1.Shape == ColliderType.Circle)
                     {
-                        this.DistributeCircle_Poly(Body1, Body2);
+                        DistributeCircle_Poly(Body1, Body2);
                     }
                     else
                     {
-                        this.DistributeCircle_Poly(Body2, Body1);
+                        DistributeCircle_Poly(Body2, Body1);
                     }
                     break;
             }

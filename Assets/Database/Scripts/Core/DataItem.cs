@@ -1,54 +1,57 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Collections.Generic;
-using System;
 
 namespace RTSLockstep.Data
 {
     [System.Serializable]
     public class DataItem
     {
-        public DataItem (string name) {
+        public DataItem(string name)
+        {
             _name = name;
         }
-        public DataItem() {}
+        public DataItem() { }
 
         [SerializeField]
         protected string
             _name;
-        
-        public string Name {
-            get { return _name; } 
+
+        public string Name
+        {
+            get { return _name; }
         }
 
 
-        public override string ToString ()
+        public override string ToString()
         {
             return Name;
         }
-        
-        public override int GetHashCode ()
+
+        public override int GetHashCode()
         {
-            return Name.GetHashCode ();
+            return Name.GetHashCode();
         }
 
-        public void Manage () {
-            OnManage ();
+        public void Manage()
+        {
+            OnManage();
         }
-        protected virtual void OnManage () {
-
-        }
-
-        public void Inject (params object[] data) {
-            OnInject (data);
-        }
-
-        protected virtual void OnInject (object[] data) {
+        protected virtual void OnManage()
+        {
 
         }
 
-     
+        public void Inject(params object[] data)
+        {
+            OnInject(data);
+        }
+
+        protected virtual void OnInject(object[] data)
+        {
+
+        }
+
+
     }
 
-   
+
 }

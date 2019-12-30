@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep.Data {
+﻿namespace RTSLockstep.Data
+{
     [System.Serializable]
-    public class DataItemCollection {
+    public class DataItemCollection
+    {
         public DataItem[] Data;
     }
 }

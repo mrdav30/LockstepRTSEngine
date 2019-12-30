@@ -1,28 +1,35 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using UnityEditor;
+using RTSLockstep.Managers;
+using RTSLockstep.Simulation.LSMath;
+
 namespace RTSLockstep
 {
     public static class Injector
     {
-        public static void SetTarget (UnityEngine.Object target) {
+        public static void SetTarget(Object target)
+        {
             Target = target;
         }
 
-        public static Object Target{ get; private set;}
+        public static Object Target { get; private set; }
         static SerializedObject so;
-        public static SerializedProperty GetProperty (string name) {
-            so = new SerializedObject (Target);
+        public static SerializedProperty GetProperty(string name)
+        {
+            so = new SerializedObject(Target);
             SerializedProperty prop = so.FindProperty(name);
             return prop;
         }
-        public static void Apply () {
+        public static void Apply()
+        {
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(Target);
         }
-        public static void SetField (string name, float value, FieldType fieldType) {
-            SerializedProperty prop = GetProperty (name);
-            switch (fieldType) {
+        public static void SetField(string name, float value, FieldType fieldType)
+        {
+            SerializedProperty prop = GetProperty(name);
+            switch (fieldType)
+            {
                 case FieldType.FixedNumber:
                     prop.longValue = FixedMath.Create(value);
                     break;
@@ -33,35 +40,39 @@ namespace RTSLockstep
                     prop.intValue = Mathf.RoundToInt((1 / value) * LockstepManager.FrameRate);
                     break;
             }
-            Apply ();
+            Apply();
         }
 
-        public static float GetField (string name, FieldType fieldType) {
-            SerializedProperty prop = GetProperty (name);
-            switch (fieldType) {
+        public static float GetField(string name, FieldType fieldType)
+        {
+            SerializedProperty prop = GetProperty(name);
+            switch (fieldType)
+            {
                 case FieldType.FixedNumber:
                     return prop.longValue.ToFloat();
-                    //break;
+                //break;
                 case FieldType.Interval:
-                    return prop.intValue / (float) LockstepManager.FrameRate;
-                    //break;
+                    return prop.intValue / (float)LockstepManager.FrameRate;
+                //break;
                 case FieldType.Rate:
                     return 1 / (prop.intValue / (float)LockstepManager.FrameRate);
                     //break;
             }
             return 0;
         }
-        public static void SetVector3 (string name, Vector3 value) {
-            SerializedProperty prop = GetProperty (name);
+        public static void SetVector3(string name, Vector3 value)
+        {
+            SerializedProperty prop = GetProperty(name);
             Vector3d vec = new Vector3d(value);
             prop.FindPropertyRelative("x").longValue = vec.x;
             prop.FindPropertyRelative("y").longValue = vec.y;
             prop.FindPropertyRelative("z").longValue = vec.z;
-            Apply ();
+            Apply();
         }
 
-        public static Vector3 GetVector3 (string name) {
-            SerializedProperty prop = GetProperty (name);
+        public static Vector3 GetVector3(string name)
+        {
+            SerializedProperty prop = GetProperty(name);
             Vector3d vec = new Vector3d(
                 prop.FindPropertyRelative("x").longValue,
                 prop.FindPropertyRelative("y").longValue,
@@ -70,7 +81,8 @@ namespace RTSLockstep
         }
 
     }
-    public enum FieldType {
+    public enum FieldType
+    {
         FixedNumber,
         Interval,
         Rate,

@@ -5,11 +5,18 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Determinism;
+using RTSLockstep.Managers;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     [System.Serializable]
     public partial class LSBody
@@ -136,7 +143,7 @@ namespace RTSLockstep
         public event CollisionFunction OnContactExit;
         public int Priority { get; set; }
         public int ID { get; private set; }
-        public RTSAgent Agent { get; private set; }
+        public LSAgent Agent { get; private set; }
         public long FastRadius { get; private set; }
         public bool PositionChangedBuffer { get; private set; } //D
         public bool RotationChangedBuffer { get; private set; } //D
@@ -365,7 +372,7 @@ namespace RTSLockstep
         private Quaternion visualRotation;
 
         #region Behavior
-        public void Setup(RTSAgent agent)
+        public void Setup(LSAgent agent)
         {
             if (Shape == ColliderType.Polygon)
             {

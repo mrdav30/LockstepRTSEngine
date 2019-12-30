@@ -1,34 +1,35 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using RTSLockstep.Data;
 using System;
 using System.Text;
 
-namespace RTSLockstep
+namespace RTSLockstep.Utility
 {
     public class Reader
     {
-        public Reader () {}
-        public Reader (byte[] source, int startIndex) {
-            this.Initialize (source,startIndex);
+        public Reader() { }
+        public Reader(byte[] source, int startIndex)
+        {
+            Initialize(source, startIndex);
         }
 
-        public int Position {get; private set;}
-        public int Length {get {return Source.Length;}}
-        public byte[] Source {get; private set;}
+        public int Position { get; private set; }
+        public int Length { get { return Source.Length; } }
+        public byte[] Source { get; private set; }
 
         public void Initialize(byte[] source, int startIndex)
         {
-            this.Source = source;
+            Source = source;
             Position = startIndex;
         }
 
-        public void MovePosition (int amount) {
+        public void MovePosition(int amount)
+        {
             Position += amount;
         }
 
         public byte ReadByte()
         {
-            byte ret = Source [Position];
+            byte ret = Source[Position];
             Position += 1;
             return ret;
         }
@@ -100,24 +101,25 @@ namespace RTSLockstep
             Position += byteLength;
             return ret;
         }
-        public byte[] ReadByteArray () {
+        public byte[] ReadByteArray()
+        {
             ushort byteLength = BitConverter.ToUInt16(Source, Position);
             Position += 2;
 
             byte[] ret = new byte[byteLength];
-            Array.Copy(Source,Position,ret,0,byteLength);
+            Array.Copy(Source, Position, ret, 0, byteLength);
 
             Position += byteLength;
             return ret;
 
         }
 
-		public TData Read <TData> () where TData : ICommandData 
-		{
-			TData data = Activator.CreateInstance<TData> ();
-			data.Read (this);
+        public TData Read<TData>() where TData : ICommandData
+        {
+            TData data = Activator.CreateInstance<TData>();
+            data.Read(this);
 
-			return data;
-		}
+            return data;
+        }
     }
 }

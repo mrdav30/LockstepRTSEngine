@@ -1,21 +1,19 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System;
+﻿using System;
 
-namespace RTSLockstep
+namespace RTSLockstep.Determinism
 {
-	[AttributeUsage(AttributeTargets.Property)]
-	public sealed class LockstepAttribute : Attribute
-	{
-		public bool DoReset { get; private set; }
-		public LockstepAttribute()
-		{
-			this.DoReset = false;
-		}
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class LockstepAttribute : Attribute
+    {
+        public bool DoReset { get; private set; }
+        public LockstepAttribute()
+        {
+            DoReset = false;
+        }
 
-		public LockstepAttribute(bool doReset)
-		{
-			DoReset = doReset;
-		}
-	}
+        public LockstepAttribute(bool doReset)
+        {
+            DoReset = doReset;
+        }
+    }
 }

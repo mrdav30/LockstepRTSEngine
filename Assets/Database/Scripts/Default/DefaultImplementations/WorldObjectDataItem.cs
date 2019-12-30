@@ -1,27 +1,28 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System;
-using System.Collections.Generic;
 
-using RTSLockstep.Data;
 namespace RTSLockstep.Data
 {
-	[Serializable]
-	public class WorldObjectDataItem : ObjectDataItem, IWorldObjectData
-	{
-        public WorldObjectDataItem(string name, string description) : this(){
+    [Serializable]
+    public class WorldObjectDataItem : ObjectDataItem, IWorldObjectData
+    {
+        public WorldObjectDataItem(string name, string description) : this()
+        {
             base._name = name;
             base._description = description;
         }
-        public WorldObjectDataItem(){
-            
+        public WorldObjectDataItem()
+        {
+
         }
 
-        public GameObject GetWorldObject () {
-            if (this.Prefab != null)
+        public GameObject GetWorldObject()
+        {
+            if (Prefab != null)
             {
-                GameObject worldObject = this.Prefab.gameObject;
-                if (worldObject) {
+                GameObject worldObject = Prefab.gameObject;
+                if (worldObject)
+                {
                     return worldObject;
                 }
             }
@@ -29,16 +30,17 @@ namespace RTSLockstep.Data
         }
 
 #if UNITY_EDITOR
-		GameObject lastPrefab;
-		protected override void OnManage ()
-		{
-			
-			if (lastPrefab != Prefab) {
-				if (string.IsNullOrEmpty(Name))
-					this._name = Prefab.name;
-				lastPrefab = Prefab;
-			}
-		}	
+        GameObject lastPrefab;
+        protected override void OnManage()
+        {
+
+            if (lastPrefab != Prefab)
+            {
+                if (string.IsNullOrEmpty(Name))
+                    _name = Prefab.name;
+                lastPrefab = Prefab;
+            }
+        }
 #endif
-	}
+    }
 }

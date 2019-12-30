@@ -20,5 +20,4 @@ namespace RTSLockstep.Data
             return string.Format("Name={0} Description={1}, Icon={2}]", base.Name, Description, Icon);
         }
     }
-
 }

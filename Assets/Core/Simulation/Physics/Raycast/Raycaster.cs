@@ -1,9 +1,10 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
 using System.Collections.Generic;
-using PanLineAlgorithm;
 using System;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public static class Raycaster
     {
@@ -21,8 +22,7 @@ namespace RTSLockstep
         {
             Version++;
             LSBody.PrepareAxisCheck(start, end);
-            foreach (FractionalLineAlgorithm.Coordinate coor in
-                GetRelevantNodeCoordinates(start, end))
+            foreach (LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate coor in GetRelevantNodeCoordinates(start, end))
             {
                 int indexX = coor.X;
                 int indexY = coor.Y;
@@ -110,10 +110,10 @@ namespace RTSLockstep
             }
         }
 
-        public static IEnumerable<FractionalLineAlgorithm.Coordinate> GetRelevantNodeCoordinates(Vector2d start, Vector2d end)
+        public static IEnumerable<LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate> GetRelevantNodeCoordinates(Vector2d start, Vector2d end)
         {
             //Note: 99% sure this is deterministic enough for use in simulation.
-            foreach (FractionalLineAlgorithm.Coordinate coor in FractionalLineAlgorithm.Trace(
+            foreach (LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate coor in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(
                 Partition.GetRelativeX(start.x).ToDouble(),
                 Partition.GetRelativeX(start.y).ToDouble(),
                 Partition.GetRelativeY(end.x).ToDouble(),

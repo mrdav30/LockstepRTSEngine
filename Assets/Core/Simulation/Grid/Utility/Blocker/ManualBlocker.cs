@@ -1,6 +1,10 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Environment;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
+using UnityEngine;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     //Blocker for static environment pieces in a scene.
     [DisallowMultipleComponent]

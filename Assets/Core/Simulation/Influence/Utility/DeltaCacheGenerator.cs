@@ -1,9 +1,9 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
 using System;
 using System.IO;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public static partial class DeltaCache
     {

@@ -1,7 +1,12 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Data;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Simulation.LSMath;
 using UnityEngine;
-namespace RTSLockstep
+
+namespace RTSLockstep.Grouping
 {
     public class MovementGroupHelper : BehaviourHelper
     {

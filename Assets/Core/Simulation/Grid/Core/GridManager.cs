@@ -5,10 +5,13 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using UnityEngine;
-using FastCollections;
-using RTSLockstep.Pathfinding;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.Pathfinding;
+using RTSLockstep.Managers;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     public static class GridManager
     {

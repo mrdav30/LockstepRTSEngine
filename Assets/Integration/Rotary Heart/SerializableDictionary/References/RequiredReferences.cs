@@ -1,4 +1,5 @@
-﻿using RTSLockstep;
+﻿using RTSLockstep.Player;
+using RTSLockstep.LSResources;
 using UnityEngine;
 
 namespace RotaryHeart.Lib.SerializableDictionary
@@ -24,6 +25,6 @@ namespace RotaryHeart.Lib.SerializableDictionary
         [SerializeField]
         private ResourceType _resourceType;
         [SerializeField]
-        private StartingResourceInfo _startingResourceInfo;
+        private BaseResourceInfo _startingResourceInfo;
     }
 }

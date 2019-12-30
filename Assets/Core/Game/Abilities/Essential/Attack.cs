@@ -1,8 +1,20 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Agents;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Determinism;
+using RTSLockstep.Grouping;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Projectiles;
+using RTSLockstep.LSResources;
 using System;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     [DisallowMultipleComponent]
     public class Attack : ActiveAbility
@@ -16,7 +28,7 @@ namespace RTSLockstep
 
         public bool IsAttackMoving { get; private set; }
 
-        public RTSAgent CurrentTarget { get; private set; }
+        public LSAgent CurrentTarget { get; private set; }
 
         public virtual Vector3d[] ProjectileOffsets
         {
@@ -43,7 +55,7 @@ namespace RTSLockstep
 
         public static Attack LastAttack;
 
-        public event Action<RTSAgent, bool> ExtraOnHit;
+        public event Action<LSAgent, bool> ExtraOnHit;
         public event Action OnStopAttack;
 
         private Vector3d[] cachedProjectileOffsets;
@@ -65,7 +77,7 @@ namespace RTSLockstep
         private bool IsWindingUp { get; set; }
         private long windupCount;
 
-        private Action<RTSAgent> CachedOnHit;
+        private Action<LSAgent> CachedOnHit;
 
         protected virtual AnimState EngagingAnimState
         {
@@ -154,9 +166,9 @@ namespace RTSLockstep
             AgentController controller = Agent.Controller;
             CachedOnHit = (target) => OnHitTarget(target, spawnVersion, controller);
 
-            if (Agent.GetCommander() && loadedSavedValues && loadedTargetId >= 0)
+            if (Agent.GetControllingPlayer() && loadedSavedValues && loadedTargetId >= 0)
             {
-                RTSAgent obj = Agent.GetCommander().GetObjectForId(loadedTargetId);
+                LSAgent obj = Agent.GetControllingPlayer().GetObjectForId(loadedTargetId);
                 if (obj.MyAgentType == AgentType.Unit || obj.MyAgentType == AgentType.Structure)
                 {
                     CurrentTarget = obj;
@@ -221,7 +233,7 @@ namespace RTSLockstep
 
         }
 
-        protected virtual void OnAttack(RTSAgent target)
+        protected virtual void OnAttack(LSAgent target)
         {
             if (_cycleProjectiles)
             {
@@ -247,7 +259,7 @@ namespace RTSLockstep
 
         }
 
-        protected virtual void OnHitTarget(RTSAgent target, uint agentVersion, AgentController controller)
+        protected virtual void OnHitTarget(LSAgent target, uint agentVersion, AgentController controller)
         {
             // If the shooter died, certain effects or records can't be completed
             bool isCurrent = Agent.IsNotNull() && agentVersion == Agent.SpawnVersion;
@@ -331,7 +343,7 @@ namespace RTSLockstep
             }
         }
 
-        public void OnAttackGroupProcessed(RTSAgent currentTarget)
+        public void OnAttackGroupProcessed(LSAgent currentTarget)
         {
             Agent.Tag = AgentTag.Offensive;
 
@@ -509,7 +521,7 @@ namespace RTSLockstep
             OnStartWindup();
         }
 
-        private void CallExtraOnHit(RTSAgent agent, bool isCurrent)
+        private void CallExtraOnHit(LSAgent agent, bool isCurrent)
         {
             ExtraOnHit?.Invoke(agent, isCurrent);
         }
@@ -527,14 +539,14 @@ namespace RTSLockstep
             OnAttack(CurrentTarget);
         }
 
-        private LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
+        private LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
         {
             LSProjectile proj = PrepareProjectile(projectileCode, projOffset, target);
             FireProjectile(proj);
             return proj;
         }
 
-        private LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, RTSAgent target)
+        private LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
         {
             LastAttack = this;
             LSProjectile currentProjectile = ProjectileManager.Create(

@@ -2,7 +2,7 @@
 using RTSLockstep;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class Convoy : Ability
     {

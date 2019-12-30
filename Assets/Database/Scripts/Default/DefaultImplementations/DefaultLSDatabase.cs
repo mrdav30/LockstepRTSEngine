@@ -1,31 +1,31 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System.Linq;
+
 namespace RTSLockstep.Data
 {
-	//PROTECTED NOT PRIVATE... private dun serialize in derived class
+    //PROTECTED NOT PRIVATE... private dun serialize in derived class
     [System.Serializable]
 
     public class DefaultLSDatabase : LSDatabase, IEssentialDataProvider, IUnitConfigDataProvider
-    ,IAgentDataProvider, IAgentControllerDataProvider
+    , IAgentDataProvider, IAgentControllerDataProvider
     {
         #region Agents
 
         [SerializeField]
         //This data is registered for editing in the database editor
         [RegisterData("Agents")]
-            
+
         [RegisterSort("Order Units First",
-            typeof (AgentDataSorter),
+            typeof(AgentDataSorter),
             "OrderUnitsFirst"
         )]
-            
+
         [RegisterSort("Order Buildings First",
-            typeof (AgentDataSorter),
+            typeof(AgentDataSorter),
             "OrderBuildingsFirst"
         )]
-            
-        
+
+
         protected AgentDataItem[]
             _agentData;
 
@@ -36,18 +36,18 @@ namespace RTSLockstep.Data
 
         #region Input
         [SerializeField]
-        [RegisterData ("Input")]
-		protected InputDataItem[] _inputData = new InputDataItem[] {
-			new InputDataItem("Move",KeyCode.M),
-			new InputDataItem("Attack",KeyCode.A),
-			new InputDataItem("Stop",KeyCode.S)
+        [RegisterData("Input")]
+        protected InputDataItem[] _inputData = new InputDataItem[] {
+            new InputDataItem("Move",KeyCode.M),
+            new InputDataItem("Attack",KeyCode.A),
+            new InputDataItem("Stop",KeyCode.S)
         };
-        public InputDataItem[] InputData {get {return _inputData;}}
+        public InputDataItem[] InputData { get { return _inputData; } }
         #endregion
 
         #region Projectiles
 
-        [SerializeField,RegisterData("Projectiles")]
+        [SerializeField, RegisterData("Projectiles")]
         protected ProjectileDataItem[] _projectileData;
 
         public IProjectileData[] ProjectileData { get { return _projectileData.Cast<IProjectileData>().ToArray(); } }
@@ -56,7 +56,7 @@ namespace RTSLockstep.Data
 
         #region Effects
 
-        [SerializeField,RegisterData("Effects")]
+        [SerializeField, RegisterData("Effects")]
         protected EffectDataItem[]
             _effectData;
 
@@ -66,30 +66,32 @@ namespace RTSLockstep.Data
 
         #region Ability
 
-        [SerializeField,RegisterData("Abilities")]
+        [SerializeField, RegisterData("Abilities")]
         protected AbilityDataItem[]
             _abilityData;
 
         public AbilityDataItem[] AbilityData { get { return _abilityData; } }
 
-		#endregion
-		
-		#region Unit Configs
-		[SerializeField, RegisterData ("UnitConfigElements")]
-		protected UnitConfigElementDataItem [] _unitConfigElementData;
-		public UnitConfigElementDataItem [] UnitConfigElementData {
-			get {
-				return _unitConfigElementData;
-			}
-		}
+        #endregion
 
-		[SerializeField, RegisterData ("UnitConfigs")]
-		protected UnitConfigDataItem [] _unitConfigData;
-		public IUnitConfigDataItem [] UnitConfigData { get { return _unitConfigData; } }
-		#endregion
+        #region Unit Configs
+        [SerializeField, RegisterData("UnitConfigElements")]
+        protected UnitConfigElementDataItem[] _unitConfigElementData;
+        public UnitConfigElementDataItem[] UnitConfigElementData
+        {
+            get
+            {
+                return _unitConfigElementData;
+            }
+        }
 
-		[SerializeField,RegisterDataAttribute("AgentControllers")]
-		protected AgentControllerDataItem[] _agentControllerData;
-		public AgentControllerDataItem[] AgentControllerData {get {return _agentControllerData;}}
+        [SerializeField, RegisterData("UnitConfigs")]
+        protected UnitConfigDataItem[] _unitConfigData;
+        public IUnitConfigDataItem[] UnitConfigData { get { return _unitConfigData; } }
+        #endregion
+
+        [SerializeField, RegisterDataAttribute("AgentControllers")]
+        protected AgentControllerDataItem[] _agentControllerData;
+        public AgentControllerDataItem[] AgentControllerData { get { return _agentControllerData; } }
     }
 }

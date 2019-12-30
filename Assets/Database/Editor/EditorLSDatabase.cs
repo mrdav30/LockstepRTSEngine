@@ -1,6 +1,6 @@
 ﻿#if true
 using UnityEngine;
-using System.Collections; using FastCollections;
+using System.Collections; using RTSLockstep.Utility.FastCollections;
 using UnityEditor;
 using System;
 using System.Reflection;

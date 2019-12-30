@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace RTSLockstep
+﻿using RTSLockstep.Environment;
+
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public class PhysicsSettingsSaver : EnvironmentSaver
     {
-        
+
     }
 }

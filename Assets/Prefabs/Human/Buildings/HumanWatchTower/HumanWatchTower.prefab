@@ -534,10 +534,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1667462521772482}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 816d3d1c7d6301b4a89c77919196dd87, type: 3}
+  m_Script: {fileID: 11500000, guid: dcac4928f5a7fa94b8056e5a7195b2af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 22937600
+  _maxHealth: 6553600
   _currentHealth: 0
 --- !u!114 &5414662841358408545
 MonoBehaviour:
@@ -551,7 +551,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strikeRange: 393216
+  _actionRange: 393216
   _sight: 655360
 --- !u!114 &114279839518768826
 MonoBehaviour:

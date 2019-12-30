@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.LSResources;
 
 namespace RTSLockstep
 {
-    public class GenericUnitAnimator: LSAnimatorBase
+    public class GenericUnitAnimator : LSAnimatorBase
     {
         [Space(10f), SerializeField]
         protected string idling = "idling";
@@ -86,7 +86,7 @@ namespace RTSLockstep
                     {
                         dyingClip = clip;
                     }
-                    else if (clip.name == this.specialEngaging)
+                    else if (clip.name == specialEngaging)
                     {
                         specialEngagingClip = clip;
                     }
@@ -164,7 +164,7 @@ namespace RTSLockstep
                 case AnimState.Dying:
                     return dying;
                 case AnimState.SpecialEngaging:
-                    return this.specialEngaging;
+                    return specialEngaging;
             }
             return idling;
         }
@@ -182,7 +182,7 @@ namespace RTSLockstep
                 case AnimState.Dying:
                     return dyingClip;
                 case AnimState.SpecialEngaging:
-                    return this.specialEngagingClip;
+                    return specialEngagingClip;
             }
             return idlingClip;
         }

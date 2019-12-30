@@ -6,10 +6,12 @@
 // @modified 2019 David Oravsky
 //=======================================================================
 
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using System.Collections.Generic;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public static class Pathfinder
     {
@@ -119,7 +121,7 @@ namespace RTSLockstep.Pathfinding
             if (outputNode.IsNull())
             {
                 //If null, it is off the grid. Raycast back onto grid for closest viable node to the destination.
-                foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
+                foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
                     outputNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
                     if (outputNode.IsNotNull())
@@ -192,13 +194,13 @@ namespace RTSLockstep.Pathfinding
             if (!allowUnwalkableEndNode && returnNode.Unwalkable)
             {
                 bool valid = false;
-                PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();
+                LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();
                 bool validTriggered = false;
                 pathingSize = (pathingSize + 1) / 2;
                 int minSqrMag = pathingSize * pathingSize;
                 minSqrMag *= 2;
 
-                foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
+                foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
                     currentNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
                     if (!validTriggered)

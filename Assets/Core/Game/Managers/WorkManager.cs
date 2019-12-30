@@ -1,11 +1,11 @@
-﻿using System;
+﻿using RTSLockstep.Agents;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
+using RTSLockstep.LSResources;
 
-namespace RTSLockstep
+namespace RTSLockstep.Managers
 {
     public static class WorkManager
     {
@@ -88,14 +88,14 @@ namespace RTSLockstep
         }
 
         //currently used by harvest ability, switch to influence?
-        public static RTSAgent FindNearestWorldObjectInListToPosition(List<RTSAgent> objects, Vector3 position)
+        public static LSAgent FindNearestWorldObjectInListToPosition(List<LSAgent> objects, Vector3 position)
         {
             if (objects == null || objects.Count == 0)
             {
                 return null;
             }
 
-            RTSAgent nearestObject = objects[0];
+            LSAgent nearestObject = objects[0];
             float sqrDistanceToNearestObject = Vector3.SqrMagnitude(position - nearestObject.transform.position);
             for (int i = 1; i < objects.Count; i++)
             {

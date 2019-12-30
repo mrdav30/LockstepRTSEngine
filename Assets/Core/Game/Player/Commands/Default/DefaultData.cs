@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System;
-using System.Text;
+﻿using System;
+using RTSLockstep.Data;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player.Commands
 {
     public class DefaultData : ICommandData
     {
@@ -14,13 +13,13 @@ namespace RTSLockstep
         public DefaultData(DataType dataType, object value)
         {
             Value = value;
-            this.DataType = dataType;
+            DataType = dataType;
         }
 
         public DefaultData(object value)
         {
             Value = value;
-            this.DataType = GetDataType(value.GetType());
+            DataType = GetDataType(value.GetType());
         }
 
         public object Value { get; protected set; }
@@ -29,7 +28,7 @@ namespace RTSLockstep
 
         public bool Is(DataType dataType)
         {
-            return this.DataType == dataType;
+            return DataType == dataType;
         }
 
         public DataType GetDataType(Type type)
@@ -56,8 +55,8 @@ namespace RTSLockstep
 
         public void Write(Writer writer)
         {
-            writer.Write((byte)this.DataType);
-            switch (this.DataType)
+            writer.Write((byte)DataType);
+            switch (DataType)
             {
                 case DataType.Int:
                     writer.Write((int)Value);
@@ -89,8 +88,8 @@ namespace RTSLockstep
 
         public void Read(Reader reader)
         {
-            this.DataType = (DataType)reader.ReadByte();
-            switch (this.DataType)
+            DataType = (DataType)reader.ReadByte();
+            switch (DataType)
             {
                 case DataType.Int:
                     Value = reader.ReadInt();

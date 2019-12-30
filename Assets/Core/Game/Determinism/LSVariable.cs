@@ -1,43 +1,44 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Reflection;
+﻿using System.Reflection;
 using System;
 using System.Linq;
-namespace RTSLockstep
+
+namespace RTSLockstep.Determinism
 {
     //Note: Ideally used for value types (i.e. Struct)
     public sealed class LSVariable
     {
 
-        public LSVariable (object lockstepObject, PropertyInfo info) {
-            
-            Init (lockstepObject, info, info.GetCustomAttributes(typeof (LockstepAttribute), true).FirstOrDefault() as LockstepAttribute);
+        public LSVariable(object lockstepObject, PropertyInfo info)
+        {
+
+            Init(lockstepObject, info, info.GetCustomAttributes(typeof(LockstepAttribute), true).FirstOrDefault() as LockstepAttribute);
         }
 
-        public LSVariable (object lockstepObject, PropertyInfo info, LockstepAttribute attribute) {
-            Init (lockstepObject, info, attribute);
+        public LSVariable(object lockstepObject, PropertyInfo info, LockstepAttribute attribute)
+        {
+            Init(lockstepObject, info, attribute);
         }
 
         //Must be PropertyInfo for PropertyInfo .Get[Get/Set]Method ()
-        private void Init (object lockstepObject, PropertyInfo info, LockstepAttribute attribute)
+        private void Init(object lockstepObject, PropertyInfo info, LockstepAttribute attribute)
         {
-            this.Info = info;
-            this.LockstepObject = lockstepObject;
+            Info = info;
+            LockstepObject = lockstepObject;
 
             //For the Value property... easier accessbility
             //_getValue = (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), info.GetGetMethod().);
 
             if (DoReset = attribute.DoReset)
             {
-               // _setValue = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), info.GetSetMethod());
+                // _setValue = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), info.GetSetMethod());
                 //Sets the base value for resetting
-                this._baseValue = this.Value;
+                _baseValue = Value;
             }
         }
-        public bool DoReset {get; private set;}
+        public bool DoReset { get; private set; }
 
         public PropertyInfo Info { get; private set; }
-        public object LockstepObject {get; private set;}
+        public object LockstepObject { get; private set; }
 
         private object _baseValue;
 
@@ -54,11 +55,11 @@ namespace RTSLockstep
         {
             get
             {
-                return Info.GetValue (LockstepObject, null);
+                return Info.GetValue(LockstepObject, null);
             }
             private set
             {
-                Info.SetValue (LockstepObject, value, null);
+                Info.SetValue(LockstepObject, value, null);
             }
         }
 
@@ -73,7 +74,7 @@ namespace RTSLockstep
         public void Reset()
         {
             if (DoReset)
-            this.Value = this.BaseValue;
+                Value = BaseValue;
         }
     }
 }

@@ -5,9 +5,11 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public class UnityLSBody : MonoBehaviour
     {

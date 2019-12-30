@@ -1,51 +1,57 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-namespace RTSLockstep
+
+namespace RTSLockstep.Utility
 {
-	public class CerealBehaviour : MonoBehaviour
+    public class CerealBehaviour : MonoBehaviour
 #if UNITY_EDITOR
-        //, ISerializationCallbackReceiver
+    //, ISerializationCallbackReceiver
 #endif
-	{
+    {
 #if UNITY_EDITOR
-		public virtual bool GetSerializedFieldNames (List<string> output) {
+        public virtual bool GetSerializedFieldNames(List<string> output)
+        {
             return false;
         }
-        public void AfterSerialize () {
-            OnAfterSerialize  ();
+        public void AfterSerialize()
+        {
+            OnAfterSerialize();
         }
-        protected virtual void OnAfterSerialize  () {
+        protected virtual void OnAfterSerialize()
+        {
 
         }
-        public void BeforeSerialize () {
-             OnBeforeSerialize ();
+        public void BeforeSerialize()
+        {
+            OnBeforeSerialize();
         }
-        protected virtual void OnBeforeSerialize () {
+        protected virtual void OnBeforeSerialize()
+        {
 
         }
-        public void BeforeGUI () {
-            OnBeforeGUI ();
+        public void BeforeGUI()
+        {
+            OnBeforeGUI();
         }
-        protected virtual void OnBeforeGUI () {}
-        public void AfterGUI () {
+        protected virtual void OnBeforeGUI() { }
+        public void AfterGUI()
+        {
             OnAfterGUI();
         }
-        protected virtual void OnAfterGUI () {}
-        public void BeforeScene () {
-            OnAfterScene ();
+        protected virtual void OnAfterGUI() { }
+        public void BeforeScene()
+        {
+            OnAfterScene();
         }
-        protected virtual void OnBeforeScene () {}
-        public void AfterScene () {
-            OnAfterScene ();
+        protected virtual void OnBeforeScene() { }
+        public void AfterScene()
+        {
+            OnAfterScene();
         }
-        protected virtual void OnAfterScene () {}
-        #endif
+        protected virtual void OnAfterScene() { }
+#endif
 
-	}
+    }
 
 
 }

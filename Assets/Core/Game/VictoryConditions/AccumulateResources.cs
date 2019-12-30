@@ -1,18 +1,22 @@
-﻿using RTSLockstep;
+﻿using RTSLockstep.Player;
+using RTSLockstep.LSResources;
 
-public class AccumulateResources : VictoryCondition
+namespace RTSLockstep.VictoryConditions
 {
-    public int amount = 1050;
-
-    private ResourceType type = ResourceType.Gold;
-
-    public override string GetDescription()
+    public class AccumulateResources : VictoryCondition
     {
-        return "Accumulating Gold";
-    }
+        public int amount = 1050;
 
-    public override bool CommanderMeetsConditions(AgentCommander commander)
-    {
-        return commander && !commander.IsDead() && commander.CachedResourceManager.GetResourceAmount(type) >= amount;
+        private ResourceType type = ResourceType.Gold;
+
+        public override string GetDescription()
+        {
+            return "Accumulating Gold";
+        }
+
+        public override bool PlayerMeetsConditions(LSPlayer player)
+        {
+            return player && !player.IsDead() && player.CachedResourceManager.GetResourceAmount(type) >= amount;
+        }
     }
-} 
+}

@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using RTSLockstep.Managers;
+using RTSLockstep.LSResources;
+using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Extra
 {
     public class SelectionRingController : Ability
     {
@@ -15,27 +16,28 @@ namespace RTSLockstep
 
         SelectionRing RingTemplate { get { return _ringTemplate; } }
 
-        public SelectionRing RingObject {get; private set;}
+        public SelectionRing RingObject { get; private set; }
 
-        public float Size {get; private set;}
+        public float Size { get; private set; }
 
         protected override void OnSetup()
         {
             Agent.OnSelectedChange += HandleSelectedChange;
             Agent.OnHighlightedChange += HandleHighlightedChange;
-            RingObject = GameObject.Instantiate(_ringTemplate.gameObject).GetComponent<SelectionRing>();
+            RingObject = Instantiate(_ringTemplate.gameObject).GetComponent<SelectionRing>();
             Size = (Agent.SelectionRadius + _ringRadiusOffset) * 2;
             RingObject.Setup(Size);
 
-            RingObject.transform.parent = this.transform;
+            RingObject.transform.parent = transform;
             RingObject.transform.localPosition = _ringPosition;
         }
 
         public void HandleSelectedChange()
         {
-			if (ReplayManager.IsPlayingBack) {
-				return;
-			}
+            if (ReplayManager.IsPlayingBack)
+            {
+                return;
+            }
 
             if (!Agent.IsSelected)
             {
@@ -43,33 +45,41 @@ namespace RTSLockstep
                 {
                     RingObject.SetState(SelectionRingState.Highlighted);
                 }
-                else {
+                else
+                {
                     RingObject.SetState(SelectionRingState.None);
                 }
             }
-            else {
+            else
+            {
                 // play selected sound
                 RingObject.SetState(SelectionRingState.Selected);
             }
-             
+
         }
 
         public void HandleHighlightedChange()
         {
-			if (ReplayManager.IsPlayingBack) {
-				return;
-			}
+            if (ReplayManager.IsPlayingBack)
+            {
+                return;
+            }
 
-            if (Agent.IsHighlighted) {
-                if (Agent.IsSelected) {
+            if (Agent.IsHighlighted)
+            {
+                if (Agent.IsSelected)
+                {
 
                 }
-                else {
+                else
+                {
                     RingObject.SetState(SelectionRingState.Highlighted);
                 }
             }
-            else {
-                if (!Agent.IsSelected) {
+            else
+            {
+                if (!Agent.IsSelected)
+                {
                     RingObject.SetState(SelectionRingState.None);
                 }
             }

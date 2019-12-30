@@ -1,8 +1,11 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
+using RTSLockstep.Data;
 using System;
 using System.Collections;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player.Utility
 {
     public class Selection : ICommandData
     {
@@ -20,9 +23,9 @@ namespace RTSLockstep
 
         public Selection() { }
 
-        private static readonly FastList<RTSAgent> bufferAgents = new FastList<RTSAgent>();
+        private static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
 
-        public Selection(FastEnumerable<RTSAgent> selectedAgents)
+        public Selection(FastEnumerable<LSAgent> selectedAgents)
         {
             bufferAgents.FastClear();
             selectedAgents.Enumerate(bufferAgents);
@@ -56,7 +59,7 @@ namespace RTSLockstep
             return bufferBites.ToArray();
         }
 
-        public void AddAgents(params RTSAgent[] agents)
+        public void AddAgents(params LSAgent[] agents)
         {
             for (int i = 0; i < agents.Length; i++)
             {
@@ -127,11 +130,11 @@ namespace RTSLockstep
 
         public void Write(Writer writer)
         {
-            writer.Write(this.GetBytes());
+            writer.Write(GetBytes());
         }
         public void Read(Reader reader)
         {
-            int move = this.Reconstruct(reader.Source, reader.Position);
+            int move = Reconstruct(reader.Source, reader.Position);
             reader.MovePosition(move);
         }
 

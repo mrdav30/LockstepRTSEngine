@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 // Generic singleton class for MonoBehaviours.
 // Subclass from this instead of Monobehaviour if you want the component to be a singleton.
@@ -7,7 +6,7 @@ using System.Collections;
 // Any subclasses need to make sure that the instance is valid before doing any work.
 // See the comments for Awake().
 
-namespace RTSLockstep
+namespace RTSLockstep.Integration
 {
     public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {

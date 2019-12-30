@@ -1,7 +1,9 @@
-﻿using System;
+﻿using RTSLockstep.Settings;
+using System;
 using TypeReferences;
 using UnityEditor;
 using UnityEngine;
+
 namespace RTSLockstep.Data
 {
     [System.Serializable]

@@ -1,6 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using RTSLockstep.Agents;
+using RTSLockstep.LSResources;
+using RTSLockstep.LSResources.Audio;
+using System;
 using UnityEngine;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep
 {
@@ -19,7 +22,7 @@ namespace RTSLockstep
         private bool animStateChanged;
         private AnimState lastAnimState;
         protected AudioElement audioElement;
-        protected RTSAgent cachedAgent;
+        protected LSAgent cachedAgent;
 
         [SerializeField]
         private AnimState currentAnimState;
@@ -41,7 +44,7 @@ namespace RTSLockstep
 
         public virtual void Setup()
         {
-            cachedAgent = transform.GetComponentInParent<RTSAgent>();
+            cachedAgent = transform.GetComponentInParent<LSAgent>();
             InitialiseAudio();
 
             animStateChanged = false;
@@ -52,7 +55,7 @@ namespace RTSLockstep
             animator = GetComponent<Animator>();
             if (animator == null)
             {
-                animator = this.GetComponentInChildren<Animator>();
+                animator = GetComponentInChildren<Animator>();
             }
         }
 
@@ -166,7 +169,7 @@ namespace RTSLockstep
 
         protected virtual void InitialiseAudio()
         {
-            audioElement = new AudioElement(null, null, cachedAgent.objectName + cachedAgent.GlobalID, this.transform);
+            audioElement = new AudioElement(null, null, cachedAgent.objectName + cachedAgent.GlobalID, transform);
         }
     }
 }

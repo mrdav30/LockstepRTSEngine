@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.LSResources;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep
 {

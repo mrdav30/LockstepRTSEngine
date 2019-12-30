@@ -1,3 +1,4 @@
-﻿namespace RTSLockstep {
-public interface IMessage {}
+﻿namespace RTSLockstep.Utility
+{
+    public interface IMessage { }
 }

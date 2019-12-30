@@ -1,7 +1,10 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Environment;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
 using UnityEngine;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     //Blocker for static environment pieces in a scene.
     [DisallowMultipleComponent]
@@ -20,9 +23,9 @@ namespace RTSLockstep.Grid
         {
             base.OnInitialize();
 
-            CachedBody = this.GetComponent<UnityLSBody>().InternalBody;
+            CachedBody = GetComponent<UnityLSBody>().InternalBody;
 
-            if (this.BlockPathfinding)
+            if (BlockPathfinding)
             {
                 bufferCoordinates.FastClear();
                 CachedBody.GetCoveredNodePositions(FixedMath.One / 8, bufferCoordinates);

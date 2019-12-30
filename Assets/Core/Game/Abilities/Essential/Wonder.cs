@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep;
-using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class Wonder : Ability
     {

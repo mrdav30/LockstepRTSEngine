@@ -1,23 +1,25 @@
 ﻿using UnityEngine;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Managers
 {
-	public class UnityInstance : MonoBehaviour
-	{
-		private static UnityInstance instance;
+    public class UnityInstance : MonoBehaviour
+    {
+        private static UnityInstance instance;
 
-		public static UnityInstance Instance
-		{
-			get {
-				if (instance == null)
-				{
-					instance = new GameObject("UnityInstance").AddComponent<UnityInstance>();
-					DontDestroyOnLoad(instance.gameObject);
-				}
-				return instance;
-			}
-		}
+        public static UnityInstance Instance
+        {
+            get
+            {
+                if (instance.IsNull())
+                {
+                    instance = new GameObject("UnityInstance").AddComponent<UnityInstance>();
+                    DontDestroyOnLoad(instance.gameObject);
+                }
+                return instance;
+            }
+        }
 
-	}
+    }
 }
 

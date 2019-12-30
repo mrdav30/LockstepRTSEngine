@@ -1,20 +1,31 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents.Teams;
+using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Data;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.LSResources;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Simulation.Influence;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Agents.AgentControllerSystem
 {
     public sealed class AgentController
     {
         #region Properties
         public string ControllerName { get; private set; }
 
-        public static Dictionary<string, FastStack<RTSAgent>> CachedAgents;
+        public static Dictionary<string, FastStack<LSAgent>> CachedAgents;
 
         public static readonly bool[] GlobalAgentActive = new bool[MaxAgents * 4];
-        public static readonly RTSAgent[] GlobalAgents = new RTSAgent[MaxAgents * 4];
+        public static readonly LSAgent[] GlobalAgents = new LSAgent[MaxAgents * 4];
 
         private static readonly FastStack<ushort> OpenGlobalIDs = new FastStack<ushort>();
 
@@ -23,15 +34,15 @@ namespace RTSLockstep
         public const int MaxAgents = 16384;
 
         public static Dictionary<ushort, FastList<bool>> TypeAgentsActive = new Dictionary<ushort, FastList<bool>>();
-        public static Dictionary<ushort, FastList<RTSAgent>> TypeAgents = new Dictionary<ushort, FastList<RTSAgent>>();
-        internal static FastBucket<RTSAgent> DeathingAgents = new FastBucket<RTSAgent>();
+        public static Dictionary<ushort, FastList<LSAgent>> TypeAgents = new Dictionary<ushort, FastList<LSAgent>>();
+        internal static FastBucket<LSAgent> DeathingAgents = new FastBucket<LSAgent>();
 
         public struct DeactivationData
         {
-            public RTSAgent Agent;
+            public LSAgent Agent;
             public bool Immediate;
 
-            public DeactivationData(RTSAgent agent, bool immediate)
+            public DeactivationData(LSAgent agent, bool immediate)
             {
                 Agent = agent;
                 Immediate = immediate;
@@ -45,11 +56,11 @@ namespace RTSLockstep
         //TODO: Hide this list and use methods to access it
         //Also, move static AC stuff into its own class
         public static FastList<AgentController> InstanceManagers = new FastList<AgentController>();
-        public readonly FastBucket<RTSAgent> SelectedAgents = new FastBucket<RTSAgent>();
+        public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent>();
 
         public bool SelectionChanged { get; set; }
 
-        public readonly RTSAgent[] LocalAgents = new RTSAgent[MaxAgents];
+        public readonly LSAgent[] LocalAgents = new LSAgent[MaxAgents];
         public readonly bool[] LocalAgentActive = new bool[MaxAgents];
 
         public byte ControllerID { get; private set; }
@@ -67,8 +78,8 @@ namespace RTSLockstep
         private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
-        private AgentCommander _commander;
-        public AgentCommander Commander
+        private LSPlayer _commander;
+        public LSPlayer Player
         {
             get
             {
@@ -83,7 +94,7 @@ namespace RTSLockstep
 
         public Selection previousSelection = new Selection();
 
-        public event Action<RTSAgent> OnCreateAgent;
+        public event Action<LSAgent> OnCreateAgent;
         #endregion
 
         #region Event Behavior
@@ -93,7 +104,7 @@ namespace RTSLockstep
             GlobalAgentActive.Clear();
             OpenGlobalIDs.FastClear();
             PeakGlobalID = 0;
-            foreach (FastStack<RTSAgent> cache in CachedAgents.Values)
+            foreach (FastStack<LSAgent> cache in CachedAgents.Values)
             {
                 for (int j = 0; j < cache.Count; j++)
                 {
@@ -128,7 +139,7 @@ namespace RTSLockstep
         {
             for (int iterator = 0; iterator < PeakGlobalID; iterator++)
             {
-                RTSAgent agent = GlobalAgents[iterator];
+                LSAgent agent = GlobalAgents[iterator];
                 if (agent.IsLive)
                 {
                     GlobalAgents[iterator].Visualize();
@@ -140,7 +151,7 @@ namespace RTSLockstep
         {
             for (int iterator = 0; iterator < PeakGlobalID; iterator++)
             {
-                RTSAgent agent = GlobalAgents[iterator];
+                LSAgent agent = GlobalAgents[iterator];
                 if (agent.IsLive)
                 {
                     GlobalAgents[iterator].LateVisualize();
@@ -163,7 +174,7 @@ namespace RTSLockstep
             {
                 if (DeathingAgents.arrayAllocation[i])
                 {
-                    RTSAgent agent = DeathingAgents[i];
+                    LSAgent agent = DeathingAgents[i];
                     EndLife(agent);
                 }
             }
@@ -172,7 +183,7 @@ namespace RTSLockstep
         #endregion
 
         #region Public
-        public static bool TryGetAgentInstance(int globalID, out RTSAgent returnAgent)
+        public static bool TryGetAgentInstance(int globalID, out LSAgent returnAgent)
         {
             if (GlobalAgentActive[globalID])
             {
@@ -189,13 +200,13 @@ namespace RTSLockstep
             {
                 if (GlobalAgentActive[i])
                 {
-                    RTSAgent agent = GlobalAgents[i];
+                    LSAgent agent = GlobalAgents[i];
                     DestroyAgent(agent);
                 }
             }
         }
 
-        public static void ChangeController(RTSAgent agent, AgentController newCont)
+        public static void ChangeController(LSAgent agent, AgentController newCont)
         {
 
             AgentController leController = agent.Controller;
@@ -220,7 +231,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void DestroyAgent(RTSAgent agent, bool immediate = false)
+        public static void DestroyAgent(LSAgent agent, bool immediate = false)
         {
             DeactivationBuffer.Add(new DeactivationData(agent, immediate));
         }
@@ -229,7 +240,7 @@ namespace RTSLockstep
         /// Completes the life of the agent and pools or destroys it.
         /// </summary>
         /// <param name="agent">Agent.</param>
-        public static void EndLife(RTSAgent agent)
+        public static void EndLife(LSAgent agent)
         {
             if (agent.CachedGameObject.IsNotNull())
             {
@@ -249,7 +260,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void CacheAgent(RTSAgent agent)
+        public static void CacheAgent(LSAgent agent)
         {
             if (LockstepManager.PoolingEnabled)
                 CachedAgents[agent.MyAgentCode].Add(agent);
@@ -265,7 +276,7 @@ namespace RTSLockstep
             {
                 if (GlobalAgentActive[i])
                 {
-                    RTSAgent agent = GlobalAgents[i];
+                    LSAgent agent = GlobalAgents[i];
                     int n1 = agent.Body._position.GetHashCode() + agent.Body._rotation.GetHashCode();
                     switch (operationToggle)
                     {
@@ -315,39 +326,44 @@ namespace RTSLockstep
             return new AgentController(defaultAllegiance, controllerName);
         }
 
-        public void CreateCommander()
+        public void CreatePlayer()
         {
-            if (Commander != null)
-                Debug.LogError("A commander called '" + Commander.gameObject.name + "' already exists for '" + this.ToString() + "'.");
+            if (Player.IsNotNull())
+            {
+                Debug.LogError("A player called '" + Player.gameObject.name + "' already exists for '" + ToString() + "'.");
+            }
+
             if (!UnityEngine.Object.FindObjectOfType<RTSGameManager>())
+            {
                 Debug.LogError("A game manager has not been initialized!");
+            }
 
             //load from ls db
-            GameObject commanderObject = GameObject.Instantiate(GameResourceManager.GetCommanderObject(), UnityEngine.Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<AgentCommanders>().transform);
+            GameObject playerObject = UnityEngine.Object.Instantiate(GameResourceManager.GetPlayerObject(), UnityEngine.Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<LSPlayers>().transform);
 
-            commanderObject.name = this.ControllerName;
+            playerObject.name = ControllerName;
 
-            AgentCommander commanderClone = commanderObject.GetComponent<AgentCommander>();
+            LSPlayer playerClone = playerObject.GetComponent<LSPlayer>();
             //change to user's selected username
-            commanderClone.username = this.ControllerName;
-            commanderClone.SetController(this);
+            playerClone.username = ControllerName;
+            playerClone.SetController(this);
 
             if (PlayerManager.ContainsController(this))
             {
-                commanderClone.human = true;
+                playerClone.human = true;
             }
 
             //come up with better way to set selected commander to the current commander
             if (this == PlayerManager.MainController)
             {
-                PlayerManager.SelectPlayer(commanderClone.username, 0, this.ControllerID, this.PlayerIndex);
+                PlayerManager.SelectPlayer(playerClone.username, 0, ControllerID, PlayerIndex);
             }
 
-            _commander = commanderClone;
+            _commander = playerClone;
             BehaviourHelperManager.InitializeOnDemand(_commander);
         }
 
-        public void AddToSelection(RTSAgent agent)
+        public void AddToSelection(LSAgent agent)
         {
             if (!agent.IsSelected)
             {
@@ -356,7 +372,7 @@ namespace RTSLockstep
             }
         }
 
-        public void RemoveFromSelection(RTSAgent agent)
+        public void RemoveFromSelection(LSAgent agent)
         {
             SelectedAgents.Remove(agent);
             SelectionChanged = true;
@@ -428,7 +444,7 @@ namespace RTSLockstep
             }
         }
 
-        public void AddAgent(RTSAgent agent)
+        public void AddAgent(LSAgent agent)
         {
             ushort localID = GenerateLocalID();
             LocalAgents[localID] = agent;
@@ -441,13 +457,13 @@ namespace RTSLockstep
             agent.InitializeController(this, localID, globalID);
         }
 
-        public RTSAgent CreateAgent(string agentCode, Vector2d position)
+        public LSAgent CreateAgent(string agentCode, Vector2d position)
         {
-            RTSAgent agent = CreateAgent(agentCode, position, Vector2d.right);
+            LSAgent agent = CreateAgent(agentCode, position, Vector2d.right);
             return agent;
         }
 
-        public RTSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
+        public LSAgent CreateAgent(string agentCode, Vector2d position, Vector2d rotation)
         {
             var agent = CreateRawAgent(agentCode, position, rotation);
 
@@ -463,14 +479,14 @@ namespace RTSLockstep
         /// <returns>The raw agent.</returns>
         /// <param name="agentCode">Agent code.</param>
         /// <param name="isBare">If set to <c>true</c> is bare.</param>
-        public static RTSAgent CreateRawAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
+        public static LSAgent CreateRawAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
         {
             if (!GameResourceManager.IsValidAgentCode(agentCode))
             {
                 throw new ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
-            FastStack<RTSAgent> cache = CachedAgents[agentCode];
-            RTSAgent curAgent;
+            FastStack<LSAgent> cache = CachedAgents[agentCode];
+            LSAgent curAgent;
 
             if (cache.IsNotNull() && cache.Count > 0)
             {
@@ -486,7 +502,7 @@ namespace RTSLockstep
                 Vector3 pos = startPosition.ToVector3();
                 Quaternion rot = new Quaternion(0, startRotation.y, 0, startRotation.x);
 
-                curAgent = UnityEngine.Object.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject, pos, rot).GetComponent<RTSAgent>();
+                curAgent = UnityEngine.Object.Instantiate(GameResourceManager.GetAgentTemplate(agentCode).gameObject, pos, rot).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
 
                 RegisterRawAgent(curAgent);
@@ -495,7 +511,7 @@ namespace RTSLockstep
             return curAgent;
         }
 
-        public static void RegisterRawAgent(RTSAgent agent)
+        public static void RegisterRawAgent(LSAgent agent)
         {
             var agentCodeID = GameResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
             FastList<bool> typeActive;
@@ -504,10 +520,10 @@ namespace RTSLockstep
                 typeActive = new FastList<bool>();
                 TypeAgentsActive.Add(agentCodeID, typeActive);
             }
-            FastList<RTSAgent> typeAgents;
+            FastList<LSAgent> typeAgents;
             if (!TypeAgents.TryGetValue(agentCodeID, out typeAgents))
             {
-                typeAgents = new FastList<RTSAgent>();
+                typeAgents = new FastList<LSAgent>();
                 TypeAgents.Add(agentCodeID, typeAgents);
             }
 
@@ -522,13 +538,13 @@ namespace RTSLockstep
         /// </summary>
         /// <returns>The bare agent.</returns>
         /// <param name="agentCode">Agent code.</param>
-        public RTSAgent CreateBareAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
+        public LSAgent CreateBareAgent(string agentCode, Vector2d startPosition = default(Vector2d), Vector2d startRotation = default(Vector2d))
         {
             var agent = CreateRawAgent(agentCode, startPosition, startRotation);
             return agent;
         }
 
-        public void InitializeAgent(RTSAgent agent,
+        public void InitializeAgent(LSAgent agent,
                                       Vector2d position,
                                       Vector2d rotation)
         {
@@ -595,7 +611,7 @@ namespace RTSLockstep
 
         private static void DestroyAgentBuffer(DeactivationData data)
         {
-            RTSAgent agent = data.Agent;
+            LSAgent agent = data.Agent;
             if (!agent.IsActive)
             {
                 return;
@@ -651,12 +667,12 @@ namespace RTSLockstep
 
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                this.SetAllegiance(InstanceManagers[i], AllegianceType.Neutral);
+                SetAllegiance(InstanceManagers[i], AllegianceType.Neutral);
             }
 
             InstanceManagers.Add(this);
             UpdateDiplomacy(this);
-            this.SetAllegiance(this, AllegianceType.Friendly);
+            SetAllegiance(this, AllegianceType.Friendly);
         }
 
         private ushort GenerateLocalID()

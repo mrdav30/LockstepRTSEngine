@@ -1,44 +1,47 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Player;
+using UnityEngine;
 
 // long term it would also be good to save the amount of time that has gone by, 
 // so that when a Player loads a game the timer will not be reset
-
-public class Survival : VictoryCondition
+namespace RTSLockstep.VictoryConditions
 {
-
-    public int minutes = 1;
-
-    private float timeLeft = 0.0f;
-
-    void Awake()
+    public class Survival : VictoryCondition
     {
-        timeLeft = minutes * 60;
-    }
 
-    void Update()
-    {
-        timeLeft -= Time.deltaTime;
-    }
+        public int minutes = 1;
 
-    public override string GetDescription()
-    {
-        return "Survival";
-    }
+        private float timeLeft = 0.0f;
 
-    public override bool GameFinished()
-    {
-        foreach (AgentCommander commander in commanders)
+        void Awake()
         {
-            if (commander && commander.human && commander.IsDead())
-            {
-                return true;
-            }
+            timeLeft = minutes * 60;
         }
-        return timeLeft < 0;
-    }
 
-    public override bool CommanderMeetsConditions(AgentCommander commander)
-    {
-        return commander && commander.human && !commander.IsDead();
+        void Update()
+        {
+            timeLeft -= Time.deltaTime;
+        }
+
+        public override string GetDescription()
+        {
+            return "Survival";
+        }
+
+        public override bool GameFinished()
+        {
+            foreach (LSPlayer players in Players)
+            {
+                if (players && players.human && players.IsDead())
+                {
+                    return true;
+                }
+            }
+            return timeLeft < 0;
+        }
+
+        public override bool PlayerMeetsConditions(LSPlayer player)
+        {
+            return player && player.human && !player.IsDead();
+        }
     }
 }

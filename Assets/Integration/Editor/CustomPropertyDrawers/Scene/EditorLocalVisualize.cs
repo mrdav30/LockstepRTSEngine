@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
 namespace RTSLockstep
 {

@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Determinism;
+using RTSLockstep.Integration;
+using RTSLockstep.Environment;
+using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     [UnityEngine.DisallowMultipleComponent]
     public class HeightSet : Ability

@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep
+﻿namespace RTSLockstep.Utility
 {
     public class DefaultMessage : IMessage
     {

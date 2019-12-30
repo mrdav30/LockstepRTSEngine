@@ -1,13 +1,19 @@
-﻿using RTSLockstep.Data;
+﻿using RTSLockstep.Agents;
+using RTSLockstep.Data;
+using RTSLockstep.LSResources;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player
 {
     public static class RTSInterfacing
     {
-        public static RTSAgent MousedAgent { get; private set; }
+        public static LSAgent MousedAgent { get; private set; }
         public static Ray CachedRay { get; private set; }
         public static Transform MousedObject { get { return CachedHit.transform; } }
         public static RaycastHit CachedHit;
@@ -16,7 +22,7 @@ namespace RTSLockstep
         private static bool agentFound;
         private static float heightDif;
         private static float closestDistance;
-        private static RTSAgent closestAgent;
+        private static LSAgent closestAgent;
 
         private static Vector3 checkDir;
         private static Vector3 checkOrigin;
@@ -28,9 +34,9 @@ namespace RTSLockstep
 
         public static void Visualize()
         {
-            if (UserInputHelper.GUIManager.MainCam.IsNotNull())
+            if (PlayerInputHelper.GUIManager.MainCam.IsNotNull())
             {
-                CachedRay = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
+                CachedRay = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
                 CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
 
                 MousedAgent = GetScreenAgent(Input.mousePosition);
@@ -79,7 +85,7 @@ namespace RTSLockstep
         }
 
         //change screenPos to Vector3?
-        public static RTSAgent GetScreenAgent(Vector2 screenPos, Func<RTSAgent, bool> conditional = null)
+        public static LSAgent GetScreenAgent(Vector2 screenPos, Func<LSAgent, bool> conditional = null)
         {
             if (conditional.IsNull())
             {
@@ -115,7 +121,7 @@ namespace RTSLockstep
                         continue;
                     }
 
-                    RTSAgent agent = body.Agent;
+                    LSAgent agent = body.Agent;
 
                     if (agent.IsVisible)
                     {
@@ -131,8 +137,8 @@ namespace RTSLockstep
 
         public static Vector2d GetWorldPosHeight(Vector2 screenPos, float height = 0)
         {
-            if (UserInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
-            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (PlayerInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
+            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             //RaycastHit hit;
 
             Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
@@ -142,8 +148,8 @@ namespace RTSLockstep
 
         public static Vector2d GetWorldPosD(Vector2 screenPos)
         {
-            if (UserInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
-            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (PlayerInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
+            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -158,8 +164,8 @@ namespace RTSLockstep
 
         public static Vector2 GetWorldPos(Vector2 screenPos)
         {
-            if (UserInputHelper.GUIManager.MainCam == null) return default(Vector2);
-            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (PlayerInputHelper.GUIManager.MainCam == null) return default(Vector2);
+            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -173,8 +179,8 @@ namespace RTSLockstep
 
         public static Vector3 GetWorldPos3(Vector2 screenPos)
         {
-            if (UserInputHelper.GUIManager.MainCam == null) return default(Vector2);
-            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (PlayerInputHelper.GUIManager.MainCam == null) return default(Vector2);
+            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -188,8 +194,8 @@ namespace RTSLockstep
 
         public static bool HitPointIsGround(Vector3 origin)
         {
-            if (UserInputHelper.GUIManager.MainCam == null) return false;
-            Ray ray = UserInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
+            if (PlayerInputHelper.GUIManager.MainCam == null) return false;
+            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
             RaycastHit hit;
             if (NDRaycast.Raycast(ray, out hit))
             {
@@ -205,7 +211,7 @@ namespace RTSLockstep
             return false;
         }
 
-        private static bool AgentIntersects(RTSAgent agent)
+        private static bool AgentIntersects(LSAgent agent)
         {
             if (agent.IsVisible)
             {

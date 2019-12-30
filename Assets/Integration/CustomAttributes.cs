@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Simulation.LSMath;
+using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Integration
 {
     public class FixedNumberAttribute : PropertyAttribute
     {
@@ -40,7 +41,7 @@ namespace RTSLockstep
         /// <param name="isRate">Is this FrameCount a rate (true) or a count?</param>
         public FrameCountAttribute(bool isRate = false)
         {
-            this.IsRate = isRate;
+            IsRate = isRate;
         }
     }
 
@@ -77,7 +78,7 @@ namespace RTSLockstep
 
         public DataCodeAttribute(string targetDataName)
         {
-            this.TargetDataName = targetDataName;
+            TargetDataName = targetDataName;
         }
 
     }

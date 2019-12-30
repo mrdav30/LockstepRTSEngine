@@ -1,28 +1,68 @@
 fileFormatVersion: 2
 guid: 1232b31cd4d9c8445963ce201213cc10
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: Box001
-    100002: Object001
-    100004: Object002
-    100006: //RootNode
-    400000: Box001
-    400002: Object001
-    400004: Object002
-    400006: //RootNode
-    2100000: 01 - Default
-    2300000: Box001
-    2300002: Object001
-    2300004: Object002
-    3300000: Box001
-    3300002: Object001
-    3300004: Object002
-    4300000: Box001
-    4300002: Object001
-    4300004: Object002
-    7400000: Take 001
-    9500000: //RootNode
+  serializedVersion: 26
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Box001
+  - first:
+      1: 100002
+    second: Object001
+  - first:
+      1: 100004
+    second: Object002
+  - first:
+      1: 100006
+    second: //RootNode
+  - first:
+      4: 400000
+    second: Box001
+  - first:
+      4: 400002
+    second: Object001
+  - first:
+      4: 400004
+    second: Object002
+  - first:
+      4: 400006
+    second: //RootNode
+  - first:
+      21: 2100000
+    second: 01 - Default
+  - first:
+      23: 2300000
+    second: Box001
+  - first:
+      23: 2300002
+    second: Object001
+  - first:
+      23: 2300004
+    second: Object002
+  - first:
+      33: 3300000
+    second: Box001
+  - first:
+      33: 3300002
+    second: Object001
+  - first:
+      33: 3300004
+    second: Object002
+  - first:
+      43: 4300000
+    second: Box001
+  - first:
+      43: 4300002
+    second: Object001
+  - first:
+      43: 4300004
+    second: Object002
+  - first:
+      74: 7400000
+    second: Take 001
+  - first:
+      95: 9500000
+    second: //RootNode
   externalObjects:
   - first:
       type: UnityEngine:Material
@@ -62,6 +102,8 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -69,27 +111,32 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 0.0254
-    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -99,6 +146,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0

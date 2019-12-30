@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.LSResources;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class ResourceDeposit : Ability
     {
@@ -71,7 +73,7 @@ namespace RTSLockstep
 
         protected override void OnSaveDetails(JsonWriter writer)
         {
-            base.SaveDetails(writer);
+            SaveDetails(writer);
             SaveManager.WriteFloat(writer, "AmountLeft", AmountLeft);
         }
 

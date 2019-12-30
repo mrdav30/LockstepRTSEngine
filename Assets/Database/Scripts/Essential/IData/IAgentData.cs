@@ -1,11 +1,11 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using RTSLockstep;
+﻿using RTSLockstep.Agents;
+using UnityEngine;
+
 namespace RTSLockstep.Data
 {
     public interface IAgentData : INamedData
     {
-        RTSAgent GetAgent();
+        LSAgent GetAgent();
         string GetAgentDescription();
         Texture2D GetAgentIcon();
     }

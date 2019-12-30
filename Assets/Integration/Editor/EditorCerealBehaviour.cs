@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System;
 using UnityEditor;
 using UnityEngine;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep
 {
     [UnityEditor.CanEditMultipleObjects]
-    [CustomEditor (typeof(CerealBehaviour), true)]
-    public sealed class EditorCerealBehaviour : UnityEditor.Editor
+    [CustomEditor(typeof(CerealBehaviour), true)]
+    public sealed class EditorCerealBehaviour : Editor
     {
         //static Dictionary<CerealBehaviour,EditorCerealBehaviour> instances = new Dictionary<CerealBehaviour,EditorCerealBehaviour>();
         private bool inited = false;
@@ -18,14 +19,15 @@ namespace RTSLockstep
 
         SerializedObject so { get { return _so ?? (_so = new SerializedObject(target)); } }
         CerealBehaviour _cereal;
-        CerealBehaviour cereal {get {return _cereal ?? (_cereal = (CerealBehaviour)target);}}
+        CerealBehaviour cereal { get { return _cereal ?? (_cereal = (CerealBehaviour)target); } }
 
         private void Init()
         {
             _Init();
 
         }
-        private void _Init () {
+        private void _Init()
+        {
             useCustomFieldNames = ((CerealBehaviour)target).GetSerializedFieldNames(customFieldNames);
             inited = true;
         }
@@ -39,7 +41,7 @@ namespace RTSLockstep
             so.Update();
             so.ApplyModifiedProperties();
 
-            foreach (SerializedProperty p in properties ())
+            foreach (SerializedProperty p in properties())
             {
                 DrawProperty(p);
             }
@@ -61,11 +63,12 @@ namespace RTSLockstep
                     {
                         yield return iterator;
                     }
-            } else
+            }
+            else
             {
                 for (int i = 0; i < customFieldNames.Count; i++)
                 {
-                    SerializedProperty p = so.FindProperty(customFieldNames [i]);
+                    SerializedProperty p = so.FindProperty(customFieldNames[i]);
                     yield return p;
                 }
             }
@@ -94,9 +97,9 @@ namespace RTSLockstep
             cereal.BeforeScene();
             cereal.BeforeSerialize();
             so.Update();
-            foreach (SerializedProperty p in properties ())
+            foreach (SerializedProperty p in properties())
             {
-                foreach (LSScenePropertyDrawer drawer in GetPropertyDrawers (p))
+                foreach (LSScenePropertyDrawer drawer in GetPropertyDrawers(p))
                 {
                     if (drawer != null)
                         drawer.OnSceneGUI(cereal, p, new GUIContent(p.displayName, p.tooltip));
@@ -132,7 +135,7 @@ namespace RTSLockstep
 
         private static void DrawProperty(SerializedProperty property)
         {
-            EditorGUILayout.PropertyField(property,true);
+            EditorGUILayout.PropertyField(property, true);
         }
 
 

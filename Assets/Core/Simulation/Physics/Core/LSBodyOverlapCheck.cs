@@ -1,6 +1,7 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public partial class LSBody
     {

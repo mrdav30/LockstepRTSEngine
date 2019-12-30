@@ -6,12 +6,14 @@
 // @modified 2019 David Oravsky
 //=======================================================================
 
-using FastCollections;
-using RTSLockstep.Grid;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.Grid;
 using System;
 using System.Collections.Generic;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public static class FlowFieldPathFinder
     {

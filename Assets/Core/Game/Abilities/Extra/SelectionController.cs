@@ -1,6 +1,13 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.LSResources;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Utility;
+using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Extra
 {
     public class SelectionController : Ability
     {

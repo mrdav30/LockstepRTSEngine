@@ -1,8 +1,12 @@
-﻿using Assets.Integration.CustomComparison;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using RTSLockstep.BuildSystem.BuildGrid;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.LSResources;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Integration.CustomComparion;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     /*
      * Essential ability that attaches to any active structure 
@@ -70,7 +74,7 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -99,14 +103,14 @@ namespace RTSLockstep
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetCommander().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
 
         public int GetUpgradeLevel()
         {
-            return this.upgradeLevel;
+            return upgradeLevel;
         }
 
         public bool CanStoreResources(ResourceType resourceType)
@@ -139,7 +143,7 @@ namespace RTSLockstep
         {
             if (provisioner)
             {
-                Agent.GetCommander().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
 
             GridBuilder.Unbuild(this);

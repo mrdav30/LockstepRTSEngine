@@ -1,7 +1,9 @@
 using UnityEngine;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Managers;
 
-namespace RTSLockstep
+namespace RTSLockstep.Determinism
 {
     public class DeterminismTester : BehaviourHelper
     {

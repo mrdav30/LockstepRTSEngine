@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace RTSLockstep
+namespace RTSLockstep.Utility
 {
     public static class StructuralExtensions
     {

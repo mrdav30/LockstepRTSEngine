@@ -1,8 +1,11 @@
 ﻿using System;
 using UnityEngine;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Networking;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Managers
 {
     public static class FrameManager
     {

@@ -1,7 +1,9 @@
-﻿using RTSLockstep.Grid;
+﻿using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using UnityEngine;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     /// <summary>
     /// Pathfinding queries require 2 valid nodes. When one is not valid, this is used to find the best nearest node to path to instead.

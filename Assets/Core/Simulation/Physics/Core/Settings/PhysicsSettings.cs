@@ -1,11 +1,9 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep
+﻿namespace RTSLockstep.Simulation.LSPhysics
 {
     public sealed class PhysicsSettings
     {
-        public PhysicsSettings () {
+        public PhysicsSettings()
+        {
             //TODO:
         }
     }

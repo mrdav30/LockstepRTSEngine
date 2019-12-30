@@ -1,31 +1,35 @@
-﻿public class Conquest : VictoryCondition
+﻿using RTSLockstep.Player;
+using RTSLockstep.Utility;
+
+namespace RTSLockstep.VictoryConditions
 {
-
-    public override string GetDescription()
+    public class Conquest : VictoryCondition
     {
-        return "Conquest";
-    }
-
-    public override bool GameFinished()
-    {
-        if (commanders == null)
+        public override string GetDescription()
         {
-            return true;
+            return "Conquest";
         }
-        int playersLeft = commanders.Length;
-        foreach (AgentCommander commander in commanders)
+
+        public override bool GameFinished()
         {
-            if (!CommanderMeetsConditions(commander))
+            if (Players.IsNull())
             {
-                playersLeft--;
+                return true;
             }
+            int playersLeft = Players.Length;
+            foreach (LSPlayer player in Players)
+            {
+                if (!PlayerMeetsConditions(player))
+                {
+                    playersLeft--;
+                }
+            }
+            return playersLeft == 1;
         }
-        return playersLeft == 1;
-    }
 
-    public override bool CommanderMeetsConditions(AgentCommander commander)
-    {
-        return commander && !commander.IsDead();
+        public override bool PlayerMeetsConditions(LSPlayer player)
+        {
+            return player && !player.IsDead();
+        }
     }
-
 }

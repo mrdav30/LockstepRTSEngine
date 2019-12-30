@@ -1,4 +1,6 @@
-﻿namespace RTSLockstep.Pathfinding
+﻿using RTSLockstep.Simulation.LSMath;
+
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public class FlowField
     {

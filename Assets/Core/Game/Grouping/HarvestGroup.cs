@@ -1,12 +1,19 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Agents.AgentControllerSystem;
 using RTSLockstep.Data;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Utility;
+using RTSLockstep.LSResources;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grouping
 {
     public class HarvestGroup
     {
         private MovementGroup _harvestMoveGroup;
-        private RTSAgent _currentGroupTarget;
+        private LSAgent _currentGroupTarget;
 
         public int IndexID { get; set; }
 
@@ -25,7 +32,7 @@ namespace RTSLockstep
 
             if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
             {
-                if (AgentController.TryGetAgentInstance((ushort)target.Value, out RTSAgent tempTarget))
+                if (AgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
                 {
                     if (tempTarget.MyAgentType == AgentType.Resource
                         || tempTarget.MyAgentType == AgentType.Structure)

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-#if UNITY_EDITOR
-#endif
+
 namespace RTSLockstep.Data
 {
     [System.Serializable]

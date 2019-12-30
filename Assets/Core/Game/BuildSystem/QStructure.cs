@@ -1,4 +1,6 @@
-﻿namespace RTSLockstep
+﻿using RTSLockstep.Simulation.LSMath;
+
+namespace RTSLockstep.BuildSystem
 {
     public class QStructure
     {

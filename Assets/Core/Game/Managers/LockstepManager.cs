@@ -4,7 +4,6 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-using RTSLockstep.NetworkHelpers;
 
 #if UNITY_EDITOR
 #pragma warning disable 0168 // variable declared but not used.
@@ -27,9 +26,22 @@ using RTSLockstep.NetworkHelpers;
 using UnityEngine;
 using RTSLockstep.Data;
 using System;
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Effects;
+using RTSLockstep.Managers.Input;
+using RTSLockstep.Networking;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Projectiles;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Managers
 {
     //TODO: Set up default functions to implement LSManager
     public static class LockstepManager

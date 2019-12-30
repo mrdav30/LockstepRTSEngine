@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep
+﻿namespace RTSLockstep.Utility
 {
     public abstract class BaseMessageStop
     {
@@ -11,6 +8,6 @@ namespace RTSLockstep
         }
 
         public abstract BaseMessageChannel GetChannel(string channelID);
-        public abstract void Clear ();
+        public abstract void Clear();
     }
 }

@@ -1,8 +1,9 @@
-﻿using RTSLockstep.Grid;
+﻿using RTSLockstep.Simulation.Grid;
 using System;
 using System.Collections.Generic;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public struct PathRequest
     {

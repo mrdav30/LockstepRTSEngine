@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
 using System;
 using RTSLockstep.Data;
 using System.Collections.Generic;
+using RTSLockstep.Agents;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Projectiles
 {
     public static class ProjectileManager
     {
@@ -135,7 +141,7 @@ namespace RTSLockstep
                 return null;
             }
         }
-        public static LSProjectile Create(string projCode, RTSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<RTSAgent, bool> agentConditional, Action<RTSAgent> hitEffect)
+        public static LSProjectile Create(string projCode, LSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<LSAgent, bool> agentConditional, Action<LSAgent> hitEffect)
         {
             Vector2d relativePos = offset.ToVector2d();
             Vector2d worldPos = relativePos.Rotated(source.Body.Rotation) + source.Body.Position;
@@ -154,7 +160,7 @@ namespace RTSLockstep
             return proj;
         }
 
-        public static LSProjectile Create(string projCode, Vector3d position, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<RTSAgent> onHit)
+        public static LSProjectile Create(string projCode, Vector3d position, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<LSAgent> onHit)
         {
             var curProj = RawCreate(projCode);
 

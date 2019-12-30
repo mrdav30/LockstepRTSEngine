@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public class PartitionNode
     {

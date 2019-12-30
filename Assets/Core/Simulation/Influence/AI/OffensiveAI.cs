@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
 using RTSLockstep.Data;
+using RTSLockstep.Player.Commands;
 using System;
+using RTSLockstep.LSResources;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class OffensiveAI : DeterminismAI
     {
@@ -48,11 +52,11 @@ namespace RTSLockstep
         }
 
         //TODO: Consolidate the checks in LSInfluencer
-        protected override Func<RTSAgent, bool> AgentConditional
+        protected override Func<LSAgent, bool> AgentConditional
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = null;
+                Func<LSAgent, bool> agentConditional = null;
 
                 if (CachedAgent.MyStats.CachedAttack.Damage >= 0)
                 {

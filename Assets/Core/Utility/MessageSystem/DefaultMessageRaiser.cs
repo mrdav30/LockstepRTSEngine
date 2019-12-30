@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using RTSLockstep.Player.Commands;
 
-namespace RTSLockstep
+namespace RTSLockstep.Utility
 {
     public static class DefaultMessageRaiser
     {
@@ -12,69 +11,78 @@ namespace RTSLockstep
 
         public static void EarlySetup()
         {
-            
+
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "EarlySetup");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlySetup");
         }
-        public static void LateSetup () {
+        public static void LateSetup()
+        {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "LateSetup");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "LateSetup");
         }
 
         public static void EarlyInitialize()
         {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "EarlyInitialize");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlyInitialize");
         }
 
-        public static void LateInitialize () {
-            if (Do){
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "Startup");
-                MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "LateInitialize");}
+        public static void LateInitialize()
+        {
+            if (Do)
+            {
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "Startup");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "LateInitialize");
+            }
         }
 
         public static void EarlySimulate()
         {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "EarlySimulate");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlySimulate");
         }
 
-        public static void LateSimulate () {
+        public static void LateSimulate()
+        {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "LateSimulate");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "LateSimulate");
         }
 
         public static void EarlyVisualize()
         {
             if (Do)
-            MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlyVisualize");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlyVisualize");
         }
 
-        public static void LateVisualize () {
+        public static void LateVisualize()
+        {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "LateVisualize");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "LateVisualize");
 
         }
 
         public static void EarlyDeactivate()
         {
             if (Do)
-            MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlyDeactivate");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "EarlyDeactivate");
         }
 
-        public static void LateDeactivate () {
+        public static void LateDeactivate()
+        {
             if (Do)
-            MessageManager.Instance.Invoke <DefaultMessage>(EmptyMessage, "LateDeactivate");
+                MessageManager.Instance.Invoke<DefaultMessage>(EmptyMessage, "LateDeactivate");
 
         }
 
-        public static void Execute (Command com)  {
+        public static void Execute(Command com)
+        {
             if (Do)
-            MessageManager.Instance.Invoke <Command> (com, "Execute");
+                MessageManager.Instance.Invoke<Command>(com, "Execute");
         }
 
-		public static void Reset () {
-			MessageManager.Instance.Reset ();
-		}
+        public static void Reset()
+        {
+            MessageManager.Instance.Reset();
+        }
     }
 }

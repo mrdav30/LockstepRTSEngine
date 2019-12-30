@@ -1,7 +1,10 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
 using UnityEngine;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(UnityLSBody))]

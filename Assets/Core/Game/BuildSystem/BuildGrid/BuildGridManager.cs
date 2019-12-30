@@ -1,236 +1,238 @@
-﻿using FastCollections;
-using RTSLockstep;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.LSMath;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class BuildGridManager
+namespace RTSLockstep.BuildSystem.BuildGrid
 {
-    public int GridLength { get; private set; }
-
-    public int BuildSpacing { get; private set; }
-
-    public BuildGridNode[,] Grid { get; private set; }
-
-    private readonly FastList<Coordinate> bufferBuildCoordinates = new FastList<Coordinate>();
-    private readonly FastList<Coordinate> bufferNeighborCoordinates = new FastList<Coordinate>();
-
-    public FastList<Coordinate> BufferNeighborCoordinates
+    public class BuildGridManager
     {
-        get { return bufferNeighborCoordinates; }
-    }
+        public int GridLength { get; private set; }
 
-    public BuildGridManager(int gridLength, int buildSpacing)
-    {
-        this.GridLength = gridLength;
-        this.BuildSpacing = buildSpacing;
-        Initialize();
-    }
+        public int BuildSpacing { get; private set; }
 
-    private void Initialize()
-    {
-        Grid = new BuildGridNode[GridLength, GridLength];
-        for (int i = 0; i < GridLength; i++)
+        public BuildGridNode[,] Grid { get; private set; }
+
+        private readonly FastList<Coordinate> bufferBuildCoordinates = new FastList<Coordinate>();
+        private readonly FastList<Coordinate> bufferNeighborCoordinates = new FastList<Coordinate>();
+
+        public FastList<Coordinate> BufferNeighborCoordinates
         {
-            for (int j = 0; j < GridLength; j++)
-            {
-                BuildGridNode node = new BuildGridNode(this, new Coordinate(i, j));
-                Grid[i, j] = node;
-            }
+            get { return bufferNeighborCoordinates; }
         }
-    }
 
-    public IEnumerable<IBuildable> GetOccupyingBuildables(IBuildable buildable)
-    {
-        if (!CanBuild(buildable.GridPosition, buildable))
+        public BuildGridManager(int gridLength, int buildSpacing)
         {
-            for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+            GridLength = gridLength;
+            BuildSpacing = buildSpacing;
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            Grid = new BuildGridNode[GridLength, GridLength];
+            for (int i = 0; i < GridLength; i++)
             {
-                Coordinate coor = bufferBuildCoordinates[i];
-                BuildGridNode buildNode = Grid[coor.x, coor.y];
-                if (buildNode.Occupied)
+                for (int j = 0; j < GridLength; j++)
                 {
-                    yield return buildNode.RegisteredBuilding;
+                    BuildGridNode node = new BuildGridNode(this, new Coordinate(i, j));
+                    Grid[i, j] = node;
                 }
             }
         }
-    }
 
-    public bool Construct(IBuildable buildable)
-    {
-        if (CanBuild(buildable.GridPosition, buildable))
+        public IEnumerable<IBuildable> GetOccupyingBuildables(IBuildable buildable)
         {
-            for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+            if (!CanBuild(buildable.GridPosition, buildable))
             {
-                Coordinate coor = bufferBuildCoordinates[i];
-                Grid[coor.x, coor.y].RegisteredBuilding = buildable;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public void Unbuild(IBuildable buildable)
-    {
-        if (TryGetBuildCoordinates(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates))
-        {
-            for (int i = 0; i < bufferBuildCoordinates.Count; i++)
-            {
-                Coordinate coor = bufferBuildCoordinates[i];
-                BuildGridNode buildNode = Grid[coor.x, coor.y];
-                /*
-                if (buildNode.Occupied == false)
-                    Debug.Log("Not built");*/
-                buildNode.RegisteredBuilding = null;
+                for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+                {
+                    Coordinate coor = bufferBuildCoordinates[i];
+                    BuildGridNode buildNode = Grid[coor.x, coor.y];
+                    if (buildNode.Occupied)
+                    {
+                        yield return buildNode.RegisteredBuilding;
+                    }
+                }
             }
         }
-        else
-        {
-            throw new System.Exception("Specified area to unbuild is invalid");
-        }
 
-    }
-
-    public bool CanBuild(Coordinate position, IBuildable buildable)
-    {
-        if (TryGetBuildCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates) == false)
+        public bool Construct(IBuildable buildable)
         {
+            if (CanBuild(buildable.GridPosition, buildable))
+            {
+                for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+                {
+                    Coordinate coor = bufferBuildCoordinates[i];
+                    Grid[coor.x, coor.y].RegisteredBuilding = buildable;
+                }
+                return true;
+            }
             return false;
         }
 
-        this.GetSpacedNeighborCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, this.bufferNeighborCoordinates);
-        for (int i = 0; i < this.bufferNeighborCoordinates.Count; i++)
+        public void Unbuild(IBuildable buildable)
         {
-            Coordinate coor = this.bufferNeighborCoordinates[i];
+            if (TryGetBuildCoordinates(buildable.GridPosition, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates))
+            {
+                for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+                {
+                    Coordinate coor = bufferBuildCoordinates[i];
+                    BuildGridNode buildNode = Grid[coor.x, coor.y];
+                    /*
+                    if (buildNode.Occupied == false)
+                        Debug.Log("Not built");*/
+                    buildNode.RegisteredBuilding = null;
+                }
+            }
+            else
+            {
+                throw new System.Exception("Specified area to unbuild is invalid");
+            }
 
-            if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
+        }
+
+        public bool CanBuild(Coordinate position, IBuildable buildable)
+        {
+            if (TryGetBuildCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferBuildCoordinates) == false)
             {
                 return false;
             }
-        }
 
-        for (int i = 0; i < bufferBuildCoordinates.Count; i++)
-        {
-            Coordinate coor = bufferBuildCoordinates[i];
-            if (this.IsOnGrid(coor.x, coor.y))
+            GetSpacedNeighborCoordinates(position, buildable.BuildSizeLow, buildable.BuildSizeHigh, bufferNeighborCoordinates);
+            for (int i = 0; i < bufferNeighborCoordinates.Count; i++)
             {
-                if (this.Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
+                Coordinate coor = bufferNeighborCoordinates[i];
+
+                if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
                 {
                     return false;
                 }
             }
-        }
 
-        return true;
-    }
-
-    private bool IsValid(Coordinate coor, int size)
-    {
-        for (int i = 0; i < size + 2; i++)
-        {
-            int temp = coor.x + i - 1;
-            if (temp < 0 || temp >= GridLength)
-                return false;
-            temp = coor.y - 1;
-            if (temp < 0 || temp >= GridLength)
-                return false;
-            temp = coor.y + size;
-            if (temp < 0 || temp >= GridLength)
-                return false;
-            temp = coor.y + i - 1;
-            if (temp < 0 || temp >= GridLength)
-                return false;
-        }
-        return true;
-    }
-
-    public bool IsOnGrid(Coordinate coor)
-    {
-        return IsOnGrid(coor.x, coor.y);
-    }
-
-    public bool IsOnGrid(int x, int y)
-    {
-        return IsOnGrid(x) && IsOnGrid(y);
-    }
-
-    public bool IsOnGrid(int value)
-    {
-        return value >= 0 && value < GridLength;
-    }
-
-    private bool TryGetBuildCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
-    {
-        int halfLow = sizeLow / 2;
-        int halfHigh = sizeHigh / 2;
-
-        int lowX = halfLow, lowY = halfHigh;
-        int highX = halfLow, highY = halfHigh;
-
-        lowX = position.x - lowX;
-        if (!IsOnGrid(lowX))
-            return false;
-        lowY = position.y - lowY;
-        if (!IsOnGrid(lowY))
-            return false;
-        highX = position.x + highX;
-        if (!IsOnGrid(highX))
-            return false;
-        highY = position.y + highY;
-        if (!IsOnGrid(highY))
-            return false;
-
-        output.FastClear();
-        
-        for (int x = lowX; x <= highX; x++)
-        {
-            for (int y = lowY; y <= highY; y++)
+            for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
-                output.Add(new Coordinate(x, y));
+                Coordinate coor = bufferBuildCoordinates[i];
+                if (IsOnGrid(coor.x, coor.y))
+                {
+                    if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
+                    {
+                        return false;
+                    }
+                }
             }
+
+            return true;
         }
 
-        return true;
-    }
-
-    public void GetSpacedNeighborCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
-    {
-        int halfLow = sizeLow / 2;
-        int halfHigh = sizeHigh / 2;
-
-        int lowX = halfLow, lowY = halfHigh;
-        int highX = halfLow, highY = halfHigh;
-
-        lowX = position.x - lowX;
-        highX = position.x + highX;
-        lowY = position.y - lowY;
-        highY = position.y + highY;
-
-        int neighborLowX = lowX - BuildSpacing;
-        int neighborHighX = highX + BuildSpacing;
-        int neighborLowY = lowY - BuildSpacing;
-        int neighborHighY = highY + BuildSpacing;
-
-        output.FastClear();
-
-        for (int x = neighborLowX; x <= neighborHighX; x++)
+        private bool IsValid(Coordinate coor, int size)
         {
-            if (IsOnGrid(x) == false)
+            for (int i = 0; i < size + 2; i++)
             {
-                continue;
+                int temp = coor.x + i - 1;
+                if (temp < 0 || temp >= GridLength)
+                    return false;
+                temp = coor.y - 1;
+                if (temp < 0 || temp >= GridLength)
+                    return false;
+                temp = coor.y + size;
+                if (temp < 0 || temp >= GridLength)
+                    return false;
+                temp = coor.y + i - 1;
+                if (temp < 0 || temp >= GridLength)
+                    return false;
             }
-            for (int y = neighborLowY; y <= neighborHighY; y++)
+            return true;
+        }
+
+        public bool IsOnGrid(Coordinate coor)
+        {
+            return IsOnGrid(coor.x, coor.y);
+        }
+
+        public bool IsOnGrid(int x, int y)
+        {
+            return IsOnGrid(x) && IsOnGrid(y);
+        }
+
+        public bool IsOnGrid(int value)
+        {
+            return value >= 0 && value < GridLength;
+        }
+
+        private bool TryGetBuildCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
+        {
+            int halfLow = sizeLow / 2;
+            int halfHigh = sizeHigh / 2;
+
+            int lowX = halfLow, lowY = halfHigh;
+            int highX = halfLow, highY = halfHigh;
+
+            lowX = position.x - lowX;
+            if (!IsOnGrid(lowX))
+                return false;
+            lowY = position.y - lowY;
+            if (!IsOnGrid(lowY))
+                return false;
+            highX = position.x + highX;
+            if (!IsOnGrid(highX))
+                return false;
+            highY = position.y + highY;
+            if (!IsOnGrid(highY))
+                return false;
+
+            output.FastClear();
+
+            for (int x = lowX; x <= highX; x++)
             {
-                if (IsOnGrid(y) == false)
+                for (int y = lowY; y <= highY; y++)
+                {
+                    output.Add(new Coordinate(x, y));
+                }
+            }
+
+            return true;
+        }
+
+        public void GetSpacedNeighborCoordinates(Coordinate position, int sizeLow, int sizeHigh, FastList<Coordinate> output)
+        {
+            int halfLow = sizeLow / 2;
+            int halfHigh = sizeHigh / 2;
+
+            int lowX = halfLow, lowY = halfHigh;
+            int highX = halfLow, highY = halfHigh;
+
+            lowX = position.x - lowX;
+            highX = position.x + highX;
+            lowY = position.y - lowY;
+            highY = position.y + highY;
+
+            int neighborLowX = lowX - BuildSpacing;
+            int neighborHighX = highX + BuildSpacing;
+            int neighborLowY = lowY - BuildSpacing;
+            int neighborHighY = highY + BuildSpacing;
+
+            output.FastClear();
+
+            for (int x = neighborLowX; x <= neighborHighX; x++)
+            {
+                if (IsOnGrid(x) == false)
                 {
                     continue;
                 }
-                if (x >= lowX && x <= highX && y >= lowY && y <= highY)
+                for (int y = neighborLowY; y <= neighborHighY; y++)
                 {
-                    continue;
+                    if (IsOnGrid(y) == false)
+                    {
+                        continue;
+                    }
+                    if (x >= lowX && x <= highX && y >= lowY && y <= highY)
+                    {
+                        continue;
+                    }
+                    output.Add(new Coordinate(x, y));
                 }
-                output.Add(new Coordinate(x, y));
             }
         }
     }
+
 }
-

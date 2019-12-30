@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using PanLineAlgorithm;
-using CCoordinate = PanLineAlgorithm.FractionalLineAlgorithm.Coordinate;
+﻿using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using UnityEngine;
+using CCoordinate = RTSLockstep.Simulation.LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate;
+
 namespace RTSLockstep.Test
 {
     public class RaycastTestHelper : MonoBehaviour
@@ -12,15 +13,17 @@ namespace RTSLockstep.Test
         public Transform end;
         Vector2d startPos;
         Vector2d endPos;
-        void OnDrawGizmos () {
-             startPos = new Vector2d(start.position);
-             endPos = new Vector2d(end.position);
-            if (testPartitions)TestPartitions ();
-            if (testBodies)TestBodies ();
-            Gizmos.DrawLine(startPos.ToVector3(0),endPos.ToVector3(0));
+        void OnDrawGizmos()
+        {
+            startPos = new Vector2d(start.position);
+            endPos = new Vector2d(end.position);
+            if (testPartitions) TestPartitions();
+            if (testBodies) TestBodies();
+            Gizmos.DrawLine(startPos.ToVector3(0), endPos.ToVector3(0));
         }
         //FastList<LSBody_> lastBodies = new FastList<LSBody_>();
-        void TestBodies () {
+        void TestBodies()
+        {
             /*if (Application.isPlaying == false) return;
             for (int i = 0; i < lastBodies.Count; i++) {
                 lastBodies[i].GetComponentInChildren<Renderer>().material.color = Color.white;
@@ -31,27 +34,31 @@ namespace RTSLockstep.Test
                 lastBodies.Add(body);
             }*/
         }
-        void TestPartitions () {
+        void TestPartitions()
+        {
             int width = Partition.Nodes.Width;
             int height = Partition.Nodes.Height;
-            bool[,] casted = new bool[width,height];
+            bool[,] casted = new bool[width, height];
 
-            foreach (CCoordinate coor in Raycaster.GetRelevantNodeCoordinates (startPos,endPos)) {
-                if (Partition.CheckValid(coor.X,coor.Y))
-                    casted[coor.X,coor.Y] = true;
+            foreach (CCoordinate coor in Raycaster.GetRelevantNodeCoordinates(startPos, endPos))
+            {
+                if (Partition.CheckValid(coor.X, coor.Y))
+                    casted[coor.X, coor.Y] = true;
             }
 
             Vector3 size = new Vector3(1 << Partition.AdditionalShiftSize, .1f, 1 << Partition.AdditionalShiftSize);
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    if (casted[i,j])
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    if (casted[i, j])
                         Gizmos.color = Color.red;
                     else
                         Gizmos.color = Color.green;
-                    Vector3 drawPos = new Vector2d (Partition.GetWorldX(i), Partition.GetWorldY(j)).ToVector3(0);
-                    Gizmos.DrawCube (drawPos, size);
+                    Vector3 drawPos = new Vector2d(Partition.GetWorldX(i), Partition.GetWorldY(j)).ToVector3(0);
+                    Gizmos.DrawCube(drawPos, size);
                     Gizmos.color = Color.black;
-                    Gizmos.DrawWireCube(drawPos,size);
+                    Gizmos.DrawWireCube(drawPos, size);
                 }
             }
         }

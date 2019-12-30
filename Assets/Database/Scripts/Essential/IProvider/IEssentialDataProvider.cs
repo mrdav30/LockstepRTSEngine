@@ -1,14 +1,11 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace RTSLockstep.Data
+﻿namespace RTSLockstep.Data
 {
     public interface IEssentialDataProvider :
     IAgentDataProvider
-    ,IAbilityDataProvider
-    ,IEffectDataProvider
-    ,IInputDataProvider
-    ,IProjectileDataProvider
+    , IAbilityDataProvider
+    , IEffectDataProvider
+    , IInputDataProvider
+    , IProjectileDataProvider
     {
 
     }

@@ -1,7 +1,12 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Integration;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class Turn : Ability
     {
@@ -52,11 +57,11 @@ namespace RTSLockstep
                 //autoturn direction will be culmination of positional changes
                 if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger))
                 {
-                    Vector2d delta = this.Agent.Body.Position - this.Agent.Body.LastPosition;
+                    Vector2d delta = Agent.Body.Position - Agent.Body.LastPosition;
                     if (delta.FastMagnitude() > collisionTurnThreshold)
                     {
                         delta.Normalize();
-                        this.StartTurnDirection(delta);
+                        StartTurnDirection(delta);
                     }
                 }
             }

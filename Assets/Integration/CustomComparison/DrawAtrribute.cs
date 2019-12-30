@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.Integration.CustomComparison
+namespace RTSLockstep.Integration.CustomComparion
 {
     /// <summary>
     /// Draws the field/property ONLY if the copared property compared by the comparison type with the value of comparedValue returns true.
@@ -23,10 +23,10 @@ namespace Assets.Integration.CustomComparison
         /// <param name="disablingType">The type of disabling that should happen if the condition is NOT met. Defaulted to DisablingType.DontDraw.</param>
         public DrawIfAttribute(string comparedPropertyName, ComparisonType comparisonType, object comparedValue, DisablingType disablingType = DisablingType.DontDraw)
         {
-            this.ComparedPropertyName = comparedPropertyName;
-            this.ComparedValue = comparedValue;
-            this.ComparisonType = comparisonType;
-            this.DisablingType = disablingType;
+            ComparedPropertyName = comparedPropertyName;
+            ComparedValue = comparedValue;
+            ComparisonType = comparisonType;
+            DisablingType = disablingType;
         }
     }
 }

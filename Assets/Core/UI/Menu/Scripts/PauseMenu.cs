@@ -1,85 +1,88 @@
 ﻿using UnityEngine;
-using RTSLockstep;
-using UnityEngine.SceneManagement;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player;
 
-public class PauseMenu : Menu
+namespace RTSLockstep.Menu.UI
 {
-    #region Properties
-    private AgentCommander commander;
-    #endregion
-
-    #region MonoBehavior
-    protected override void Start()
+    public class PauseMenu : Menu
     {
-        base.Start();
-        commander = transform.root.GetComponent<AgentCommander>();
-    }
+        #region Properties
+        private LSPlayer player;
+        #endregion
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        #region MonoBehavior
+        protected override void Start()
         {
-            Resume();
+            base.Start();
+            player = transform.root.GetComponent<LSPlayer>();
         }
-    }
-    #endregion
 
-    #region Private
-    protected override void SetButtons()
-    {
-        buttons = new string[] { "Resume", "Save Game", "Load Game", "Main Menu", "Exit Game" };
-    }
-
-    protected override void HandleButton(string text)
-    {
-        base.HandleButton(text);
-        switch (text)
+        void Update()
         {
-            case "Resume":
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
                 Resume();
-                break;
-            case "Save Game":
-                SaveGame();
-                break;
-            case "Load Game":
-                LoadGame();
-                break;
-            case "Main Menu":
-                ReturnToMainMenu();
-                break;
-            case "Exit Game":
-                ExitGame();
-                break;
-            default: break;
+            }
         }
-    }
+        #endregion
 
-    private void Resume()
-    {
-        Time.timeScale = 1.0f;
-        GetComponent<PauseMenu>().enabled = false;
-        if (commander)
+        #region Private
+        protected override void SetButtons()
         {
-            commander.GetComponent<UserInputHelper>().enabled = true;
+            buttons = new string[] { "Resume", "Save Game", "Load Game", "Main Menu", "Exit Game" };
         }
-        Cursor.visible = false;
-        GameResourceManager.MenuOpen = false;
-    }
 
-    private void SaveGame()
-    {
-        GetComponent<PauseMenu>().enabled = false;
-        SaveMenu saveMenu = GetComponent<SaveMenu>();
-        if (saveMenu)
+        protected override void HandleButton(string text)
         {
-            saveMenu.enabled = true;
-            saveMenu.Activate();
+            base.HandleButton(text);
+            switch (text)
+            {
+                case "Resume":
+                    Resume();
+                    break;
+                case "Save Game":
+                    SaveGame();
+                    break;
+                case "Load Game":
+                    LoadGame();
+                    break;
+                case "Main Menu":
+                    ReturnToMainMenu();
+                    break;
+                case "Exit Game":
+                    ExitGame();
+                    break;
+                default: break;
+            }
         }
-    }
 
-    protected override void HideCurrentMenu()
-    {
-        GetComponent<PauseMenu>().enabled = false;
+        private void Resume()
+        {
+            Time.timeScale = 1.0f;
+            GetComponent<PauseMenu>().enabled = false;
+            if (player)
+            {
+                player.GetComponent<PlayerInputHelper>().enabled = true;
+            }
+            Cursor.visible = false;
+            GameResourceManager.MenuOpen = false;
+        }
+
+        private void SaveGame()
+        {
+            GetComponent<PauseMenu>().enabled = false;
+            SaveMenu saveMenu = GetComponent<SaveMenu>();
+            if (saveMenu)
+            {
+                saveMenu.enabled = true;
+                saveMenu.Activate();
+            }
+        }
+
+        protected override void HideCurrentMenu()
+        {
+            GetComponent<PauseMenu>().enabled = false;
+        }
+        #endregion
     }
-    #endregion
 }

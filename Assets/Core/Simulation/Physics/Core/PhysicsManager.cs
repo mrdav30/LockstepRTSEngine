@@ -5,11 +5,14 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Managers;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using System;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public static class PhysicsManager
     {

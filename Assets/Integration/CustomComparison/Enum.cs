@@ -1,4 +1,4 @@
-﻿namespace Assets.Integration.CustomComparison
+﻿namespace RTSLockstep.Integration.CustomComparion
 {
     /// <summary>
     /// Types of comperisons.

@@ -1,16 +1,21 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Data;
-using System;
-using System.Collections.Generic;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Player;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.LSResources;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
-    [UnityEngine.DisallowMultipleComponent]
+    [DisallowMultipleComponent]
     public class Rally : ActiveAbility
     {
-        public Vector3 spawnPoint { get; private set; }
-        public Vector3 rallyPoint { get; private set; }
+        public Vector3 SpawnPoint { get; private set; }
+        public Vector3 RallyPoint { get; private set; }
         private FlagState _flagState;
 
         #region Serialized Values (Further description in properties)
@@ -25,16 +30,16 @@ namespace RTSLockstep
 
         public void HandleSelectedChange()
         {
-            if (Agent.GetCommander() == PlayerManager.MainController.Commander)
+            if (Agent.GetControllingPlayer() == PlayerManager.MainController.Player)
             {
-                RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = Agent.GetControllingPlayer().GetComponentInChildren<RallyPoint>();
                 if (Agent.IsSelected)
                 {
-                    if (flag && spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3())
+                    if (flag && SpawnPoint != GameResourceManager.InvalidPosition.ToVector3() && RallyPoint != GameResourceManager.InvalidPosition.ToVector3())
                     {
                         if (_flagState == FlagState.FlagSet)
                         {
-                            flag.transform.localPosition = rallyPoint;
+                            flag.transform.localPosition = RallyPoint;
                             flag.transform.forward = transform.forward;
                             flag.Enable();
                         }
@@ -57,17 +62,17 @@ namespace RTSLockstep
 
         public void SetRallyPoint(Vector3 position)
         {
-            rallyPoint = position;
-            if (Agent.GetCommander() && Agent.IsSelected)
+            RallyPoint = position;
+            if (Agent.GetControllingPlayer() && Agent.IsSelected)
             {
-                RallyPoint flag = Agent.GetCommander().GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = Agent.GetControllingPlayer().GetComponentInChildren<RallyPoint>();
                 if (flag)
                 {
                     if (!flag.ActiveStatus)
                     {
                         flag.Enable();
                     }
-                    flag.transform.localPosition = rallyPoint;
+                    flag.transform.localPosition = RallyPoint;
                     _flagState = FlagState.FlagSet;
                     Agent.Controller.GetCommanderHUD().SetCursorLock(false);
                     Agent.Controller.GetCommanderHUD().SetCursorState(CursorState.Select);
@@ -80,14 +85,13 @@ namespace RTSLockstep
         {
             int spawnX = (int)(Agent.Body.XMin.CeilToInt() + transform.forward.x * Agent.Body.XMax.CeilToInt() + transform.forward.x * 20);
             int spawnZ = (int)(Agent.Body.YMin.CeilToInt() + transform.forward.z * Agent.Body.YMax.CeilToInt() + transform.forward.z * 20);
-            spawnPoint = new Vector3(spawnX, 0, spawnZ);
-            rallyPoint = spawnPoint;
+            SpawnPoint = new Vector3(spawnX, 0, spawnZ);
+            RallyPoint = SpawnPoint;
         }
 
         protected override void OnExecute(Command com)
         {
-            Vector2d pos;
-            if (com.TryGetData(out pos))
+            if (com.TryGetData(out Vector2d pos))
             {
                 if (pos.ToVector3d() != GameResourceManager.InvalidPosition)
                 {
@@ -98,24 +102,24 @@ namespace RTSLockstep
 
         public bool hasSpawnPoint()
         {
-            return spawnPoint != GameResourceManager.InvalidPosition.ToVector3() && rallyPoint != GameResourceManager.InvalidPosition.ToVector3();
+            return SpawnPoint != GameResourceManager.InvalidPosition.ToVector3() && RallyPoint != GameResourceManager.InvalidPosition.ToVector3();
         }
 
         public FlagState GetFlagState()
         {
-            return this._flagState;
+            return _flagState;
         }
 
         public void SetFlagState(FlagState value)
         {
-            this._flagState = value;
+            _flagState = value;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
         {
-            base.SaveDetails(writer);
-            SaveManager.WriteVector(writer, "SpawnPoint", spawnPoint);
-            SaveManager.WriteVector(writer, "RallyPoint", rallyPoint);
+            SaveDetails(writer);
+            SaveManager.WriteVector(writer, "SpawnPoint", SpawnPoint);
+            SaveManager.WriteVector(writer, "RallyPoint", RallyPoint);
             SaveManager.WriteString(writer, "FlagState", _flagState.ToString());
         }
 
@@ -125,10 +129,10 @@ namespace RTSLockstep
             switch (propertyName)
             {
                 case "SpawnPoint":
-                    spawnPoint = LoadManager.LoadVector(reader);
+                    SpawnPoint = LoadManager.LoadVector(reader);
                     break;
                 case "RallyPoint":
-                    rallyPoint = LoadManager.LoadVector(reader);
+                    RallyPoint = LoadManager.LoadVector(reader);
                     break;
                 case "FlagState":
                     _flagState = WorkManager.GetFlagState((string)readValue);

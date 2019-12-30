@@ -1,9 +1,12 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
 using RTSLockstep.Data;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Utility;
 using System;
 using System.Collections.Generic;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities
 {
     public class AbilityManager
     {
@@ -13,7 +16,7 @@ namespace RTSLockstep
         public ActiveAbility[] ActiveAbilitys { get; private set; }
         public readonly FastList<AbilityDataItem> Interfacers = new FastList<AbilityDataItem>();
 
-        public void Setup(RTSAgent agent)
+        public void Setup(LSAgent agent)
         {
             setupActives.FastClear();
             Abilities = agent.AttachedAbilities;
@@ -234,7 +237,7 @@ namespace RTSLockstep
         {
             for (var k = 0; k < Abilities.Length; k++)
             {
-                var abil = this.Abilities[k];
+                var abil = Abilities[k];
                 if (abil is T)
                     yield return abil;
             }

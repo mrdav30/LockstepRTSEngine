@@ -1,19 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using RTSLockstep.Data;
-using FastCollections;
-namespace RTSLockstep
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Player;
+using RTSLockstep.Integration;
+
+namespace RTSLockstep.Agents.AgentControllerSystem
 {
     /// <summary>
     /// At the moment a simple script that automatically creates AgentControllers at the start of games
     /// </summary>
     public class AgentControllerHelper : BehaviourHelper
     {
-        [SerializeField, DataCodeAttribute("AgentControllers")]
+        [SerializeField, DataCode("AgentControllers")]
         private string _environmentController;
         public string EnvironmentController { get { return _environmentController; } }
-        [SerializeField, DataCodeAttribute("AgentControllers")]
+        [SerializeField, DataCode("AgentControllers")]
         private string _defaultController;
         public string DefaultController { get { return _defaultController; } }
 
@@ -24,8 +26,7 @@ namespace RTSLockstep
         {
             Instance = this;
 
-            IAgentControllerDataProvider database;
-            if (!LSDatabaseManager.TryGetDatabase<IAgentControllerDataProvider>(out database))
+            if (!LSDatabaseManager.TryGetDatabase(out IAgentControllerDataProvider database))
             {
                 Debug.LogError("IAgentControllerDataProvider unavailable.");
             }
@@ -42,7 +43,7 @@ namespace RTSLockstep
                 {
                     PlayerManager.AddController(controller);
                 }
-                controller.CreateCommander();
+                controller.CreatePlayer();
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
         }
@@ -54,8 +55,8 @@ namespace RTSLockstep
                 Debug.Log("controllerCode is null or empty.");
                 return null;
             }
-            byte id;
-            if (!CodeIDMap.TryGetValue(controllerCode, out id))
+
+            if (!CodeIDMap.TryGetValue(controllerCode, out byte id))
             {
                 Debug.Log("Controller name " + controllerCode + " is not valid.");
             }

@@ -1,14 +1,16 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using RTSLockstep.Data;
-namespace RTSLockstep
+﻿using RTSLockstep.Data;
+using RTSLockstep.Utility;
+
+namespace RTSLockstep.Player.Commands
 {
     public struct EmptyData : ICommandData
     {
-        public void Read (Reader reader) {
+        public void Read(Reader reader)
+        {
 
         }
-        public void Write (Writer writer) {
+        public void Write(Writer writer)
+        {
 
         }
     }

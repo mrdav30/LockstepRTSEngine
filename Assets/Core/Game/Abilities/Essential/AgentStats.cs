@@ -1,6 +1,9 @@
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class AgentStats : Ability
     {

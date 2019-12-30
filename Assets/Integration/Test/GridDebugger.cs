@@ -1,7 +1,10 @@
-﻿using RTSLockstep.Grid;
+﻿using RTSLockstep.BuildSystem.BuildGrid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Integration
 {
     public class GridDebugger : MonoBehaviour
     {

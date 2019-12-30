@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Data;
 using System.Collections.Generic;
+using RTSLockstep.Projectiles;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep
+namespace RTSLockstep.Effects
 {
-
-
     public static class EffectManager
     {
 
         const int MaxEffects = ProjectileManager.MaxProjectiles * 2;
-        private static Dictionary<string,FastStack<LSEffect>> EffectPool;
-        private static Dictionary<string,IEffectData> CodeDataMap;
+        private static Dictionary<string, FastStack<LSEffect>> EffectPool;
+        private static Dictionary<string, IEffectData> CodeDataMap;
 
         public static void Setup()
         {
@@ -20,11 +21,11 @@ namespace RTSLockstep
             if (LSDatabaseManager.TryGetDatabase<IEffectDataProvider>(out database))
             {
                 IEffectData[] effectData = database.EffectData;
-                EffectPool = new Dictionary<string,FastStack<LSEffect>>(effectData.Length);
+                EffectPool = new Dictionary<string, FastStack<LSEffect>>(effectData.Length);
                 CodeDataMap = new Dictionary<string, IEffectData>(effectData.Length);
                 for (int i = 0; i < effectData.Length; i++)
                 {
-                    IEffectData dataItem = effectData [i];
+                    IEffectData dataItem = effectData[i];
                     string code = (string)dataItem.Name;
                     EffectPool.Add(code, new FastStack<LSEffect>());
                     CodeDataMap.Add(code, dataItem);
@@ -36,40 +37,41 @@ namespace RTSLockstep
         {
             for (int i = 0; i < PeakCount; i++)
             {
-                if (EffectActive [i])
+                if (EffectActive[i])
                 {
-                    Effects [i].Visualize();
+                    Effects[i].Visualize();
                 }
             }
         }
 
-		public static void Deactivate()
-		{
-			for (int i = 0; i < PeakCount; i++)
-			{
-				if (EffectActive [i])
-				{
-					EndEffect(Effects [i]);
-				}
-			}
-		}
+        public static void Deactivate()
+        {
+            for (int i = 0; i < PeakCount; i++)
+            {
+                if (EffectActive[i])
+                {
+                    EndEffect(Effects[i]);
+                }
+            }
+        }
 
         public static bool IsValid(string effectCode)
         {
-			return !string.IsNullOrEmpty (effectCode) && effectCode != "None" && CodeDataMap.ContainsKey (effectCode);
+            return !string.IsNullOrEmpty(effectCode) && effectCode != "None" && CodeDataMap.ContainsKey(effectCode);
         }
-		public static LSEffect CreateCollisionEffect (string effectCode, LSProjectile projectile, LSBody hitBody) {
-			Vector3 collisionDirection = -(projectile.Forward.ToVector3());
-			Vector3 collisionPosition = collisionDirection * hitBody.Radius.ToFloat () + hitBody.PositionalTransform.position;
-			return CreateEffect (effectCode, collisionPosition, projectile.transform.rotation);
-		}
+        public static LSEffect CreateCollisionEffect(string effectCode, LSProjectile projectile, LSBody hitBody)
+        {
+            Vector3 collisionDirection = -(projectile.Forward.ToVector3());
+            Vector3 collisionPosition = collisionDirection * hitBody.Radius.ToFloat() + hitBody.PositionalTransform.position;
+            return CreateEffect(effectCode, collisionPosition, projectile.transform.rotation);
+        }
         public static LSEffect CreateEffect(string effectCode, Vector3 position)
         {
             if (!IsValid(effectCode))
                 return null;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
-            Fire (effect);
+            Fire(effect);
             return effect;
         }
 
@@ -80,7 +82,7 @@ namespace RTSLockstep
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
             effect.CachedTransform.rotation = rotation;
-            Fire (effect);
+            Fire(effect);
             return effect;
 
         }
@@ -91,7 +93,7 @@ namespace RTSLockstep
                 return null;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.parent = spawnParent;
-            Fire (effect);
+            Fire(effect);
             return effect;
 
         }
@@ -102,12 +104,13 @@ namespace RTSLockstep
                 return null;
 
             LSEffect effect = GenEffect(effectCode, -1);
-            EffectActive [effect.ID] = true;
-            Effects [effect.ID] = effect;
+            EffectActive[effect.ID] = true;
+            Effects[effect.ID] = effect;
             return effect;
         }
 
-        public static void Fire (LSEffect effect) {
+        public static void Fire(LSEffect effect)
+        {
             effect.Initialize();
         }
         #region Allocation
@@ -130,16 +133,18 @@ namespace RTSLockstep
         {
             FastStack<LSEffect> pool;
 
-            if (!EffectPool.TryGetValue(effectCode, out pool))  {
+            if (!EffectPool.TryGetValue(effectCode, out pool))
+            {
                 return null;
             }
             LSEffect effect = null;
             if (pool.Count > 0)
             {
                 effect = pool.Pop();
-            } else
+            }
+            else
             {
-                IEffectData dataItem = CodeDataMap [effectCode];
+                IEffectData dataItem = CodeDataMap[effectCode];
                 effect = GameObject.Instantiate<GameObject>(dataItem.GetEffect().gameObject).GetComponent<LSEffect>();
                 effect.Setup(effectCode);
             }
@@ -149,7 +154,8 @@ namespace RTSLockstep
             if (effect.Create(id))
             {
                 return effect;
-            } else
+            }
+            else
             {
                 return GenEffect(effectCode, id);
             }
@@ -157,12 +163,12 @@ namespace RTSLockstep
 
         public static void EndEffect(LSEffect effect)
         {
-            if (EffectActive [effect.ID] == false)
+            if (EffectActive[effect.ID] == false)
                 return;
             effect.Deactivate();
-            EffectPool [effect.MyEffectCode].Add(effect);
-            EffectActive [effect.ID] = false;
-            Effects [effect.ID] = null;
+            EffectPool[effect.MyEffectCode].Add(effect);
+            EffectActive[effect.ID] = false;
+            Effects[effect.ID] = null;
             OpenSlots.Add(effect.ID);
 
         }
@@ -173,9 +179,9 @@ namespace RTSLockstep
         /// <param name="effect">Effect.</param>
         public static void DestroyEffect(LSEffect effect)
         {
-            if (EffectActive [effect.ID] == false)
+            if (EffectActive[effect.ID] == false)
                 return;
-            EffectActive [effect.ID] = false;
+            EffectActive[effect.ID] = false;
             OpenSlots.Add(effect.ID);
         }
 

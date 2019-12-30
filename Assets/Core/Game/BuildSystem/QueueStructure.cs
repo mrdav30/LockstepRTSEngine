@@ -1,8 +1,8 @@
-﻿using FastCollections;
-using System;
-using System.Collections;
+﻿using RTSLockstep.Data;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.BuildSystem
 {
     public class QueueStructure : ICommandData
     {
@@ -31,19 +31,19 @@ namespace RTSLockstep
 
         public void Read(Reader reader)
         {
-            this.Value.StructureName = reader.ReadString();
+            Value.StructureName = reader.ReadString();
             long buildX = reader.ReadLong();
             long buildY = reader.ReadLong();
-            this.Value.BuildPoint = new Vector2d(buildX, buildY);
+            Value.BuildPoint = new Vector2d(buildX, buildY);
             long rotX = reader.ReadLong();
             long rotY = reader.ReadLong();
-            this.Value.RotationPoint = new Vector2d(rotX, rotY);
+            Value.RotationPoint = new Vector2d(rotX, rotY);
             long scaleX = reader.ReadLong();
             long scaleY = reader.ReadLong();
             long scaleZ = reader.ReadLong();
-            this.Value.LocalScale = new Vector3d(scaleX, scaleY, scaleZ);
-            this.Value.HalfWidth = reader.ReadLong();
-            this.Value.HalfLength = reader.ReadLong();
+            Value.LocalScale = new Vector3d(scaleX, scaleY, scaleZ);
+            Value.HalfWidth = reader.ReadLong();
+            Value.HalfLength = reader.ReadLong();
         }
     }
 }

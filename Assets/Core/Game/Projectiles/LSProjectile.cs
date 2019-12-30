@@ -1,9 +1,17 @@
 using System;
 using UnityEngine;
 using RTSLockstep.Data;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
+using RTSLockstep.Effects;
+using RTSLockstep.Managers;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Projectiles
 {
     public sealed class LSProjectile : CerealBehaviour
     {
@@ -190,7 +198,7 @@ namespace RTSLockstep
 
         public long Speed { get; set; }
 
-        public RTSAgent Target
+        public LSAgent Target
         {
             get;
             set;
@@ -216,13 +224,13 @@ namespace RTSLockstep
 
         public Vector2d Forward { get; set; }
 
-        private Action<RTSAgent> HitEffect { get; set; }
+        private Action<LSAgent> HitEffect { get; set; }
 
-        static FastList<RTSAgent> ScanOutput = new FastList<RTSAgent>();
+        static FastList<LSAgent> ScanOutput = new FastList<LSAgent>();
 
         public Func<byte, bool> BucketConditional { get; private set; }
 
-        public Func<RTSAgent, bool> AgentConditional { get; private set; }
+        public Func<LSAgent, bool> AgentConditional { get; private set; }
 
         public bool Deterministic { get; private set; }
 
@@ -239,7 +247,7 @@ namespace RTSLockstep
         public event Action OnDeactivate;
 
         public event Action OnHit;
-        public event Action<RTSAgent> OnHitAgent;
+        public event Action<LSAgent> OnHitAgent;
 
         public event Action OnInitialize;
 
@@ -259,7 +267,7 @@ namespace RTSLockstep
             Scan(center, radius);
             for (int i = 0; i < ScanOutput.Count; i++)
             {
-                RTSAgent agent = ScanOutput[i];
+                LSAgent agent = ScanOutput[i];
                 if (agent.Body.Position.FastDistance(center.x, center.y) < num)
                 {
                     HitAgent(agent);
@@ -267,7 +275,7 @@ namespace RTSLockstep
             }
         }
 
-        void HitAgent(RTSAgent agent)
+        void HitAgent(LSAgent agent)
         {
             if (UseEffects && AttachEndEffectToTarget)
             {
@@ -288,7 +296,7 @@ namespace RTSLockstep
             Scan(center, radius);
             for (int i = 0; i < ScanOutput.Count; i++)
             {
-                RTSAgent agent = ScanOutput[i];
+                LSAgent agent = ScanOutput[i];
                 Vector2d agentPos = agent.Body.Position;
                 Vector2d difference = agentPos - center;
 
@@ -325,7 +333,7 @@ namespace RTSLockstep
 
         private void Scan(Vector2d center, long radius)
         {
-            InfluenceManager.ScanAll(
+            AgentLOSManager.ScanAll(
                 center,
                 radius,
                 AgentConditional,
@@ -402,7 +410,7 @@ namespace RTSLockstep
             }
         }
 
-        internal void Prepare(int id, Vector3d projectilePosition, Func<RTSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<RTSAgent> onHit, bool deterministic)
+        internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<LSAgent> onHit, bool deterministic)
         {
             Deterministic = deterministic;
 
@@ -425,7 +433,7 @@ namespace RTSLockstep
             Forward = Vector2d.up;
         }
 
-        public void InitializeHoming(RTSAgent target)
+        public void InitializeHoming(LSAgent target)
         {
             SetHeightReached(false);
             Target = target;
@@ -437,7 +445,7 @@ namespace RTSLockstep
             cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - Position.ToVector3());
         }
 
-        public void InitializeTimed(RTSAgent target)
+        public void InitializeTimed(LSAgent target)
         {
             Target = target;
             TargetVersion = Target.SpawnVersion;
@@ -674,7 +682,7 @@ namespace RTSLockstep
                     if (HitBehavior == HitType.Single && Target.SpawnVersion != TargetVersion)
                     {
                         //Switch to positional to move to target's last position and not seek deceased target
-                        this.TargetingBehavior = TargetingType.Positional;
+                        TargetingBehavior = TargetingType.Positional;
                         Target = null;
                         TargetCurrent = false;
                         goto case TargetingType.Positional;

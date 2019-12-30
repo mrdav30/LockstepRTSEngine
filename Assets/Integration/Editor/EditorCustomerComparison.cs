@@ -1,4 +1,4 @@
-﻿using Assets.Integration.CustomComparison;
+﻿using RTSLockstep.Integration.CustomComparion;
 using UnityEditor;
 using UnityEngine;
 

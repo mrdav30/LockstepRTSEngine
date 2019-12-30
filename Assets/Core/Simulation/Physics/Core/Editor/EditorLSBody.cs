@@ -1,9 +1,12 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Simulation.LSMath;
+
 #if true
 namespace RTSLockstep.Integration
 {
-    [CustomEditor(typeof(UnityLSBody), true), UnityEditor.CanEditMultipleObjects]
+    [CustomEditor(typeof(UnityLSBody), true), CanEditMultipleObjects]
     public class EditorLSBody : Editor
     {
 

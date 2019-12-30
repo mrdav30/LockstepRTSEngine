@@ -1,5 +1,7 @@
-﻿using UnityEditor;
+﻿using RTSLockstep.Settings;
+using UnityEditor;
 using UnityEngine;
+
 namespace RTSLockstep.Data
 {
     public static class LSFSettingsModifier

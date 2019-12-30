@@ -1,17 +1,28 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.BuildSystem;
+using RTSLockstep.BuildSystem.BuildGrid;
 using RTSLockstep.Data;
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.LSResources;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grouping
 {
     public class ConstructGroup
     {
         private MovementGroup _constructMoveGroup;
-        public Queue<RTSAgent> GroupConstructionQueue = new Queue<RTSAgent>();
+        public Queue<LSAgent> GroupConstructionQueue = new Queue<LSAgent>();
 
-        private RTSAgent _currentGroupTarget;
+        private LSAgent _currentGroupTarget;
 
         public int IndexID { get; set; }
 
@@ -38,7 +49,7 @@ namespace RTSLockstep
             // otherwise were going to help construct
             else if (com.TryGetData(out DefaultData targetValue, 1) && targetValue.Is(DataType.UShort))
             {
-                if (AgentController.TryGetAgentInstance((ushort)targetValue.Value, out RTSAgent tempTarget))
+                if (AgentController.TryGetAgentInstance((ushort)targetValue.Value, out LSAgent tempTarget))
                 {
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
@@ -144,7 +155,7 @@ namespace RTSLockstep
                 QStructure qStructure = _queueStructures[i].Value;
                 if (qStructure.IsNotNull())
                 {
-                    RTSAgent newRTSAgent = AgentController.InstanceManagers[_controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as RTSAgent;
+                    LSAgent newRTSAgent = AgentController.InstanceManagers[_controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as LSAgent;
                     Structure newStructure = newRTSAgent.GetAbility<Structure>();
 
                     // remove the bounds so we can get to the temp structure from any angle
@@ -167,9 +178,9 @@ namespace RTSLockstep
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        AgentController.InstanceManagers[_controllerID].Commander.CachedResourceManager.RemoveResources(newRTSAgent);
+                        AgentController.InstanceManagers[_controllerID].Player.CachedResourceManager.RemoveResources(newRTSAgent);
 
-                        newRTSAgent.SetCommander(AgentController.InstanceManagers[_controllerID].Commander);
+                        newRTSAgent.SetControllingPlayer(AgentController.InstanceManagers[_controllerID].Player);
 
                         newRTSAgent.gameObject.name = newRTSAgent.objectName;
                         newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform

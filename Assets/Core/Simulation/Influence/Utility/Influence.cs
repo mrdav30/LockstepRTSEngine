@@ -1,8 +1,11 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
+using RTSLockstep.Data;
 using System;
 using System.Collections;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class Influence : ICommandData
     {
@@ -20,14 +23,14 @@ namespace RTSLockstep
 
         public Influence() { }
 
-        public Influence(RTSAgent influencedAgent)
+        public Influence(LSAgent influencedAgent)
         {
             InfluencedAgentLocalID = influencedAgent.LocalID;
         }
 
         public byte[] GetBytes()
         {
-            this.Serialize();
+            Serialize();
 
             bufferBites.FastClear();
             //Serialize header
@@ -109,11 +112,11 @@ namespace RTSLockstep
 
         public void Write(Writer writer)
         {
-            writer.Write(this.GetBytes());
+            writer.Write(GetBytes());
         }
         public void Read(Reader reader)
         {
-            int move = this.Reconstruct(reader.Source, reader.Position);
+            int move = Reconstruct(reader.Source, reader.Position);
             reader.MovePosition(move);
         }
     }

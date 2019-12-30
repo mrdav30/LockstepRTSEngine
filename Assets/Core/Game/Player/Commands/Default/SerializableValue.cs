@@ -1,13 +1,7 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Runtime.Serialization.Formatters.Binary;
-using System;
+﻿using System;
 using System.Runtime.Serialization;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player.Commands
 {
     public class SerializableValue<TValue> : BaseSerializableValue where TValue : new()
     {
@@ -16,7 +10,8 @@ namespace RTSLockstep
             if (typeof(TValue).IsSerializable || typeof(TValue).IsAssignableFrom(typeof(ISerializable)))
             {
                 Value = value;
-            } else
+            }
+            else
             {
                 throw new InvalidOperationException("A serializable Type is required");
             }
@@ -30,7 +25,8 @@ namespace RTSLockstep
             {
                 return Value;
             }
-            set {
+            set
+            {
                 Value = value;
             }
         }
@@ -39,14 +35,15 @@ namespace RTSLockstep
         {
             get
             {
-                return (object)this._ObjectValue;
+                return (object)_ObjectValue;
             }
-            protected set {
+            protected set
+            {
                 _ObjectValue = (TValue)value;
             }
         }
 
-      
+
 
         public static implicit operator TValue(SerializableValue<TValue> serializable)
         {

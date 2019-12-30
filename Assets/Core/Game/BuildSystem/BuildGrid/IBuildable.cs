@@ -1,4 +1,6 @@
-﻿namespace RTSLockstep
+﻿using RTSLockstep.Simulation.LSMath;
+
+namespace RTSLockstep.BuildSystem.BuildGrid
 {
     public interface IBuildable
     {

@@ -1,7 +1,9 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.Influence;
+using RTSLockstep.Utility;
 using System;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     public class ScanNode
     {

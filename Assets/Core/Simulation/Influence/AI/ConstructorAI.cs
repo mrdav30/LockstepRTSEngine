@@ -1,7 +1,12 @@
-﻿using RTSLockstep.Data;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Data;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Utility;
 using System;
+using RTSLockstep.LSResources;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class ConstructorAI : DeterminismAI
     {
@@ -44,11 +49,11 @@ namespace RTSLockstep
             InfluenceConstruction();
         }
 
-        protected override Func<RTSAgent, bool> AgentConditional
+        protected override Func<LSAgent, bool> AgentConditional
         {
             get
             {
-                bool agentConditional(RTSAgent other)
+                bool agentConditional(LSAgent other)
                 {
                     Structure structure = other.GetAbility<Structure>();
                     return other.GlobalID != CachedAgent.GlobalID

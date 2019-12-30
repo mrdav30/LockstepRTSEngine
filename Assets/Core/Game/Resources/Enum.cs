@@ -1,4 +1,4 @@
-﻿namespace RTSLockstep
+﻿namespace RTSLockstep.LSResources
 {
     public enum AgentTag
     {
@@ -136,5 +136,62 @@
     {
         AStar,
         VectorFlowField
+    }
+
+    public enum InformationGatherType
+    {
+        None,
+        Position,
+        Target,
+        PositionOrTarget,
+        PositionOrAction
+    }
+
+    public enum SelectionRingState
+    {
+        Selected,
+        Highlighted,
+        None
+    }
+
+    public enum PlacementResult
+    {
+        Placed,
+        Returned,
+        Limbo
+    }
+
+    public enum MessageType : byte
+    {
+        Input,
+        Frame,
+        Init,
+        Matchmaking,
+        Register,
+        Test,
+    }
+
+    public enum MarkerType
+    {
+        None,
+        Friendly,
+        Neutral,
+        Aggresive
+    }
+
+    public enum HitType
+    {
+        None,
+        Single,
+        Area,
+        Cone
+    }
+
+    public enum TargetingType
+    {
+        Timed,
+        Homing,
+        Directional,
+        Positional
     }
 }

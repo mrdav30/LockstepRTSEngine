@@ -1,10 +1,20 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Agents;
 using RTSLockstep.Data;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Determinism;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.Influence;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     [UnityEngine.DisallowMultipleComponent]
     public class Spawner : ActiveAbility
@@ -102,18 +112,18 @@ namespace RTSLockstep
         public void CreateUnit(string unitName)
         {
             GameObject unit = GameResourceManager.GetAgentTemplate(unitName).gameObject;
-            RTSAgent unitObject = unit.GetComponent<RTSAgent>();
+            LSAgent unitObject = unit.GetComponent<LSAgent>();
             // check that the Player has the resources available before allowing them to create a new Unit / Building
-            if (Agent.GetCommander() && unitObject)
+            if (Agent.GetControllingPlayer() && unitObject)
             {
-                if (Agent.GetCommander().CachedResourceManager.CheckResources(unitObject))
+                if (Agent.GetControllingPlayer().CachedResourceManager.CheckResources(unitObject))
                 {
-                    Agent.GetCommander().CachedResourceManager.RemoveResources(unitObject);
+                    Agent.GetControllingPlayer().CachedResourceManager.RemoveResources(unitObject);
                     spawnQueue.Enqueue(unitName);
                 }
                 else
                 {
-                //    Debug.Log("not enough resources!");
+                    //    Debug.Log("not enough resources!");
                 }
             }
         }
@@ -136,12 +146,12 @@ namespace RTSLockstep
                 {
                     windupCount = 0;
                     ProcessSpawnQueue();
-                    while (this.spawnCount >= _spawnInterval)
+                    while (spawnCount >= _spawnInterval)
                     {
                         //resetting back down after attack is fired
-                        this.spawnCount -= (this._spawnInterval);
+                        spawnCount -= (_spawnInterval);
                     }
-                    this.spawnCount += _windup;
+                    spawnCount += _windup;
                     IsWindingUp = false;
                 }
             }
@@ -156,24 +166,24 @@ namespace RTSLockstep
             currentSpawnProgress += spawnIncrement;
             if (currentSpawnProgress > _maxSpawnProgress)
             {
-                if (Agent.GetCommander())
+                if (Agent.GetControllingPlayer())
                 {
                     //if (audioElement != null)
                     //{
                     //    audioElement.Play(finishedJobSound);
                     //}
-                    Vector2d spawnOutside = new Vector2d(this.transform.position);
-                    RTSAgent agent = Agent.Controller.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
+                    Vector2d spawnOutside = new Vector2d(transform.position);
+                    LSAgent agent = Agent.Controller.CreateAgent(spawnQueue.Dequeue(), spawnOutside);
                     agent.SetProvision(true);
 
                     if (cachedRally)
                     {
-                        if (cachedRally.spawnPoint != cachedRally.rallyPoint)
-                        {                          
+                        if (cachedRally.SpawnPoint != cachedRally.RallyPoint)
+                        {
                             Command moveCom = new Command(AbilityDataItem.FindInterfacer("Move").ListenInputID);
-                            moveCom.Add<Vector2d>(new Vector2d(cachedRally.rallyPoint));
+                            moveCom.Add(new Vector2d(cachedRally.RallyPoint));
                             moveCom.ControllerID = agent.Controller.ControllerID;
-                            moveCom.Add<Influence>(new Influence(agent));
+                            moveCom.Add(new Influence(agent));
 
                             CommandManager.SendCommand(moveCom);
                         }
@@ -192,26 +202,26 @@ namespace RTSLockstep
         protected override void OnExecute(Command com)
         {
             DefaultData action;
-            if (com.TryGetData<DefaultData>(out action) && action.Is(DataType.String))
+            if (com.TryGetData(out action) && action.Is(DataType.String))
             {
-                String unit = action.Value.ToString();
+                string unit = action.Value.ToString();
                 CreateUnit(unit);
             }
         }
 
         public int GetSpawnQueueCount()
         {
-            return this.spawnQueue.Count;
+            return spawnQueue.Count;
         }
 
-        public String[] GetSpawnActions()
+        public string[] GetSpawnActions()
         {
-            return this._spawnActions;
+            return _spawnActions;
         }
 
         protected override void OnSaveDetails(JsonWriter writer)
         {
-            base.SaveDetails(writer);
+            SaveDetails(writer);
             SaveManager.WriteFloat(writer, "SpawnProgress", currentSpawnProgress);
             SaveManager.WriteLong(writer, "SpawnCount", spawnCount);
             SaveManager.WriteStringArray(writer, "SpawnQueue", spawnQueue.ToArray());

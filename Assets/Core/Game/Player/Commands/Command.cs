@@ -1,7 +1,14 @@
-﻿using FastCollections;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.BuildSystem;
+using RTSLockstep.Data;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Simulation.Influence;
+using RTSLockstep.Simulation.LSMath;
 using System;
 using System.Collections.Generic;
-namespace RTSLockstep
+using RTSLockstep.Utility;
+
+namespace RTSLockstep.Player.Commands
 {
     public partial class Command
     {
@@ -74,9 +81,9 @@ namespace RTSLockstep
 
         public Command(ushort inputCode, byte controllerID = byte.MaxValue)
         {
-            this.Initialize();
-            this.InputCode = inputCode;
-            this.ControllerID = controllerID;
+            Initialize();
+            InputCode = inputCode;
+            ControllerID = controllerID;
         }
 
         public void Initialize()
@@ -149,7 +156,7 @@ namespace RTSLockstep
 
         public TData[] GetDataArray<TData>() where TData : ICommandData
         {
-            int count = this.GetDataCount<TData>();
+            int count = GetDataCount<TData>();
             TData[] array = new TData[count];
             for (int i = 0; i < count; i++)
             {
@@ -167,7 +174,7 @@ namespace RTSLockstep
                 return false;
             }
             FastList<ICommandData> items;
-            if (!this.ContainedData.TryGetValue(dataID, out items))
+            if (!ContainedData.TryGetValue(dataID, out items))
             {
                 return false;
             }
@@ -181,7 +188,7 @@ namespace RTSLockstep
 
         public void SetData<TData>(TData value, int index = 0) where TData : ICommandData
         {
-            this.ContainedData[RegisteredData[typeof(TData)]][index] = value;
+            ContainedData[RegisteredData[typeof(TData)]][index] = value;
         }
 
         public bool SetFirstData<TData>(TData value) where TData : ICommandData
@@ -192,7 +199,7 @@ namespace RTSLockstep
                 return false;
             }
             FastList<ICommandData> items;
-            if (!this.ContainedData.TryGetValue(dataID, out items))
+            if (!ContainedData.TryGetValue(dataID, out items))
             {
                 return false;
             }
@@ -209,7 +216,7 @@ namespace RTSLockstep
         }
         public void ClearData<TData>()
         {
-            this.ContainedData[RegisteredData[typeof(TData)]].Clear();
+            ContainedData[RegisteredData[typeof(TData)]].Clear();
         }
 
         /// <summary>
@@ -220,8 +227,8 @@ namespace RTSLockstep
             reader.Initialize(Source, StartIndex);
             ControllerID = reader.ReadByte();
             InputCode = reader.ReadUShort();
-            this.ContainedTypesCount = reader.ReadUShort();
-            for (int i = 0; i < this.ContainedTypesCount; i++)
+            ContainedTypesCount = reader.ReadUShort();
+            for (int i = 0; i < ContainedTypesCount; i++)
             {
                 ushort dataID = reader.ReadUShort();
                 ushort dataCount = reader.ReadUShort();
@@ -277,9 +284,9 @@ namespace RTSLockstep
         public Command Clone()
         {
             Command com = new Command();
-            com.ControllerID = this.ControllerID;
-            com.InputCode = this.InputCode;
-            foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in this.ContainedData)
+            com.ControllerID = ControllerID;
+            com.InputCode = InputCode;
+            foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in ContainedData)
             {
                 FastList<ICommandData> list = new FastList<ICommandData>();
                 pair.Value.CopyTo(list);

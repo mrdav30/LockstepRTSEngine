@@ -1,8 +1,9 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
-using FastCollections;
-namespace RTSLockstep
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Managers;
+using RTSLockstep.Networking;
+
+namespace RTSLockstep.Player.Commands
 {
     public static class CommandManager
     {
@@ -22,10 +23,10 @@ namespace RTSLockstep
         {
             SendOut();
         }
-		public static void Visualize()
-		{
-			SendOut();
-		}
+        public static void Visualize()
+        {
+            SendOut();
+        }
 
         public static void ProcessPacket(byte[] packet)
         {
@@ -38,7 +39,7 @@ namespace RTSLockstep
 
         public static void ProcessPacket(FastList<byte> packet)
         {
-			if (ReplayManager.IsPlayingBack) return;
+            if (ReplayManager.IsPlayingBack) return;
             if (packet == null || packet.Count < 4)
             {
                 throw new System.Exception("Packet is null or not valid length");
@@ -48,17 +49,17 @@ namespace RTSLockstep
 
             Frame frame = new Frame();
 
-			// packet.Count > 6 is a guard for random extra bytes bug with DarkRift implementation
+            // packet.Count > 6 is a guard for random extra bytes bug with DarkRift implementation
             if (packet.Count > 4 && packet.Count > 6)
             {
-				while (index < packet.Count)
+                while (index < packet.Count)
                 {
                     Command com = new Command();
                     index += com.Reconstruct(packet.innerArray, index);
                     frame.AddCommand(com);
                 }
 
-			}
+            }
             ProcessFrame(frameCount, frame);
         }
 
@@ -77,23 +78,23 @@ namespace RTSLockstep
         public static void SendOut()
         {
 
-			if (bufferedBytes.Count > 0)
-			{
-				ClientManager.Distribute(bufferedBytes.ToArray());
+            if (bufferedBytes.Count > 0)
+            {
+                ClientManager.Distribute(bufferedBytes.ToArray());
 
-				bufferedBytes.FastClear();
-			}
-            
+                bufferedBytes.FastClear();
+            }
+
         }
-		//static FastList<Command> asdf = new FastList<Command>();
+        //static FastList<Command> asdf = new FastList<Command>();
         public static void SendCommand(Command com)
         {
-			if (com == null)
-			{
-				return;
-			}
+            if (com == null)
+            {
+                return;
+            }
 
-			bufferedBytes.AddRange(com.Serialized);
+            bufferedBytes.AddRange(com.Serialized);
 
         }
     }

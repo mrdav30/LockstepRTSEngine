@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using UnityEditor;
 
-namespace RTSLockstep
+namespace RTSLockstep.Utility
 {
-	public static class DevelopmentHelpers
-	{
+    public static class DevelopmentHelpers
+    {
         public static void ClearConsole()
         {
             var assembly = Assembly.GetAssembly(typeof(SceneView));

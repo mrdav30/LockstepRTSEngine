@@ -1,6 +1,8 @@
-﻿using UnityEngine;
-using RTSLockstep.Data;
-namespace RTSLockstep
+﻿using RTSLockstep.Player.Commands;
+using RTSLockstep.Integration;
+using UnityEngine;
+
+namespace RTSLockstep.Abilities
 {
     public abstract class ActiveAbility : Ability
     {

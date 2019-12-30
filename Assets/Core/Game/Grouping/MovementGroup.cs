@@ -1,9 +1,16 @@
-﻿using FastCollections;
-using RTSLockstep.Grid;
-using RTSLockstep.Pathfinding;
+﻿using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.Pathfinding;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Utility;
+using RTSLockstep.LSResources;
 using System.Collections.Generic;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep
+namespace RTSLockstep.Grouping
 {
     public class MovementGroup
     {

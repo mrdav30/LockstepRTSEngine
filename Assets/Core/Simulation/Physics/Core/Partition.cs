@@ -5,10 +5,12 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 using System;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.LSPhysics
 {
     public static class Partition
     {
@@ -193,7 +195,7 @@ namespace RTSLockstep
                 }
             }
         }
-       
+
         /// <summary>
         /// Returns true if size changed. False if not.
         /// </summary>

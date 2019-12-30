@@ -1,24 +1,29 @@
-﻿using RTSLockstep;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Player;
 
-public class BuildWonder : VictoryCondition
+namespace RTSLockstep.VictoryConditions
 {
-    public override string GetDescription()
+    public class BuildWonder : VictoryCondition
     {
-        return "Building Wonder";
-    }
-
-    public override bool CommanderMeetsConditions(AgentCommander commander)
-    {
-        Wonder wonder = commander.GetComponentInChildren<Wonder>();
-
-        RTSAgent[] agents = commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>();
-        foreach (RTSAgent agent in agents)
+        public override string GetDescription()
         {
-            if (agent.GetAbility<Wonder>())
-            {
-                return commander && !commander.IsDead() && agent && !agent.GetAbility<Structure>().NeedsConstruction;
-            }
+            return "Building Wonder";
         }
-        return false;
+
+        public override bool PlayerMeetsConditions(LSPlayer player)
+        {
+            // Wonder wonder = commander.GetComponentInChildren<Wonder>();
+
+            LSAgent[] agents = player.GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>();
+            foreach (LSAgent agent in agents)
+            {
+                if (agent.GetAbility<Wonder>())
+                {
+                    return player && !player.IsDead() && agent && !agent.GetAbility<Structure>().NeedsConstruction;
+                }
+            }
+            return false;
+        }
     }
 }

@@ -1,48 +1,54 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System;
-namespace RTSLockstep
+﻿using RTSLockstep.Agents;
+
+namespace RTSLockstep.Buffs
 {
     public class Buff
-    {     
+    {
         protected int Duration;
         protected int Timer;
-        protected RTSAgent Target;
-        internal int ID {get; set;}
-        public bool Active {get; private set;}
-        public void Initialize (int duration, RTSAgent target) {
+        protected LSAgent Target;
+        internal int ID { get; set; }
+        public bool Active { get; private set; }
+        public void Initialize(int duration, LSAgent target)
+        {
             Duration = duration;
             Timer = 0;
             Target = target;
 
             Target.AddBuff(this);
             Active = true;
-            this.OnInitialize();
+            OnInitialize();
         }
 
-        protected virtual void OnInitialize () {
+        protected virtual void OnInitialize()
+        {
 
         }
 
-        public void Simulate () {
+        public void Simulate()
+        {
             Timer++;
-            OnSimulate ();
+            OnSimulate();
             if (Duration >= 0)
-            if (Timer > Duration) {
-                Deactivate ();
-            }
+                if (Timer > Duration)
+                {
+                    Deactivate();
+                }
         }
 
-        protected virtual void OnSimulate () {
+        protected virtual void OnSimulate()
+        {
 
         }
 
-        public void Deactivate () {
+        public void Deactivate()
+        {
             Target.RemoveBuff(this);
             Active = false;
-            this.OnDeactivate();
+            OnDeactivate();
         }
-        protected virtual void OnDeactivate () {
+        protected virtual void OnDeactivate()
+        {
 
         }
     }

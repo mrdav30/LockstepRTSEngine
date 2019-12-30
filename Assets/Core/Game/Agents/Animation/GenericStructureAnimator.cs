@@ -1,4 +1,6 @@
 ﻿using RotaryHeart.Lib.SerializableDictionary;
+using RTSLockstep.Abilities.Essential;
+using RTSLockstep.LSResources;
 using System;
 using UnityEngine;
 

@@ -1,26 +1,26 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
+using RTSLockstep.LSResources;
 
-namespace RTSLockstep
+namespace RTSLockstep.Agents
 {
-	public class LSParticler : MonoBehaviour
-	{
-		LSAnimatorBase animator;
+    public class LSParticler : MonoBehaviour
+    {
+        LSAnimatorBase animator;
 
-		void Awake ()
-		{
-			animator = GetComponent<LSAnimatorBase> ();
-			animator.OnStatePlay += HandleOnStatePlay;
-			animator.OnImpulsePlay += HandleOnImpulsePlay;
-		}
+        void Awake()
+        {
+            animator = GetComponent<LSAnimatorBase>();
+            animator.OnStatePlay += HandleOnStatePlay;
+            animator.OnImpulsePlay += HandleOnImpulsePlay;
+        }
 
-		void HandleOnImpulsePlay (AnimImpulse obj, int rate)
-		{
-		}
+        void HandleOnImpulsePlay(AnimImpulse obj, int rate)
+        {
+        }
 
-		void HandleOnStatePlay (AnimState obj)
-		{
+        void HandleOnStatePlay(AnimState obj)
+        {
 
-		}
-	}
+        }
+    }
 }

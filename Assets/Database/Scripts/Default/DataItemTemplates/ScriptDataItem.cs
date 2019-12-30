@@ -17,8 +17,7 @@ namespace RTSLockstep.Data
         {
             Type type = (Type)data[0];
             _script = type;
-            this._name = type.Name;
+            _name = type.Name;
         }
     }
-
 }

@@ -1,11 +1,23 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Pathfinding;
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Pathfinding;
+using RTSLockstep.Simulation.Grid;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents;
+using RTSLockstep.Grouping;
+using RTSLockstep.Determinism;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Managers;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     public class Move : ActiveAbility
     {
@@ -46,7 +58,7 @@ namespace RTSLockstep
 
         public bool CanMove { get; private set; }
         public bool IsMoving { get; private set; }
-        public bool IsStuck { get; private set; }
+        public bool IsStuck { get; private set; } 
 
         [HideInInspector]
         public Vector2d Destination;
@@ -101,7 +113,7 @@ namespace RTSLockstep
         private readonly int _collidedCount;
         private readonly ushort _collidedID;
 
-        private RTSAgent _tempAgent;
+        private LSAgent _tempAgent;
         private readonly bool _paused;
 
         private Vector2d _movementDirection;
@@ -468,7 +480,7 @@ namespace RTSLockstep
             for (int i = 0; i < AgentController.GlobalAgents.Length; i++)
             {
                 bool neighborFound = false;
-                RTSAgent a = AgentController.GlobalAgents[i];
+                LSAgent a = AgentController.GlobalAgents[i];
                 if (a.IsNotNull()
                     && a.GlobalID != Agent.GlobalID
                     && a.MyAgentType == AgentType.Unit)
@@ -550,11 +562,11 @@ namespace RTSLockstep
             return desiredMag > 0 ? desired * (MovementSpeed / desiredMag) : Vector2d.zero;
         }
 
-        protected virtual Func<RTSAgent, bool> AvoidAgentConditional
+        protected virtual Func<LSAgent, bool> AvoidAgentConditional
         {
             get
             {
-                bool agentConditional(RTSAgent other)
+                bool agentConditional(LSAgent other)
                 {
                     // check to make sure we didn't find ourselves and that the other agent can move
                     if (Agent.GlobalID != other.GlobalID
@@ -586,9 +598,9 @@ namespace RTSLockstep
 
             _minAvoidanceDistance = FixedMath.One * 6;
 
-            Func<RTSAgent, bool> avoidAgentConditional = AvoidAgentConditional;
+            Func<LSAgent, bool> avoidAgentConditional = AvoidAgentConditional;
 
-            RTSAgent closetAgent = InfluenceManager.Scan(
+            LSAgent closetAgent = AgentLOSManager.Scan(
                      Position,
                      Agent.MyStats.Sight,
                      avoidAgentConditional,

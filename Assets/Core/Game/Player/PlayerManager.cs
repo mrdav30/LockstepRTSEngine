@@ -1,34 +1,34 @@
-﻿using System;
-using UnityEngine;
-using FastCollections;
+﻿using UnityEngine;
+using RTSLockstep.Utility.FastCollections;
 using Newtonsoft.Json;
 using System.IO;
-using RTSLockstep;
+using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.LSResources;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player
 {
     public static class PlayerManager
     {
         #region Properties
         private struct PlayerDetails
         {
-            private readonly string name;
-            private readonly int avatar;
-            private readonly int controllerId;
-            private readonly int playerIndex;
             public PlayerDetails(string name, int avatar, int controllerId, int playerIndex)
             {
-                this.name = name;
-                this.avatar = avatar;
-                this.controllerId = controllerId;
-                this.playerIndex = playerIndex;
+                Name = name;
+                Avatar = avatar;
+                ControllerId = controllerId;
+                PlayerIndex = playerIndex;
             }
             // using the name of the Player as a unique identifier
             // to support multiplayer at some point this may need to be modified
-            public string Name { get { return name; } }
-            public int Avatar { get { return avatar; } }
-            public int ControllerId { get { return ControllerId; } }
-            public int PlayerIndex { get { return PlayerIndex; } }
+            public string Name { get; private set; }
+            public int Avatar { get; private set; }
+            public int ControllerId { get; private set; }
+            public int PlayerIndex { get; private set; }
         }
         private static FastBucket<PlayerDetails> Players = new FastBucket<PlayerDetails>();
         private static PlayerDetails currentPlayer;
@@ -141,7 +141,7 @@ namespace RTSLockstep
             return MainController.GetAllegiance(otherController);
         }
 
-        public static AllegianceType GetAllegiance(RTSAgent agent)
+        public static AllegianceType GetAllegiance(LSAgent agent)
         {
             return GetAllegiance(agent.Controller);
         }

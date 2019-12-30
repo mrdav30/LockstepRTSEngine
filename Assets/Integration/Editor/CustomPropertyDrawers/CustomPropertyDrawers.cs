@@ -1,7 +1,11 @@
 ﻿#if UNITY_EDITOR
+using RTSLockstep.Managers;
 using System;
 using UnityEditor;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
 namespace RTSLockstep
 {
@@ -106,7 +110,7 @@ namespace RTSLockstep
 
                 cache = false;
             }
-            bool changed = false;
+            // bool changed = false;
             Rect contentPosition = EditorGUI.PrefixLabel(position, new GUIContent(name));
 
             //Check if there is enough space to put the name on the same line (to save space)
@@ -135,7 +139,7 @@ namespace RTSLockstep
                 if (EditorGUI.EndChangeCheck())
                 {
                     X.longValue = newVal;
-                    changed = true;
+                    // changed = true;
                 }
             }
             EditorGUI.EndProperty();
@@ -149,7 +153,7 @@ namespace RTSLockstep
                 if (EditorGUI.EndChangeCheck())
                 {
                     Y.longValue = newVal;
-                    changed = true;
+                    // changed = true;
                 }
             }
             EditorGUI.EndProperty();

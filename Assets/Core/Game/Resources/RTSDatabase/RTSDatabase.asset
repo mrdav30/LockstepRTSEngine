@@ -126,11 +126,11 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 1192182045702688, guid: e7fc641f62ca86a46b2a77a821393dfd, type: 3}
-  - _name: Ground
+  - _name: GrassyMeadows
     _description: 
     _icon: {fileID: 0}
-    _prefab: {fileID: 1492072546167288, guid: 128830cd048d508489d67e66eb42a2f1, type: 3}
-  - _name: AgentCommander
+    _prefab: {fileID: 1492072546167288, guid: 077cd10f303d09545a392b0ccc81c038, type: 3}
+  - _name: LSPlayer
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 1048473000217382, guid: 82a2a2fe36414064aa801e58d913d25f, type: 3}
@@ -142,6 +142,7 @@ MonoBehaviour:
   - _name: Construct
   - _name: Harvest
   - _name: Rally
+  - _name: Destroy
   _projectileData:
   - _name: Melee
     _description: 
@@ -158,62 +159,62 @@ MonoBehaviour:
       type: 3}
   _effectData: []
   _abilityData:
-  - _name: Attack
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: RTSLockstep.Attack, Assembly-CSharp
-    _listenInputCode: Attack
-    _informationGather: 3
   - _name: DurationAbility
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: RTSLockstep.DurationAbility, Assembly-CSharp
+      _classRef: RTSLockstep.Abilities.DurationAbility, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0
+  - _name: Attack
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Abilities.Essential.Attack, Assembly-CSharp
+    _listenInputCode: Attack
+    _informationGather: 3
+  - _name: Construct
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Abilities.Essential.Construct, Assembly-CSharp
+    _listenInputCode: Construct
+    _informationGather: 3
   - _name: Harvest
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: RTSLockstep.Harvest, Assembly-CSharp
+      _classRef: RTSLockstep.Abilities.Essential.Harvest, Assembly-CSharp
     _listenInputCode: Harvest
     _informationGather: 3
   - _name: Move
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: RTSLockstep.Move, Assembly-CSharp
+      _classRef: RTSLockstep.Abilities.Essential.Move, Assembly-CSharp
     _listenInputCode: Move
+    _informationGather: 1
+  - _name: Rally
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Abilities.Essential.Rally, Assembly-CSharp
+    _listenInputCode: Rally
     _informationGather: 1
   - _name: Spawner
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: RTSLockstep.Spawner, Assembly-CSharp
+      _classRef: RTSLockstep.Abilities.Essential.Spawner, Assembly-CSharp
     _listenInputCode: Spawner
     _informationGather: 0
   - _name: Stop
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: RTSLockstep.Stop, Assembly-CSharp
+      _classRef: RTSLockstep.Abilities.Essential.Stop, Assembly-CSharp
     _listenInputCode: Stop
     _informationGather: 0
-  - _name: Construct
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: RTSLockstep.Construct, Assembly-CSharp
-    _listenInputCode: Construct
-    _informationGather: 3
-  - _name: Rally
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: RTSLockstep.Rally, Assembly-CSharp
-    _listenInputCode: Rally
-    _informationGather: 1
   _unitConfigElementData: []
   _unitConfigData: []
   _avatarData:

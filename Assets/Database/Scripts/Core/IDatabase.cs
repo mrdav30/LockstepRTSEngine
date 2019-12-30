@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-public interface IDatabase {
+﻿namespace RTSLockstep.Data
+{
+    public interface IDatabase
+    {
+    }
 }

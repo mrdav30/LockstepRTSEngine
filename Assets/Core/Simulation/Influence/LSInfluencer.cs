@@ -1,13 +1,18 @@
-﻿using RTSLockstep.Grid;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Managers;
 using System;
 using System.Collections.Generic;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class LSInfluencer
     {
         #region Static Helpers
-        static RTSAgent tempAgent;
+        static LSAgent tempAgent;
         static GridNode tempNode;
         #endregion
 
@@ -22,12 +27,12 @@ namespace RTSLockstep
 
         public GridNode LocatedNode { get; private set; }
         public LSBody Body { get; private set; }
-        public RTSAgent Agent { get; private set; }
+        public LSAgent Agent { get; private set; }
 
         // convert to fast array
         private List<DeterminismAI> AgentAI = new List<DeterminismAI>();
 
-        public void Setup(RTSAgent agent)
+        public void Setup(LSAgent agent)
         {
             Agent = agent;
             Body = agent.Body;

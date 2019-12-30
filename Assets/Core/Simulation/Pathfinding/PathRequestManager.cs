@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System;
-using RTSLockstep.Grid;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.LSMath;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public static class PathRequestManager
     {

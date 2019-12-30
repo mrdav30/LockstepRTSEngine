@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
-public interface IMousable {
-    Vector3 WorldPosition {get;}
-    float MousableRadius {get;}
+namespace RTSLockstep.Player.Utility
+{
+    public interface IMousable
+    {
+        Vector3 WorldPosition { get; }
+        float MousableRadius { get; }
+    }
 }

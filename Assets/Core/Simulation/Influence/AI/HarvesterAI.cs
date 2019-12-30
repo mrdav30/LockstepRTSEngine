@@ -1,8 +1,15 @@
-﻿using RTSLockstep.Data;
+﻿using RTSLockstep.Abilities.Essential;
+using RTSLockstep.Agents;
+using RTSLockstep.Data;
+using RTSLockstep.Managers;
+using RTSLockstep.Player.Commands;
 using System;
 using System.Collections.Generic;
+using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class HarvesterAI : DeterminismAI
     {
@@ -47,11 +54,11 @@ namespace RTSLockstep
             InfluenceHarvest();
         }
 
-        protected override Func<RTSAgent, bool> AgentConditional
+        protected override Func<LSAgent, bool> AgentConditional
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = null;
+                Func<LSAgent, bool> agentConditional = null;
 
                 if (CachedAgent.MyStats.CachedHarvest.IsEmptying)
                 {
@@ -107,12 +114,12 @@ namespace RTSLockstep
             }
         }
 
-        protected override RTSAgent DoScan()
+        protected override LSAgent DoScan()
         {
-            Func<RTSAgent, bool> agentConditional = AgentConditional;
+            Func<LSAgent, bool> agentConditional = AgentConditional;
             Func<byte, bool> allianceConditional = AllianceConditional;
 
-            RTSAgent agent = null;
+            LSAgent agent = null;
 
             if (agentConditional.IsNotNull())
             {
@@ -134,7 +141,7 @@ namespace RTSLockstep
                     }
                 }
 
-                agent = InfluenceManager.Scan(
+                agent = AgentLOSManager.Scan(
                      scanPos,
                      CachedAgent.MyStats.Sight,
                      agentConditional,
@@ -183,12 +190,12 @@ namespace RTSLockstep
 
         // Backup in case agent can't find storage within range
         // default is to always go as far as it takes to store them goods
-        private RTSAgent ClosestResourceStorage()
+        private LSAgent ClosestResourceStorage()
         {
             //change list to fastarray
-            List<RTSAgent> playerBuildings = new List<RTSAgent>();
+            List<LSAgent> playerBuildings = new List<LSAgent>();
             // use RTS influencer?
-            foreach (RTSAgent child in CachedAgent.Controller.Commander.GetComponentInChildren<RTSAgents>().GetComponentsInChildren<RTSAgent>())
+            foreach (LSAgent child in CachedAgent.Controller.Player.GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>())
             {
                 if (child.GetAbility<Structure>()
                     && child.GetAbility<Structure>().CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)
@@ -199,7 +206,7 @@ namespace RTSLockstep
             }
             if (playerBuildings.Count > 0)
             {
-                RTSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, CachedAgent.transform.position) as RTSAgent;
+                LSAgent nearestObject = WorkManager.FindNearestWorldObjectInListToPosition(playerBuildings, CachedAgent.transform.position) as LSAgent;
                 return nearestObject;
             }
             else

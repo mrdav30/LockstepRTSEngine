@@ -1,6 +1,9 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-namespace RTSLockstep
+﻿using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Managers;
+using UnityEngine;
+
+namespace RTSLockstep.Networking
 {
     public class NetworkHelperTester : BehaviourHelper
     {
@@ -9,9 +12,9 @@ namespace RTSLockstep
 
         protected override void DoGUI()
         {
-			GUILayout.Label("State Hash: " + AgentController.GetStateHash());
+            GUILayout.Label("State Hash: " + AgentController.GetStateHash());
 
-			if (LockstepManager.MainNetworkHelper != null && LockstepManager.MainNetworkHelper.IsConnected)
+            if (LockstepManager.MainNetworkHelper != null && LockstepManager.MainNetworkHelper.IsConnected)
             {
                 return;
             }
@@ -27,18 +30,21 @@ namespace RTSLockstep
             #endregion
 
             //Below = important!
-            if (GUILayout.Button("Host")) {
+            if (GUILayout.Button("Host"))
+            {
                 //Hosting with a room size of RoomSize
                 ClientManager.HostGame(RoomSize);
             }
-            if (GUILayout.Button ("Connect")) {
+            if (GUILayout.Button("Connect"))
+            {
                 //Connecting to the server with ip address 'IP'
                 ClientManager.ConnectGame(IP);
             }
             GUILayout.EndVertical();
         }
 
-        void OnDisable () {
+        void OnDisable()
+        {
         }
     }
 }

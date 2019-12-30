@@ -1,83 +1,87 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using RTSLockstep.LSResources;
+using RTSLockstep.Projectiles;
 using UnityEditor;
 
 namespace RTSLockstep.Integration
 {
-    [CustomEditor (typeof(LSProjectile))]
+    [CustomEditor(typeof(LSProjectile))]
     public class EditorLSProjectile : Editor
     {
-        SerializedObject so {get {return base.serializedObject;}}
+        private SerializedObject _serializedObject { get { return serializedObject; } }
+
         public override void OnInspectorGUI()
         {
-            EditorGUI.BeginChangeCheck ();
-            
+            EditorGUI.BeginChangeCheck();
+
             //Targeting
-            EditorGUILayout.LabelField ("Targeting Settings", EditorStyles.boldLabel);
-            so.PropertyField("_targetingBehavior");
-            TargetingType targetingBehavior = (TargetingType) so.FindProperty("_targetingBehavior").enumValueIndex;
-            switch (targetingBehavior) {
+            EditorGUILayout.LabelField("Targeting Settings", EditorStyles.boldLabel);
+            _serializedObject.PropertyField("_targetingBehavior");
+            TargetingType targetingBehavior = (TargetingType)_serializedObject.FindProperty("_targetingBehavior").enumValueIndex;
+            switch (targetingBehavior)
+            {
                 case TargetingType.Directional:
-					so.PropertyField("_speed");
-					break;
+                    _serializedObject.PropertyField("_speed");
+                    break;
                 case TargetingType.Positional:
                 case TargetingType.Homing:
-                    so.PropertyField("_speed");
-					so.PropertyField("_visualArc");
+                    _serializedObject.PropertyField("_speed");
+                    _serializedObject.PropertyField("_visualArc");
                     break;
                 case TargetingType.Timed:
-                    so.PropertyField("_delay");
-                    so.PropertyField ("_lastingDuration");
-					so.PropertyField("_tickRate");
+                    _serializedObject.PropertyField("_delay");
+                    _serializedObject.PropertyField("_lastingDuration");
+                    _serializedObject.PropertyField("_tickRate");
                     break;
             }
-            EditorGUILayout.Space ();
-            
+            EditorGUILayout.Space();
+
             //Damage
-            EditorGUILayout.LabelField ("Damage Settings", EditorStyles.boldLabel);
-            so.PropertyField("_hitBehavior");
-            switch ((HitType)so.FindProperty("_hitBehavior").enumValueIndex) {
+            EditorGUILayout.LabelField("Damage Settings", EditorStyles.boldLabel);
+            _serializedObject.PropertyField("_hitBehavior");
+            switch ((HitType)_serializedObject.FindProperty("_hitBehavior").enumValueIndex)
+            {
                 case HitType.Cone:
-                    so.PropertyField("_angle");
-					so.PropertyField("_radius");
+                    _serializedObject.PropertyField("_angle");
+                    _serializedObject.PropertyField("_radius");
                     break;
                 case HitType.Area:
-					so.PropertyField("_radius");
+                    _serializedObject.PropertyField("_radius");
                     break;
-                    
+
                 case HitType.Single:
-                    
+
                     break;
             }
-            EditorGUILayout.Space ();
-            
+            EditorGUILayout.Space();
+
             //Trajectory
-            EditorGUILayout.LabelField ("Trajectory Settings", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Trajectory Settings", EditorStyles.boldLabel);
 
-            EditorGUILayout.Space ();
-            
+            EditorGUILayout.Space();
+
             //Visuals
-            EditorGUILayout.LabelField ("Visuals Settings", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Visuals Settings", EditorStyles.boldLabel);
 
-			SerializedProperty useEffectProp = so.FindProperty("UseEffects");
+            SerializedProperty useEffectProp = _serializedObject.FindProperty("UseEffects");
 
-			EditorGUILayout.PropertyField(useEffectProp);
+            EditorGUILayout.PropertyField(useEffectProp);
 
 
-			if (useEffectProp.boolValue)
-			{
-				so.PropertyField("_startFX");
-				so.PropertyField("_hitFX");
-				so.PropertyField("_attachEndEffectToTarget");
-			}
+            if (useEffectProp.boolValue)
+            {
+                _serializedObject.PropertyField("_startFX");
+                _serializedObject.PropertyField("_hitFX");
+                _serializedObject.PropertyField("_attachEndEffectToTarget");
+            }
 
-			//PAPPS ADDED THIS:
-			so.PropertyField("DoReleaseChildren");
+            //PAPPS ADDED THIS:
+            _serializedObject.PropertyField("DoReleaseChildren");
 
-            if (EditorGUI.EndChangeCheck ()) {
-                serializedObject.ApplyModifiedProperties ();
-                EditorUtility.SetDirty (target);
-			}
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(target);
+            }
         }
     }
 }

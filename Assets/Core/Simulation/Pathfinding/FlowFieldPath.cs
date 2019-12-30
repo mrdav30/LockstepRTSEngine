@@ -1,7 +1,8 @@
-﻿using RTSLockstep.Grid;
+﻿using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Simulation.LSMath;
 using System.Collections.Generic;
 
-namespace RTSLockstep.Pathfinding
+namespace RTSLockstep.Simulation.Pathfinding
 {
     public class FlowFieldPath
     {

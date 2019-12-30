@@ -1,17 +1,19 @@
 ﻿using System;
-using FastCollections;
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
+using RTSLockstep.Utility;
 
-namespace RTSLockstep
+namespace RTSLockstep.Player.Utility
 {
     public static class Selector
     {
         public static event Action OnChange;
-        public static event Action<RTSAgent> OnAdd;
-        public static event Action<RTSAgent> OnRemove;
+        public static event Action<LSAgent> OnAdd;
+        public static event Action<LSAgent> OnRemove;
         public static event Action OnClear;
 
-        public static RTSAgent MainSelectedAgent { get; private set; }
-        public static FastSorter<RTSAgent> SelectedAgents { get; private set; }
+        public static LSAgent MainSelectedAgent { get; private set; }
+        public static FastSorter<LSAgent> SelectedAgents { get; private set; }
 
         static Selector()
         {
@@ -22,7 +24,7 @@ namespace RTSLockstep
 
         public static void Initialize()
         {
-            SelectedAgents = new FastSorter<RTSAgent>();
+            SelectedAgents = new FastSorter<LSAgent>();
         }
 
         private static void Change()
@@ -30,7 +32,7 @@ namespace RTSLockstep
             OnChange?.Invoke();
         }
 
-        public static void Add(RTSAgent agent)
+        public static void Add(LSAgent agent)
         {
             if (!agent.IsSelected)
             {
@@ -50,7 +52,7 @@ namespace RTSLockstep
             }
         }
 
-        public static void Remove(RTSAgent agent)
+        public static void Remove(LSAgent agent)
         {
             PlayerManager.MainController.RemoveFromSelection(agent);
             agent.IsSelected = false;
@@ -67,7 +69,7 @@ namespace RTSLockstep
             {
                 if (PlayerManager.AgentControllers.arrayAllocation[i])
                 {
-                    FastBucket<RTSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
+                    FastBucket<LSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
                     for (int j = 0; j < selectedAgents.PeakCount; j++)
                     {
                         if (selectedAgents.arrayAllocation[j])

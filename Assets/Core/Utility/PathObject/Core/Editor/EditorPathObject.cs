@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using UnityEditor;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep
 {
     [CustomPropertyDrawer(typeof(PathObjectAttribute))]
-    public class EditorPathObject : UnityEditor.PropertyDrawer
+    public class EditorPathObject : PropertyDrawer
     {
         const float defaultPropertyHeight = 16f;
 

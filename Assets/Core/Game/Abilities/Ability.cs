@@ -5,24 +5,27 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using Newtonsoft.Json;
+using RTSLockstep.Agents;
 using RTSLockstep.Data;
+using RTSLockstep.Determinism;
+using RTSLockstep.Integration;
 using UnityEngine;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities
 {
     public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
         private bool IsFirstFrame = true;
 
-        private RTSAgent _agent;
+        private LSAgent _agent;
 
-        public RTSAgent Agent
+        public LSAgent Agent
         {
             get
             {
 #if UNITY_EDITOR
                 if (_agent == null)
-                    return GetComponent<RTSAgent>();
+                    return GetComponent<LSAgent>();
 #endif
                 return _agent;
             }
@@ -94,9 +97,9 @@ namespace RTSLockstep
 
         protected bool loadedSavedValues = false;
 
-        internal void Setup(RTSAgent agent, int id)
+        internal void Setup(LSAgent agent, int id)
         {
-            System.Type mainType = this.GetType();
+            System.Type mainType = GetType();
             if (mainType.IsSubclassOf(typeof(ActiveAbility)))
             {
                 while (mainType.BaseType != typeof(ActiveAbility) &&
@@ -109,23 +112,23 @@ namespace RTSLockstep
                 {
                     throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
                 }
-                this.MyAbilityCode = Data.Name;
+                MyAbilityCode = Data.Name;
             }
             else
             {
-                this.MyAbilityCode = mainType.Name;
+                MyAbilityCode = mainType.Name;
             }
             _agent = agent;
             ID = id;
             TemplateSetup();
             OnSetup();
-            this.VariableContainerTicket = LSVariableManager.Register(this);
-            this._variableContainer = LSVariableManager.GetContainer(VariableContainerTicket);
+            VariableContainerTicket = LSVariableManager.Register(this);
+            _variableContainer = LSVariableManager.GetContainer(VariableContainerTicket);
         }
 
         internal void LateSetup()
         {
-            this.OnLateSetup();
+            OnLateSetup();
         }
 
         /// <summary>
@@ -215,7 +218,7 @@ namespace RTSLockstep
 
         public void LateVisualize()
         {
-            this.OnLateVisualize();
+            OnLateVisualize();
         }
 
         protected virtual void OnLateVisualize()

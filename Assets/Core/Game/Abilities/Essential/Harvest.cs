@@ -1,7 +1,18 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Agents;
+using RTSLockstep.Determinism;
+using RTSLockstep.Grouping;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.LSResources;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.LSPhysics;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     [DisallowMultipleComponent]
     public class Harvest : ActiveAbility
@@ -18,9 +29,9 @@ namespace RTSLockstep
         public bool IsEmptying;
 
         public ResourceType HarvestType { get; private set; }
-        public RTSAgent CurrentTarget { get; private set; }
-        public RTSAgent LastResourceTarget { get; private set; }
-        public RTSAgent LastStorageTarget { get; private set; }
+        public LSAgent CurrentTarget { get; private set; }
+        public LSAgent LastResourceTarget { get; private set; }
+        public LSAgent LastStorageTarget { get; private set; }
 
         private const int _searchRate = LockstepManager.FrameRate / 2;
         private long _currentLoadAmount = 0;
@@ -93,9 +104,9 @@ namespace RTSLockstep
             _repathTimer.Reset(_repathInterval);
             _repathRandom = LSUtility.GetRandom(_repathInterval);
 
-            if (Agent.GetCommander() && loadedSavedValues && _loadedDepositId >= 0)
+            if (Agent.GetControllingPlayer() && loadedSavedValues && _loadedDepositId >= 0)
             {
-                RTSAgent obj = Agent.GetCommander().GetObjectForId(_loadedDepositId);
+                LSAgent obj = Agent.GetControllingPlayer().GetObjectForId(_loadedDepositId);
                 if (obj.MyAgentType == AgentType.Resource)
                 {
                     CurrentTarget = obj;
@@ -196,7 +207,7 @@ namespace RTSLockstep
             _currentLoadAmount -= deposit;
 
             ResourceType depositType = HarvestType;
-            Agent.Controller.Commander.CachedResourceManager.AddResource(depositType, deposit);
+            Agent.Controller.Player.CachedResourceManager.AddResource(depositType, deposit);
 
             if (_currentLoadAmount <= 0)
             {
@@ -280,7 +291,7 @@ namespace RTSLockstep
             }
         }
 
-        public void OnHarvestGroupProcessed(RTSAgent currentTarget)
+        public void OnHarvestGroupProcessed(LSAgent currentTarget)
         {
             Agent.Tag = AgentTag.Harvester;
 

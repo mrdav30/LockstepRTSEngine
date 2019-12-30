@@ -1,4 +1,6 @@
-﻿namespace RTSLockstep.Grid
+﻿using RTSLockstep.Simulation.LSMath;
+
+namespace RTSLockstep.Simulation.Grid
 {
     public sealed class GridSettings
     {
@@ -24,11 +26,11 @@
 
         private void Init(int width, int height, long xOffset, long yOffset, bool useDiagonalConnections)
         {
-            this.Width = width;
-            this.Height = height;
-            this.XOffset = xOffset;
-            this.YOffset = yOffset;
-            this.UseDiagonalConnections = useDiagonalConnections;
+            Width = width;
+            Height = height;
+            XOffset = xOffset;
+            YOffset = yOffset;
+            UseDiagonalConnections = useDiagonalConnections;
         }
     }
 }

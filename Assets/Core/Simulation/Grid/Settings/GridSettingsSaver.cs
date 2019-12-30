@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using RTSLockstep.Environment;
+using RTSLockstep.Simulation.LSMath;
+using UnityEngine;
 
-namespace RTSLockstep.Grid
+namespace RTSLockstep.Simulation.Grid
 {
     public sealed class GridSettingsSaver : EnvironmentSaver
     {
@@ -27,12 +29,12 @@ namespace RTSLockstep.Grid
 
         protected override void OnSave()
         {
-            this._mapCenter = new Vector2d(transform.position);
+            _mapCenter = new Vector2d(transform.position);
         }
 
         protected override void OnEarlyApply()
         {
-            GridManager.Settings = new GridSettings(this.MapWidth, this.MapHeight, this.Offset.x, this.Offset.y, this.UseDiagonalConnetions);
+            GridManager.Settings = new GridSettings(MapWidth, MapHeight, Offset.x, Offset.y, UseDiagonalConnetions);
         }
 
 #if UNITY_EDITOR
@@ -45,7 +47,7 @@ namespace RTSLockstep.Grid
                 return;
             }
             Gizmos.color = Color.green;
-            Vector3 offset = Offset.ToVector3(this.transform.position.y);
+            Vector3 offset = Offset.ToVector3(transform.position.y);
             Vector3 scale = Vector3.one * .5f;
             for (int x = 0; x < MapWidth; x++)
             {

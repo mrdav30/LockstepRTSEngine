@@ -1,10 +1,12 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-namespace RTSLockstep {
-public class Stop : ActiveAbility {
-		protected override void OnExecute (Command com)
-		{
-			Agent.StopCast ();
-		}
-	}
+﻿using RTSLockstep.Player.Commands;
+
+namespace RTSLockstep.Abilities.Essential
+{
+    public class Stop : ActiveAbility
+    {
+        protected override void OnExecute(Command com)
+        {
+            Agent.StopCast();
+        }
+    }
 }

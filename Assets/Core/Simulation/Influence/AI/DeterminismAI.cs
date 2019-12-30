@@ -1,25 +1,28 @@
 ﻿using Newtonsoft.Json;
+using RTSLockstep.Agents;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Utility;
 using System;
-using System.Collections.Generic;
 
-namespace RTSLockstep
+namespace RTSLockstep.Simulation.Influence
 {
     public class DeterminismAI
     {
-        protected RTSAgent CachedAgent { get; private set; }
-        protected Func<RTSAgent, bool> CachedAgentValid { get; private set; }
+        protected LSAgent CachedAgent { get; private set; }
+        protected Func<LSAgent, bool> CachedAgentValid { get; private set; }
 
         // we want to restrict how many decisions are made to help with game performance
         protected const int SearchRate = LockstepManager.FrameRate / 2;
         protected int searchCount;
 
         // convert to fast list...
-        protected RTSAgent nearbyAgent;
+        protected LSAgent nearbyAgent;
 
         #region Serialized Values (Further description in properties)
         #endregion
 
-        public virtual void OnSetup(RTSAgent agent)
+        public virtual void OnSetup(LSAgent agent)
         {
             CachedAgent = agent;
 
@@ -80,11 +83,11 @@ namespace RTSLockstep
             nearbyAgent = DoScan();
         }
 
-        protected virtual Func<RTSAgent, bool> AgentConditional
+        protected virtual Func<LSAgent, bool> AgentConditional
         {
             get
             {
-                Func<RTSAgent, bool> agentConditional = null;
+                Func<LSAgent, bool> agentConditional = null;
                 return agentConditional;
             }
         }
@@ -98,16 +101,16 @@ namespace RTSLockstep
             }
         }
 
-        protected virtual RTSAgent DoScan()
+        protected virtual LSAgent DoScan()
         {
-            Func<RTSAgent, bool> agentConditional = AgentConditional;
+            Func<LSAgent, bool> agentConditional = AgentConditional;
             Func<byte, bool> allianceConditional = AllianceConditional;
 
-            RTSAgent agent = null;
+            LSAgent agent = null;
 
             if (agentConditional.IsNotNull())
             {
-                agent = InfluenceManager.Scan(
+                agent = AgentLOSManager.Scan(
                      CachedAgent.Body.Position,
                      CachedAgent.MyStats.Sight,
                      agentConditional,
@@ -123,7 +126,7 @@ namespace RTSLockstep
             nearbyAgent = null;
         }
 
-        protected virtual bool AgentValid(RTSAgent agent)
+        protected virtual bool AgentValid(LSAgent agent)
         {
             return true;
         }

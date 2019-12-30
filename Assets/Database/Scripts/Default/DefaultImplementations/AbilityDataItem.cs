@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using RTSLockstep.Abilities;
+using RTSLockstep.Managers.Input;
+using RTSLockstep.LSResources;
+using RTSLockstep.Integration;
 
 namespace RTSLockstep.Data
 {
@@ -78,7 +82,7 @@ namespace RTSLockstep.Data
 
         public string GetAbilityCode()
         {
-            return this.Name;
+            return Name;
         }
 
         [SerializeField, DataCode("Input")]

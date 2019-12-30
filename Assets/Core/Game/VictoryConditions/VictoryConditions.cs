@@ -1,91 +1,95 @@
-﻿using RTSLockstep;
-using UnityEngine;
+﻿using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Player;
+using RTSLockstep.Utility;
 
-public abstract class VictoryCondition : BehaviourHelper
+namespace RTSLockstep.VictoryConditions
 {
-    private HUD hud;
-    private static bool Setted = false;
-
-    protected void Setup()
+    public abstract class VictoryCondition : BehaviourHelper
     {
-        LoadDetails();
-        Setted = true;
-    }
+        private HUD hud;
+        private static bool Setted = false;
 
-    protected override void OnInitialize()
-    {
-        if (!Setted)
-            Setup();
-    }
+        protected LSPlayer[] Players;
 
-    protected override void OnSimulate()
-    {
-        if (GameFinished())
+        protected void Setup()
         {
-            //ResultsScreen resultsScreen = hud.GetComponent<ResultsScreen>();
-            //resultsScreen.SetMetVictoryCondition(this);
-            //resultsScreen.enabled = true;
-            //Time.timeScale = 0.0f;
-            //Cursor.visible = true;
-            //ResourceManager.MenuOpen = true;
-            //hud.enabled = false;
+            LoadDetails();
+            Setted = true;
         }
-    }
 
-    protected AgentCommander[] commanders;
-
-    public void SetCommanders(AgentCommander[] commanders)
-    {
-        this.commanders = commanders;
-    }
-
-    public AgentCommander[] GetCommanders()
-    {
-        return commanders;
-    }
-
-    public virtual bool GameFinished()
-    {
-        if (commanders == null)
+        protected override void OnInitialize()
         {
-            return true;
+            if (!Setted)
+                Setup();
         }
-        foreach (AgentCommander commander in commanders)
+
+        protected override void OnSimulate()
         {
-            if (CommanderMeetsConditions(commander))
+            if (GameFinished())
+            {
+                //ResultsScreen resultsScreen = hud.GetComponent<ResultsScreen>();
+                //resultsScreen.SetMetVictoryCondition(this);
+                //resultsScreen.enabled = true;
+                //Time.timeScale = 0.0f;
+                //Cursor.visible = true;
+                //ResourceManager.MenuOpen = true;
+                //hud.enabled = false;
+            }
+        }
+
+        public void SetCommanders(LSPlayer[] players)
+        {
+            Players = players;
+        }
+
+        public LSPlayer[] GetCommanders()
+        {
+            return Players;
+        }
+
+        public virtual bool GameFinished()
+        {
+            if (Players.IsNull())
             {
                 return true;
             }
+            foreach (LSPlayer palyer in Players)
+            {
+                if (PlayerMeetsConditions(palyer))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        return false;
-    }
 
-    public AgentCommander GetWinner()
-    {
-        if (commanders == null)
+        public LSPlayer GetWinner()
         {
+            if (Players.IsNull())
+            {
+                return null;
+            }
+            foreach (LSPlayer player in Players)
+            {
+                if (PlayerMeetsConditions(player))
+                {
+                    return player;
+                }
+            }
             return null;
         }
-        foreach (AgentCommander commander in commanders)
+
+        public abstract string GetDescription();
+
+        // Any child class that extends must provide an implementation for this method. 
+        public abstract bool PlayerMeetsConditions(LSPlayer player);
+
+        private void LoadDetails()
         {
-            if (CommanderMeetsConditions(commander))
-            {
-                return commander;
-            }
+            LSPlayer[] players = FindObjectsOfType(typeof(LSPlayer)) as LSPlayer[];
+            hud = PlayerManager.MainController.Player.GetComponentInChildren<HUD>();
+
+            SetCommanders(players);
         }
-        return null;
-    }
-
-    public abstract string GetDescription();
-
-    // Any child class that extends must provide an implementation for this method. 
-    public abstract bool CommanderMeetsConditions(AgentCommander commander);
-
-    private void LoadDetails()
-    {
-        AgentCommander[] commanders = GameObject.FindObjectsOfType(typeof(AgentCommander)) as AgentCommander[];
-        hud = PlayerManager.MainController.Commander.GetComponentInChildren<HUD>();
-
-        SetCommanders(commanders);
     }
 }

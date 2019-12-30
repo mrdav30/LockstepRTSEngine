@@ -1,9 +1,20 @@
 ﻿using Newtonsoft.Json;
-using RTSLockstep.Grid;
+using RTSLockstep.Agents;
+using RTSLockstep.BuildSystem;
+using RTSLockstep.Determinism;
+using RTSLockstep.Simulation.Grid;
+using RTSLockstep.Grouping;
+using RTSLockstep.Managers;
+using RTSLockstep.Managers.GameState;
+using RTSLockstep.Player.Commands;
+using RTSLockstep.LSResources;
 using System;
 using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility;
+using RTSLockstep.Integration;
 
-namespace RTSLockstep
+namespace RTSLockstep.Abilities.Essential
 {
     [DisallowMultipleComponent]
     public class Construct : ActiveAbility
@@ -23,7 +34,7 @@ namespace RTSLockstep
         //Called whenever construction is stopped... i.e. to attack
         public event Action OnStopConstruct;
 
-        private RTSAgent _currentProject;
+        private LSAgent _currentProject;
         private Structure _projectStructure
         {
             get
@@ -104,9 +115,9 @@ namespace RTSLockstep
             _repathRandom = LSUtility.GetRandom(_repathInterval);
 
             // need to move this to a construct group
-            if (Agent.GetCommander() && loadedSavedValues && _loadedProjectId >= 0)
+            if (Agent.GetControllingPlayer() && loadedSavedValues && _loadedProjectId >= 0)
             {
-                RTSAgent obj = Agent.GetCommander().GetObjectForId(_loadedProjectId);
+                LSAgent obj = Agent.GetControllingPlayer().GetObjectForId(_loadedProjectId);
                 if (obj.MyAgentType == AgentType.Structure)
                 {
                     _currentProject = obj;
@@ -234,7 +245,7 @@ namespace RTSLockstep
             }
         }
 
-        public void OnConstructGroupProcessed(RTSAgent currentTarget)
+        public void OnConstructGroupProcessed(LSAgent currentTarget)
         {
             Agent.Tag = AgentTag.Builder;
 
