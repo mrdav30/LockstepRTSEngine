@@ -27,12 +27,12 @@ namespace RTSLockstep.Grouping
         {
             _calculatedBehaviors = false;
             controllerID = com.ControllerID;
-            Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
+            Selection selection = GlobalAgentController.InstanceManagers[controllerID].GetSelection(com);
             harvesters = new FastList<Harvest>(selection.selectedAgentLocalIDs.Count);
 
             if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
             {
-                if (AgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
+                if (GlobalAgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
                 {
                     if (tempTarget.MyAgentType == AgentType.Resource
                         || tempTarget.MyAgentType == AgentType.Structure)

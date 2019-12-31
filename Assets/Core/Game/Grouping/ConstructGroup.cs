@@ -36,7 +36,7 @@ namespace RTSLockstep.Grouping
         {
             _calculatedBehaviors = false;
             _controllerID = com.ControllerID;
-            Selection selection = AgentController.InstanceManagers[_controllerID].GetSelection(com);
+            Selection selection = GlobalAgentController.InstanceManagers[_controllerID].GetSelection(com);
             _constructors = new FastList<Construct>(selection.selectedAgentLocalIDs.Count);
 
             // check if we're queueing structures to construct
@@ -49,7 +49,7 @@ namespace RTSLockstep.Grouping
             // otherwise were going to help construct
             else if (com.TryGetData(out DefaultData targetValue, 1) && targetValue.Is(DataType.UShort))
             {
-                if (AgentController.TryGetAgentInstance((ushort)targetValue.Value, out LSAgent tempTarget))
+                if (GlobalAgentController.TryGetAgentInstance((ushort)targetValue.Value, out LSAgent tempTarget))
                 {
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
@@ -155,7 +155,7 @@ namespace RTSLockstep.Grouping
                 QStructure qStructure = _queueStructures[i].Value;
                 if (qStructure.IsNotNull())
                 {
-                    LSAgent newRTSAgent = AgentController.InstanceManagers[_controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as LSAgent;
+                    LSAgent newRTSAgent = GlobalAgentController.InstanceManagers[_controllerID].CreateAgent(qStructure.StructureName, qStructure.BuildPoint, qStructure.RotationPoint) as LSAgent;
                     Structure newStructure = newRTSAgent.GetAbility<Structure>();
 
                     // remove the bounds so we can get to the temp structure from any angle
@@ -178,9 +178,9 @@ namespace RTSLockstep.Grouping
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        AgentController.InstanceManagers[_controllerID].Player.PlayerResourceManager.RemoveResources(newRTSAgent);
+                        GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer.PlayerResourceManager.RemoveResources(newRTSAgent);
 
-                        newRTSAgent.SetControllingPlayer(AgentController.InstanceManagers[_controllerID].Player);
+                        newRTSAgent.SetControllingPlayer(GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer);
 
                         newRTSAgent.gameObject.name = newRTSAgent.objectName;
                         newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform

@@ -195,7 +195,7 @@ namespace RTSLockstep.Simulation.Influence
             //change list to fastarray
             List<LSAgent> playerBuildings = new List<LSAgent>();
             // use RTS influencer?
-            foreach (LSAgent child in CachedAgent.Controller.Player.GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>())
+            foreach (LSAgent child in CachedAgent.Controller.ControllingPlayer.GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>())
             {
                 if (child.GetAbility<Structure>()
                     && child.GetAbility<Structure>().CanStoreResources(CachedAgent.MyStats.CachedHarvest.HarvestType)

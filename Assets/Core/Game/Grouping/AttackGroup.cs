@@ -26,12 +26,12 @@ namespace RTSLockstep.Grouping
         {
             _calculatedBehaviors = false;
             controllerID = com.ControllerID;
-            Selection selection = AgentController.InstanceManagers[controllerID].GetSelection(com);
+            Selection selection = GlobalAgentController.InstanceManagers[controllerID].GetSelection(com);
             attackers = new FastList<Attack>(selection.selectedAgentLocalIDs.Count);
 
             if (com.TryGetData(out DefaultData target) && target.Is(DataType.UShort))
             {
-                if (AgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
+                if (GlobalAgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
                 {
                     currentGroupTarget = tempTarget;
                 }

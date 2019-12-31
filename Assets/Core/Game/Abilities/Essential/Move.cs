@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using RTSLockstep.Simulation.Pathfinding;
-using RTSLockstep.Simulation.Grid;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
+
+using RTSLockstep.Simulation.Pathfinding;
+using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Agents.AgentControllerSystem;
 using RTSLockstep.Agents;
 using RTSLockstep.Grouping;
@@ -477,10 +478,10 @@ namespace RTSLockstep.Abilities.Essential
             Vector2d averageHeading = Vector2d.zero;
             Vector2d centerOfMass = Vector2d.zero;
 
-            for (int i = 0; i < AgentController.GlobalAgents.Length; i++)
+            for (int i = 0; i < GlobalAgentController.GlobalAgents.Length; i++)
             {
                 bool neighborFound = false;
-                LSAgent a = AgentController.GlobalAgents[i];
+                LSAgent a = GlobalAgentController.GlobalAgents[i];
                 if (a.IsNotNull()
                     && a.GlobalID != Agent.GlobalID
                     && a.MyAgentType == AgentType.Unit)

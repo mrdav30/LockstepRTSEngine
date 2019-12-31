@@ -163,7 +163,7 @@ namespace RTSLockstep.Abilities.Essential
 
             //caching parameters
             uint spawnVersion = Agent.SpawnVersion;
-            AgentController controller = Agent.Controller;
+            LocalAgentController controller = Agent.Controller;
             CachedOnHit = (target) => OnHitTarget(target, spawnVersion, controller);
 
             if (Agent.GetControllingPlayer() && loadedSavedValues && loadedTargetId >= 0)
@@ -259,7 +259,7 @@ namespace RTSLockstep.Abilities.Essential
 
         }
 
-        protected virtual void OnHitTarget(LSAgent target, uint agentVersion, AgentController controller)
+        protected virtual void OnHitTarget(LSAgent target, uint agentVersion, LocalAgentController controller)
         {
             // If the shooter died, certain effects or records can't be completed
             bool isCurrent = Agent.IsNotNull() && agentVersion == Agent.SpawnVersion;

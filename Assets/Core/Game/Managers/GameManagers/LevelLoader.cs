@@ -73,7 +73,7 @@ namespace RTSLockstep.Managers.GameManagers
         {
             foreach (SpawnInfo info in Spawns)
             {
-                AgentController controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
+                LocalAgentController controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
 
                 for (int j = 0; j < info.Count; j++)
                 {

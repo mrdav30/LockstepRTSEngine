@@ -1,26 +1,28 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Newtonsoft.Json;
 using RotaryHeart.Lib.SerializableDictionary;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents.AgentControllerSystem;
 using RTSLockstep.Agents.Teams;
 using RTSLockstep.Buffs;
 using RTSLockstep.Data;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using RTSLockstep.Determinism;
 using RTSLockstep.Managers.GameState;
 using RTSLockstep.Managers;
-using RTSLockstep.Player.Commands;
 using RTSLockstep.Player;
+using RTSLockstep.Player.Commands;
 using RTSLockstep.LSResources;
 using RTSLockstep.Simulation.Influence;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
+
 using Coroutine = RTSLockstep.Utility.Coroutine;
 
 namespace RTSLockstep.Agents
@@ -92,7 +94,7 @@ namespace RTSLockstep.Agents
         /// </summary>
         /// <value>The index of the type.</value>
         private ushort _typeIndex;
-        public ushort TypeIndex { get { return _typeIndex; } set { _typeIndex = value; _typeIndex = AgentController.UnregisterdTypeIndex; } }
+        public ushort TypeIndex { get { return _typeIndex; } set { _typeIndex = value; _typeIndex = LocalAgentController.UnregisterdTypeIndex; } }
 
         #region Pre-runtime generated (maybe not)
         public Ability[] AttachedAbilities { get; private set; }
@@ -211,7 +213,7 @@ namespace RTSLockstep.Agents
 
         public LSInfluencer Influencer { get; private set; }
         public uint SpawnVersion { get; private set; }
-        public AgentController Controller { get; private set; }
+        public LocalAgentController Controller { get; private set; }
         public bool Controllable { get { return PlayerManager.ContainsController(Controller); } }
         public AllegianceType GetAllegiance(LSAgent other) { return Controller.GetAllegiance(other.Controller); }
         public readonly AbilityManager abilityManager = new AbilityManager();
@@ -278,7 +280,7 @@ namespace RTSLockstep.Agents
             CheckCasting = true;
 
             // place game object under it's agent commander
-            CachedGameObject.transform.parent = Controller.Player.GetComponentInChildren<LSAgents>().transform;
+            CachedGameObject.transform.parent = Controller.ControllingPlayer.GetComponentInChildren<LSAgents>().transform;
 
             CachedGameObject.SetActive(true);
 
@@ -299,7 +301,7 @@ namespace RTSLockstep.Agents
                 Animator.Initialize();
             }
 
-            SetControllingPlayer(Controller.Player);
+            SetControllingPlayer(Controller.ControllingPlayer);
 
             if (_cachedPlayer)
             {
@@ -389,7 +391,7 @@ namespace RTSLockstep.Agents
             SpawnVersion = 1;
         }
 
-        public void InitializeController(AgentController controller, ushort localID, ushort globalID)
+        public void InitializeController(LocalAgentController controller, ushort localID, ushort globalID)
         {
             Controller = controller;
             LocalID = localID;
@@ -416,7 +418,7 @@ namespace RTSLockstep.Agents
 
         public void Die(bool immediate = false)
         {
-            AgentController.DestroyAgent(this, immediate);
+            GlobalAgentController.DestroyAgent(this, immediate);
             if (Animator.IsNotNull())
             {
                 Animator.SetDyingState();
@@ -450,7 +452,7 @@ namespace RTSLockstep.Agents
             }
             else
             {
-                AgentController.EndLife(this);
+                GlobalAgentController.EndLife(this);
             }
         }
 
@@ -474,13 +476,13 @@ namespace RTSLockstep.Agents
 
         private IEnumerator<int> PoolDelayer()
         {
-            deathingIndex = AgentController.DeathingAgents.Add(this);
+            deathingIndex = GlobalAgentController.DeathingAgents.Add(this);
 
 
             yield return _deathTime;
-            AgentController.DeathingAgents.RemoveAt(deathingIndex);
+            GlobalAgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-            AgentController.EndLife(this);
+            GlobalAgentController.EndLife(this);
         }
 
         internal void _EndLife()
@@ -549,7 +551,7 @@ namespace RTSLockstep.Agents
             return false;
         }
 
-        public bool IsOwnedBy(AgentController owner)
+        public bool IsOwnedBy(LocalAgentController owner)
         {
             if (Controller.IsNotNull() && Controller.Equals(owner))
             {

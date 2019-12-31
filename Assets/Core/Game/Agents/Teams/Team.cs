@@ -7,7 +7,6 @@ namespace RTSLockstep.Agents.Teams
 {
     public class Team
     {
-
         public Vector2d BasePos { get; private set; }
         public Team(Vector2d basePos)
         {
@@ -16,7 +15,7 @@ namespace RTSLockstep.Agents.Teams
 
         public int ID { get; private set; }
 
-        public AgentController MainController { get; private set; }
+        public LocalAgentController MainController { get; private set; }
 
         public void Setup(int id)
         {
@@ -43,7 +42,7 @@ namespace RTSLockstep.Agents.Teams
             TeamManager.Teams.Add(this);
             SetAllegiance(this, AllegianceType.Friendly);
 
-            MainController = AgentController.Create();
+            MainController = GlobalAgentController.Create();
             MainController.JoinTeam(this);
 
         }
@@ -59,7 +58,7 @@ namespace RTSLockstep.Agents.Teams
         }
 
 
-        public void AddController(AgentController controller)
+        public void AddController(LocalAgentController controller)
         {
             controller.JoinTeam(this);
         }
@@ -70,7 +69,7 @@ namespace RTSLockstep.Agents.Teams
                 Diplomacy.Add(AllegianceType.Neutral);
             Diplomacy[other.ID] = allegiance;
         }
-        public AllegianceType GetAllegiance(AgentController controller)
+        public AllegianceType GetAllegiance(LocalAgentController controller)
         {
             return GetAllegiance(controller.MyTeam);
         }

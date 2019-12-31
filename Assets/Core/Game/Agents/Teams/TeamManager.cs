@@ -75,7 +75,7 @@ namespace RTSLockstep.Agents.Teams
         #endregion
         static int nextDistribute;
 
-        public static void JoinTeam(AgentController controller)
+        public static void JoinTeam(LocalAgentController controller)
         {
             Teams[nextDistribute++].AddController(controller);
             if (nextDistribute >= Teams.Count)

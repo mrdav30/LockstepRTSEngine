@@ -5,12 +5,12 @@ namespace RTSLockstep.Abilities.Essential
 {
     public class AttackerInfo
     {
-        public AttackerInfo(LSAgent attacker, AgentController controller)
+        public AttackerInfo(LSAgent attacker, LocalAgentController controller)
         {
             Attacker = attacker;
             Controller = controller;
         }
         public LSAgent Attacker;
-        public AgentController Controller;
+        public LocalAgentController Controller;
     }
 }

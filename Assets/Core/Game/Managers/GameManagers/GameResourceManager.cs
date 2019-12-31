@@ -80,25 +80,25 @@ namespace RTSLockstep.Managers.GameManagers
         public static void Setup()
         {
             IAgentDataProvider agentDatabase;
-            if (LSDatabaseManager.TryGetDatabase<IAgentDataProvider>(out agentDatabase))
+            if (LSDatabaseManager.TryGetDatabase(out agentDatabase))
             {
                 AgentData = agentDatabase.AgentData;
                 AgentCodes = new string[AgentData.Length];
 
-                AgentController.CachedAgents = new Dictionary<string, FastStack<LSAgent>>(AgentData.Length);
+                GlobalAgentController.CachedAgents = new Dictionary<string, FastStack<LSAgent>>(AgentData.Length);
 
                 OrganizerObject = LSUtility.CreateEmpty().transform;
                 OrganizerObject.gameObject.name = "OrganizerObject";
                 OrganizerObject.gameObject.SetActive(false);
 
-                GameObject.DontDestroyOnLoad(OrganizerObject);
+                Object.DontDestroyOnLoad(OrganizerObject);
                 for (int i = 0; i < AgentData.Length; i++)
                 {
                     IAgentData interfacer = AgentData[i];
                     string agentCode = interfacer.Name;
                     AgentCodes[i] = agentCode;
 
-                    AgentController.CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
+                    GlobalAgentController.CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
                     AgentCodeInterfacerMap.Add(agentCode, interfacer);
                     AgentCodeIndexMap.Add(agentCode, (ushort)i);
                 }

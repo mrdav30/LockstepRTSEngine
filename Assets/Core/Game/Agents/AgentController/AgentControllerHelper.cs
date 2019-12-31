@@ -35,18 +35,18 @@ namespace RTSLockstep.Agents.AgentControllerSystem
             for (int i = 0; i < controllerItems.Length; i++)
             {
                 AgentControllerDataItem item = controllerItems[i];
-                AgentController controller = AgentController.Create(item.DefaultAllegiance, item.Name);
+                LocalAgentController controller = GlobalAgentController.Create(item.DefaultAllegiance, item.Name);
                 if (item.PlayerManaged)
                 {
                     PlayerManager.AddController(controller);
                 }
 
-                controller.CreatePlayer();
+                PlayerManager.CreatePlayer(controller);
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
         }
 
-        public AgentController GetInstanceManager(string controllerCode)
+        public LocalAgentController GetInstanceManager(string controllerCode)
         {
             if (string.IsNullOrEmpty(controllerCode))
             {
@@ -59,7 +59,7 @@ namespace RTSLockstep.Agents.AgentControllerSystem
                 Debug.Log("Controller name " + controllerCode + " is not valid.");
             }
 
-            return AgentController.GetInstanceManager(id);
+            return GlobalAgentController.GetInstanceManager(id);
         }
     }
 }

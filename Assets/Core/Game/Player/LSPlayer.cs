@@ -19,7 +19,7 @@ namespace RTSLockstep.Player
         public ResourceManager PlayerResourceManager;
         public Color TeamColor;
 
-        private AgentController _cachedController;
+        private LocalAgentController _cachedController;
         private bool IsSetup = false;
         #endregion
 
@@ -159,12 +159,12 @@ namespace RTSLockstep.Player
             return true;
         }
 
-        public void SetController(AgentController controller)
+        public void SetController(LocalAgentController controller)
         {
             _cachedController = controller;
         }
 
-        public AgentController GetController()
+        public LocalAgentController GetController()
         {
             return _cachedController;
         }

@@ -45,7 +45,7 @@ namespace RTSLockstep.Managers
         {
             if (IsPlayingBack)
             {
-                AgentController.Deactivate();
+                GlobalAgentController.Deactivate();
                 IsPlayingBack = false;
                 StopStreaming();
 

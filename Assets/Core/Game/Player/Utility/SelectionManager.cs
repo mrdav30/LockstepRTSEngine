@@ -108,7 +108,7 @@ namespace RTSLockstep.Player.Utility
                         for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                         {
                             var agentController = PlayerManager.GetAgentController(i);
-                            for (int j = 0; j < AgentController.MaxAgents; j++)
+                            for (int j = 0; j < LocalAgentController.MaxAgents; j++)
                             {
                                 if (agentController.LocalAgentActive[j])
                                 {
@@ -210,7 +210,7 @@ namespace RTSLockstep.Player.Utility
                 for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
                 {
                     var agentController = PlayerManager.GetAgentController(i);
-                    for (int j = 0; j < AgentController.MaxAgents; j++)
+                    for (int j = 0; j < LocalAgentController.MaxAgents; j++)
                     {
                         if (agentController.LocalAgentActive[j])
                         {

@@ -43,7 +43,7 @@ namespace RTSLockstep.Grouping
         {
             _destination = com.GetData<Vector2d>();
             _calculatedBehaviors = false;
-            Selection selection = AgentController.InstanceManagers[com.ControllerID].GetSelection(com);
+            Selection selection = GlobalAgentController.InstanceManagers[com.ControllerID].GetSelection(com);
             _movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
         }
 

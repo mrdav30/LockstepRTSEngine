@@ -169,7 +169,7 @@ namespace RTSLockstep.Managers
             InfluenceFrameCount = 0;
             MainNetworkHelper = networkHelper;
 
-            AgentController.Initialize();
+            GlobalAgentController.Initialize();
 
             ClientManager.Initialize(MainNetworkHelper);
 
@@ -226,7 +226,7 @@ namespace RTSLockstep.Managers
                 GameStart();
             }
             BehaviourHelperManager.Simulate();
-            AgentController.Simulate();
+            GlobalAgentController.Simulate();
             PhysicsManager.Simulate();
             CoroutineManager.Simulate();
             ProjectileManager.Simulate();
@@ -245,7 +245,7 @@ namespace RTSLockstep.Managers
         private static void LateSimulate()
         {
             BehaviourHelperManager.LateSimulate();
-            AgentController.LateSimulate();
+            GlobalAgentController.LateSimulate();
             PhysicsManager.LateSimulate();
             DefaultMessageRaiser.LateSimulate();
         }
@@ -266,7 +266,7 @@ namespace RTSLockstep.Managers
             }
             if (com.ControllerID != byte.MaxValue)
             {
-                AgentController cont = AgentController.InstanceManagers[com.ControllerID];
+                LocalAgentController cont = GlobalAgentController.InstanceManagers[com.ControllerID];
                 cont.Execute(com);
             }
             else
@@ -288,7 +288,7 @@ namespace RTSLockstep.Managers
             DefaultMessageRaiser.EarlyVisualize();
             PlayerManager.Visualize();
             BehaviourHelperManager.Visualize();
-            AgentController.Visualize();
+            GlobalAgentController.Visualize();
             ProjectileManager.Visualize();
             EffectManager.Visualize();
             CommandManager.Visualize();
@@ -298,7 +298,7 @@ namespace RTSLockstep.Managers
         internal static void LateVisualize()
         {
             DefaultMessageRaiser.LateVisualize();
-            AgentController.LateVisualize();
+            GlobalAgentController.LateVisualize();
             PhysicsManager.LateVisualize();
             BehaviourHelperManager.LateVisualize();
         }
@@ -312,13 +312,13 @@ namespace RTSLockstep.Managers
         {
             DefaultMessageRaiser.EarlyDeactivate();
 
-            if (GameStarted == false)
+            if (!GameStarted)
             {
                 return;
             }
 
             Selector.Clear();
-            AgentController.Deactivate();
+            GlobalAgentController.Deactivate();
             BehaviourHelperManager.Deactivate();
             ProjectileManager.Deactivate();
             EffectManager.Deactivate();
@@ -343,7 +343,7 @@ namespace RTSLockstep.Managers
         {
             int hash = LSUtility.PeekRandom(int.MaxValue);
             hash += 1;
-            hash ^= AgentController.GetStateHash();
+            hash ^= GlobalAgentController.GetStateHash();
             hash += 1;
             hash ^= ProjectileManager.GetStateHash();
             hash += 1;

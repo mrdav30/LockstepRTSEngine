@@ -12,7 +12,7 @@ namespace RTSLockstep.Networking
 
         protected override void OnUpdateGUI()
         {
-            GUILayout.Label("State Hash: " + AgentController.GetStateHash());
+            GUILayout.Label("State Hash: " + GlobalAgentController.GetStateHash());
 
             if (LockstepManager.MainNetworkHelper != null && LockstepManager.MainNetworkHelper.IsConnected)
             {

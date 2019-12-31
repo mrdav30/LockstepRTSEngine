@@ -146,7 +146,7 @@ namespace RTSLockstep.Projectiles
             Vector2d relativePos = offset.ToVector2d();
             Vector2d worldPos = relativePos.Rotated(source.Body.Rotation) + source.Body.Position;
             Vector3d pos = new Vector3d(worldPos.x, worldPos.y, offset.z + source.Body.HeightPos);
-            AgentController sourceController = source.Controller;
+            LocalAgentController sourceController = source.Controller;
             LSProjectile proj = Create(
                 projCode,
                 pos,

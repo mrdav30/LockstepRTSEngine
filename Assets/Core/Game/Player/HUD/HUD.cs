@@ -165,7 +165,7 @@ namespace RTSLockstep.Player
             if (_cachedPlayer
                 && _cachedPlayer.IsHuman
                 && PlayerManager.MainController.IsNotNull()
-                && _cachedPlayer == PlayerManager.MainController.Player)
+                && _cachedPlayer == PlayerManager.MainController.ControllingPlayer)
             {
                 DrawPlayerDetails();
                 if (!GameResourceManager.MenuOpen)

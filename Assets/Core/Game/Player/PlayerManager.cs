@@ -7,6 +7,8 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.BehaviourHelpers;
 
 namespace RTSLockstep.Player
 {
@@ -17,9 +19,9 @@ namespace RTSLockstep.Player
         private static PlayerDetails _currentPlayer;
         private static Texture2D[] _avatars;
 
-        public static readonly FastBucket<AgentController> AgentControllers = new FastBucket<AgentController>();
+        public static readonly FastBucket<LocalAgentController> AgentControllers = new FastBucket<LocalAgentController>();
 
-        public static AgentController MainController { get; private set; }
+        public static LocalAgentController MainController { get; private set; }
         #endregion
 
         #region Public
@@ -43,12 +45,12 @@ namespace RTSLockstep.Player
             get { return AgentControllers.Count; }
         }
 
-        public static AgentController GetAgentController(int index)
+        public static LocalAgentController GetAgentController(int index)
         {
             return AgentControllers[index];
         }
 
-        public static void AddController(AgentController agentController)
+        public static void AddController(LocalAgentController agentController)
         {
             if (ContainsController(agentController))
             {
@@ -63,7 +65,7 @@ namespace RTSLockstep.Player
             }
         }
 
-        public static void RemoveController(AgentController agentController)
+        public static void RemoveController(LocalAgentController agentController)
         {
             Selector.Clear();
             AgentControllers.RemoveAt(agentController.PlayerIndex);
@@ -99,7 +101,7 @@ namespace RTSLockstep.Player
             AgentControllers.FastClear();
         }
 
-        public static bool ContainsController(AgentController controller)
+        public static bool ContainsController(LocalAgentController controller)
         {
             if (AgentControllers.IsNull())
             {
@@ -120,7 +122,7 @@ namespace RTSLockstep.Player
             {
                 if (AgentControllers.arrayAllocation[i])
                 {
-                    AgentController cont = AgentControllers[i];
+                    LocalAgentController cont = AgentControllers[i];
 
                     if (cont.SelectedAgents.Count > 0)
                     {
@@ -195,7 +197,7 @@ namespace RTSLockstep.Player
 
         public static void Save()
         {
-            JsonSerializer serializer = new JsonSerializer
+            _ = new JsonSerializer
             {
                 NullValueHandling = NullValueHandling.Ignore
             };
@@ -242,7 +244,7 @@ namespace RTSLockstep.Player
                     {
                         while (reader.Read())
                         {
-                            if (reader.Value != null)
+                            if (reader.Value.IsNotNull())
                             {
                                 if (reader.TokenType == JsonToken.PropertyName)
                                 {
@@ -296,6 +298,43 @@ namespace RTSLockstep.Player
             }
 
             return savedGames;
+        }
+
+        public static void CreatePlayer(LocalAgentController controller)
+        {
+            if (controller.ControllingPlayer.IsNotNull())
+            {
+                Debug.LogError("A player called '" + controller.ControllingPlayer.gameObject.name + "' already exists for '" + controller.ToString() + "'.");
+            }
+
+            if (!Object.FindObjectOfType<RTSGameManager>())
+            {
+                Debug.LogError("A game manager has not been initialized!");
+            }
+
+            //load from ls db
+            GameObject playerObject = Object.Instantiate(GameResourceManager.GetPlayerObject(), Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<LSPlayers>().transform);
+
+            playerObject.name = controller.ControllerName;
+
+            LSPlayer playerClone = playerObject.GetComponent<LSPlayer>();
+            //change to user's selected username
+            playerClone.Username = controller.ControllerName;
+            playerClone.SetController(controller);
+
+            if (ContainsController(controller))
+            {
+                playerClone.IsHuman = true;
+            }
+
+            //come up with better way to set selected player to the current player
+            if (controller == MainController)
+            {
+                SelectPlayer(playerClone.Username, 0, controller.ControllerID, controller.PlayerIndex);
+            }
+
+            controller.ControllingPlayer = playerClone;
+            BehaviourHelperManager.InitializeOnDemand(controller.ControllingPlayer);
         }
         #endregion
 
