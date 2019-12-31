@@ -82,12 +82,12 @@ namespace RTSLockstep.BehaviourHelpers
             OnLateVisualize();
         }
 
-        public void OnGUI()
+        public void UpdateGUI()
         {
-            DoGUI();
+            OnUpdateGUI();
         }
 
-        protected virtual void DoGUI()
+        protected virtual void OnUpdateGUI()
         {
         }
 

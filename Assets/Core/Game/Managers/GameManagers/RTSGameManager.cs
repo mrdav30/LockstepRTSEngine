@@ -6,12 +6,13 @@ namespace RTSLockstep.Managers.GameManagers
     public class RTSGameManager : GameManager
     {
         #region Properties
-        static Replay LastSave = new Replay();
+        private static Replay LastSave = new Replay();
         #endregion
 
         #region MonoBehavior
-        void OnGUI()
+        protected override void OnGUI()
         {
+            base.OnGUI();
             //GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2.5f, 2.5f, 1));
 
             //if (GUILayout.Button("Restart"))
@@ -25,9 +26,7 @@ namespace RTSLockstep.Managers.GameManagers
                 LastSave = ReplayManager.SerializeCurrent();
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 ReplayManager.Play(LastSave);
-
             }
-
         }
         #endregion
     }

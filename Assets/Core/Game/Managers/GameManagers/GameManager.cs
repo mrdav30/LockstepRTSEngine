@@ -12,6 +12,7 @@ namespace RTSLockstep.Managers.GameManagers
         // currently behaviors aren't executed in order...
         //  [SerializeField]
         //private BehaviourHelper[] helpers;
+        private bool hasQuit;
 
         protected virtual void Awake()
 		{
@@ -42,20 +43,25 @@ namespace RTSLockstep.Managers.GameManagers
 			LockstepManager.LateVisualize();
 		}
 
-		bool Quited = false;
+        protected virtual void OnGUI()
+        {
+            LockstepManager.UpdateGUI();
+        }
 
         protected virtual void OnDisable()
 		{
-			if (Quited)
-				return;
+			if (hasQuit)
+            {
+                return;
+            }
+
 			LockstepManager.Deactivate();
 		}
 
         private void OnApplicationQuit()
 		{
-			Quited = true;
+            hasQuit = true;
 			LockstepManager.Quit();
 		}
-
 	}
 }

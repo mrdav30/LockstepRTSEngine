@@ -83,7 +83,7 @@ namespace RTSLockstep.Environment
                 agentInfo.Agent.Setup(GameResourceManager.GetAgentInterfacer(agentInfo.AgentCode));
                 environmentController.InitializeAgent(agent, agentInfo.Position.ToVector2d(), agentInfo.Rotation);
                 agentInfo.Agent.Body.HeightPos = agentInfo.Position.z;
-                agentInfo.Agent.TypeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
+                agentInfo.Agent.TypeIndex = AgentController.UnregisterdTypeIndex;
 
             }
         }

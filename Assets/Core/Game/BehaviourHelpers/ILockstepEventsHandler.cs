@@ -12,6 +12,7 @@ namespace RTSLockstep.BehaviourHelpers
         void LateSimulate();
         void Visualize();
         void LateVisualize();
+        void UpdateGUI();
         void GlobalExecute(Command com);
         void RawExecute(Command com);
         void GameStart();

@@ -54,7 +54,7 @@ namespace RTSLockstep.BuildSystem
         {
             if (IsFindingBuildingLocation())
             {
-                if (!_cachedPlayer.CachedHud._mouseOverHud)
+                if (!_cachedPlayer.PlayerHUD.IsMouseOverHUD)
                 {
                     if (!GridBuilder.IsMovingBuilding)
                     {
@@ -121,7 +121,7 @@ namespace RTSLockstep.BuildSystem
             if (buildingTemplate.MyAgentType == AgentType.Structure && buildingTemplate.GetComponent<Structure>())
             {
                 // check that the Player has the resources available before allowing them to create a new structure
-                if (!_cachedPlayer.CachedResourceManager.CheckResources(buildingTemplate))
+                if (!_cachedPlayer.PlayerResourceManager.CheckResources(buildingTemplate))
                 {
                     Debug.Log("Not enough resources!");
                 }

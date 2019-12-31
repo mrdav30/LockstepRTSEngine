@@ -1,51 +1,32 @@
 ﻿using UnityEngine;
-using RTSLockstep.Utility.FastCollections;
 using Newtonsoft.Json;
 using System.IO;
+
 using RTSLockstep.Agents.AgentControllerSystem;
-using RTSLockstep.Agents;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
-using RTSLockstep.LSResources;
 using RTSLockstep.Utility;
+using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Player
 {
     public static class PlayerManager
     {
         #region Properties
-        private struct PlayerDetails
-        {
-            public PlayerDetails(string name, int avatar, int controllerId, int playerIndex)
-            {
-                Name = name;
-                Avatar = avatar;
-                ControllerId = controllerId;
-                PlayerIndex = playerIndex;
-            }
-            // using the name of the Player as a unique identifier
-            // to support multiplayer at some point this may need to be modified
-            public string Name { get; private set; }
-            public int Avatar { get; private set; }
-            public int ControllerId { get; private set; }
-            public int PlayerIndex { get; private set; }
-        }
-        private static FastBucket<PlayerDetails> Players = new FastBucket<PlayerDetails>();
-        private static PlayerDetails currentPlayer;
-        private static Texture2D[] avatars;
+        private static FastBucket<PlayerDetails> _players = new FastBucket<PlayerDetails>();
+        private static PlayerDetails _currentPlayer;
+        private static Texture2D[] _avatars;
 
         public static readonly FastBucket<AgentController> AgentControllers = new FastBucket<AgentController>();
 
         public static AgentController MainController { get; private set; }
-        //   public static Player MainController.Commander { get; private set; }
-        //  public static AgentController _environmentController { get; set; }
         #endregion
 
         #region Public
         public static void Initialize()
         {
             MainController = null;
-            Players.FastClear();
+            _players.FastClear();
             AgentControllers.FastClear();
         }
 
@@ -67,8 +48,7 @@ namespace RTSLockstep.Player
             return AgentControllers[index];
         }
 
-        //instantiate commander object
-        public static void AddController(AgentController agentController) //, string defaultController
+        public static void AddController(AgentController agentController)
         {
             if (ContainsController(agentController))
             {
@@ -81,7 +61,6 @@ namespace RTSLockstep.Player
             {
                 MainController = agentController;
             }
-            //  CreatePlayerObject(agentController, defaultController);
         }
 
         public static void RemoveController(AgentController agentController)
@@ -91,7 +70,9 @@ namespace RTSLockstep.Player
             if (MainController == agentController)
             {
                 if (AgentControllers.Count == 0)
+                {
                     MainController = null;
+                }
                 else
                 {
                     for (int i = 0; i < AgentControllers.PeakCount; i++)
@@ -109,13 +90,13 @@ namespace RTSLockstep.Player
         public static void ClearControllers()
         {
             Selector.Clear();
-            while (MainController != null)
+            while (MainController.IsNotNull())
             {
                 RemoveController(MainController);
             }
-            //return;
-            //MainController = null;
-            //AgentControllers.FastClear();
+
+            MainController = null;
+            AgentControllers.FastClear();
         }
 
         public static bool ContainsController(AgentController controller)
@@ -125,25 +106,6 @@ namespace RTSLockstep.Player
                 Debug.Log(controller);
             }
             return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers.ContainsAt(controller.PlayerIndex, controller);
-        }
-
-        public static AllegianceType GetAllegiance(AgentController otherController)
-        {
-            if (Selector.MainSelectedAgent.IsNotNull())
-            {
-                return Selector.MainSelectedAgent.Controller.GetAllegiance(otherController);
-            }
-            else if (MainController.IsNull())
-            {
-                return AllegianceType.Neutral;
-            }
-
-            return MainController.GetAllegiance(otherController);
-        }
-
-        public static AllegianceType GetAllegiance(LSAgent agent)
-        {
-            return GetAllegiance(agent.Controller);
         }
 
         /// <summary>
@@ -175,17 +137,17 @@ namespace RTSLockstep.Player
 
         public static void SelectPlayer(string name, int avatar, int controllerId, int playerIndex)
         {
-            //check commander doesnt already exist
+            //check player doesnt already exist
             bool playerExists = false;
-            for (int i = 0; i < Players.PeakCount; i++)
+            for (int i = 0; i < _players.PeakCount; i++)
             {
-                if (Players.arrayAllocation[i])
+                if (_players.arrayAllocation[i])
                 {
-                    PlayerDetails commander = Players[i];
+                    PlayerDetails commander = _players[i];
 
                     if (commander.Name == name)
                     {
-                        currentPlayer = commander;
+                        _currentPlayer = commander;
                         playerExists = true;
                     }
                 }
@@ -194,44 +156,50 @@ namespace RTSLockstep.Player
             if (!playerExists)
             {
                 PlayerDetails newPlayer = new PlayerDetails(name, avatar, controllerId, playerIndex);
-                Players.Add(newPlayer);
-                currentPlayer = newPlayer;
+                _players.Add(newPlayer);
+                _currentPlayer = newPlayer;
                 Directory.CreateDirectory("SavedGames" + Path.DirectorySeparatorChar + name);
             }
+
             Save();
         }
 
-        //change to accept commander param
-        //search through players list
+        // change to accept player param
+        // search through players list
         public static string GetPlayerName()
         {
-            return currentPlayer.Name == "" ? "Unknown" : currentPlayer.Name;
+            return _currentPlayer.Name == "" ? "Unknown" : _currentPlayer.Name;
         }
 
         public static void SetAvatarTextures(Texture2D[] avatarTextures)
         {
-            avatars = avatarTextures;
+            _avatars = avatarTextures;
         }
 
         //change to accept commander param
         //search through players list
         public static Texture2D GetPlayerAvatar()
         {
-            if (avatars == null)
+            if (_avatars.IsNull())
             {
                 return null;
             }
-            if (currentPlayer.Avatar >= 0 && currentPlayer.Avatar < avatars.Length)
+
+            if (_currentPlayer.Avatar >= 0 && _currentPlayer.Avatar < _avatars.Length)
             {
-                return avatars[currentPlayer.Avatar];
+                return _avatars[_currentPlayer.Avatar];
             }
+
             return null;
         }
 
         public static void Save()
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.NullValueHandling = NullValueHandling.Ignore;
+            JsonSerializer serializer = new JsonSerializer
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            };
+
             using (StreamWriter sw = new StreamWriter("SavedGames" + Path.DirectorySeparatorChar + "Players.json"))
             {
                 using (JsonWriter writer = new JsonTextWriter(sw))
@@ -240,11 +208,11 @@ namespace RTSLockstep.Player
 
                     writer.WritePropertyName("Players");
                     writer.WriteStartArray();
-                    for (int i = 0; i < Players.PeakCount; i++)
+                    for (int i = 0; i < _players.PeakCount; i++)
                     {
-                        if (Players.arrayAllocation[i])
+                        if (_players.arrayAllocation[i])
                         {
-                            SavePlayer(writer, Players[i]);
+                            SavePlayer(writer, _players[i]);
                         }
                     }
                     writer.WriteEndArray();
@@ -256,7 +224,7 @@ namespace RTSLockstep.Player
 
         public static void Load()
         {
-            Players.Clear();
+            _players.Clear();
 
             string filename = "SavedGames" + Path.DirectorySeparatorChar + "Players.json";
             if (File.Exists(filename))
@@ -292,32 +260,33 @@ namespace RTSLockstep.Player
 
         public static string[] GetPlayerNames()
         {
-            string[] playerNames = new string[Players.Count];
+            string[] playerNames = new string[_players.Count];
             for (int i = 0; i < playerNames.Length; i++)
             {
-                playerNames[i] = Players[i].Name;
+                playerNames[i] = _players[i].Name;
             }
             return playerNames;
         }
 
         public static int GetAvatar(string playerName)
         {
-            for (int i = 0; i < Players.PeakCount; i++)
+            for (int i = 0; i < _players.PeakCount; i++)
             {
-                if (Players.arrayAllocation[i])
+                if (_players.arrayAllocation[i])
                 {
-                    if (Players[i].Name == playerName)
+                    if (_players[i].Name == playerName)
                     {
-                        return Players[i].Avatar;
+                        return _players[i].Avatar;
                     }
                 }
             }
+
             return 0;
         }
 
         public static string[] GetSavedGames()
         {
-            DirectoryInfo directory = new DirectoryInfo("SavedGames" + Path.DirectorySeparatorChar + currentPlayer.Name);
+            DirectoryInfo directory = new DirectoryInfo("SavedGames" + Path.DirectorySeparatorChar + _currentPlayer.Name);
             FileInfo[] files = directory.GetFiles();
             string[] savedGames = new string[files.Length];
             for (int i = 0; i < files.Length; i++)
@@ -325,6 +294,7 @@ namespace RTSLockstep.Player
                 string filename = files[i].Name;
                 savedGames[i] = filename.Substring(0, filename.IndexOf("."));
             }
+
             return savedGames;
         }
         #endregion
@@ -379,10 +349,10 @@ namespace RTSLockstep.Player
                                 name = (string)reader.Value;
                                 break;
                             case "Avatar":
-                                avatar = (int)(System.Int64)reader.Value;
+                                avatar = (int)(long)reader.Value;
                                 break;
                             case "ControllerId":
-                                controllerId = (int)(System.Int64)reader.Value;
+                                controllerId = (int)(long)reader.Value;
                                 break;
                             default:
                                 break;
@@ -393,7 +363,7 @@ namespace RTSLockstep.Player
                 {
                     if (reader.TokenType == JsonToken.EndObject)
                     {
-                        Players.Add(new PlayerDetails(name, avatar, controllerId, playerIndex));
+                        _players.Add(new PlayerDetails(name, avatar, controllerId, playerIndex));
                         return;
                     }
                 }

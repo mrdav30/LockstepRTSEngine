@@ -87,6 +87,14 @@ namespace RTSLockstep.BehaviourHelpers
             }
         }
 
+        public static void UpdateGUI()
+        {
+            foreach (var helper in Helpers)
+            {
+                helper.UpdateGUI();
+            }
+        }
+
         public static void Deactivate()
         {
             foreach (ILockstepEventsHandler helper in Helpers)

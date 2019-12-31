@@ -31,18 +31,16 @@ namespace RTSLockstep.Agents.AgentControllerSystem
                 Debug.LogError("IAgentControllerDataProvider unavailable.");
             }
 
-            //TODO: Re-implement cammander system. Putting on hold for now.
-            //Also think of other settings for AgentController to be set in database
-
             AgentControllerDataItem[] controllerItems = database.AgentControllerData;
             for (int i = 0; i < controllerItems.Length; i++)
             {
-                var item = controllerItems[i];
-                var controller = AgentController.Create(item.DefaultAllegiance, item.Name);
+                AgentControllerDataItem item = controllerItems[i];
+                AgentController controller = AgentController.Create(item.DefaultAllegiance, item.Name);
                 if (item.PlayerManaged)
                 {
                     PlayerManager.AddController(controller);
                 }
+
                 controller.CreatePlayer();
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
@@ -63,6 +61,5 @@ namespace RTSLockstep.Agents.AgentControllerSystem
 
             return AgentController.GetInstanceManager(id);
         }
-
     }
 }

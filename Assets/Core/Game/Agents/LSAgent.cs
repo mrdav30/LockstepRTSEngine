@@ -92,7 +92,7 @@ namespace RTSLockstep.Agents
         /// </summary>
         /// <value>The index of the type.</value>
         private ushort _typeIndex;
-        public ushort TypeIndex { get { return _typeIndex; } set { _typeIndex = value; _typeIndex = AgentController.UNREGISTERED_TYPE_INDEX; } }
+        public ushort TypeIndex { get { return _typeIndex; } set { _typeIndex = value; _typeIndex = AgentController.UnregisterdTypeIndex; } }
 
         #region Pre-runtime generated (maybe not)
         public Ability[] AttachedAbilities { get; private set; }
@@ -315,7 +315,7 @@ namespace RTSLockstep.Agents
             if (!_provisioned)
             {
                 _provisioned = true;
-                _cachedPlayer.CachedResourceManager.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
+                _cachedPlayer.PlayerResourceManager.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
             }
 
             if (Influencer.IsNotNull())

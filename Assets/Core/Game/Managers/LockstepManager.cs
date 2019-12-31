@@ -303,6 +303,11 @@ namespace RTSLockstep.Managers
             BehaviourHelperManager.LateVisualize();
         }
 
+        internal static void UpdateGUI()
+        {
+            BehaviourHelperManager.UpdateGUI();
+        }
+
         internal static void Deactivate()
         {
             DefaultMessageRaiser.EarlyDeactivate();

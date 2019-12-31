@@ -49,7 +49,7 @@ namespace RTSLockstep.Menu.UI
             string message = "Game Over";
             if (winner)
             {
-                message = "Congratulations " + winner.username + "! You have won by " + metVictoryCondition.GetDescription();
+                message = "Congratulations " + winner.Username + "! You have won by " + metVictoryCondition.GetDescription();
             }
             GUI.Label(new Rect(leftPos, topPos, Screen.width - 2 * padding, itemHeight), message);
             leftPos = Screen.width / 2 - padding / 2 - buttonWidth;

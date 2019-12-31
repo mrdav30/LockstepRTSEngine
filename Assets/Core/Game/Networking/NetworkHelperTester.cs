@@ -10,7 +10,7 @@ namespace RTSLockstep.Networking
         public string IP = "127.0.0.1";
         public int RoomSize = 1;
 
-        protected override void DoGUI()
+        protected override void OnUpdateGUI()
         {
             GUILayout.Label("State Hash: " + AgentController.GetStateHash());
 

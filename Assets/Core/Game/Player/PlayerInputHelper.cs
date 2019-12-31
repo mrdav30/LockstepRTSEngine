@@ -175,7 +175,7 @@ namespace RTSLockstep.Player
                 MoveCamera();
 
                 // prevent user input if mouse is over hud
-                bool mouseOverHud = PlayerManager.MainController.GetCommanderHUD()._mouseOverHud;
+                bool mouseOverHud = PlayerManager.MainController.GetPlayerHUD().IsMouseOverHUD;
                 if (!mouseOverHud)
                 {
                     // detect rotation amount if no agents selected & Right mouse button is down
@@ -262,7 +262,7 @@ namespace RTSLockstep.Player
             }
         }
 
-        protected override void DoGUI()
+        protected override void OnUpdateGUI()
         {
             if (_boxStyle == null)
             {
@@ -299,13 +299,13 @@ namespace RTSLockstep.Player
             if (xpos >= 0 && xpos < GameResourceManager.ScrollWidth)
             {
                 movement.x -= GameResourceManager.ScrollSpeed;
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanLeft);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.PanLeft);
                 mouseScroll = true;
             }
             else if (xpos <= Screen.width && xpos > Screen.width - GameResourceManager.ScrollWidth)
             {
                 movement.x += GameResourceManager.ScrollSpeed;
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanRight);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.PanRight);
                 mouseScroll = true;
             }
 
@@ -313,13 +313,13 @@ namespace RTSLockstep.Player
             if (ypos >= 0 && ypos < GameResourceManager.ScrollWidth)
             {
                 movement.z -= GameResourceManager.ScrollSpeed;
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanDown);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.PanDown);
                 mouseScroll = true;
             }
             else if (ypos <= Screen.height && ypos > Screen.height - GameResourceManager.ScrollWidth)
             {
                 movement.z += GameResourceManager.ScrollSpeed;
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.PanUp);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.PanUp);
                 mouseScroll = true;
             }
 
@@ -356,10 +356,10 @@ namespace RTSLockstep.Player
 
             if (!SelectionManager.MousedAgent
                 && !mouseScroll
-                && !PlayerManager.MainController.GetCommanderHUD().GetCursorLockState()
-                && !PlayerManager.MainController.GetCommanderHUD()._mouseOverHud)
+                && !PlayerManager.MainController.GetPlayerHUD().GetCursorLockState()
+                && !PlayerManager.MainController.GetPlayerHUD().IsMouseOverHUD)
             {
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Select);
             }
         }
 
@@ -385,7 +385,7 @@ namespace RTSLockstep.Player
 
         private void HandleSingleLeftClick()
         {
-            if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds())
+            if (PlayerManager.MainController.GetPlayerHUD().MouseInBounds())
             {
                 if (!ConstructionHandler.IsFindingBuildingLocation())
                 {
@@ -412,7 +412,7 @@ namespace RTSLockstep.Player
 
         private void HandleSingleRightClick()
         {
-            if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
+            if (PlayerManager.MainController.GetPlayerHUD().MouseInBounds()
                 && Selector.MainSelectedAgent
                 && !ConstructionHandler.IsFindingBuildingLocation())
             {
@@ -425,8 +425,8 @@ namespace RTSLockstep.Player
                         if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                         {
                             Selector.MainSelectedAgent.GetAbility<Rally>().SetFlagState(FlagState.SetFlag);
-                            PlayerManager.MainController.GetCommanderHUD().SetCursorLock(false);
-                            PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Select);
+                            PlayerManager.MainController.GetPlayerHUD().SetCursorLock(false);
+                            PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Select);
                         }
                         else
                         {
@@ -485,7 +485,7 @@ namespace RTSLockstep.Player
 
         private void MouseHover()
         {
-            if (PlayerManager.MainController.GetCommanderHUD().MouseInBounds()
+            if (PlayerManager.MainController.GetPlayerHUD().MouseInBounds()
                 && Selector.MainSelectedAgent
                     && Selector.MainSelectedAgent.IsActive
                     && Selector.MainSelectedAgent.GetAbility<Move>()
@@ -493,7 +493,7 @@ namespace RTSLockstep.Player
                     && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController)
                     && !SelectionManager.MousedAgent)
             {
-                PlayerManager.MainController.GetCommanderHUD().SetCursorState(CursorState.Move);
+                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Move);
             }
         }
 

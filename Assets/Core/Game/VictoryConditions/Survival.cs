@@ -31,7 +31,7 @@ namespace RTSLockstep.VictoryConditions
         {
             foreach (LSPlayer players in Players)
             {
-                if (players && players.human && players.IsDead())
+                if (players && players.IsHuman && players.IsDead())
                 {
                     return true;
                 }
@@ -41,7 +41,7 @@ namespace RTSLockstep.VictoryConditions
 
         public override bool PlayerMeetsConditions(LSPlayer player)
         {
-            return player && player.human && !player.IsDead();
+            return player && player.IsHuman && !player.IsDead();
         }
     }
 }

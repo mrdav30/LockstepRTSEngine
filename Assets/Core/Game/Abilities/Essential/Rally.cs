@@ -74,8 +74,8 @@ namespace RTSLockstep.Abilities.Essential
                     }
                     flag.transform.localPosition = RallyPoint;
                     _flagState = FlagState.FlagSet;
-                    Agent.Controller.GetCommanderHUD().SetCursorLock(false);
-                    Agent.Controller.GetCommanderHUD().SetCursorState(CursorState.Select);
+                    Agent.Controller.GetPlayerHUD().SetCursorLock(false);
+                    Agent.Controller.GetPlayerHUD().SetCursorState(CursorState.Select);
                     SelectionManager.SetSelectionLock(false);
                 }
             }

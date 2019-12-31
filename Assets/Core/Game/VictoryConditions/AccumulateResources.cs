@@ -16,7 +16,7 @@ namespace RTSLockstep.VictoryConditions
 
         public override bool PlayerMeetsConditions(LSPlayer player)
         {
-            return player && !player.IsDead() && player.CachedResourceManager.GetResourceAmount(type) >= amount;
+            return player && !player.IsDead() && player.PlayerResourceManager.GetResourceAmount(type) >= amount;
         }
     }
 }

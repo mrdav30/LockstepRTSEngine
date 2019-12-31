@@ -1,34 +1,33 @@
 ﻿using Newtonsoft.Json;
+using UnityEngine;
+
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentControllerSystem;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Managers.GameState;
-using UnityEngine;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep.Player
 {
     public class LSPlayer : BehaviourHelper
     {
         #region Properties
-        public string username;
-        public bool human;
-        public HUD CachedHud { get; private set; }
-        public ResourceManager CachedResourceManager { get; private set; }
-        private AgentController _cachedController;
-
+        public string Username;
+        public bool IsHuman;
+        public HUD PlayerHUD;
+        public ResourceManager PlayerResourceManager;
         public Color TeamColor;
-        private bool Setted = false;
+
+        private AgentController _cachedController;
+        private bool IsSetup = false;
         #endregion
 
         #region MonoBehavior
         protected void Setup()
         {
-            CachedResourceManager = GetComponentInParent<ResourceManager>();
-            CachedHud = GetComponentInParent<HUD>();
-
-            CachedResourceManager.Setup();
-            CachedHud.Setup();
+            PlayerResourceManager.Setup();
+            PlayerHUD.Setup();
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
             {
@@ -40,49 +39,49 @@ namespace RTSLockstep.Player
                 GameResourceManager.AssignedTeamColors.Add(TeamColor);
             }
 
-            Setted = true;
+            IsSetup = true;
         }
 
         // Use this for initialization
         protected override void OnInitialize()
         {
-            if (!Setted)
+            if (!IsSetup)
             {
                 Setup();
             }
 
-            CachedResourceManager.Initialize();
+            PlayerResourceManager.Initialize();
         }
 
         // Update is called once per frame
         protected override void OnVisualize()
         {
-            if (human)
+            if (IsHuman)
             {
-                CachedResourceManager.Visualize();
-                CachedHud.Visualize();
+                PlayerResourceManager.Visualize();
+                PlayerHUD.Visualize();
             }
         }
 
-        protected override void DoGUI()
+        protected override void OnUpdateGUI()
         {
-            CachedHud.DoGUI();
+            PlayerHUD.DoGUI();
         }
         #endregion
 
         #region Public
         public virtual void SaveDetails(JsonWriter writer)
         {
-            SaveManager.WriteString(writer, "Username", username);
-            SaveManager.WriteBoolean(writer, "Human", human);
+            SaveManager.WriteString(writer, "Username", Username);
+            SaveManager.WriteBoolean(writer, "Human", IsHuman);
             SaveManager.WriteColor(writer, "TeamColor", TeamColor);
-            SaveManager.SavePlayerResources(writer, CachedResourceManager.GetResources(), CachedResourceManager.GetResourceLimits());
+            SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetResources(), PlayerResourceManager.GetResourceLimits());
             SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgents>().GetComponentsInChildren<LSAgent>());
         }
 
         public LSAgent GetObjectForId(int id)
         {
-            LSAgent[] objects = GameObject.FindObjectsOfType(typeof(LSAgent)) as LSAgent[];
+            LSAgent[] objects = FindObjectsOfType(typeof(LSAgent)) as LSAgent[];
             foreach (LSAgent obj in objects)
             {
                 if (obj.GlobalID == id)
@@ -90,12 +89,13 @@ namespace RTSLockstep.Player
                     return obj;
                 }
             }
+
             return null;
         }
 
         public void LoadDetails(JsonTextReader reader)
         {
-            if (reader == null)
+            if (reader.IsNull())
             {
                 return;
             }
@@ -114,10 +114,10 @@ namespace RTSLockstep.Player
                         switch (currValue)
                         {
                             case "Username":
-                                username = (string)reader.Value;
+                                Username = (string)reader.Value;
                                 break;
                             case "Human":
-                                human = (bool)reader.Value;
+                                IsHuman = (bool)reader.Value;
                                 break;
                             default:
                                 break;
@@ -132,10 +132,10 @@ namespace RTSLockstep.Player
                             TeamColor = LoadManager.LoadColor(reader);
                             break;
                         case "Resources":
-                            CachedResourceManager.LoadResources(reader);
+                            PlayerResourceManager.LoadResources(reader);
                             break;
                         case "Units":
-                            LoadRTSAgents(reader);
+                            LoadLSAgents(reader);
                             break;
                         default:
                             break;
@@ -151,10 +151,11 @@ namespace RTSLockstep.Player
         public bool IsDead()
         {
             LSAgent[] agents = GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>();
-            if (agents != null && agents.Length > 0)
+            if (agents.IsNotNull() && agents.Length > 0)
             {
                 return false;
             }
+
             return true;
         }
 
@@ -171,17 +172,18 @@ namespace RTSLockstep.Player
 
         #region Private
         //this should be in the controller...
-        private void LoadRTSAgents(JsonTextReader reader)
+        private void LoadLSAgents(JsonTextReader reader)
         {
-            if (reader == null)
+            if (reader.IsNull())
             {
                 return;
             }
+
             LSAgents agents = GetComponentInChildren<LSAgents>();
-            string currValue = "", type = "";
+            string currValue = "";
             while (reader.Read())
             {
-                if (reader.Value != null)
+                if (reader.Value.IsNotNull())
                 {
                     if (reader.TokenType == JsonToken.PropertyName)
                     {
@@ -189,8 +191,8 @@ namespace RTSLockstep.Player
                     }
                     else if (currValue == "Type")
                     {
-                        type = (string)reader.Value;
-                        // need to create unit via commander controller...
+                        string type = (string)reader.Value;
+                        // need to create unit via player controller...
                         GameObject newObject = Instantiate(GameResourceManager.GetAgentTemplate(type).gameObject);
                         LSAgent agent = newObject.GetComponent<LSAgent>();
                         agent.name = agent.name.Replace("(Clone)", "").Trim();

@@ -1,8 +1,9 @@
-﻿using RTSLockstep.Settings;
-using System;
+﻿using System;
 using TypeReferences;
 using UnityEditor;
 using UnityEngine;
+
+using RTSLockstep.Settings;
 
 namespace RTSLockstep.Data
 {
@@ -126,7 +127,7 @@ namespace RTSLockstep.Data
                     {
 
                         LSFSettingsModifier.Save();
-                        if (LoadDatabaseFromPath(DatabasePath) == false)
+                        if (!LoadDatabaseFromPath(DatabasePath))
                         {
                             Debug.LogFormat("Database was not found at path of '{0}'.", DatabasePath);
                         }

@@ -1,4 +1,10 @@
-﻿using RTSLockstep.Abilities.Essential;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Menu.UI;
+using RTSLockstep.Utility;
+using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.BuildSystem;
 using RTSLockstep.Data;
@@ -7,11 +13,6 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
 using RTSLockstep.LSResources.Audio;
-using System.Collections.Generic;
-using UnityEngine;
-using RTSLockstep.Simulation.LSMath;
-using RTSLockstep.Menu.UI;
-using RTSLockstep.Utility;
 
 namespace RTSLockstep.Player
 {
@@ -19,153 +20,152 @@ namespace RTSLockstep.Player
     {
         #region Properties
         // public 
-        public GUISkin resourceSkin, ordersSkin, selectBoxSkin;
-        private Texture2D activeCursor;
-        public Texture2D pointerCursor, selectCursor, leftCursor, rightCursor, upCursor, downCursor;
-        public Texture2D[] moveCursors, attackCursors, harvestCursors, depositCursors, constructCursors, garrisonCursors;
-        public GUISkin mouseCursorSkin;
-        public Texture2D[] resources;
+        public GUISkin ResourceSkin, OrdersSkin, SelectBoxSkin;
+        private Texture2D _activeCursor;
+        public Texture2D PointerCursor, SelectCursor, LeftCursor, RightCursor, UpCursor, DownCursor;
+        public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors;
+        public GUISkin MouseCursorSkin;
+        public Texture2D[] Resources;
         // buildFrame provides a border around each buildImage
         // buildMask is used to show the user how far through the current build the object at the front of the queue is
-        public Texture2D buttonHover, buttonClick;
-        public Texture2D buildFrame, buildMask;
-        public Texture2D smallButtonHover, smallButtonClick;
-        public Texture2D rallyPointCursor;
-        public Texture2D healthy, damaged, critical;
-        public Texture2D[] resourceHealthBars;
-        public Material notAllowedMaterial, allowedMaterial;
-        public GUISkin playerDetailsSkin;
-        public AudioClip clickSound;
-        public float clickVolume = 1.0f;
+        public Texture2D ButtonHover, ButtonClick;
+        public Texture2D BuildFrame, BuildMask;
+        public Texture2D SmallButtonHover, SmallButtonClick;
+        public Texture2D RallyPointCursor;
+        public Texture2D Healthy, Damaged, Critical;
+        public Texture2D[] ResourceHealthBars;
+        public Material NotAllowedMaterial, AllowedMaterial;
+        public GUISkin PlayerDetailsSkin;
+        public AudioClip ClickSound;
+        public float ClickVolume = 1.0f;
 
-        private LSPlayer cachedCommander;
+        private LSPlayer _cachedPlayer;
         private bool _cursorLocked;
-        public bool _mouseOverHud { get; private set; }
-        private const int ORDERS_BAR_WIDTH = 150, RESOURCE_BAR_HEIGHT = 40;
-        private const int SELECTION_NAME_HEIGHT = 15;
-        private CursorState activeCursorState;
-        private int currentFrame = 0;
-        private Dictionary<ResourceType, long> resourceValues;
-        private Dictionary<ResourceType, long> resourceLimits;
-        private const int ICON_WIDTH = 32, ICON_HEIGHT = 32, TEXT_WIDTH = 128, TEXT_HEIGHT = 32;
-        private static Dictionary<ResourceType, Texture2D> resourceImages;
-        private LSAgent lastSelection;
-        private float sliderValue;
-        private const int BUILD_IMAGE_WIDTH = 64, BUILD_IMAGE_HEIGHT = 64;
-        private int buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
-        private int statusAreaHeight = 0;
-        private const int BUTTON_SPACING = 7;
-        private const int SCROLL_BAR_WIDTH = 22;
-        private const int BUILD_IMAGE_PADDING = 8;
-        private CursorState previousCursorState;
-        private AudioElement audioElement;
+        public bool IsMouseOverHUD { get; private set; }
+        private const int _ordersBarWidth = 150, _resourceBarHeight = 40;
+        private const int _selectionNameHeight = 15;
+        private CursorState _activeCursorState;
+        private int _currentFrame = 0;
+        private Dictionary<ResourceType, long> _resourceValues;
+        private Dictionary<ResourceType, long> _resourceLimits;
+        private const int _iconWidth = 32, _iconHeight = 32, _textWidth = 128, _textHeight = 32;
+        private static Dictionary<ResourceType, Texture2D> _resourceImages;
+        private LSAgent _lastSelection;
+        private float _sliderValue;
+        private const int _buildImageWidth = 64, _buildImageHeight = 64;
+        private int _buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
+        private int _statusAreaHeight = 0;
+        private const int _buttonSpacing = 7;
+        private const int _scrollBarWidth = 22;
+        private const int _buildImagePadding = 8;
+        private AudioElement _audioElement;
         #endregion
 
         #region MonoBehavior
         // Use this for initialization
         public void Setup()
         {
-            cachedCommander = GetComponentInParent<LSPlayer>();
-            if (cachedCommander && cachedCommander.human)
+            _cachedPlayer = GetComponentInParent<LSPlayer>();
+            if (_cachedPlayer && _cachedPlayer.IsHuman)
             {
-                resourceValues = new Dictionary<ResourceType, long>();
-                resourceLimits = new Dictionary<ResourceType, long>();
-                resourceImages = new Dictionary<ResourceType, Texture2D>();
-                for (int i = 0; i < resources.Length; i++)
+                _resourceValues = new Dictionary<ResourceType, long>();
+                _resourceLimits = new Dictionary<ResourceType, long>();
+                _resourceImages = new Dictionary<ResourceType, Texture2D>();
+                for (int i = 0; i < Resources.Length; i++)
                 {
-                    switch (resources[i].name)
+                    switch (Resources[i].name)
                     {
                         case "Gold":
-                            resourceImages.Add(ResourceType.Gold, resources[i]);
-                            resourceValues.Add(ResourceType.Gold, 0);
-                            resourceLimits.Add(ResourceType.Gold, 0);
+                            _resourceImages.Add(ResourceType.Gold, Resources[i]);
+                            _resourceValues.Add(ResourceType.Gold, 0);
+                            _resourceLimits.Add(ResourceType.Gold, 0);
                             break;
                         case "Ore":
-                            resourceImages.Add(ResourceType.Ore, resources[i]);
-                            resourceValues.Add(ResourceType.Ore, 0);
-                            resourceLimits.Add(ResourceType.Ore, 0);
+                            _resourceImages.Add(ResourceType.Ore, Resources[i]);
+                            _resourceValues.Add(ResourceType.Ore, 0);
+                            _resourceLimits.Add(ResourceType.Ore, 0);
                             break;
                         case "Stone":
-                            resourceImages.Add(ResourceType.Stone, resources[i]);
-                            resourceValues.Add(ResourceType.Stone, 0);
-                            resourceLimits.Add(ResourceType.Stone, 0);
+                            _resourceImages.Add(ResourceType.Stone, Resources[i]);
+                            _resourceValues.Add(ResourceType.Stone, 0);
+                            _resourceLimits.Add(ResourceType.Stone, 0);
                             break;
                         case "Wood":
-                            resourceImages.Add(ResourceType.Wood, resources[i]);
-                            resourceValues.Add(ResourceType.Wood, 0);
-                            resourceLimits.Add(ResourceType.Wood, 0);
+                            _resourceImages.Add(ResourceType.Wood, Resources[i]);
+                            _resourceValues.Add(ResourceType.Wood, 0);
+                            _resourceLimits.Add(ResourceType.Wood, 0);
                             break;
                         case "Crystal":
-                            resourceImages.Add(ResourceType.Crystal, resources[i]);
-                            resourceValues.Add(ResourceType.Crystal, 0);
-                            resourceLimits.Add(ResourceType.Crystal, 0);
+                            _resourceImages.Add(ResourceType.Crystal, Resources[i]);
+                            _resourceValues.Add(ResourceType.Crystal, 0);
+                            _resourceLimits.Add(ResourceType.Crystal, 0);
                             break;
                         case "Food":
-                            resourceImages.Add(ResourceType.Food, resources[i]);
-                            resourceValues.Add(ResourceType.Food, 0);
-                            resourceLimits.Add(ResourceType.Food, 0);
+                            _resourceImages.Add(ResourceType.Food, Resources[i]);
+                            _resourceValues.Add(ResourceType.Food, 0);
+                            _resourceLimits.Add(ResourceType.Food, 0);
                             break;
                         case "Army":
-                            resourceImages.Add(ResourceType.Provision, resources[i]);
-                            resourceValues.Add(ResourceType.Provision, 0);
-                            resourceLimits.Add(ResourceType.Provision, 0);
+                            _resourceImages.Add(ResourceType.Provision, Resources[i]);
+                            _resourceValues.Add(ResourceType.Provision, 0);
+                            _resourceLimits.Add(ResourceType.Provision, 0);
                             break;
                         default: break;
                     }
                 }
 
                 Dictionary<ResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<ResourceType, Texture2D>();
-                for (int i = 0; i < resourceHealthBars.Length; i++)
+                for (int i = 0; i < ResourceHealthBars.Length; i++)
                 {
-                    switch (resourceHealthBars[i].name)
+                    switch (ResourceHealthBars[i].name)
                     {
                         case "ore":
-                            resourceHealthBarTextures.Add(ResourceType.Ore, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Ore, ResourceHealthBars[i]);
                             break;
                         case "stone":
-                            resourceHealthBarTextures.Add(ResourceType.Stone, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Stone, ResourceHealthBars[i]);
                             break;
                         case "gold":
-                            resourceHealthBarTextures.Add(ResourceType.Gold, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Gold, ResourceHealthBars[i]);
                             break;
                         case "crystal":
-                            resourceHealthBarTextures.Add(ResourceType.Crystal, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Crystal, ResourceHealthBars[i]);
                             break;
                         case "food":
-                            resourceHealthBarTextures.Add(ResourceType.Food, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Food, ResourceHealthBars[i]);
                             break;
                         case "wood":
-                            resourceHealthBarTextures.Add(ResourceType.Wood, resourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(ResourceType.Wood, ResourceHealthBars[i]);
                             break;
                         default: break;
                     }
                 }
                 GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
-                GameResourceManager.StoreSelectBoxItems(selectBoxSkin, healthy, damaged, critical);
-                GameResourceManager.StoreConstructionMaterials(allowedMaterial, notAllowedMaterial);
-                buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
+                GameResourceManager.StoreSelectBoxItems(SelectBoxSkin, Healthy, Damaged, Critical);
+                GameResourceManager.StoreConstructionMaterials(AllowedMaterial, NotAllowedMaterial);
+                _buildAreaHeight = Screen.height - _resourceBarHeight - _selectionNameHeight - 2 * _buttonSpacing;
                 SetCursorState(CursorState.Select);
 
                 List<AudioClip> sounds = new List<AudioClip>();
                 List<float> volumes = new List<float>();
-                sounds.Add(clickSound);
-                volumes.Add(clickVolume);
-                audioElement = new AudioElement(sounds, volumes, "HUD", null);
+                sounds.Add(ClickSound);
+                volumes.Add(ClickVolume);
+                _audioElement = new AudioElement(sounds, volumes, "HUD", null);
             }
         }
 
         public void Visualize()
         {
-            _mouseOverHud = !MouseInBounds() && activeCursorState != CursorState.PanRight && activeCursorState != CursorState.PanUp;
+            IsMouseOverHUD = !MouseInBounds() && _activeCursorState != CursorState.PanRight && _activeCursorState != CursorState.PanUp;
         }
 
         // Update is called once per frame
         public void DoGUI()
         {
-            if (cachedCommander
-                && cachedCommander.human
+            if (_cachedPlayer
+                && _cachedPlayer.IsHuman
                 && PlayerManager.MainController.IsNotNull()
-                && cachedCommander == PlayerManager.MainController.Player)
+                && _cachedPlayer == PlayerManager.MainController.Player)
             {
                 DrawPlayerDetails();
                 if (!GameResourceManager.MenuOpen)
@@ -188,12 +188,13 @@ namespace RTSLockstep.Player
             // Screen coordinates start in the lower-left corner of the screen
             // not the top-left of the screen like drawing coordinate do
             Vector3 mousePos = Input.mousePosition;
-            int screenHeight = Screen.height - RESOURCE_BAR_HEIGHT;
+            int screenHeight = Screen.height - _resourceBarHeight;
             int screenWidth = Screen.width;
             if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
             {
-                screenWidth = screenWidth - ORDERS_BAR_WIDTH;
+                screenWidth -= _ordersBarWidth;
             }
+
             bool insideHeight = mousePos.y >= 0 && mousePos.y <= screenHeight;
             bool insideWidth = mousePos.x >= 0 && mousePos.x <= screenWidth;
             return insideWidth && insideHeight;
@@ -201,14 +202,14 @@ namespace RTSLockstep.Player
 
         public Rect GetPlayingArea()
         {
-            int screenHeight = Screen.height - RESOURCE_BAR_HEIGHT;
+            int screenHeight = Screen.height - _resourceBarHeight;
             int screenWidth = Screen.width;
             if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
             {
-                screenWidth = screenWidth - ORDERS_BAR_WIDTH;
+                screenWidth -= _ordersBarWidth;
             }
 
-            return new Rect(0, RESOURCE_BAR_HEIGHT, screenWidth, screenHeight);
+            return new Rect(0, _resourceBarHeight, screenWidth, screenHeight);
         }
 
         public void SetCursorState(CursorState newState)
@@ -218,53 +219,49 @@ namespace RTSLockstep.Player
                 return;
             }
 
-            if (activeCursorState != newState)
-            {
-                previousCursorState = activeCursorState;
-            }
-            activeCursorState = newState;
+            _activeCursorState = newState;
             switch (newState)
             {
                 case CursorState.Pointer:
-                    activeCursor = pointerCursor;
+                    _activeCursor = PointerCursor;
                     break;
                 case CursorState.Select:
-                    activeCursor = selectCursor;
+                    _activeCursor = SelectCursor;
                     break;
                 case CursorState.Attack:
-                    currentFrame = (int)Time.time % attackCursors.Length;
-                    activeCursor = attackCursors[currentFrame];
+                    _currentFrame = (int)Time.time % AttackCursors.Length;
+                    _activeCursor = AttackCursors[_currentFrame];
                     break;
                 case CursorState.Harvest:
-                    currentFrame = (int)Time.time % harvestCursors.Length;
-                    activeCursor = harvestCursors[currentFrame];
+                    _currentFrame = (int)Time.time % HarvestCursors.Length;
+                    _activeCursor = HarvestCursors[_currentFrame];
                     break;
                 case CursorState.Deposit:
-                    currentFrame = (int)Time.time % depositCursors.Length;
-                    activeCursor = depositCursors[currentFrame];
+                    _currentFrame = (int)Time.time % DepositCursors.Length;
+                    _activeCursor = DepositCursors[_currentFrame];
                     break;
                 case CursorState.Construct:
-                    currentFrame = (int)Time.time % constructCursors.Length;
-                    activeCursor = constructCursors[currentFrame];
+                    _currentFrame = (int)Time.time % ConstructCursors.Length;
+                    _activeCursor = ConstructCursors[_currentFrame];
                     break;
                 case CursorState.Move:
-                    currentFrame = (int)Time.time % moveCursors.Length;
-                    activeCursor = moveCursors[currentFrame];
+                    _currentFrame = (int)Time.time % MoveCursors.Length;
+                    _activeCursor = MoveCursors[_currentFrame];
                     break;
                 case CursorState.PanLeft:
-                    activeCursor = leftCursor;
+                    _activeCursor = LeftCursor;
                     break;
                 case CursorState.PanRight:
-                    activeCursor = rightCursor;
+                    _activeCursor = RightCursor;
                     break;
                 case CursorState.PanUp:
-                    activeCursor = upCursor;
+                    _activeCursor = UpCursor;
                     break;
                 case CursorState.PanDown:
-                    activeCursor = downCursor;
+                    _activeCursor = DownCursor;
                     break;
                 case CursorState.RallyPoint:
-                    activeCursor = rallyPointCursor;
+                    _activeCursor = RallyPointCursor;
                     break;
                 default:
                     break;
@@ -285,13 +282,13 @@ namespace RTSLockstep.Player
 
         public void SetResourceValues(Dictionary<ResourceType, long> resourceValues, Dictionary<ResourceType, long> resourceLimits)
         {
-            resourceValues = resourceValues;
-            resourceLimits = resourceLimits;
+            _resourceValues = resourceValues;
+            _resourceLimits = resourceLimits;
         }
 
         public CursorState GetCursorState()
         {
-            return activeCursorState;
+            return _activeCursorState;
         }
 
         public bool GetCursorLockState()
@@ -305,24 +302,24 @@ namespace RTSLockstep.Player
         {
             LSAgent selectedAgent = Selector.MainSelectedAgent as LSAgent;
 
-            GUI.skin = ordersSkin;
-            GUI.BeginGroup(new Rect(Screen.width - ORDERS_BAR_WIDTH - BUILD_IMAGE_WIDTH, RESOURCE_BAR_HEIGHT, ORDERS_BAR_WIDTH + BUILD_IMAGE_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT));
-            GUI.Box(new Rect(BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH, 0, ORDERS_BAR_WIDTH, Screen.height - RESOURCE_BAR_HEIGHT), "");
+            GUI.skin = OrdersSkin;
+            GUI.BeginGroup(new Rect(Screen.width - _ordersBarWidth - _buildImageWidth, _resourceBarHeight, _ordersBarWidth + _buildImageWidth, Screen.height - _resourceBarHeight));
+            GUI.Box(new Rect(_buildImageWidth + _scrollBarWidth, 0, _ordersBarWidth, Screen.height - _resourceBarHeight), "");
             string selectionName = selectedAgent.GetComponent<LSAgent>().AgentDescription;
 
             // reset height of agent status
-            statusAreaHeight = 0;
-            if (cachedCommander.GetController().SelectedAgents.Count == 1)
+            _statusAreaHeight = 0;
+            if (_cachedPlayer.GetController().SelectedAgents.Count == 1)
             {
                 DrawStatusBar(selectedAgent.GetAbility<AgentStats>());
             }
 
-            if (selectedAgent.IsOwnedBy(cachedCommander.GetController()))
+            if (selectedAgent.IsOwnedBy(_cachedPlayer.GetController()))
             {
                 // reset slider value if the selected object has changed
-                if (lastSelection && lastSelection != selectedAgent)
+                if (_lastSelection && _lastSelection != selectedAgent)
                 {
-                    sliderValue = 0.0f;
+                    _sliderValue = 0.0f;
                 }
                 if (selectedAgent.MyAgentType == AgentType.Unit && selectedAgent.GetAbility<Construct>())
                 {
@@ -333,25 +330,25 @@ namespace RTSLockstep.Player
                     DrawActions(selectedAgent.GetAbility<Spawner>().GetSpawnActions());
                 }
                 // store the current selection
-                lastSelection = selectedAgent;
-                if (lastSelection.MyAgentType == AgentType.Structure)
+                _lastSelection = selectedAgent;
+                if (_lastSelection.MyAgentType == AgentType.Structure)
                 {
-                    if (lastSelection.GetAbility<Spawner>())
+                    if (_lastSelection.GetAbility<Spawner>())
                     {
-                        DrawBuildQueue(lastSelection.GetAbility<Spawner>().getBuildQueueValues(), lastSelection.GetAbility<Spawner>().getBuildPercentage());
+                        DrawBuildQueue(_lastSelection.GetAbility<Spawner>().getBuildQueueValues(), _lastSelection.GetAbility<Spawner>().getBuildPercentage());
                     }
                 }
-                if (lastSelection.MyAgentType == AgentType.Structure || lastSelection.MyAgentType == AgentType.Unit)
+                if (_lastSelection.MyAgentType == AgentType.Structure || _lastSelection.MyAgentType == AgentType.Unit)
                 {
-                    DrawStandardOptions(lastSelection as LSAgent);
+                    DrawStandardOptions(_lastSelection as LSAgent);
                 }
             }
 
             if (!selectionName.Equals(""))
             {
-                int leftPos = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH / 2;
-                int topPos = buildAreaHeight + BUTTON_SPACING;
-                GUI.Label(new Rect(leftPos, topPos, ORDERS_BAR_WIDTH, SELECTION_NAME_HEIGHT), selectionName);
+                int leftPos = _buildImageWidth + _scrollBarWidth / 2;
+                int topPos = _buildAreaHeight + _buttonSpacing;
+                GUI.Label(new Rect(leftPos, topPos, _ordersBarWidth, _selectionNameHeight), selectionName);
             }
 
             GUI.EndGroup();
@@ -359,68 +356,69 @@ namespace RTSLockstep.Player
 
         private void DrawStatusBar(AgentStats agentStats)
         {
-            int leftPos = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH;
+            int leftPos = _buildImageWidth + _scrollBarWidth;
             int topPos = 0;
 
             if (agentStats.CachedHealth)
             {
                 string healthStat = "Health: " + agentStats.CurrentHealth.CeilToInt() + " / " + agentStats.MaxHealth.CeilToInt();
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), healthStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), healthStat);
             }
             else if (agentStats.CachedResourceDeposit)
             {
                 string resourceStat = "Amount: " + agentStats.AmountLeft + " / " + agentStats.Capacity;
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), resourceStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), resourceStat);
             }
 
 
             if (agentStats.CachedMove)
             {
-                topPos += TEXT_HEIGHT;
+                topPos += _textHeight;
                 string speedStat = "Move Speed: " + agentStats.MovementSpeed.CeilToInt();
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), speedStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), speedStat);
             }
 
             if (agentStats.CachedAttack)
             {
-                topPos += TEXT_HEIGHT;
+                topPos += _textHeight;
                 string damageStat = "Damage: " + agentStats.Damage.CeilToInt();
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), damageStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), damageStat);
 
-                topPos += TEXT_HEIGHT;
+                topPos += _textHeight;
                 string dpsStat = "DPS: " + agentStats.DPS.CeilToInt();
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), dpsStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), dpsStat);
 
-                topPos += TEXT_HEIGHT;
+                topPos += _textHeight;
                 string rangeStat = "Range: " + agentStats.ActionRange.CeilToInt();
-                GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), rangeStat);
+                GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), rangeStat);
             }
 
-            topPos += TEXT_HEIGHT;
+            topPos += _textHeight;
             string sightStat = "Sight: " + agentStats.Sight.CeilToInt();
-            GUI.Label(new Rect(leftPos, topPos, TEXT_WIDTH, TEXT_HEIGHT), sightStat);
+            GUI.Label(new Rect(leftPos, topPos, _textWidth, _textHeight), sightStat);
 
-            statusAreaHeight = topPos += TEXT_HEIGHT;
+            _statusAreaHeight = topPos += _textHeight;
         }
 
         private void DrawBuildQueue(string[] buildQueue, float buildPercentage)
         {
             for (int i = 0; i < buildQueue.Length; i++)
             {
-                float topPos = i * BUILD_IMAGE_HEIGHT - (i + 1) * BUILD_IMAGE_PADDING;
-                Rect buildPos = new Rect(BUILD_IMAGE_PADDING, topPos, BUILD_IMAGE_WIDTH, BUILD_IMAGE_HEIGHT);
+                float topPos = i * _buildImageHeight - (i + 1) * _buildImagePadding;
+                Rect buildPos = new Rect(_buildImagePadding, topPos, _buildImageWidth, _buildImageHeight);
                 GUI.DrawTexture(buildPos, GameResourceManager.GetBuildImage(buildQueue[i]));
-                GUI.DrawTexture(buildPos, buildFrame);
-                topPos += BUILD_IMAGE_PADDING;
-                float width = BUILD_IMAGE_WIDTH - 2 * BUILD_IMAGE_PADDING;
-                float height = BUILD_IMAGE_HEIGHT - 2 * BUILD_IMAGE_PADDING;
+                GUI.DrawTexture(buildPos, BuildFrame);
+                topPos += _buildImagePadding;
+                float width = _buildImageWidth - 2 * _buildImagePadding;
+                float height = _buildImageHeight - 2 * _buildImagePadding;
                 if (i == 0)
                 {
                     // shrink the build mask on the item currently being built to give an idea of progress
                     topPos += height * buildPercentage;
                     height *= (1 - buildPercentage);
                 }
-                GUI.DrawTexture(new Rect(2 * BUILD_IMAGE_PADDING, topPos, width, height), buildMask);
+
+                GUI.DrawTexture(new Rect(2 * _buildImagePadding, topPos, width, height), BuildMask);
             }
         }
 
@@ -428,15 +426,15 @@ namespace RTSLockstep.Player
         private void DrawStandardOptions(LSAgent agent)
         {
             GUIStyle buttons = new GUIStyle();
-            buttons.hover.background = smallButtonHover;
-            buttons.active.background = smallButtonClick;
+            buttons.hover.background = SmallButtonHover;
+            buttons.active.background = SmallButtonClick;
             GUI.skin.button = buttons;
-            int leftPos = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH + BUTTON_SPACING;
-            int topPos = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
-            int width = BUILD_IMAGE_WIDTH / 2;
-            int height = BUILD_IMAGE_HEIGHT / 2;
+            int leftPos = _buildImageWidth + _scrollBarWidth + _buttonSpacing;
+            int topPos = _buildAreaHeight - _buildImageHeight / 2;
+            int width = _buildImageWidth / 2;
+            int height = _buildImageHeight / 2;
 
-            if (cachedCommander.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
+            if (_cachedPlayer.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
             {
                 PlayClick();
                 agent.Die();
@@ -444,11 +442,11 @@ namespace RTSLockstep.Player
 
             if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
             {
-                leftPos += width + BUTTON_SPACING;
+                leftPos += width + _buttonSpacing;
                 if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Rally>().rallyPointImage))
                 {
                     PlayClick();
-                    if (activeCursorState != CursorState.RallyPoint)
+                    if (_activeCursorState != CursorState.RallyPoint)
                     {
                         agent.GetAbility<Rally>().SetFlagState(FlagState.SettingFlag);
                         SetCursorState(CursorState.RallyPoint);
@@ -466,33 +464,33 @@ namespace RTSLockstep.Player
 
         private void DrawResourcesBar()
         {
-            GUI.skin = resourceSkin;
-            GUI.BeginGroup(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT));
-            GUI.Box(new Rect(0, 0, Screen.width, RESOURCE_BAR_HEIGHT), "");
+            GUI.skin = ResourceSkin;
+            GUI.BeginGroup(new Rect(0, 0, Screen.width, _resourceBarHeight));
+            GUI.Box(new Rect(0, 0, Screen.width, _resourceBarHeight), "");
             int topPos = 4, iconLeft = 4, textLeft = 15;
             DrawResourceIcon(ResourceType.Gold, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Food, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Ore, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Stone, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Wood, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Crystal, iconLeft, textLeft, topPos);
-            iconLeft += TEXT_WIDTH;
-            textLeft += TEXT_WIDTH;
+            iconLeft += _textWidth;
+            textLeft += _textWidth;
             DrawResourceIcon(ResourceType.Provision, iconLeft, textLeft, topPos);
             int padding = 7;
-            int buttonWidth = ORDERS_BAR_WIDTH - 2 * padding - SCROLL_BAR_WIDTH;
-            int buttonHeight = RESOURCE_BAR_HEIGHT - 2 * padding;
-            int leftPos = Screen.width - ORDERS_BAR_WIDTH / 2 - buttonWidth / 2 + SCROLL_BAR_WIDTH / 2;
+            int buttonWidth = _ordersBarWidth - 2 * padding - _scrollBarWidth;
+            int buttonHeight = _resourceBarHeight - 2 * padding;
+            int leftPos = Screen.width - _ordersBarWidth / 2 - buttonWidth / 2 + _scrollBarWidth / 2;
             Rect menuButtonPosition = new Rect(leftPos, padding, buttonWidth, buttonHeight);
 
             if (GUI.Button(menuButtonPosition, "Menu"))
@@ -504,7 +502,7 @@ namespace RTSLockstep.Player
                 {
                     pauseMenu.enabled = true;
                 }
-                PlayerInputHelper userInput = cachedCommander.GetComponent<PlayerInputHelper>();
+                PlayerInputHelper userInput = _cachedPlayer.GetComponent<PlayerInputHelper>();
                 if (userInput)
                 {
                     userInput.enabled = false;
@@ -515,10 +513,10 @@ namespace RTSLockstep.Player
 
         private void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topPos)
         {
-            Texture2D icon = resourceImages[type];
-            string text = resourceValues[type].ToString() + "/" + resourceLimits[type].ToString();
-            GUI.DrawTexture(new Rect(iconLeft, topPos, ICON_WIDTH, ICON_HEIGHT), icon);
-            GUI.Label(new Rect(textLeft, topPos, TEXT_WIDTH, TEXT_HEIGHT), text);
+            Texture2D icon = _resourceImages[type];
+            string text = _resourceValues[type].ToString() + "/" + _resourceLimits[type].ToString();
+            GUI.DrawTexture(new Rect(iconLeft, topPos, _iconWidth, _iconHeight), icon);
+            GUI.Label(new Rect(textLeft, topPos, _textWidth, _textHeight), text);
         }
 
         private void DrawMouseCursor()
@@ -526,7 +524,7 @@ namespace RTSLockstep.Player
             Cursor.visible = false;
 
             // toggle back to pointer if over hud
-            if (_mouseOverHud && !_cursorLocked)
+            if (IsMouseOverHUD && !_cursorLocked)
             {
                 SelectionManager.SetSelectionLock(true);
                 SetCursorState(CursorState.Pointer);
@@ -534,11 +532,11 @@ namespace RTSLockstep.Player
 
             if (!ConstructionHandler.IsFindingBuildingLocation())
             {
-                GUI.skin = mouseCursorSkin;
+                GUI.skin = MouseCursorSkin;
                 GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
                 UpdateCursorAnimation();
                 Rect cursorPosition = GetCursorDrawPosition();
-                GUI.Label(cursorPosition, activeCursor);
+                GUI.Label(cursorPosition, _activeCursor);
                 GUI.EndGroup();
             }
         }
@@ -547,25 +545,25 @@ namespace RTSLockstep.Player
         {
             // sequence animation for cursor (based on mor ethan one iamge for the cursor)
             // change once per second, loops through array of images
-            if (activeCursorState == CursorState.Move)
+            if (_activeCursorState == CursorState.Move)
             {
-                currentFrame = (int)Time.time % moveCursors.Length;
-                activeCursor = moveCursors[currentFrame];
+                _currentFrame = (int)Time.time % MoveCursors.Length;
+                _activeCursor = MoveCursors[_currentFrame];
             }
-            else if (activeCursorState == CursorState.Attack)
+            else if (_activeCursorState == CursorState.Attack)
             {
-                currentFrame = (int)Time.time % attackCursors.Length;
-                activeCursor = attackCursors[currentFrame];
+                _currentFrame = (int)Time.time % AttackCursors.Length;
+                _activeCursor = AttackCursors[_currentFrame];
             }
-            else if (activeCursorState == CursorState.Harvest)
+            else if (_activeCursorState == CursorState.Harvest)
             {
-                currentFrame = (int)Time.time % harvestCursors.Length;
-                activeCursor = harvestCursors[currentFrame];
+                _currentFrame = (int)Time.time % HarvestCursors.Length;
+                _activeCursor = HarvestCursors[_currentFrame];
             }
-            else if (activeCursorState == CursorState.Construct)
+            else if (_activeCursorState == CursorState.Construct)
             {
-                currentFrame = (int)Time.time % constructCursors.Length;
-                activeCursor = constructCursors[currentFrame];
+                _currentFrame = (int)Time.time % ConstructCursors.Length;
+                _activeCursor = ConstructCursors[_currentFrame];
             }
         }
 
@@ -573,42 +571,46 @@ namespace RTSLockstep.Player
         {
             // set base position for custom cursor image
             float leftPos = Input.mousePosition.x;
-            float topPos = Screen.height - Input.mousePosition.y; // screen draw coordinates are inverted
-                                                                  // adjust position base on the type of cursor being shown
-            if (activeCursorState == CursorState.PanRight)
+            // screen draw coordinates are inverted
+            // adjust position base on the type of cursor being shown
+            float topPos = Screen.height - Input.mousePosition.y;
+                                                                  
+            if (_activeCursorState == CursorState.PanRight)
             {
-                leftPos = Screen.width - activeCursor.width;
+                leftPos = Screen.width - _activeCursor.width;
             }
-            else if (activeCursorState == CursorState.PanDown)
+            else if (_activeCursorState == CursorState.PanDown)
             {
-                topPos = Screen.height - activeCursor.height;
+                topPos = Screen.height - _activeCursor.height;
             }
-            else if (activeCursorState == CursorState.Move || activeCursorState == CursorState.Select || activeCursorState == CursorState.Harvest)
+            else if (_activeCursorState == CursorState.Move || _activeCursorState == CursorState.Select || _activeCursorState == CursorState.Harvest)
             {
-                topPos -= activeCursor.height / 2;
-                leftPos -= activeCursor.width / 2;
+                topPos -= _activeCursor.height / 2;
+                leftPos -= _activeCursor.width / 2;
             }
-            else if (activeCursorState == CursorState.RallyPoint)
+            else if (_activeCursorState == CursorState.RallyPoint)
             {
-                topPos -= activeCursor.height;
+                topPos -= _activeCursor.height;
             }
-            return new Rect(leftPos, topPos, activeCursor.width, activeCursor.height);
+
+            return new Rect(leftPos, topPos, _activeCursor.width, _activeCursor.height);
         }
 
         private void DrawActions(string[] actions)
         {
             GUIStyle buttons = new GUIStyle();
-            buttons.hover.background = buttonHover;
-            buttons.active.background = buttonClick;
+            buttons.hover.background = ButtonHover;
+            buttons.active.background = ButtonClick;
             GUI.skin.button = buttons;
             int numActions = actions.Length;
             //define the area to draw the actions inside
-            GUI.BeginGroup(new Rect(BUILD_IMAGE_WIDTH, statusAreaHeight, ORDERS_BAR_WIDTH, buildAreaHeight));
+            GUI.BeginGroup(new Rect(_buildImageWidth, _statusAreaHeight, _ordersBarWidth, _buildAreaHeight));
             //draw scroll bar for the list of actions if need be
-            if (numActions >= MaxNumRows(buildAreaHeight))
+            if (numActions >= MaxNumRows(_buildAreaHeight))
             {
-                DrawSlider(buildAreaHeight, numActions / 2.0f);
+                DrawSlider(_buildAreaHeight, numActions / 2.0f);
             }
+
             //display possible actions as buttons and handle the button click for each
             for (int i = 0; i < numActions; i++)
             {
@@ -651,30 +653,31 @@ namespace RTSLockstep.Player
 
         private int MaxNumRows(int areaHeight)
         {
-            return areaHeight / BUILD_IMAGE_HEIGHT;
+            return areaHeight / _buildImageHeight;
         }
 
         private Rect GetButtonPos(int row, int column)
         {
-            int left = SCROLL_BAR_WIDTH + column * BUILD_IMAGE_WIDTH;
-            float top = row * BUILD_IMAGE_HEIGHT - sliderValue * BUILD_IMAGE_HEIGHT;
-            return new Rect(left, top, BUILD_IMAGE_WIDTH, BUILD_IMAGE_HEIGHT);
+            int left = _scrollBarWidth + column * _buildImageWidth;
+            float top = row * _buildImageHeight - _sliderValue * _buildImageHeight;
+
+            return new Rect(left, top, _buildImageWidth, _buildImageHeight);
         }
 
         private void DrawSlider(int groupHeight, float numRows)
         {
             // slider goes from 0 to the number of rows that do not fit on screen
-            sliderValue = GUI.VerticalSlider(GetScrollPos(groupHeight), sliderValue, 0.0f, numRows - MaxNumRows(groupHeight));
+            _sliderValue = GUI.VerticalSlider(GetScrollPos(groupHeight), _sliderValue, 0.0f, numRows - MaxNumRows(groupHeight));
         }
 
         private Rect GetScrollPos(int groupHeight)
         {
-            return new Rect(BUTTON_SPACING, BUTTON_SPACING, SCROLL_BAR_WIDTH, groupHeight - 2 * BUTTON_SPACING);
+            return new Rect(_buttonSpacing, _buttonSpacing, _scrollBarWidth, groupHeight - 2 * _buttonSpacing);
         }
 
         private void DrawPlayerDetails()
         {
-            GUI.skin = playerDetailsSkin;
+            GUI.skin = PlayerDetailsSkin;
             GUI.BeginGroup(new Rect(0, 0, Screen.width, Screen.height));
             float height = GameResourceManager.TextHeight;
             float leftPos = GameResourceManager.Padding;
@@ -686,16 +689,19 @@ namespace RTSLockstep.Player
                 GUI.DrawTexture(new Rect(leftPos, topPos, height, height), avatar);
                 leftPos += height + GameResourceManager.Padding;
             }
-            float minWidth = 0, maxWidth = 0;
+
             string playerName = PlayerManager.GetPlayerName();
-            playerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(playerName), out minWidth, out maxWidth);
+            PlayerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(playerName), out _, out float maxWidth);
             GUI.Label(new Rect(leftPos, topPos, maxWidth, height), playerName);
             GUI.EndGroup();
         }
 
         private void PlayClick()
         {
-            if (audioElement != null) audioElement.Play(clickSound);
+            if (_audioElement != null)
+            {
+                _audioElement.Play(ClickSound);
+            }
         }
         #endregion
     }

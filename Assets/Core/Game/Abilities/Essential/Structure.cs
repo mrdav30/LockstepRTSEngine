@@ -74,7 +74,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().CachedResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             if (provisioner)
             {
-                Agent.GetControllingPlayer().CachedResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().PlayerResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
             }
 
             GridBuilder.Unbuild(this);
