@@ -7,24 +7,21 @@ namespace RTSLockstep
     [CustomEditor(typeof(EnvironmentHelper))]
     public class EditorEnvironmentHelper : Editor
     {
-
         public override void OnInspectorGUI()
         {
-            SerializedProperty saverObjectProperty = serializedObject.FindProperty("_saverObject");
-            EditorGUILayout.PropertyField(saverObjectProperty);
+            EnvironmentHelper saver = (EnvironmentHelper)target;
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("BasePriority"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("_saverObject"));
 
             serializedObject.ApplyModifiedProperties();
 
-            EnvironmentHelper saver = this.target as EnvironmentHelper;
             EditorGUI.BeginChangeCheck();
             if (GUILayout.Button("Scan and Save"))
             {
-
                 saver.ScanAndSave();
-
             }
 
         }
-
     }
 }

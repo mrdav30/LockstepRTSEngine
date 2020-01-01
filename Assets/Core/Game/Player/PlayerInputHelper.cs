@@ -1,4 +1,8 @@
-﻿using RotaryHeart.Lib.SerializableDictionary;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using RotaryHeart.Lib.SerializableDictionary;
+
 using RTSLockstep.Abilities;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.BehaviourHelpers;
@@ -9,9 +13,6 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.UI;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Menu.UI;
 using RTSLockstep.Utility;
@@ -32,7 +33,7 @@ namespace RTSLockstep.Player
         [SerializeField]
         private GUIStyle _boxStyle;
         [SerializeField]
-        private PlayerInputKeys userInputKeys;
+        private PlayerInputKeys _userInputKeys;
 #pragma warning restore 0649
         public static RTSGUIManager GUIManager;
         /// <summary>
@@ -240,7 +241,7 @@ namespace RTSLockstep.Player
                     }
 
                     // other defined keys
-                    foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in userInputKeys)
+                    foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in _userInputKeys)
                     {
                         if (Input.GetKeyDown(inputKey.Value))
                         {

@@ -26,7 +26,7 @@ namespace RTSLockstep.Integration
 
         private Vector3 nodeScale;
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             if (Application.isPlaying && Show)
             {
@@ -48,7 +48,7 @@ namespace RTSLockstep.Integration
             }
         }
 
-        void DrawBuilding()
+        private void DrawBuilding()
         {
             int length = BuildGridAPI.MainBuildGrid.GridLength;
             for (int i = 0; i < length; i++)
@@ -69,7 +69,7 @@ namespace RTSLockstep.Integration
             }
         }
 
-        void DrawPathfinding()
+        private void DrawPathfinding()
         {
             for (int i = 0; i < GridManager.GridSize; i++)
             {

@@ -1,6 +1,6 @@
 ﻿#if true
 using UnityEngine;
-using System.Collections; using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Utility.FastCollections;
 using UnityEditor;
 using System;
 using System.Reflection;
@@ -25,11 +25,11 @@ namespace RTSLockstep.Data
                 FieldInfo[] fields = databaseType.GetFields((BindingFlags)~0);
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    FieldInfo field = fields [i];
+                    FieldInfo field = fields[i];
                     object[] attributes = field.GetCustomAttributes(typeof(RegisterDataAttribute), false);
                     for (int j = 0; j < attributes.Length; j++)
                     {
-                        RegisterDataAttribute registerDataAttribute = attributes [j] as RegisterDataAttribute;
+                        RegisterDataAttribute registerDataAttribute = attributes[j] as RegisterDataAttribute;
                         if (registerDataAttribute != null)
                         {
                             if (!field.FieldType.IsArray)
@@ -93,13 +93,13 @@ namespace RTSLockstep.Data
             this.MainWindow = window;
             Database = database;
             InitializeData();
-			bool isValid = true;
+            bool isValid = true;
             for (int i = 0; i < DataItemInfos.Count; i++)
             {
-                DataItemInfo info = DataItemInfos [i];
-				bool bufferValid;
-				CreateDataHelper(info, out bufferValid);
-				if (!bufferValid)
+                DataItemInfo info = DataItemInfos[i];
+                bool bufferValid;
+                CreateDataHelper(info, out bufferValid);
+                if (!bufferValid)
                 {
                     Debug.LogError("Database does not match database type described by the database editor. Make sure Lockstep_Database.asset is the correct database type.");
                     isValid = false;
@@ -129,7 +129,7 @@ namespace RTSLockstep.Data
 
         private readonly FastList<DataItemInfo> DataItemInfos = new FastList<DataItemInfo>();
         public readonly FastList<string> HelperOrder = new FastList<string>();
-        public readonly Dictionary<string,DataHelper> DataHelpers = new Dictionary<string,DataHelper>();
+        public readonly Dictionary<string, DataHelper> DataHelpers = new Dictionary<string, DataHelper>();
         static bool isSearching;
         static string lastSearchString;
         static string searchString = "";
@@ -146,24 +146,24 @@ namespace RTSLockstep.Data
             EditorGUILayout.BeginHorizontal();
             if (DataHelpers.Count == 0)
             {
-				EditorGUILayout.LabelField ("Nothin' here to see");
+                EditorGUILayout.LabelField("Nothin' here to see");
                 return;
             }
             for (int i = 0; i < DataHelpers.Count; i++)
             {
-                if (GUILayout.Button(DataHelpers [HelperOrder [i]].DisplayName))
+                if (GUILayout.Button(DataHelpers[HelperOrder[i]].DisplayName))
                 {
                     selectedHelperIndex = i;
                 }
             }
             EditorGUILayout.EndHorizontal();
-            DrawDatabase(DataHelpers [HelperOrder [selectedHelperIndex]]);
+            DrawDatabase(DataHelpers[HelperOrder[selectedHelperIndex]]);
             EditorGUILayout.EndVertical();
         }
 
         private static void DrawDatabase(DataHelper dataHelper)
         {
-			if (dataHelper == null || dataHelper.DataProperty == null) return;
+            if (dataHelper == null || dataHelper.DataProperty == null) return;
             dataHelper.serializedObject.Update();
             EditorGUI.BeginChangeCheck();
             LSEditorUtility.ListField(dataHelper.DataProperty, dataHelper.ListFlags);
@@ -179,27 +179,33 @@ namespace RTSLockstep.Data
             foldAllBuffer = false;
             if (GUILayout.Button("Fold All", GUILayout.MaxWidth(80)))
             {
-                FoldAll();        
+                FoldAll();
             }
 
-			//TODO: Prevent search from modifying data... only modifying display of data
+            //TODO: Prevent search from modifying data... only modifying display of data
             //Search
-			if (dataHelper.DataAttribute.UseFilter) {
-				EditorGUILayout.LabelField ("Filter: ", GUILayout.MaxWidth (35));
-				searchString = EditorGUILayout.TextField (searchString, GUILayout.ExpandWidth (true));
-				if (GUILayout.Button ("X", GUILayout.MaxWidth (20))) {
-					searchString = "";
-				}
-				if (lastSearchString != searchString) {
-					if (string.IsNullOrEmpty (searchString) == false) {
-						dataHelper.FilterWithString (searchString);
-					}
-					lastSearchString = searchString;
-				}
-			} else {
-				EditorGUILayout.LabelField ("Filter Disabled", GUILayout.MaxWidth (150));
+            if (dataHelper.DataAttribute.UseFilter)
+            {
+                EditorGUILayout.LabelField("Filter: ", GUILayout.MaxWidth(35));
+                searchString = EditorGUILayout.TextField(searchString, GUILayout.ExpandWidth(true));
+                if (GUILayout.Button("X", GUILayout.MaxWidth(20)))
+                {
+                    searchString = "";
+                }
+                if (lastSearchString != searchString)
+                {
+                    if (string.IsNullOrEmpty(searchString) == false)
+                    {
+                        dataHelper.FilterWithString(searchString);
+                    }
+                    lastSearchString = searchString;
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Filter Disabled", GUILayout.MaxWidth(150));
 
-			}
+            }
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -211,7 +217,7 @@ namespace RTSLockstep.Data
             SortInfo[] sorts = dataHelper.Sorts;
             for (int i = 0; i < sorts.Length; i++)
             {
-                SortInfo sort = sorts [i];
+                SortInfo sort = sorts[i];
                 if (GUILayout.Button(sort.sortName))
                 {
                     dataHelper.Sort((a1, a2) => sort.degreeGetter(a1) - sort.degreeGetter(a2));
@@ -219,10 +225,10 @@ namespace RTSLockstep.Data
             }
 
             EditorGUILayout.EndHorizontal();
-            
+
             dataHelper.Manage();
             dataHelper.serializedObject.Update();
-            
+
             EditorGUILayout.Space();
 
             /*if (GUILayout.Button ("Apply")) {

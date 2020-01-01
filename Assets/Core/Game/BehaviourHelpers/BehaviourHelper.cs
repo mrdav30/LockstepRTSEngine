@@ -4,10 +4,13 @@ using UnityEngine;
 namespace RTSLockstep.BehaviourHelpers
 {
     /// <summary>
-    /// Global singleton abilities. Attach to the Manager gameobject or child.
+    /// Global singleton abilities. Attach to the GameManager gameobject.
     /// </summary>
     public abstract class BehaviourHelper : MonoBehaviour, ILockstepEventsHandler
     {
+        [Range(1, 9999), Tooltip("Determines the order in which this helper will call it's event behavior")]
+        public int BasePriority;
+
         private ushort CachedListenInput;
 
         public virtual ushort ListenInput

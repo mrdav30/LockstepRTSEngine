@@ -1,4 +1,5 @@
 ﻿using RTSLockstep.BehaviourHelpers;
+using RTSLockstep.Utility;
 using UnityEngine;
 
 namespace RTSLockstep.Environment
@@ -20,11 +21,11 @@ namespace RTSLockstep.Environment
 #if UNITY_EDITOR
         [SerializeField]
         private GameObject _saverObject;
-        GameObject SaverObject { get { return _saverObject; } }
+        private GameObject SaverObject { get { return _saverObject; } }
 
         public void ScanAndSave()
         {
-            if (SaverObject == null)
+            if (SaverObject.IsNull())
             {
                 Debug.Log("Please assign 'Saver Object'");
                 return;
@@ -50,11 +51,12 @@ namespace RTSLockstep.Environment
         {
             if (SaverObject != null)
             {
-                _savers = SaverObject.GetComponents<EnvironmentSaver>(); //Gets savers from SaverObject
+                //Gets savers from SaverObject
+                _savers = SaverObject.GetComponents<EnvironmentSaver>();
             }
         }
 
-        void Reset()
+        private void Reset()
         {
             _saverObject = gameObject;
         }
@@ -64,10 +66,11 @@ namespace RTSLockstep.Environment
         {
             foreach (EnvironmentSaver saver in Savers)
             {
-                if (saver == null)
+                if (saver.IsNull())
                 {
                     Debug.LogError("One of the EnvironmentSavers does not exist. Re-scan with the EnvironmentHelper component.");
                 }
+
                 saver.EarlyApply();
             }
         }
