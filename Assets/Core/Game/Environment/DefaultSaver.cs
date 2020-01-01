@@ -1,6 +1,6 @@
 ﻿using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Data;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Simulation.LSMath;

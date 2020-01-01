@@ -7,7 +7,7 @@ using RTSLockstep.LSResources;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
 
-namespace RTSLockstep.Agents.AgentControllerSystem
+namespace RTSLockstep.Agents.AgentController
 {
     public static class GlobalAgentController
     {

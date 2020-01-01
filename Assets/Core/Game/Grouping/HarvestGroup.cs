@@ -1,7 +1,7 @@
 ﻿using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Data;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;

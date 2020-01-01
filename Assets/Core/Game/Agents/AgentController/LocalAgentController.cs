@@ -14,7 +14,7 @@ using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
 
-namespace RTSLockstep.Agents.AgentControllerSystem
+namespace RTSLockstep.Agents.AgentController
 {
     public class LocalAgentController
     {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Determinism;
 using RTSLockstep.Grouping;
 using RTSLockstep.Managers;

@@ -40,7 +40,7 @@ namespace RTSLockstep.BuildSystem
             GridBuilder.Initialize();
 
             OrganizerStructures = LSUtility.CreateEmpty().transform;
-            OrganizerStructures.transform.parent = PlayerManager.MainController.ControllingPlayer.GetComponentInChildren<LSAgents>().transform;
+            OrganizerStructures.transform.parent = PlayerManager.MainController.ControllingPlayer.AgentContainer;
             OrganizerStructures.gameObject.name = "OrganizerStructures";
 
             WallPositioningHelper.Initialize();

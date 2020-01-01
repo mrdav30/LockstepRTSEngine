@@ -1,6 +1,6 @@
 ﻿using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Player;
 using RTSLockstep.Player.Commands;
@@ -95,6 +95,7 @@ namespace RTSLockstep.Managers.GameManagers
                 {
                     battlePos += info.Position;
                 }
+
                 battlePos /= Spawns.Length;
                 Command com = new Command(Data.AbilityDataItem.FindInterfacer<Attack>().ListenInputID);
                 com.Add(battlePos);

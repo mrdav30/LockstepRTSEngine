@@ -1,4 +1,4 @@
-﻿using RTSLockstep.Agents.AgentControllerSystem;
+﻿using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Managers;
 using UnityEngine;

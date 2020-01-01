@@ -1,6 +1,6 @@
 ﻿using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities.Essential;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Simulation.Pathfinding;
 using RTSLockstep.Player.Commands;

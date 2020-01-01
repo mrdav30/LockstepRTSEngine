@@ -1,5 +1,5 @@
 ﻿using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 
 namespace RTSLockstep.Abilities.Essential
 {

@@ -7,7 +7,7 @@ using RotaryHeart.Lib.SerializableDictionary;
 using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities;
 using RTSLockstep.Abilities.Essential;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Agents.Teams;
 using RTSLockstep.Buffs;
 using RTSLockstep.Data;
@@ -280,7 +280,7 @@ namespace RTSLockstep.Agents
             CheckCasting = true;
 
             // place game object under it's agent commander
-            CachedGameObject.transform.parent = Controller.ControllingPlayer.GetComponentInChildren<LSAgents>().transform;
+            CachedGameObject.transform.parent = Controller.ControllingPlayer.AgentContainer;
 
             CachedGameObject.SetActive(true);
 

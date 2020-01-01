@@ -4,7 +4,7 @@ using System;
 using RTSLockstep.Data;
 using System.Collections.Generic;
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.LSResources;
 using RTSLockstep.Simulation.LSMath;

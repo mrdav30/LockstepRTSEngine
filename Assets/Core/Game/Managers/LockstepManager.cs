@@ -27,7 +27,7 @@ using UnityEngine;
 using RTSLockstep.Data;
 using System;
 using RTSLockstep.Simulation.Grid;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Effects;
 using RTSLockstep.Managers.Input;

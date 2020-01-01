@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using RTSLockstep.Utility.FastCollections;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Utility;
 

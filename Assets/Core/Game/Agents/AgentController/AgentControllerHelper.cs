@@ -5,7 +5,7 @@ using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Player;
 using RTSLockstep.Integration;
 
-namespace RTSLockstep.Agents.AgentControllerSystem
+namespace RTSLockstep.Agents.AgentController
 {
     /// <summary>
     /// At the moment a simple script that automatically creates AgentControllers at the start of games

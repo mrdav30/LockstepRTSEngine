@@ -1,4 +1,4 @@
-﻿namespace RTSLockstep.Agents.AgentControllerSystem
+﻿namespace RTSLockstep.Agents.AgentController
 {
     public struct AgentDeactivationData
     {

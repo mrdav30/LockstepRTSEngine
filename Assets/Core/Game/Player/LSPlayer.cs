@@ -2,7 +2,7 @@
 using UnityEngine;
 
 using RTSLockstep.Agents;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Managers.GameState;
@@ -18,6 +18,8 @@ namespace RTSLockstep.Player
         public HUD PlayerHUD;
         public ResourceManager PlayerResourceManager;
         public Color TeamColor;
+
+        public Transform AgentContainer; 
 
         private LocalAgentController _cachedController;
         private bool IsSetup = false;
@@ -38,6 +40,8 @@ namespace RTSLockstep.Player
                 TeamColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                 GameResourceManager.AssignedTeamColors.Add(TeamColor);
             }
+
+            AgentContainer = GetComponentInChildren<LSAgents>().transform;
 
             IsSetup = true;
         }

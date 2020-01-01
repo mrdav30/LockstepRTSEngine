@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.IO;
 
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Utility;

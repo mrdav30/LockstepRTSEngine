@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 using RTSLockstep.Simulation.Pathfinding;
 using RTSLockstep.Simulation.Grid;
-using RTSLockstep.Agents.AgentControllerSystem;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Agents;
 using RTSLockstep.Grouping;
 using RTSLockstep.Determinism;
