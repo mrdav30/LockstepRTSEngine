@@ -8,7 +8,7 @@ namespace RTSLockstep.BehaviourHelpers
     [RequireComponent(typeof(MovementGroupHelper))]
     [RequireComponent(typeof(AttackGroupHelper))]
     [RequireComponent(typeof(HarvestGroupHelper))]
-    [RequireComponent(typeof(ConstructionGroupHelper))]
+    [RequireComponent(typeof(ConstructGroupHelper))]
     [RequireComponent(typeof(EnvironmentHelper))]
     public class DefaultHelperSetup : MonoBehaviour
     {

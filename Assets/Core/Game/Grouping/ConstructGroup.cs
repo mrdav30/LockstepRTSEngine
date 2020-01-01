@@ -222,7 +222,7 @@ namespace RTSLockstep.Grouping
             GroupConstructionQueue.Clear();
             _currentGroupTarget = null;
             _constructMoveGroup = null;
-            ConstructionGroupHelper.Pool(this);
+            ConstructGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;
         }

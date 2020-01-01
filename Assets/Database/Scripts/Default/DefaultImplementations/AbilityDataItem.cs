@@ -26,8 +26,7 @@ namespace RTSLockstep.Data
 
         public static void Setup()
         {
-            IAbilityDataProvider database;
-            if (LSDatabaseManager.TryGetDatabase(out database))
+            if (LSDatabaseManager.TryGetDatabase(out IAbilityDataProvider database))
             {
                 AbilityDataItem[] interfacers = database.AbilityData;
                 for (int i = 0; i < interfacers.Length; i++)
@@ -50,18 +49,16 @@ namespace RTSLockstep.Data
 
         public static AbilityDataItem FindInterfacer(string code)
         {
-            AbilityDataItem output;
-            if (!CodeInterfacerMap.TryGetValue(code, out output))
+            if (!CodeInterfacerMap.TryGetValue(code, out AbilityDataItem output))
             {
-                throw new System.Exception(string.Format("AbilityInterfacer for code '{0}' not found.", code));
+                throw new Exception(string.Format("AbilityInterfacer for code '{0}' not found.", code));
             }
             return output;
         }
 
         public static AbilityDataItem FindInterfacer(Type type)
         {
-            AbilityDataItem interfacer;
-            if (TypeInterfacerMap.TryGetValue(type, out interfacer))
+            if (TypeInterfacerMap.TryGetValue(type, out AbilityDataItem interfacer))
             {
                 return interfacer;
             }

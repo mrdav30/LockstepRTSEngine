@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace RTSLockstep.Grouping
 {
-    public class ConstructionGroupHelper : BehaviourHelper
+    public class ConstructGroupHelper : BehaviourHelper
     {
         public override ushort ListenInput
         {
@@ -21,7 +21,7 @@ namespace RTSLockstep.Grouping
         private static readonly FastBucket<ConstructGroup> activeGroups = new FastBucket<ConstructGroup>();
         private static readonly FastStack<ConstructGroup> pooledGroups = new FastStack<ConstructGroup>();
 
-        public static ConstructionGroupHelper Instance { get; private set; }
+        public static ConstructGroupHelper Instance { get; private set; }
 
         protected override void OnInitialize()
         {

@@ -7,7 +7,7 @@ using RTSLockstep.Utility;
 
 namespace RTSLockstep
 {
-    [UnityEditor.CanEditMultipleObjects]
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(CerealBehaviour), true)]
     public sealed class EditorCerealBehaviour : Editor
     {

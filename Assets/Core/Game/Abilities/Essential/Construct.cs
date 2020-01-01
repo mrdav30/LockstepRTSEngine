@@ -271,9 +271,9 @@ namespace RTSLockstep.Abilities.Essential
 
         private void RegisterConstructGroup()
         {
-            if (ConstructionGroupHelper.CheckValidAndAlert())
+            if (ConstructGroupHelper.CheckValidAndAlert())
             {
-                ConstructionGroupHelper.LastCreatedGroup.Add(this);
+                ConstructGroupHelper.LastCreatedGroup.Add(this);
             }
         }
 
