@@ -24,8 +24,10 @@
  */
 
 using UnityEngine;
-using RTSLockstep.Data;
+
 using System;
+
+using RTSLockstep.Data;
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
@@ -33,8 +35,8 @@ using RTSLockstep.Effects;
 using RTSLockstep.Managers.Input;
 using RTSLockstep.Networking;
 using RTSLockstep.Managers.GameManagers;
-using RTSLockstep.Player.Commands;
 using RTSLockstep.Player;
+using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Projectiles;
 using RTSLockstep.Simulation.LSPhysics;
@@ -46,6 +48,7 @@ namespace RTSLockstep.Managers
     //TODO: Set up default functions to implement LSManager
     public static class LockstepManager
     {
+        #region Properties
         public const int FrameRate = 32;
         public const int InfluenceResolution = 2;
         public const long DeltaTime = FixedMath.One / FrameRate;
@@ -77,47 +80,6 @@ namespace RTSLockstep.Managers
 
         public static NetworkHelper MainNetworkHelper;
 
-        public static void Pause()
-        {
-            PauseCount++;
-        }
-
-        public static void Unpause()
-        {
-            PauseCount--;
-        }
-
-        public static void Reset()
-        {
-            Deactivate();
-        }
-
-        internal static void Setup()
-        {
-            DefaultMessageRaiser.EarlySetup();
-
-            LSDatabaseManager.Setup();
-            Command.Setup();
-
-            GridManager.Setup();
-            InputCodeManager.Setup();
-            AbilityDataItem.Setup();
-
-            GameResourceManager.Setup();
-
-            ProjectileManager.Setup();
-            EffectManager.Setup();
-
-            PhysicsManager.Setup();
-            ClientManager.Setup();
-
-            Time.fixedDeltaTime = DeltaTimeF;
-            Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
-
-            DefaultMessageRaiser.LateSetup();
-            OnSetup?.Invoke();
-        }
-
         private static long _playRate = FixedMath.One;
         public static long PlayRate
         {
@@ -143,6 +105,36 @@ namespace RTSLockstep.Managers
             {
                 PlayRate = FixedMath.Create(value);
             }
+        }
+
+        private static bool Stalled;
+        #endregion
+
+        #region Event Behavior
+        internal static void Setup()
+        {
+            DefaultMessageRaiser.EarlySetup();
+
+            LSDatabaseManager.Setup();
+            Command.Setup();
+
+            GridManager.Setup();
+            InputCodeManager.Setup();
+            AbilityDataItem.Setup();
+
+            GameResourceManager.Setup();
+
+            ProjectileManager.Setup();
+            EffectManager.Setup();
+
+            PhysicsManager.Setup();
+            ClientManager.Setup();
+
+            Time.fixedDeltaTime = DeltaTimeF;
+            Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
+
+            DefaultMessageRaiser.LateSetup();
+            OnSetup?.Invoke();
         }
 
         internal static void Initialize(ILockstepEventsHandler[] helpers, NetworkHelper networkHelper)
@@ -192,8 +184,6 @@ namespace RTSLockstep.Managers
             OnInitialize?.Invoke();
         }
 
-        static bool Stalled;
-
         internal static void Simulate()
         {
             MainNetworkHelper.Simulate();
@@ -202,7 +192,7 @@ namespace RTSLockstep.Managers
             {
                 InfluenceSimulate();
                 InfluenceCount = InfluenceResolution - 1;
-                if (FrameManager.CanAdvanceFrame == false)
+                if (!FrameManager.CanAdvanceFrame)
                 {
                     Stalled = true;
                     return;
@@ -216,6 +206,7 @@ namespace RTSLockstep.Managers
             {
                 InfluenceCount--;
             }
+
             if (Stalled || IsPaused)
             {
                 return;
@@ -235,28 +226,6 @@ namespace RTSLockstep.Managers
             FrameCount++;
         }
 
-        //Called on the first frame of the game
-        private static void GameStart()
-        {
-            BehaviourHelperManager.GameStart();
-            GameStarted = true;
-        }
-
-        private static void LateSimulate()
-        {
-            BehaviourHelperManager.LateSimulate();
-            GlobalAgentController.LateSimulate();
-            PhysicsManager.LateSimulate();
-            DefaultMessageRaiser.LateSimulate();
-        }
-
-        internal static void InfluenceSimulate()
-        {
-            PlayerManager.Simulate();
-            CommandManager.Simulate();
-            ClientManager.Simulate();
-        }
-
         internal static void Execute(Command com)
         {
             if (!GameStarted)
@@ -264,6 +233,8 @@ namespace RTSLockstep.Managers
                 Debug.LogError("BOOM");
                 return;
             }
+
+            // Check if command is for a player command or a behavior helper
             if (com.ControllerID != byte.MaxValue)
             {
                 LocalAgentController cont = GlobalAgentController.InstanceManagers[com.ControllerID];
@@ -275,7 +246,6 @@ namespace RTSLockstep.Managers
             }
 
             DefaultMessageRaiser.Execute(com);
-
         }
 
         internal static void Visualize()
@@ -332,6 +302,44 @@ namespace RTSLockstep.Managers
             CoroutineManager.Deactivate();
 
             DefaultMessageRaiser.Reset();
+        }
+        #endregion
+
+        public static void Pause()
+        {
+            PauseCount++;
+        }
+
+        public static void Unpause()
+        {
+            PauseCount--;
+        }
+
+        public static void Reset()
+        {
+            Deactivate();
+        }
+
+        //Called on the first frame of the game
+        private static void GameStart()
+        {
+            BehaviourHelperManager.GameStart();
+            GameStarted = true;
+        }
+
+        private static void LateSimulate()
+        {
+            BehaviourHelperManager.LateSimulate();
+            GlobalAgentController.LateSimulate();
+            PhysicsManager.LateSimulate();
+            DefaultMessageRaiser.LateSimulate();
+        }
+
+        internal static void InfluenceSimulate()
+        {
+            PlayerManager.Simulate();
+            CommandManager.Simulate();
+            ClientManager.Simulate();
         }
 
         public static void Quit()

@@ -22,6 +22,11 @@ namespace RTSLockstep.Player
         public static readonly FastBucket<LocalAgentController> AgentControllers = new FastBucket<LocalAgentController>();
 
         public static LocalAgentController MainController { get; private set; }
+
+        public static int AgentControllerCount
+        {
+            get { return AgentControllers.Count; }
+        }
         #endregion
 
         #region Public
@@ -38,11 +43,6 @@ namespace RTSLockstep.Player
 
         public static void Visualize()
         {
-        }
-
-        public static int AgentControllerCount
-        {
-            get { return AgentControllers.Count; }
         }
 
         public static LocalAgentController GetAgentController(int index)
