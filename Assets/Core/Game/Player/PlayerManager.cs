@@ -227,7 +227,7 @@ namespace RTSLockstep.Player
                 playerClone.IsHuman = true;
             }
 
-            if (CurrentPlayerController.IsNull())
+            if (playerClone.IsHuman && CurrentPlayerController.IsNull())
             {
                 CurrentPlayerController = controller;
             }
