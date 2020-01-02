@@ -36,11 +36,11 @@ namespace RTSLockstep.BuildSystem
 
         public static void Initialize()
         {
-            _cachedPlayer = PlayerManager.MainController.ControllingPlayer;
+            _cachedPlayer = PlayerManager.CurrentPlayerController.ControllingPlayer;
             GridBuilder.Initialize();
 
             OrganizerStructures = LSUtility.CreateEmpty().transform;
-            OrganizerStructures.transform.parent = PlayerManager.MainController.ControllingPlayer.AgentContainer;
+            OrganizerStructures.transform.parent = PlayerManager.CurrentPlayerController.ControllingPlayer.AgentContainer;
             OrganizerStructures.gameObject.name = "OrganizerStructures";
 
             WallPositioningHelper.Initialize();

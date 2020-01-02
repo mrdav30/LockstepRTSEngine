@@ -9,6 +9,7 @@ namespace RTSLockstep.Agents.AgentController
 {
     /// <summary>
     /// At the moment a simple script that automatically creates AgentControllers at the start of games
+    /// Plan to develop into player selection helper
     /// </summary>
     public class AgentControllerHelper : BehaviourHelper
     {
@@ -36,12 +37,8 @@ namespace RTSLockstep.Agents.AgentController
             {
                 AgentControllerDataItem item = controllerItems[i];
                 LocalAgentController controller = GlobalAgentController.Create(item.DefaultAllegiance, item.Name);
-                if (item.PlayerManaged)
-                {
-                    PlayerManager.AddController(controller);
-                }
 
-                PlayerManager.CreatePlayer(controller);
+                PlayerManager.CreatePlayer(controller, item.PlayerManaged);
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
         }

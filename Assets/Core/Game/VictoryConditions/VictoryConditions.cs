@@ -87,7 +87,7 @@ namespace RTSLockstep.VictoryConditions
         private void LoadDetails()
         {
             LSPlayer[] players = FindObjectsOfType(typeof(LSPlayer)) as LSPlayer[];
-            hud = PlayerManager.MainController.ControllingPlayer.GetComponentInChildren<HUD>();
+            hud = PlayerManager.CurrentPlayerController.ControllingPlayer.GetComponentInChildren<HUD>();
 
             SetCommanders(players);
         }

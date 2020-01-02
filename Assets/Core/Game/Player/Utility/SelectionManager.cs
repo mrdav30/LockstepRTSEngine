@@ -105,9 +105,9 @@ namespace RTSLockstep.Player.Utility
                     if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
                     {
                         bufferSelectedAgents.Clear();
-                        for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                        for (int i = 0; i < GlobalAgentController.LocalAgentControllersCount; i++)
                         {
-                            var agentController = PlayerManager.GetAgentController(i);
+                            var agentController = GlobalAgentController.GetAgentController(i);
                             for (int j = 0; j < LocalAgentController.MaxAgents; j++)
                             {
                                 if (agentController.LocalAgentActive[j])
@@ -120,7 +120,7 @@ namespace RTSLockstep.Player.Utility
                                         {
                                             bufferSelectedAgents.Add(curAgent);
                                         }
-                                        else if (curAgent.IsOwnedBy(PlayerManager.MainController))
+                                        else if (curAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
                                         {
                                             agentPos = curAgent.Position2;
                                             Edge = Box_TopRight - Box_TopLeft;
@@ -207,9 +207,9 @@ namespace RTSLockstep.Player.Utility
             if (MousedAgent)
             {
                 bufferSelectedAgents.Clear();
-                for (int i = 0; i < PlayerManager.AgentControllerCount; i++)
+                for (int i = 0; i < GlobalAgentController.LocalAgentControllersCount; i++)
                 {
-                    var agentController = PlayerManager.GetAgentController(i);
+                    var agentController = GlobalAgentController.GetAgentController(i);
                     for (int j = 0; j < LocalAgentController.MaxAgents; j++)
                     {
                         if (agentController.LocalAgentActive[j])
@@ -219,7 +219,7 @@ namespace RTSLockstep.Player.Utility
                             {
                                 if (curAgent.IsVisible
                                     && curAgent.objectName == MousedAgent.objectName
-                                    && curAgent.IsOwnedBy(PlayerManager.MainController))
+                                    && curAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
                                 {
                                     bufferSelectedAgents.Add(curAgent);
                                 }

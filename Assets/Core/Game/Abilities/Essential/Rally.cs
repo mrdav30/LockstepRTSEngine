@@ -30,7 +30,7 @@ namespace RTSLockstep.Abilities.Essential
 
         public void HandleSelectedChange()
         {
-            if (Agent.GetControllingPlayer() == PlayerManager.MainController.ControllingPlayer)
+            if (Agent.GetControllingPlayer() == PlayerManager.CurrentPlayerController.ControllingPlayer)
             {
                 RallyPoint flag = Agent.GetControllingPlayer().GetComponentInChildren<RallyPoint>();
                 if (Agent.IsSelected)

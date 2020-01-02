@@ -65,7 +65,7 @@ namespace RTSLockstep.Abilities.Extra
             {
                 if (!Agent.IsSelected && Agent.IsHighlighted)
                 {
-                    if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.MainController))
+                    if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
                     {
                         if (Selector.MainSelectedAgent.Controller.RefEquals(Agent.Controller))
                         {
@@ -74,41 +74,41 @@ namespace RTSLockstep.Abilities.Extra
                             {
                                 if (Agent.MyAgentType == AgentType.Structure && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().NeedsConstruction)
                                 {
-                                    PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Construct);
+                                    PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Construct);
                                 }
                             }
                             else
                             {
-                                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
                             }
                         }
-                        else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.MainController.SelectedAgents.Count > 0
+                        else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.CurrentPlayerController.SelectedAgents.Count > 0
                             && Agent.MyAgentType != AgentType.Resource)
                         {
                             if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Structure) && Selector.MainSelectedAgent.IsActive
                                 && Selector.MainSelectedAgent.GetAbility<Attack>())
                             {
-                                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Attack);
+                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Attack);
                             }
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Harvest>())
                         {
                             if (Agent.MyAgentType == AgentType.Resource && !Agent.GetAbility<ResourceDeposit>().IsEmpty())
                             {
-                                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Harvest);
+                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Harvest);
                             }
                             else if (Agent.MyAgentType == AgentType.Structure 
                                 && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().CanStoreResources(Selector.MainSelectedAgent.GetAbility<Harvest>().HarvestType)
                                 && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
                             {
-                                PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Deposit);
+                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Deposit);
                             }
                         }
                     }
                     else
                     {
                         //agent doesn't belong to player
-                        PlayerManager.MainController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                        PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
                     }
                 }
             }

@@ -1,7 +1,9 @@
 ﻿using System;
-using RTSLockstep.Utility.FastCollections;
+
 using RTSLockstep.Agents;
+using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Utility;
+using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Player.Utility
 {
@@ -45,7 +47,7 @@ namespace RTSLockstep.Player.Utility
                 if (agent.MyAgentType == MainSelectedAgent.MyAgentType
                     && agent.IsOwnedBy(MainSelectedAgent.Controller))
                 {
-                    PlayerManager.MainController.AddToSelection(agent);
+                    PlayerManager.CurrentPlayerController.AddToSelection(agent);
                     agent.IsSelected = true;
                     OnAdd(agent);
                 }
@@ -54,7 +56,7 @@ namespace RTSLockstep.Player.Utility
 
         public static void Remove(LSAgent agent)
         {
-            PlayerManager.MainController.RemoveFromSelection(agent);
+            PlayerManager.CurrentPlayerController.RemoveFromSelection(agent);
             agent.IsSelected = false;
             if (agent == MainSelectedAgent)
             {
@@ -65,11 +67,11 @@ namespace RTSLockstep.Player.Utility
 
         public static void Clear()
         {
-            for (int i = 0; i < PlayerManager.AgentControllers.PeakCount; i++)
+            for (int i = 0; i < GlobalAgentController.LocalAgentControllers.PeakCount; i++)
             {
-                if (PlayerManager.AgentControllers.arrayAllocation[i])
+                if (GlobalAgentController.LocalAgentControllers.arrayAllocation[i])
                 {
-                    FastBucket<LSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
+                    FastBucket<LSAgent> selectedAgents = GlobalAgentController.LocalAgentControllers[i].SelectedAgents;
                     for (int j = 0; j < selectedAgents.PeakCount; j++)
                     {
                         if (selectedAgents.arrayAllocation[j])

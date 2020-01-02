@@ -1,4 +1,6 @@
-﻿using RTSLockstep.Abilities.Essential;
+﻿using UnityEngine;
+
+using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
@@ -6,27 +8,13 @@ using RTSLockstep.Player;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Simulation.LSMath;
-using System;
-using UnityEngine;
-using RTSLockstep.Integration;
 
 namespace RTSLockstep.Managers.GameManagers
 {
-    [Serializable]
-    public struct SpawnInfo
-    {
-        [DataCode("Agents")]
-        public string AgentCode;
-        public int Count;
-        [DataCode("AgentControllers")]
-        public string ControllerCode;
-        public Vector2d Position;
-    }
-
     public class LevelLoader : BehaviourHelper
     {
         [SerializeField]
-        private SpawnInfo[] Spawns;
+        private LSAgentSpawnInfo[] Spawns;
         public bool AutoCommand = true;
 
         protected override void OnInitialize()
@@ -71,7 +59,7 @@ namespace RTSLockstep.Managers.GameManagers
 
         public void LaunchSpawns()
         {
-            foreach (SpawnInfo info in Spawns)
+            foreach (LSAgentSpawnInfo info in Spawns)
             {
                 LocalAgentController controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
 
@@ -91,7 +79,7 @@ namespace RTSLockstep.Managers.GameManagers
             {
                 //Find average of spawn positions
                 Vector2d battlePos = Vector2d.zero;
-                foreach (SpawnInfo info in Spawns)
+                foreach (LSAgentSpawnInfo info in Spawns)
                 {
                     battlePos += info.Position;
                 }
@@ -100,7 +88,7 @@ namespace RTSLockstep.Managers.GameManagers
                 Command com = new Command(Data.AbilityDataItem.FindInterfacer<Attack>().ListenInputID);
                 com.Add(battlePos);
 
-                PlayerManager.SendCommand(com);
+                GlobalAgentController.SendCommand(com);
                 Selector.Clear();
             }
         }

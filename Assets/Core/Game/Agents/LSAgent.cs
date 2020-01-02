@@ -214,7 +214,7 @@ namespace RTSLockstep.Agents
         public LSInfluencer Influencer { get; private set; }
         public uint SpawnVersion { get; private set; }
         public LocalAgentController Controller { get; private set; }
-        public bool Controllable { get { return PlayerManager.ContainsController(Controller); } }
+        public bool Controllable { get { return GlobalAgentController.ContainsController(Controller); } }
         public AllegianceType GetAllegiance(LSAgent other) { return Controller.GetAllegiance(other.Controller); }
         public readonly AbilityManager abilityManager = new AbilityManager();
         public FastBucket<Buff> Buffs = new FastBucket<Buff>();

@@ -6,6 +6,9 @@ using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.LSResources;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Player;
+using RTSLockstep.Player.Utility;
+using RTSLockstep.Player.Commands;
 
 namespace RTSLockstep.Agents.AgentController
 {
@@ -26,6 +29,13 @@ namespace RTSLockstep.Agents.AgentController
         // TODO: Hide this list and use methods to access it
         public static FastList<LocalAgentController> InstanceManagers = new FastList<LocalAgentController>();
 
+        public static readonly FastBucket<LocalAgentController> LocalAgentControllers = new FastBucket<LocalAgentController>();
+
+        public static int LocalAgentControllersCount
+        {
+            get { return LocalAgentControllers.Count; }
+        }
+
         private static readonly FastStack<ushort> _openGlobalIDs = new FastStack<ushort>();
 
         private static ushort _peakGlobalID;
@@ -40,6 +50,7 @@ namespace RTSLockstep.Agents.AgentController
         {
             InstanceManagers.Clear();
             GlobalAgentActive.Clear();
+            LocalAgentControllers.FastClear();
             _openGlobalIDs.FastClear();
             _peakGlobalID = 0;
             foreach (FastStack<LSAgent> cache in CachedAgents.Values)
@@ -243,7 +254,68 @@ namespace RTSLockstep.Agents.AgentController
         {
             return new LocalAgentController(defaultAllegiance, controllerName);
         }
-    
+
+        public static bool ContainsController(LocalAgentController controller)
+        {
+            if (LocalAgentControllers.IsNull())
+            {
+                Debug.Log(controller);
+            }
+            return controller.PlayerIndex < LocalAgentControllers.PeakCount && LocalAgentControllers.ContainsAt(controller.PlayerIndex, controller);
+        }
+
+        public static LocalAgentController GetAgentController(int index)
+        {
+            return LocalAgentControllers[index];
+        }
+
+        public static void AddLocalController(LocalAgentController agentController)
+        {
+            if (ContainsController(agentController))
+            {
+                Debug.Log("BOOM");
+                return;
+            }
+
+            agentController.PlayerIndex = LocalAgentControllers.Add(agentController);
+        }
+
+        public static void RemoveLocalController(LocalAgentController agentController)
+        {
+            Selector.Clear();
+            LocalAgentControllers.RemoveAt(agentController.PlayerIndex);
+            if (PlayerManager.CurrentPlayerController == agentController)
+            {
+                if (LocalAgentControllers.Count == 0)
+                {
+                    PlayerManager.CurrentPlayerController = null;
+                }
+                else
+                {
+                    for (int i = 0; i < LocalAgentControllers.PeakCount; i++)
+                    {
+                        if (LocalAgentControllers.arrayAllocation[i])
+                        {
+                            PlayerManager.CurrentPlayerController = LocalAgentControllers[i];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ClearLocalControllers()
+        {
+            Selector.Clear();
+            while (PlayerManager.CurrentPlayerController.IsNotNull())
+            {
+                RemoveLocalController(PlayerManager.CurrentPlayerController);
+            }
+
+            PlayerManager.CurrentPlayerController = null;
+            LocalAgentControllers.FastClear();
+        }
+
         public static void RegisterRawAgent(LSAgent agent)
         {
             ushort agentCodeID = GameResourceManager.GetAgentCodeIndex(agent.MyAgentCode);
@@ -328,6 +400,33 @@ namespace RTSLockstep.Agents.AgentController
                 else
                 {
                     newController.SetAllegiance(other, newController.DefaultAllegiance);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends the command for all LocalAgentControllers under the control of this GlobalAgentController...
+        /// Mainly for shared control capabilities
+        /// </summary>
+        /// <param name="com">COM.</param>
+        public static void SendCommand(Command com)
+        {
+            com.Add(new Selection());
+            for (int i = 0; i < LocalAgentControllers.PeakCount; i++)
+            {
+                if (LocalAgentControllers.arrayAllocation[i])
+                {
+                    LocalAgentController cont = LocalAgentControllers[i];
+
+                    if (cont.SelectedAgents.Count > 0)
+                    {
+                        com.ControllerID = cont.ControllerID;
+
+                        //we always sending selection data
+                        com.SetData(new Selection(cont.SelectedAgents));
+
+                        CommandManager.SendCommand(com);
+                    }
                 }
             }
         }
