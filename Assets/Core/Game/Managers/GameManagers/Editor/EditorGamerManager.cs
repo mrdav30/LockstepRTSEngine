@@ -23,13 +23,13 @@ namespace RTSLockstep
             {
                 for (int i = 0; i < helpers.Length; i++)
                 {
-                    if (helpers[i].BasePriority <= 0)
+                    if (helpers[i].BaseEventPriority <= 0)
                     {
-                        helpers[i].BasePriority = 9999;
+                        helpers[i].BaseEventPriority = 9999;
                     }
                 }
 
-                targetValue.BehaviourHelpers = helpers.OrderBy(c => c.BasePriority).ToArray();
+                targetValue.BehaviourHelpers = helpers.OrderBy(c => c.BaseEventPriority).ToArray();
             }
         }
 

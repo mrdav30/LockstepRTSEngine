@@ -4,10 +4,10 @@ using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BehaviourHelpers;
-using RTSLockstep.Player;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Agents.Player;
 
 namespace RTSLockstep.Managers.GameManagers
 {
@@ -61,7 +61,7 @@ namespace RTSLockstep.Managers.GameManagers
         {
             foreach (LSAgentSpawnInfo info in Spawns)
             {
-                LocalAgentController controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
+                LocalAgentController controller = PlayerConfigurationHelper.Instance.GetInstanceManager(info.ControllerCode);
 
                 for (int j = 0; j < info.Count; j++)
                 {

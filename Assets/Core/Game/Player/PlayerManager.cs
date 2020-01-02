@@ -224,17 +224,8 @@ namespace RTSLockstep.Player
             if (isPlayerManaged)
             {
                 GlobalAgentController.AddLocalController(controller);
-                playerClone.IsHuman = true;
-            }
-
-            if (playerClone.IsHuman && CurrentPlayerController.IsNull())
-            {
+                playerClone.IsCurrentPlayer = true;
                 CurrentPlayerController = controller;
-            }
-
-            //come up with better way to set selected player to the current player thru agent controller helper
-            if (controller == CurrentPlayerController)
-            {
                 SelectPlayer(playerClone.Username, 0, controller.ControllerID, controller.PlayerIndex);
             }
 

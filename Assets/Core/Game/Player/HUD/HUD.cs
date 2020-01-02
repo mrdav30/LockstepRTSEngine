@@ -66,7 +66,7 @@ namespace RTSLockstep.Player
         public void Setup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
-            if (_cachedPlayer && _cachedPlayer.IsHuman)
+            if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {
                 _resourceValues = new Dictionary<ResourceType, long>();
                 _resourceLimits = new Dictionary<ResourceType, long>();
@@ -163,7 +163,7 @@ namespace RTSLockstep.Player
         public void DoGUI()
         {
             if (_cachedPlayer
-                && _cachedPlayer.IsHuman
+                && _cachedPlayer.IsCurrentPlayer
                 && PlayerManager.CurrentPlayerController.IsNotNull()
                 && _cachedPlayer == PlayerManager.CurrentPlayerController.ControllingPlayer)
             {

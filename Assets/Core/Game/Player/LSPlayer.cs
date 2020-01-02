@@ -14,7 +14,7 @@ namespace RTSLockstep.Player
     {
         #region Properties
         public string Username;
-        public bool IsHuman;
+        public bool IsCurrentPlayer;
         public HUD PlayerHUD;
         public ResourceManager PlayerResourceManager;
         public Color TeamColor;
@@ -60,7 +60,7 @@ namespace RTSLockstep.Player
         // Update is called once per frame
         protected override void OnVisualize()
         {
-            if (IsHuman)
+            if (IsCurrentPlayer)
             {
                 PlayerResourceManager.Visualize();
                 PlayerHUD.Visualize();
@@ -77,7 +77,7 @@ namespace RTSLockstep.Player
         public virtual void SaveDetails(JsonWriter writer)
         {
             SaveManager.WriteString(writer, "Username", Username);
-            SaveManager.WriteBoolean(writer, "Human", IsHuman);
+            SaveManager.WriteBoolean(writer, "Human", IsCurrentPlayer);
             SaveManager.WriteColor(writer, "TeamColor", TeamColor);
             SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetResources(), PlayerResourceManager.GetResourceLimits());
             SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgents>().GetComponentsInChildren<LSAgent>());
@@ -121,7 +121,7 @@ namespace RTSLockstep.Player
                                 Username = (string)reader.Value;
                                 break;
                             case "Human":
-                                IsHuman = (bool)reader.Value;
+                                IsCurrentPlayer = (bool)reader.Value;
                                 break;
                             default:
                                 break;

@@ -9,7 +9,7 @@ namespace RTSLockstep.BehaviourHelpers
     public abstract class BehaviourHelper : MonoBehaviour, ILockstepEventsHandler
     {
         [Range(1, 9999), Tooltip("Determines the order in which this helper will call it's event behavior")]
-        public int BasePriority;
+        public int BaseEventPriority;
 
         private ushort CachedListenInput;
 

@@ -239,17 +239,13 @@ MonoBehaviour:
   _agentControllerData:
   - _name: Hostile
     _defaultAllegiance: 4
-    _playerManaged: 0
     _commanderCode: 
   - _name: Neutral
     _defaultAllegiance: 1
-    _playerManaged: 0
     _commanderCode: 
   - _name: Player 1
     _defaultAllegiance: 4
-    _playerManaged: 1
     _commanderCode: 
   - _name: Player 2
     _defaultAllegiance: 4
-    _playerManaged: 1
     _commanderCode: 

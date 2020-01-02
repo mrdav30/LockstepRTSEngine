@@ -1,30 +1,36 @@
 ﻿using UnityEngine;
+
 using RTSLockstep.Data;
 using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Player;
 using RTSLockstep.Integration;
+using RTSLockstep.Agents.AgentController;
 
-namespace RTSLockstep.Agents.AgentController
+namespace RTSLockstep.Agents.Player
 {
     /// <summary>
     /// At the moment a simple script that automatically creates AgentControllers at the start of games
     /// Plan to develop into player selection helper
     /// </summary>
-    public class AgentControllerHelper : BehaviourHelper
+    public class PlayerConfigurationHelper : BehaviourHelper
     {
         [SerializeField, DataCode("AgentControllers")]
         private string _environmentController;
         public string EnvironmentController { get { return _environmentController; } }
         [SerializeField, DataCode("AgentControllers")]
-        private string _defaultController;
-        public string DefaultController { get { return _defaultController; } }
+        public string SelectedController;
 
-        public static AgentControllerHelper Instance { get; private set; }
+        public static PlayerConfigurationHelper Instance { get; private set; }
         BiDictionary<string, byte> CodeIDMap = new BiDictionary<string, byte>();
 
         protected override void OnInitialize()
         {
+            if (SelectedController.Length == 0)
+            {
+                Debug.LogError("You need to pick a controller to control!");
+            }
+
             Instance = this;
 
             if (!LSDatabaseManager.TryGetDatabase(out IAgentControllerDataProvider database))
@@ -38,7 +44,9 @@ namespace RTSLockstep.Agents.AgentController
                 AgentControllerDataItem item = controllerItems[i];
                 LocalAgentController controller = GlobalAgentController.Create(item.DefaultAllegiance, item.Name);
 
-                PlayerManager.CreatePlayer(controller, item.PlayerManaged);
+                bool isPlayerManaged = item.Name == SelectedController ? true : false;
+
+                PlayerManager.CreatePlayer(controller, isPlayerManaged);
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
         }

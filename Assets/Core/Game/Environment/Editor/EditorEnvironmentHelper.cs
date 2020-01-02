@@ -11,7 +11,7 @@ namespace RTSLockstep
         {
             EnvironmentHelper saver = (EnvironmentHelper)target;
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("BasePriority"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("BaseEventPriority"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("_saverObject"));
 
             serializedObject.ApplyModifiedProperties();

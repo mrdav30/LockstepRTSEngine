@@ -8,6 +8,7 @@ using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using System.Collections.Generic;
 using UnityEngine;
+using RTSLockstep.Agents.Player;
 
 namespace RTSLockstep.Environment
 {
@@ -75,7 +76,7 @@ namespace RTSLockstep.Environment
             {
                 obj.LateInitialize();
             }
-            var environmentController = AgentControllerHelper.Instance.GetInstanceManager(AgentControllerHelper.Instance.EnvironmentController);
+            var environmentController = PlayerConfigurationHelper.Instance.GetInstanceManager(PlayerConfigurationHelper.Instance.EnvironmentController);
 
             foreach (var agentInfo in EnvironmentAgents)
             {
