@@ -40,7 +40,7 @@ namespace RTSLockstep.BuildSystem
             GridBuilder.Initialize();
 
             OrganizerStructures = LSUtility.CreateEmpty().transform;
-            OrganizerStructures.transform.parent = PlayerManager.CurrentPlayerController.ControllingPlayer.AgentContainer;
+            OrganizerStructures.transform.parent = PlayerManager.CurrentPlayerController.ControllingPlayer.LocalAgentContainerTransform;
             OrganizerStructures.gameObject.name = "OrganizerStructures";
 
             WallPositioningHelper.Initialize();
@@ -121,7 +121,7 @@ namespace RTSLockstep.BuildSystem
             if (buildingTemplate.MyAgentType == AgentType.Structure && buildingTemplate.GetComponent<Structure>())
             {
                 // check that the Player has the resources available before allowing them to create a new structure
-                if (!_cachedPlayer.PlayerResourceManager.CheckPlayersRawMaterials(buildingTemplate))
+                if (!_cachedPlayer.PlayerRawMaterialManager.CheckPlayersRawMaterials(buildingTemplate))
                 {
                     Debug.Log("Not enough resources!");
                 }

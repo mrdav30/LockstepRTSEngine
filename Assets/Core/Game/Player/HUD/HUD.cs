@@ -22,9 +22,10 @@ namespace RTSLockstep.Player
         // public 
         public GUISkin RawMaterialSkin, OrdersSkin, SelectBoxSkin, PlayerDetailsSkin, MouseCursorSkin;
         public Texture2D PointerCursor, SelectCursor, LeftCursor, RightCursor, UpCursor, DownCursor;
-        public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors;
+        public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors, RallyCursors;
         public RawMaterialsHUD RawMaterialIcons;
-        public Texture2D RallyPointCursor;
+        public Texture2D RallyPointIcon;
+        public Texture2D DestroyIcon;
         // buildFrame provides a border around each buildImage
         // buildMask is used to show the user how far through the current build the object at the front of the queue is
         public Texture2D ButtonHover, ButtonClick;
@@ -198,7 +199,8 @@ namespace RTSLockstep.Player
                     _activeCursor = DownCursor;
                     break;
                 case CursorState.RallyPoint:
-                    _activeCursor = RallyPointCursor;
+                    _currentFrame = (int)Time.time % RallyCursors.Length;
+                    _activeCursor = RallyCursors[_currentFrame];
                     break;
                 default:
                     break;
@@ -367,7 +369,7 @@ namespace RTSLockstep.Player
 
             if (_cachedPlayer.GetController().SelectedAgents.Count == 1 
                 && agent.GetAbility<Destroy>()
-                && GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Destroy>().DestroyIcon))
+                && GUI.Button(new Rect(leftPos, topPos, width, height), DestroyIcon))
             {
                 PlayClick();
 
@@ -377,10 +379,10 @@ namespace RTSLockstep.Player
                 PlayerInputHelper.SendCommand(destroyCom);
             }
 
-            if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
+            if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().HasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
             {
                 leftPos += width + _buttonSpacing;
-                if (GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Rally>().rallyPointImage))
+                if (GUI.Button(new Rect(leftPos, topPos, width, height), RallyPointIcon))
                 {
                     PlayClick();
                     if (_activeCursorState != CursorState.RallyPoint)

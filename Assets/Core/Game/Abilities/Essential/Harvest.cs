@@ -203,7 +203,7 @@ namespace RTSLockstep.Abilities.Essential
             _currentLoadAmount -= deposit;
 
             RawMaterialType depositType = HarvestType;
-            Agent.Controller.ControllingPlayer.PlayerResourceManager.AddRawMaterial(depositType, deposit);
+            Agent.Controller.ControllingPlayer.PlayerRawMaterialManager.AddRawMaterial(depositType, deposit);
 
             if (_currentLoadAmount <= 0)
             {

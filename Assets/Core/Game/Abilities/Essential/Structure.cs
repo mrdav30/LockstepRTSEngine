@@ -74,7 +74,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
                 }
             }
         }
@@ -143,7 +143,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             if (provisioner)
             {
-                Agent.GetControllingPlayer().PlayerResourceManager.DecrementRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().PlayerRawMaterialManager.DecrementRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
             }
 
             GridBuilder.Unbuild(this);

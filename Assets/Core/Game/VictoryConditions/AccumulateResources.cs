@@ -16,7 +16,7 @@ namespace RTSLockstep.VictoryConditions
 
         public override bool PlayerMeetsConditions(LSPlayer player)
         {
-            return player && !player.IsDead() && player.PlayerResourceManager.GetRawMaterialAmount(type) >= amount;
+            return player && !player.IsDead() && player.PlayerRawMaterialManager.GetRawMaterialAmount(type) >= amount;
         }
     }
 }

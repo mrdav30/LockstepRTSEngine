@@ -12,13 +12,17 @@ namespace RTSLockstep.Player
     public class LSPlayer : MonoBehaviour
     {
         #region Properties
-        public string Username;
-        public bool IsCurrentPlayer;
         public HUD PlayerHUD;
-        public RawMaterialManager PlayerResourceManager;
-        public Color TeamColor;
+        public RawMaterialManager PlayerRawMaterialManager;
+        public Transform LocalAgentContainerTransform;
+        public RallyPoint RallyPointOjbect;
 
-        public Transform AgentContainer; 
+        [HideInInspector]
+        public Color TeamColor;
+        [HideInInspector]
+        public string Username;
+        [HideInInspector]
+        public bool IsCurrentPlayer;
 
         private LocalAgentController _cachedController;
         private bool IsSetup = false;
@@ -27,7 +31,7 @@ namespace RTSLockstep.Player
         #region MonoBehavior
         protected void Setup()
         {
-            PlayerResourceManager.OnSetup();
+            PlayerRawMaterialManager.OnSetup();
             PlayerHUD.OnSetup();
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
@@ -40,8 +44,6 @@ namespace RTSLockstep.Player
                 GameResourceManager.AssignedTeamColors.Add(TeamColor);
             }
 
-            AgentContainer = GetComponentInChildren<LSAgents>().transform;
-
             IsSetup = true;
         }
 
@@ -53,7 +55,7 @@ namespace RTSLockstep.Player
                 Setup();
             }
 
-           // PlayerResourceManager.OnInitialize();
+            // PlayerResourceManager.OnInitialize();
         }
 
         // Update is called once per frame
@@ -61,7 +63,7 @@ namespace RTSLockstep.Player
         {
             if (IsCurrentPlayer)
             {
-              //  PlayerResourceManager.OnVisualize();
+                //  PlayerResourceManager.OnVisualize();
                 PlayerHUD.OnVisualize();
             }
         }
@@ -78,8 +80,8 @@ namespace RTSLockstep.Player
             SaveManager.WriteString(writer, "Username", Username);
             SaveManager.WriteBoolean(writer, "Human", IsCurrentPlayer);
             SaveManager.WriteColor(writer, "TeamColor", TeamColor);
-          //  SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentResources(), PlayerResourceManager.GetResourceLimits());
-            SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentRawMaterials());
+            //  SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentResources(), PlayerResourceManager.GetResourceLimits());
+            SaveManager.SavePlayerResources(writer, PlayerRawMaterialManager.GetCurrentRawMaterials());
             SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgents>().GetComponentsInChildren<LSAgent>());
         }
 
@@ -136,7 +138,7 @@ namespace RTSLockstep.Player
                             TeamColor = LoadManager.LoadColor(reader);
                             break;
                         case "Resources":
-                            PlayerResourceManager.LoadPlayersRawMaterials(reader);
+                            PlayerRawMaterialManager.LoadPlayersRawMaterials(reader);
                             break;
                         case "Units":
                             LoadLSAgents(reader);

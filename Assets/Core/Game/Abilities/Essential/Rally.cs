@@ -18,10 +18,6 @@ namespace RTSLockstep.Abilities.Essential
         public Vector3 RallyPoint { get; private set; }
         private FlagState _flagState;
 
-        #region Serialized Values (Further description in properties)
-        public Texture2D rallyPointImage;
-        #endregion
-
         protected override void OnSetup()
         {
             Agent.OnSelectedChange += HandleSelectedChange;
@@ -32,7 +28,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             if (Agent.GetControllingPlayer() == PlayerManager.CurrentPlayerController.ControllingPlayer)
             {
-                RallyPoint flag = Agent.GetControllingPlayer().GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = Agent.GetControllingPlayer().RallyPointOjbect;
                 if (Agent.IsSelected)
                 {
                     if (flag && SpawnPoint != GameResourceManager.InvalidPosition.ToVector3() && RallyPoint != GameResourceManager.InvalidPosition.ToVector3())
@@ -65,7 +61,7 @@ namespace RTSLockstep.Abilities.Essential
             RallyPoint = position;
             if (Agent.GetControllingPlayer() && Agent.IsSelected)
             {
-                RallyPoint flag = Agent.GetControllingPlayer().GetComponentInChildren<RallyPoint>();
+                RallyPoint flag = Agent.GetControllingPlayer().RallyPointOjbect;
                 if (flag)
                 {
                     if (!flag.ActiveStatus)
@@ -100,7 +96,7 @@ namespace RTSLockstep.Abilities.Essential
             } 
         }
 
-        public bool hasSpawnPoint()
+        public bool HasSpawnPoint()
         {
             return SpawnPoint != GameResourceManager.InvalidPosition.ToVector3() && RallyPoint != GameResourceManager.InvalidPosition.ToVector3();
         }

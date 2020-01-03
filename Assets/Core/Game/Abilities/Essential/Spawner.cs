@@ -116,9 +116,9 @@ namespace RTSLockstep.Abilities.Essential
             // check that the Player has the resources available before allowing them to create a new Unit / Building
             if (Agent.GetControllingPlayer() && unitObject)
             {
-                if (Agent.GetControllingPlayer().PlayerResourceManager.CheckPlayersRawMaterials(unitObject))
+                if (Agent.GetControllingPlayer().PlayerRawMaterialManager.CheckPlayersRawMaterials(unitObject))
                 {
-                    Agent.GetControllingPlayer().PlayerResourceManager.RemovePlayersRawMaterials(unitObject);
+                    Agent.GetControllingPlayer().PlayerRawMaterialManager.RemovePlayersRawMaterials(unitObject);
                     spawnQueue.Enqueue(unitName);
                 }
                 else

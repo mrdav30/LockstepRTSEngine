@@ -285,7 +285,7 @@ namespace RTSLockstep.Agents
             CheckCasting = true;
 
             // place game object under it's agent commander
-            CachedGameObject.transform.parent = Controller.ControllingPlayer.AgentContainer;
+            CachedGameObject.transform.parent = Controller.ControllingPlayer.LocalAgentContainerTransform;
 
             CachedGameObject.SetActive(true);
 
@@ -322,7 +322,7 @@ namespace RTSLockstep.Agents
             if (!_provisioned)
             {
                 _provisioned = true;
-                _cachedPlayer.PlayerResourceManager.AddRawMaterial(RawMaterialType.Provision, resourceCost[RawMaterialType.Provision]);
+                _cachedPlayer.PlayerRawMaterialManager.AddRawMaterial(RawMaterialType.Provision, resourceCost[RawMaterialType.Provision]);
             }
 
             if (Influencer.IsNotNull())
