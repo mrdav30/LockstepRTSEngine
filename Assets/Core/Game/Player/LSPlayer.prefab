@@ -51,9 +51,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerHUD: {fileID: 4771793385981513702}
-  PlayerResourceManager: {fileID: 1664733367458406862}
-  AgentContainer: {fileID: 4042109894542122}
-  PlayerRallyPoint: {fileID: 8389500551737492617}
+  PlayerRawMaterialManager: {fileID: 1664733367458406862}
+  LocalAgentContainerTransform: {fileID: 4042109894542122}
+  RallyPointOjbect: {fileID: 8389500551737492617}
   TeamColor: {r: 0, g: 0, b: 0, a: 0}
   Username: 
   IsCurrentPlayer: 0
