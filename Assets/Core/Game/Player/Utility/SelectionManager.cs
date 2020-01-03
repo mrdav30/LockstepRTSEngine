@@ -218,7 +218,7 @@ namespace RTSLockstep.Player.Utility
                             if (curAgent.CanSelect)
                             {
                                 if (curAgent.IsVisible
-                                    && curAgent.objectName == MousedAgent.objectName
+                                    && curAgent.ObjectName == MousedAgent.ObjectName
                                     && curAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
                                 {
                                     bufferSelectedAgents.Add(curAgent);

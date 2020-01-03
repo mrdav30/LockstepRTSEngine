@@ -215,6 +215,13 @@ MonoBehaviour:
       _classRef: RTSLockstep.Abilities.Essential.Stop, Assembly-CSharp
     _listenInputCode: Stop
     _informationGather: 0
+  - _name: Destroy
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: RTSLockstep.Abilities.Essential.Destroy, Assembly-CSharp
+    _listenInputCode: Destroy
+    _informationGather: 2
   _unitConfigElementData: []
   _unitConfigData: []
   _avatarData:

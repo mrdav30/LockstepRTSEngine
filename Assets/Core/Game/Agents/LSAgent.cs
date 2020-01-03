@@ -56,10 +56,15 @@ namespace RTSLockstep.Agents
         [SerializeField]
         private Transform _visualCenter;
         public Transform VisualCenter { get { return _visualCenter; } }
-        public string objectName;
+        [HideInInspector]
+        public string ObjectName {
+            get
+            {
+                return gameObject.name;
+            }
+        }
         [HideInInspector]
         public string AgentDescription;
-        public Texture2D destroyImage;
         [SerializeField]
         public ResourceCost resourceCost = new ResourceCost
         {
@@ -422,7 +427,8 @@ namespace RTSLockstep.Agents
             if (Animator.IsNotNull())
             {
                 Animator.SetDyingState();
-                Animator.Visualize(); // TODO: Now call in LockstepManager.LateVisualize ()
+                // TODO: Now call in LockstepManager.LateVisualize ()
+                Animator.Visualize(); 
             }
         }
 
@@ -430,9 +436,9 @@ namespace RTSLockstep.Agents
         /// Do not call this to destroy the agent. Use AgentController.DestroyAgent().
         /// </summary>
         /// <param name="Immediate"></param>
-        internal void _Deactivate(bool Immediate = false)
+        internal void Deactivate(bool Immediate = false)
         {
-            if (IsActive == false)
+            if (!IsActive)
             {
                 Debug.Log("NOASER");
             }
@@ -599,7 +605,6 @@ namespace RTSLockstep.Agents
 
         public void SaveDetails(JsonWriter writer)
         {
-            SaveManager.WriteString(writer, "Type", objectName);
             SaveManager.WriteInt(writer, "GlobalID", GlobalID);
             SaveManager.WriteInt(writer, "LocalID", LocalID);
             SaveManager.WriteVector2d(writer, "Position", Body.Position);
@@ -642,8 +647,8 @@ namespace RTSLockstep.Agents
 
         private void LoadComponents()
         {
-            CachedTransform = base.transform;
-            CachedGameObject = base.gameObject;
+            CachedTransform = transform;
+            CachedGameObject = gameObject;
             UnityBody = GetComponent<UnityLSBody>();
             Animator = GetComponent<LSAnimatorBase>();
             AttachedAbilities = GetComponents<Ability>();
@@ -654,9 +659,6 @@ namespace RTSLockstep.Agents
         {
             switch (propertyName)
             {
-                case "Type":
-                    objectName = (string)readValue;
-                    break;
                 case "GlobalID":
                     GlobalID = (ushort)readValue;
                     break;

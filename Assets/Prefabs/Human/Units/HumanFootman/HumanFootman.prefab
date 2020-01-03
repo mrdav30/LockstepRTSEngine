@@ -290,12 +290,13 @@ GameObject:
   - component: {fileID: 4916245628546948}
   - component: {fileID: 114278842269955762}
   - component: {fileID: 114644781022417000}
+  - component: {fileID: 6959672707864319737}
   - component: {fileID: 114958002785914002}
   - component: {fileID: 114391237123899296}
   - component: {fileID: 114217481193622392}
   - component: {fileID: 114753310074032226}
+  - component: {fileID: -162990702614248100}
   - component: {fileID: 114084417549043994}
-  - component: {fileID: 6959672707864319737}
   - component: {fileID: 114725471045373676}
   - component: {fileID: 95585489092668588}
   - component: {fileID: 114342021143916102}
@@ -344,9 +345,7 @@ MonoBehaviour:
   Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4916245628546948}
-  objectName: HumanFootman
   AgentDescription: 
-  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
       canAdd: 1
@@ -415,6 +414,20 @@ MonoBehaviour:
     _height: 229376
     _positionalTransform: {fileID: 4916245628546948}
     _rotationalTransform: {fileID: 4916245628546948}
+--- !u!114 &6959672707864319737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588637964981362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _actionRange: 65536
+  _sight: 655360
 --- !u!114 &114958002785914002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,6 +507,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 6553600
   _currentHealth: 0
+--- !u!114 &-162990702614248100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588637964981362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c1d22f63460bf48a3d08cf739ebf48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &114084417549043994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -508,20 +535,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &6959672707864319737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1588637964981362}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _actionRange: 65536
-  _sight: 655360
 --- !u!114 &114725471045373676
 MonoBehaviour:
   m_ObjectHideFlags: 0

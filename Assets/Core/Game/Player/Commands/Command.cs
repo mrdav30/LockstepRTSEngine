@@ -1,11 +1,12 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System;
+using System.Collections.Generic;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.BuildSystem;
 using RTSLockstep.Data;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Simulation.Influence;
 using RTSLockstep.Simulation.LSMath;
-using System;
-using System.Collections.Generic;
 using RTSLockstep.Utility;
 
 namespace RTSLockstep.Player.Commands
@@ -15,19 +16,19 @@ namespace RTSLockstep.Player.Commands
         public byte ControllerID;
         public ushort InputCode;
 
-        private static readonly FastList<byte> serializeList = new FastList<byte>();
-        private static readonly Writer writer = new Writer(serializeList);
-        private static readonly Reader reader = new Reader();
+        private static readonly FastList<byte> _serializeList = new FastList<byte>();
+        private static readonly Writer _writer = new Writer(_serializeList);
+        private static readonly Reader _reader = new Reader();
 
-        private static ushort RegisterCount;
+        private static ushort _registerCount;
 
-        private static BiDictionary<Type, ushort> RegisteredData = new BiDictionary<Type, ushort>();
+        private static BiDictionary<Type, ushort> _registeredData = new BiDictionary<Type, ushort>();
         /// <summary>
         /// Backward compatability for InputCode
         /// </summary>
         /// <value>The le input.</value>
-        private Dictionary<ushort, FastList<ICommandData>> ContainedData = new Dictionary<ushort, FastList<ICommandData>>();
-        private ushort ContainedTypesCount;
+        private Dictionary<ushort, FastList<ICommandData>> _containedData = new Dictionary<ushort, FastList<ICommandData>>();
+        private ushort _containedTypesCount;
 
         public static void Setup()
         {
@@ -63,16 +64,16 @@ namespace RTSLockstep.Player.Commands
 
         private static void Register(Type t)
         {
-            if (RegisterCount > ushort.MaxValue)
+            if (_registerCount > ushort.MaxValue)
             {
                 throw new Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
             }
-            if (RegisteredData.ContainsKey(t))
+            if (_registeredData.ContainsKey(t))
             {
                 return;
             }
 
-            RegisteredData.Add(t, RegisterCount++);
+            _registeredData.Add(t, _registerCount++);
         }
 
         public Command()
@@ -88,8 +89,8 @@ namespace RTSLockstep.Player.Commands
 
         public void Initialize()
         {
-            ContainedData.Clear();
-            ContainedTypesCount = 0;
+            _containedData.Clear();
+            _containedTypesCount = 0;
         }
 
         public void Add<TData>(params TData[] addItems) where TData : ICommandData
@@ -102,8 +103,7 @@ namespace RTSLockstep.Player.Commands
 
         public void Add<TData>(TData item) where TData : ICommandData
         {
-            ushort dataID;
-            if (RegisteredData.TryGetValue(typeof(TData), out dataID))
+            if (_registeredData.TryGetValue(typeof(TData), out ushort dataID))
             {
                 FastList<ICommandData> items = GetItemsList(dataID);
                 if (items.Count == ushort.MaxValue)
@@ -112,14 +112,14 @@ namespace RTSLockstep.Player.Commands
                 }
                 if (items.Count == 0)
                 {
-                    ContainedTypesCount++;
+                    _containedTypesCount++;
                 }
 
                 items.Add(item);
             }
             else
             {
-                throw new System.Exception(string.Format("Type '{0}' not registered.", typeof(TData)));
+                throw new Exception(string.Format("Type '{0}' not registered.", typeof(TData)));
             }
         }
 
@@ -130,28 +130,26 @@ namespace RTSLockstep.Player.Commands
 
         public int GetDataCount<TData>()
         {
-            ushort dataID;
-            if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            if (!_registeredData.TryGetValue(typeof(TData), out ushort dataID))
             {
                 return 0;
             }
 
-            FastList<ICommandData> items;
-            if (!ContainedData.TryGetValue(dataID, out items))
+            if (!_containedData.TryGetValue(dataID, out FastList<ICommandData> items))
             {
                 return 0;
             }
+
             return items.Count;
         }
 
         public TData GetData<TData>(int index = 0) where TData : ICommandData
         {
-            TData item;
-            if (TryGetData(out item, index))
+            if (TryGetData(out TData item, index))
             {
                 return item;
             }
-            return default(TData);
+            return default;
         }
 
         public TData[] GetDataArray<TData>() where TData : ICommandData
@@ -162,47 +160,49 @@ namespace RTSLockstep.Player.Commands
             {
                 array[i] = GetData<TData>(i);
             }
+
             return array;
         }
 
         public bool TryGetData<TData>(out TData data, int index = 0) where TData : ICommandData
         {
-            data = default(TData);
-            ushort dataID;
-            if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            data = default;
+            if (!_registeredData.TryGetValue(typeof(TData), out ushort dataID))
             {
                 return false;
             }
-            FastList<ICommandData> items;
-            if (!ContainedData.TryGetValue(dataID, out items))
+
+            if (!_containedData.TryGetValue(dataID, out FastList<ICommandData> items))
             {
                 return false;
             }
+
             if (items.Count <= index)
             {
                 return false;
             }
+
             data = (TData)items[index];
             return true;
         }
 
         public void SetData<TData>(TData value, int index = 0) where TData : ICommandData
         {
-            ContainedData[RegisteredData[typeof(TData)]][index] = value;
+            _containedData[_registeredData[typeof(TData)]][index] = value;
         }
 
         public bool SetFirstData<TData>(TData value) where TData : ICommandData
         {
-            ushort dataID;
-            if (!RegisteredData.TryGetValue(typeof(TData), out dataID))
+            if (!_registeredData.TryGetValue(typeof(TData), out ushort dataID))
             {
                 return false;
             }
-            FastList<ICommandData> items;
-            if (!ContainedData.TryGetValue(dataID, out items))
+
+            if (!_containedData.TryGetValue(dataID, out FastList<ICommandData> items))
             {
                 return false;
             }
+
             if (items.Count == 0)
             {
                 items.Add(value);
@@ -214,9 +214,10 @@ namespace RTSLockstep.Player.Commands
 
             return true;
         }
+
         public void ClearData<TData>()
         {
-            ContainedData[RegisteredData[typeof(TData)]].Clear();
+            _containedData[_registeredData[typeof(TData)]].Clear();
         }
 
         /// <summary>
@@ -224,75 +225,78 @@ namespace RTSLockstep.Player.Commands
         /// </summary>
         public int Reconstruct(byte[] Source, int StartIndex = 0)
         {
-            reader.Initialize(Source, StartIndex);
-            ControllerID = reader.ReadByte();
-            InputCode = reader.ReadUShort();
-            ContainedTypesCount = reader.ReadUShort();
-            for (int i = 0; i < ContainedTypesCount; i++)
+            _reader.Initialize(Source, StartIndex);
+            ControllerID = _reader.ReadByte();
+            InputCode = _reader.ReadUShort();
+            _containedTypesCount = _reader.ReadUShort();
+            for (int i = 0; i < _containedTypesCount; i++)
             {
-                ushort dataID = reader.ReadUShort();
-                ushort dataCount = reader.ReadUShort();
+                ushort dataID = _reader.ReadUShort();
+                ushort dataCount = _reader.ReadUShort();
 
                 FastList<ICommandData> items = GetItemsList(dataID);
-                Type dataType = RegisteredData.GetReversed(dataID);
+                Type dataType = _registeredData.GetReversed(dataID);
                 for (int j = 0; j < dataCount; j++)
                 {
                     ICommandData item = Activator.CreateInstance(dataType) as ICommandData;
-                    item.Read(reader);
+                    item.Read(_reader);
                     items.Add(item);
                 }
             }
 
-            return reader.Position - StartIndex;
+            return _reader.Position - StartIndex;
         }
 
         public byte[] Serialized
         {
             get
             {
-                writer.Reset();
+                _writer.Reset();
 
                 //Essential Information
-                writer.Write(ControllerID);
-                writer.Write(InputCode);
-                writer.Write(ContainedTypesCount);
-                foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in ContainedData)
+                _writer.Write(ControllerID);
+                _writer.Write(InputCode);
+                _writer.Write(_containedTypesCount);
+                foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in _containedData)
                 {
-                    writer.Write(pair.Key);
-                    writer.Write((ushort)pair.Value.Count);
+                    _writer.Write(pair.Key);
+                    _writer.Write((ushort)pair.Value.Count);
                     for (int i = 0; i < pair.Value.Count; i++)
                     {
-                        pair.Value[i].Write(writer);
+                        pair.Value[i].Write(_writer);
                     }
                 }
 
-                return serializeList.ToArray();
+                return _serializeList.ToArray();
             }
         }
 
         FastList<ICommandData> GetItemsList(ushort dataID)
         {
-            FastList<ICommandData> items;
-            if (!ContainedData.TryGetValue(dataID, out items))
+            if (!_containedData.TryGetValue(dataID, out FastList<ICommandData> items))
             {
                 items = new FastList<ICommandData>();
-                ContainedData.Add(dataID, items);
+                _containedData.Add(dataID, items);
             }
+
             return items;
         }
 
         public Command Clone()
         {
-            Command com = new Command();
-            com.ControllerID = ControllerID;
-            com.InputCode = InputCode;
-            foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in ContainedData)
+            Command com = new Command
+            {
+                ControllerID = ControllerID,
+                InputCode = InputCode
+            };
+            foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in _containedData)
             {
                 FastList<ICommandData> list = new FastList<ICommandData>();
                 pair.Value.CopyTo(list);
 
-                com.ContainedData.Add(pair.Key, list);
+                com._containedData.Add(pair.Key, list);
             }
+
             return com;
         }
     }

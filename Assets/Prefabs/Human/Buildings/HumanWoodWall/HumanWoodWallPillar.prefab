@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 6181614929816299083}
   - component: {fileID: 9050172180886772449}
   - component: {fileID: 5471687020666200654}
+  - component: {fileID: -1617614689248369114}
   - component: {fileID: 242638430047052249}
   - component: {fileID: 4139659409858952994}
-  - component: {fileID: -1617614689248369114}
+  - component: {fileID: 4491695735153125104}
   - component: {fileID: 5471459949468220228}
   - component: {fileID: 1422794587854036375}
   m_Layer: 11
@@ -59,9 +60,7 @@ MonoBehaviour:
   Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 6181614929816299083}
-  objectName: HumanWoodWallPillar
   AgentDescription: 
-  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
       canAdd: 1
@@ -138,6 +137,20 @@ MonoBehaviour:
     _height: 327680
     _positionalTransform: {fileID: 6181614929816299083}
     _rotationalTransform: {fileID: 6181614929816299083}
+--- !u!114 &-1617614689248369114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5530549526402322929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _actionRange: 393216
+  _sight: 655360
 --- !u!114 &242638430047052249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,7 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 6553600
   _currentHealth: 0
---- !u!114 &-1617614689248369114
+--- !u!114 &4491695735153125104
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -179,11 +192,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5530549526402322929}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Script: {fileID: 11500000, guid: e5c1d22f63460bf48a3d08cf739ebf48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionRange: 393216
-  _sight: 655360
+  _cooldown: 0
+  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &5471459949468220228
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1780,12 +1780,13 @@ GameObject:
   - component: {fileID: 4000010907238942}
   - component: {fileID: 114061601890469220}
   - component: {fileID: 114614306233172148}
+  - component: {fileID: -3008316332646673733}
   - component: {fileID: 114663279844443730}
   - component: {fileID: 114951773368346060}
   - component: {fileID: 114588237757547290}
   - component: {fileID: 114783308967027076}
+  - component: {fileID: 6641902724760547125}
   - component: {fileID: 114500290942403552}
-  - component: {fileID: -3008316332646673733}
   - component: {fileID: 1897794942392741647}
   - component: {fileID: 95000011980069812}
   - component: {fileID: 114491111891892718}
@@ -1834,9 +1835,7 @@ MonoBehaviour:
   Tag: 3
   _selectionRadius: -1
   _visualCenter: {fileID: 0}
-  objectName: RockWarrior
   AgentDescription: 
-  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
       canAdd: 1
@@ -1905,6 +1904,20 @@ MonoBehaviour:
     _height: 425984
     _positionalTransform: {fileID: 4000010907238942}
     _rotationalTransform: {fileID: 4000010907238942}
+--- !u!114 &-3008316332646673733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _actionRange: 131072
+  _sight: 983040
 --- !u!114 &114663279844443730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1984,6 +1997,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 6553600
   _currentHealth: 0
+--- !u!114 &6641902724760547125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013931707134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c1d22f63460bf48a3d08cf739ebf48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &114500290942403552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1998,20 +2025,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &-3008316332646673733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000013931707134}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _actionRange: 131072
-  _sight: 983040
 --- !u!114 &1897794942392741647
 MonoBehaviour:
   m_ObjectHideFlags: 0

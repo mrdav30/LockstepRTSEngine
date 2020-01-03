@@ -11,16 +11,17 @@ GameObject:
   - component: {fileID: 4548112688198874}
   - component: {fileID: 114573005599800606}
   - component: {fileID: 114015093618350784}
+  - component: {fileID: -7078871663375157955}
   - component: {fileID: 114922605507946052}
   - component: {fileID: 114276689992937454}
   - component: {fileID: 114364363761700510}
   - component: {fileID: 114470791607603074}
   - component: {fileID: 114529490774990488}
   - component: {fileID: 114515592197092712}
+  - component: {fileID: -6177999464975956772}
   - component: {fileID: 114265760236710430}
-  - component: {fileID: -7078871663375157955}
-  - component: {fileID: 114552794059523324}
   - component: {fileID: 95137511769296372}
+  - component: {fileID: 114552794059523324}
   - component: {fileID: 114043561203084636}
   m_Layer: 0
   m_Name: HumanWorker
@@ -69,9 +70,7 @@ MonoBehaviour:
   Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4548112688198874}
-  objectName: HumanWorker
   AgentDescription: 
-  destroyImage: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
   resourceCost:
     reorderableList:
       canAdd: 1
@@ -140,6 +139,20 @@ MonoBehaviour:
     _height: 196608
     _positionalTransform: {fileID: 4548112688198874}
     _rotationalTransform: {fileID: 4548112688198874}
+--- !u!114 &-7078871663375157955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845799108638348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _actionRange: 65536
+  _sight: 1310720
 --- !u!114 &114922605507946052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,6 +281,20 @@ MonoBehaviour:
   _harvestSpeed: 65536
   _windup: 131072
   _increasePriority: 1
+--- !u!114 &-6177999464975956772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845799108638348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c1d22f63460bf48a3d08cf739ebf48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cooldown: 0
+  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &114265760236710430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,20 +309,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mapIndex: 0
   _bonusHeight: 0
---- !u!114 &-7078871663375157955
-MonoBehaviour:
+--- !u!95 &95137511769296372
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1845799108638348}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _actionRange: 65536
-  _sight: 1310720
+  m_Avatar: {fileID: 9000000, guid: 9b57b40051016ef45a2b3bbf2b233918, type: 3}
+  m_Controller: {fileID: 9100000, guid: 221c5e65582f6724eaf85900ee49835a, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114552794059523324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,25 +375,6 @@ MonoBehaviour:
   emptyHarvestVolume: 0.5
   harvestVolume: 0.5
   startHarvestVolume: 1
---- !u!95 &95137511769296372
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1845799108638348}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 9b57b40051016ef45a2b3bbf2b233918, type: 3}
-  m_Controller: {fileID: 9100000, guid: 221c5e65582f6724eaf85900ee49835a, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 1
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &114043561203084636
 MonoBehaviour:
   m_ObjectHideFlags: 0

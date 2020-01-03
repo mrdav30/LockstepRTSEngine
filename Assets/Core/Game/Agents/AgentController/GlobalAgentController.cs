@@ -411,7 +411,6 @@ namespace RTSLockstep.Agents.AgentController
         /// <param name="com">COM.</param>
         public static void SendCommand(Command com)
         {
-            com.Add(new Selection());
             for (int i = 0; i < LocalAgentControllers.PeakCount; i++)
             {
                 if (LocalAgentControllers.arrayAllocation[i])
@@ -423,7 +422,7 @@ namespace RTSLockstep.Agents.AgentController
                         com.ControllerID = cont.ControllerID;
 
                         //we always sending selection data
-                        com.SetData(new Selection(cont.SelectedAgents));
+                        com.Add(new Selection(cont.SelectedAgents));
 
                         CommandManager.SendCommand(com);
                     }
@@ -452,7 +451,7 @@ namespace RTSLockstep.Agents.AgentController
 
             bool immediate = data.Immediate;
 
-            agent._Deactivate(immediate);
+            agent.Deactivate(immediate);
             ChangeController(agent, null);
 
             //Pool if the agent is registered

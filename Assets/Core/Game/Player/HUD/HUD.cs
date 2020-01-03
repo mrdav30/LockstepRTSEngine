@@ -365,10 +365,16 @@ namespace RTSLockstep.Player
             int width = _buildImageWidth / 2;
             int height = _buildImageHeight / 2;
 
-            if (_cachedPlayer.GetController().SelectedAgents.Count == 1 && GUI.Button(new Rect(leftPos, topPos, width, height), agent.destroyImage))
+            if (_cachedPlayer.GetController().SelectedAgents.Count == 1 
+                && agent.GetAbility<Destroy>()
+                && GUI.Button(new Rect(leftPos, topPos, width, height), agent.GetAbility<Destroy>().DestroyIcon))
             {
                 PlayClick();
-                agent.Die();
+
+                // send destroy command
+                Command destroyCom = new Command(AbilityDataItem.FindInterfacer("Destroy").ListenInputID);
+                destroyCom.Add(new DefaultData(DataType.UShort, agent.LocalID));
+                PlayerInputHelper.SendCommand(destroyCom);
             }
 
             if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().hasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)

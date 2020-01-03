@@ -182,7 +182,7 @@ namespace RTSLockstep.Grouping
 
                         newRTSAgent.SetControllingPlayer(GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer);
 
-                        newRTSAgent.gameObject.name = newRTSAgent.objectName;
+                        newRTSAgent.gameObject.name = newRTSAgent.ObjectName;
                         newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
                             : ConstructionHandler.OrganizerStructures.transform;
 

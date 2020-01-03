@@ -62,7 +62,7 @@ namespace RTSLockstep.Player
                     curCom = new Command(facer.ListenInputID);
                     if (MousedAgent.IsNotNull())
                     {
-                        curCom.SetData(new DefaultData(DataType.UShort, MousedAgent.LocalID));
+                        curCom.Add(new DefaultData(DataType.UShort, MousedAgent.LocalID));
                     }
                     break;
                 case InformationGatherType.PositionOrTarget:

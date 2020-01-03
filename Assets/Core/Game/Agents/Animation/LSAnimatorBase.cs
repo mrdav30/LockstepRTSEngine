@@ -169,7 +169,7 @@ namespace RTSLockstep
 
         protected virtual void InitialiseAudio()
         {
-            audioElement = new AudioElement(null, null, cachedAgent.objectName + cachedAgent.GlobalID, transform);
+            audioElement = new AudioElement(null, null, cachedAgent.ObjectName + cachedAgent.GlobalID, transform);
         }
     }
 }
