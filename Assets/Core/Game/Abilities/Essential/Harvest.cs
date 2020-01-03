@@ -28,7 +28,7 @@ namespace RTSLockstep.Abilities.Essential
         [HideInInspector]
         public bool IsEmptying;
 
-        public EnvironmentResourceType HarvestType { get; private set; }
+        public RawMaterialType HarvestType { get; private set; }
         public LSAgent CurrentTarget { get; private set; }
         public LSAgent LastResourceTarget { get; private set; }
         public LSAgent LastStorageTarget { get; private set; }
@@ -202,8 +202,8 @@ namespace RTSLockstep.Abilities.Essential
 
             _currentLoadAmount -= deposit;
 
-            EnvironmentResourceType depositType = HarvestType;
-            Agent.Controller.ControllingPlayer.PlayerResourceManager.AddResource(depositType, deposit);
+            RawMaterialType depositType = HarvestType;
+            Agent.Controller.ControllingPlayer.PlayerResourceManager.AddRawMaterial(depositType, deposit);
 
             if (_currentLoadAmount <= 0)
             {
@@ -300,7 +300,7 @@ namespace RTSLockstep.Abilities.Essential
 
                 if (IsHarvesting)
                 {
-                    EnvironmentResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
+                    RawMaterialType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
 
                     // we can only collect one resource at a time, other resources are lost
                     if (resourceType != HarvestType)
@@ -525,7 +525,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             switch (HarvestType)
             {
-                case EnvironmentResourceType.Wood:
+                case RawMaterialType.Wood:
                     HarvestingAnimState = AnimState.EngagingWood;
                     MovingAnimState = AnimState.MovingWood;
                     IdlingAnimState = AnimState.IdlingWood;

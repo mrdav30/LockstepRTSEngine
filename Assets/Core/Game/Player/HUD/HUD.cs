@@ -13,6 +13,7 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
 using RTSLockstep.LSResources.Audio;
+using System;
 
 namespace RTSLockstep.Player
 {
@@ -20,12 +21,12 @@ namespace RTSLockstep.Player
     {
         #region Properties
         // public 
-        public GUISkin ResourceSkin, OrdersSkin, SelectBoxSkin;
+        public GUISkin RawMaterialSkin, OrdersSkin, SelectBoxSkin;
         private Texture2D _activeCursor;
         public Texture2D PointerCursor, SelectCursor, LeftCursor, RightCursor, UpCursor, DownCursor;
         public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors;
         public GUISkin MouseCursorSkin;
-        public Texture2D[] Resources;
+        public Texture2D[] RawMaterialIcons;
         // buildFrame provides a border around each buildImage
         // buildMask is used to show the user how far through the current build the object at the front of the queue is
         public Texture2D ButtonHover, ButtonClick;
@@ -33,23 +34,24 @@ namespace RTSLockstep.Player
         public Texture2D SmallButtonHover, SmallButtonClick;
         public Texture2D RallyPointCursor;
         public Texture2D Healthy, Damaged, Critical;
-        public Texture2D[] ResourceHealthBars;
+        public Texture2D[] RawMaterialHealthBars;
         public Material NotAllowedMaterial, AllowedMaterial;
         public GUISkin PlayerDetailsSkin;
         public AudioClip ClickSound;
         public float ClickVolume = 1.0f;
 
         private LSPlayer _cachedPlayer;
+        private RawMaterialManager _cachedResourceManager;
         private bool _cursorLocked;
         public bool IsMouseOverHUD { get; private set; }
         private const int _ordersBarWidth = 150, _resourceBarHeight = 40;
         private const int _selectionNameHeight = 15;
         private CursorState _activeCursorState;
         private int _currentFrame = 0;
-        private Dictionary<EnvironmentResourceType, long> _resourceValues;
-        private Dictionary<EnvironmentResourceType, long> _resourceLimits;
+        // private Dictionary<EnvironmentResourceType, long> _resourceValues;
+        // private Dictionary<EnvironmentResourceType, long> _resourceLimits;
         private const int _iconWidth = 32, _iconHeight = 32, _textWidth = 128, _textHeight = 32;
-        private static Dictionary<EnvironmentResourceType, Texture2D> _resourceImages;
+        private static Dictionary<RawMaterialType, Texture2D> _rawMaterialImages;
         private LSAgent _lastSelection;
         private float _sliderValue;
         private const int _buildImageWidth = 64, _buildImageHeight = 64;
@@ -66,80 +68,37 @@ namespace RTSLockstep.Player
         public void OnSetup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
+            _cachedResourceManager = GetComponentInParent<RawMaterialManager>();
+
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {
-                _resourceValues = new Dictionary<EnvironmentResourceType, long>();
-                _resourceLimits = new Dictionary<EnvironmentResourceType, long>();
-                _resourceImages = new Dictionary<EnvironmentResourceType, Texture2D>();
-                for (int i = 0; i < Resources.Length; i++)
+                _rawMaterialImages = new Dictionary<RawMaterialType, Texture2D>();
+
+                RawMaterialType[] values = (RawMaterialType[])Enum.GetValues(typeof(RawMaterialType));
+
+                for (int i = 0; i < RawMaterialIcons.Length; i++)
                 {
-                    switch (Resources[i].name)
+                    foreach (var type in values)
                     {
-                        case "Gold":
-                            _resourceImages.Add(EnvironmentResourceType.Gold, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Gold, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Gold, 0);
-                            break;
-                        case "Ore":
-                            _resourceImages.Add(EnvironmentResourceType.Ore, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Ore, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Ore, 0);
-                            break;
-                        case "Stone":
-                            _resourceImages.Add(EnvironmentResourceType.Stone, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Stone, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Stone, 0);
-                            break;
-                        case "Wood":
-                            _resourceImages.Add(EnvironmentResourceType.Wood, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Wood, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Wood, 0);
-                            break;
-                        case "Crystal":
-                            _resourceImages.Add(EnvironmentResourceType.Crystal, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Crystal, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Crystal, 0);
-                            break;
-                        case "Food":
-                            _resourceImages.Add(EnvironmentResourceType.Food, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Food, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Food, 0);
-                            break;
-                        case "Army":
-                            _resourceImages.Add(EnvironmentResourceType.Provision, Resources[i]);
-                            _resourceValues.Add(EnvironmentResourceType.Provision, 0);
-                            _resourceLimits.Add(EnvironmentResourceType.Provision, 0);
-                            break;
-                        default: break;
+                        if (RawMaterialIcons[i].name == type.ToString())
+                        {
+                            _rawMaterialImages.Add(type, RawMaterialIcons[i]);
+                        }
                     }
                 }
 
-                Dictionary<EnvironmentResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<EnvironmentResourceType, Texture2D>();
-                for (int i = 0; i < ResourceHealthBars.Length; i++)
+                Dictionary<RawMaterialType, Texture2D> resourceHealthBarTextures = new Dictionary<RawMaterialType, Texture2D>();
+                for (int i = 0; i < RawMaterialHealthBars.Length; i++)
                 {
-                    switch (ResourceHealthBars[i].name)
+                    foreach (var type in values)
                     {
-                        case "ore":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Ore, ResourceHealthBars[i]);
-                            break;
-                        case "stone":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Stone, ResourceHealthBars[i]);
-                            break;
-                        case "gold":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Gold, ResourceHealthBars[i]);
-                            break;
-                        case "crystal":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Crystal, ResourceHealthBars[i]);
-                            break;
-                        case "food":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Food, ResourceHealthBars[i]);
-                            break;
-                        case "wood":
-                            resourceHealthBarTextures.Add(EnvironmentResourceType.Wood, ResourceHealthBars[i]);
-                            break;
-                        default: break;
+                        if (RawMaterialHealthBars[i].name == type.ToString())
+                        {
+                            resourceHealthBarTextures.Add(type, RawMaterialHealthBars[i]);
+                        }
                     }
                 }
+
                 GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
                 GameResourceManager.StoreSelectBoxItems(SelectBoxSkin, Healthy, Damaged, Critical);
                 GameResourceManager.StoreConstructionMaterials(AllowedMaterial, NotAllowedMaterial);
@@ -174,7 +133,7 @@ namespace RTSLockstep.Player
                     {
                         DrawOrdersBar();
                     }
-                    DrawResourcesBar();
+                    DrawRawMaterialBar();
                     // call last to ensure that the custom mouse cursor is seen on top of everything
                     DrawMouseCursor();
                 }
@@ -278,12 +237,6 @@ namespace RTSLockstep.Player
             {
                 _cursorLocked = false;
             }
-        }
-
-        public void SetResourceValues(Dictionary<EnvironmentResourceType, long> resourceValues, Dictionary<EnvironmentResourceType, long> resourceLimits)
-        {
-            _resourceValues = resourceValues;
-            _resourceLimits = resourceLimits;
         }
 
         public CursorState GetCursorState()
@@ -462,31 +415,19 @@ namespace RTSLockstep.Player
             }
         }
 
-        private void DrawResourcesBar()
+        private void DrawRawMaterialBar()
         {
-            GUI.skin = ResourceSkin;
+            GUI.skin = RawMaterialSkin;
             GUI.BeginGroup(new Rect(0, 0, Screen.width, _resourceBarHeight));
             GUI.Box(new Rect(0, 0, Screen.width, _resourceBarHeight), "");
             int topPos = 4, iconLeft = 4, textLeft = 15;
-            DrawResourceIcon(EnvironmentResourceType.Gold, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Food, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Ore, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Stone, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Wood, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Crystal, iconLeft, textLeft, topPos);
-            iconLeft += _textWidth;
-            textLeft += _textWidth;
-            DrawResourceIcon(EnvironmentResourceType.Provision, iconLeft, textLeft, topPos);
+            foreach (KeyValuePair<RawMaterialType, Texture2D> keyValuePair in _rawMaterialImages)
+            {
+                DrawResourceIcon(keyValuePair.Key, iconLeft, textLeft, topPos);
+                iconLeft += _textWidth;
+                textLeft += _textWidth;
+            }
+
             int padding = 7;
             int buttonWidth = _ordersBarWidth - 2 * padding - _scrollBarWidth;
             int buttonHeight = _resourceBarHeight - 2 * padding;
@@ -511,10 +452,12 @@ namespace RTSLockstep.Player
             GUI.EndGroup();
         }
 
-        private void DrawResourceIcon(EnvironmentResourceType type, int iconLeft, int textLeft, int topPos)
+        private void DrawResourceIcon(RawMaterialType type, int iconLeft, int textLeft, int topPos)
         {
-            Texture2D icon = _resourceImages[type];
-            string text = _resourceValues[type].ToString() + "/" + _resourceLimits[type].ToString();
+            Texture2D icon = _rawMaterialImages[type];
+
+            string text = _cachedResourceManager.CurrentRawMaterials[type].currentValue.ToString() + "/" + _cachedResourceManager.CurrentRawMaterials[type].currentLimit.ToString();
+
             GUI.DrawTexture(new Rect(iconLeft, topPos, _iconWidth, _iconHeight), icon);
             GUI.Label(new Rect(textLeft, topPos, _textWidth, _textHeight), text);
         }
@@ -574,7 +517,7 @@ namespace RTSLockstep.Player
             // screen draw coordinates are inverted
             // adjust position base on the type of cursor being shown
             float topPos = Screen.height - Input.mousePosition.y;
-                                                                  
+
             if (_activeCursorState == CursorState.PanRight)
             {
                 leftPos = Screen.width - _activeCursor.width;

@@ -6,14 +6,14 @@ using UnityEngine;
 namespace RTSLockstep.Player
 {
     [Serializable]
-    public class BaseResourceInfo
+    public class RawMaterialInfo
     {
         [Range(0, 5000)]
-        public long startValue;
+        public long currentValue;
         [Range(0, 5000)]
-        public long startLimit;
+        public long currentLimit;
     }
 
     [Serializable]
-    public class BaseResources : SerializableDictionaryBase<EnvironmentResourceType, BaseResourceInfo> { };
+    public class RawMaterials : SerializableDictionaryBase<RawMaterialType, RawMaterialInfo> { };
 }

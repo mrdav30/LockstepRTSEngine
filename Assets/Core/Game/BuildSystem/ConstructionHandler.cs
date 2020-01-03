@@ -121,7 +121,7 @@ namespace RTSLockstep.BuildSystem
             if (buildingTemplate.MyAgentType == AgentType.Structure && buildingTemplate.GetComponent<Structure>())
             {
                 // check that the Player has the resources available before allowing them to create a new structure
-                if (!_cachedPlayer.PlayerResourceManager.CheckPlayerResources(buildingTemplate))
+                if (!_cachedPlayer.PlayerResourceManager.CheckPlayersRawMaterials(buildingTemplate))
                 {
                     Debug.Log("Not enough resources!");
                 }

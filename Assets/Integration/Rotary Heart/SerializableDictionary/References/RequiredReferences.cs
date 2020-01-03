@@ -23,8 +23,8 @@ namespace RotaryHeart.Lib.SerializableDictionary
         [SerializeField]
         private KeyCode _keyCode;
         [SerializeField]
-        private EnvironmentResourceType _resourceType;
+        private RawMaterialType _resourceType;
         [SerializeField]
-        private BaseResourceInfo _startingResourceInfo;
+        private RawMaterialInfo _startingResourceInfo;
     }
 }

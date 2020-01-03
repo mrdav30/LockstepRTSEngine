@@ -50,7 +50,7 @@ namespace RTSLockstep.Managers.GameManagers
         //  private static GameObjectList gameObjectList;
         private static Texture2D _healthyTexture, _damagedTexture, _criticalTexture;
         private static Material _allowedMaterial, _notAllowedMaterial;
-        private static Dictionary<EnvironmentResourceType, Texture2D> _resourceHealthBarTextures;
+        private static Dictionary<RawMaterialType, Texture2D> _resourceHealthBarTextures;
         private static float _buttonHeight = 40;
         private static float _headerHeight = 32, _headerWidth = 256;
         private static float _textHeight = 25, _padding = 15;
@@ -232,7 +232,7 @@ namespace RTSLockstep.Managers.GameManagers
             _notAllowedMaterial = notAllowed;
         }
 
-        public static Texture2D GetResourceHealthBar(EnvironmentResourceType resourceType)
+        public static Texture2D GetResourceHealthBar(RawMaterialType resourceType)
         {
             if (_resourceHealthBarTextures != null && _resourceHealthBarTextures.ContainsKey(resourceType))
             {
@@ -241,7 +241,7 @@ namespace RTSLockstep.Managers.GameManagers
             return null;
         }
 
-        public static void SetResourceHealthBarTextures(Dictionary<EnvironmentResourceType, Texture2D> images)
+        public static void SetResourceHealthBarTextures(Dictionary<RawMaterialType, Texture2D> images)
         {
             _resourceHealthBarTextures = images;
         }

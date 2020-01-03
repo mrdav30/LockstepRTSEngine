@@ -3,7 +3,6 @@ using UnityEngine;
 
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
-using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Managers.GameState;
 using RTSLockstep.Utility;
@@ -16,7 +15,7 @@ namespace RTSLockstep.Player
         public string Username;
         public bool IsCurrentPlayer;
         public HUD PlayerHUD;
-        public PlayerResourceManager PlayerResourceManager;
+        public RawMaterialManager PlayerResourceManager;
         public Color TeamColor;
 
         public Transform AgentContainer; 
@@ -54,7 +53,7 @@ namespace RTSLockstep.Player
                 Setup();
             }
 
-            PlayerResourceManager.OnInitialize();
+           // PlayerResourceManager.OnInitialize();
         }
 
         // Update is called once per frame
@@ -62,7 +61,7 @@ namespace RTSLockstep.Player
         {
             if (IsCurrentPlayer)
             {
-                PlayerResourceManager.OnVisualize();
+              //  PlayerResourceManager.OnVisualize();
                 PlayerHUD.OnVisualize();
             }
         }
@@ -79,7 +78,8 @@ namespace RTSLockstep.Player
             SaveManager.WriteString(writer, "Username", Username);
             SaveManager.WriteBoolean(writer, "Human", IsCurrentPlayer);
             SaveManager.WriteColor(writer, "TeamColor", TeamColor);
-            SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetResources(), PlayerResourceManager.GetResourceLimits());
+          //  SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentResources(), PlayerResourceManager.GetResourceLimits());
+            SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentRawMaterials());
             SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgents>().GetComponentsInChildren<LSAgent>());
         }
 
@@ -136,7 +136,7 @@ namespace RTSLockstep.Player
                             TeamColor = LoadManager.LoadColor(reader);
                             break;
                         case "Resources":
-                            PlayerResourceManager.LoadResources(reader);
+                            PlayerResourceManager.LoadPlayersRawMaterials(reader);
                             break;
                         case "Units":
                             LoadLSAgents(reader);

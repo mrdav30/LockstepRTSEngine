@@ -49,9 +49,9 @@ namespace RTSLockstep.Managers
             return new Rect(selectBoxLeft, selectBoxTop, selectBoxWidth, selectBoxHeight);
         }
 
-        public static EnvironmentResourceType GetResourceType(string resourceName)
+        public static RawMaterialType GetResourceType(string resourceName)
         {
-            return (EnvironmentResourceType)Enum.Parse(typeof(EnvironmentResourceType), resourceName);            
+            return (RawMaterialType)Enum.Parse(typeof(RawMaterialType), resourceName);            
         }
 
         public static FlagState GetFlagState(string type)

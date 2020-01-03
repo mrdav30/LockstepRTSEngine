@@ -178,7 +178,7 @@ namespace RTSLockstep.Grouping
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer.PlayerResourceManager.RemoveResources(newRTSAgent);
+                        GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer.PlayerResourceManager.RemovePlayersRawMaterials(newRTSAgent);
 
                         newRTSAgent.SetControllingPlayer(GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer);
 

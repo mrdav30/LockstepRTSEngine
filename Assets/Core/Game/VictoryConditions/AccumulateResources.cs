@@ -7,7 +7,7 @@ namespace RTSLockstep.VictoryConditions
     {
         public int amount = 1050;
 
-        private EnvironmentResourceType type = EnvironmentResourceType.Gold;
+        private RawMaterialType type = RawMaterialType.Gold;
 
         public override string GetDescription()
         {
@@ -16,7 +16,7 @@ namespace RTSLockstep.VictoryConditions
 
         public override bool PlayerMeetsConditions(LSPlayer player)
         {
-            return player && !player.IsDead() && player.PlayerResourceManager.GetResourceAmount(type) >= amount;
+            return player && !player.IsDead() && player.PlayerResourceManager.GetRawMaterialAmount(type) >= amount;
         }
     }
 }

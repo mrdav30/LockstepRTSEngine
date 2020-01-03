@@ -33,7 +33,7 @@
         RallyPoint
     }
 
-    public enum EnvironmentResourceType
+    public enum RawMaterialType
     {
         Gold,
         Provision,
@@ -42,8 +42,6 @@
         Stone,
         Wood,
         Food
-        //    ,
-        //Unknown
     }
 
     // Used to determine influence on structure

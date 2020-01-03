@@ -16,7 +16,7 @@ namespace RTSLockstep.Abilities.Essential
         public bool provisioner;
         public int provisionAmount;
         [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
-        private EnvironmentResourceType[] _resourceStorage;
+        private RawMaterialType[] _resourceStorage;
         public StructureType StructureType;
         /// <summary>
         /// Every wall pillar needs a corresponding section of wall to hold up.
@@ -74,7 +74,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace RTSLockstep.Abilities.Essential
             return upgradeLevel;
         }
 
-        public bool CanStoreResources(EnvironmentResourceType resourceType)
+        public bool CanStoreResources(RawMaterialType resourceType)
         {
 
             if (_resourceStorage.Length > 0)
@@ -143,7 +143,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             if (provisioner)
             {
-                Agent.GetControllingPlayer().PlayerResourceManager.DecrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().PlayerResourceManager.DecrementRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
             }
 
             GridBuilder.Unbuild(this);

@@ -6,7 +6,6 @@ using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Managers.GameManagers;
-using RTSLockstep.BehaviourHelpers;
 
 namespace RTSLockstep.Player
 {

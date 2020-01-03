@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
-using System.Collections.Generic;
 using RTSLockstep.Agents;
 using RTSLockstep.Abilities;
 using RTSLockstep.Player;
-using RTSLockstep.LSResources;
 using RTSLockstep.Environment;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
@@ -33,33 +31,31 @@ namespace RTSLockstep.Managers.GameState
             }
         }
 
-        public static void SavePlayerResources(JsonWriter writer, Dictionary<EnvironmentResourceType, long> resources, Dictionary<EnvironmentResourceType, long> resourceLimits)
+        public static void SavePlayerResources(JsonWriter writer, RawMaterials currentResources)
         {
-            if (writer == null)
+            if (writer.IsNull())
             {
                 return;
             }
 
             writer.WritePropertyName("Resources");
             writer.WriteStartArray();
-            foreach (KeyValuePair<EnvironmentResourceType, long> pair in resources)
+            foreach (var pair in currentResources)
             {
                 writer.WriteStartObject();
-                WriteLong(writer, pair.Key.ToString(), pair.Value);
+                WriteLong(writer, pair.Key.ToString(), pair.Value.currentValue);
                 writer.WriteEndObject();
-            }
-            foreach (KeyValuePair<EnvironmentResourceType, long> pair in resourceLimits)
-            {
                 writer.WriteStartObject();
-                WriteLong(writer, pair.Key.ToString() + "_Limit", pair.Value);
+                WriteLong(writer, pair.Key.ToString() + "_Limit", pair.Value.currentLimit);
                 writer.WriteEndObject();
             }
+
             writer.WriteEndArray();
         }
 
         public static void SavePlayerRTSAgents(JsonWriter writer, LSAgent[] agents)
         {
-            if (writer == null)
+            if (writer.IsNull())
             {
                 return;
             }
