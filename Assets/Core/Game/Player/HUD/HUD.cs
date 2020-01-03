@@ -20,34 +20,36 @@ namespace RTSLockstep.Player
     {
         #region Properties
         // public 
-        public GUISkin RawMaterialSkin, OrdersSkin, SelectBoxSkin;
-        private Texture2D _activeCursor;
+        public GUISkin RawMaterialSkin, OrdersSkin, SelectBoxSkin, PlayerDetailsSkin, MouseCursorSkin;
         public Texture2D PointerCursor, SelectCursor, LeftCursor, RightCursor, UpCursor, DownCursor;
         public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors;
-        public GUISkin MouseCursorSkin;
         public RawMaterialsHUD RawMaterialIcons;
+        public Texture2D RallyPointCursor;
         // buildFrame provides a border around each buildImage
         // buildMask is used to show the user how far through the current build the object at the front of the queue is
         public Texture2D ButtonHover, ButtonClick;
         public Texture2D BuildFrame, BuildMask;
         public Texture2D SmallButtonHover, SmallButtonClick;
-        public Texture2D RallyPointCursor;
         public Texture2D Healthy, Damaged, Critical;
         public Material NotAllowedMaterial, AllowedMaterial;
-        public GUISkin PlayerDetailsSkin;
+
         public AudioClip ClickSound;
         public float ClickVolume = 1.0f;
 
+        public bool IsMouseOverHUD { get; private set; }
+
         private LSPlayer _cachedPlayer;
         private RawMaterialManager _cachedResourceManager;
+
+        private Texture2D _activeCursor;
         private bool _cursorLocked;
-        public bool IsMouseOverHUD { get; private set; }
+        private LSAgent _lastSelection;
+
         private const int _ordersBarWidth = 150, _resourceBarHeight = 40;
         private const int _selectionNameHeight = 15;
         private CursorState _activeCursorState;
         private int _currentFrame = 0;
         private const int _iconWidth = 32, _iconHeight = 32, _textWidth = 128, _textHeight = 32;
-        private LSAgent _lastSelection;
         private float _sliderValue;
         private const int _buildImageWidth = 64, _buildImageHeight = 64;
         // value for determining the height of the area we will draw the actions in
@@ -56,6 +58,7 @@ namespace RTSLockstep.Player
         private const int _buttonSpacing = 7;
         private const int _scrollBarWidth = 22;
         private const int _buildImagePadding = 8;
+
         private AudioElement _audioElement;
         #endregion
 
