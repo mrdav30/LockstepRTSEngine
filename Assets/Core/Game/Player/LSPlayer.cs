@@ -16,7 +16,7 @@ namespace RTSLockstep.Player
         public string Username;
         public bool IsCurrentPlayer;
         public HUD PlayerHUD;
-        public ResourceManager PlayerResourceManager;
+        public PlayerResourceManager PlayerResourceManager;
         public Color TeamColor;
 
         public Transform AgentContainer; 

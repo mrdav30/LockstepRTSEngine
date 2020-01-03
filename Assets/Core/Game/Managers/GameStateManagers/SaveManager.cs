@@ -33,7 +33,7 @@ namespace RTSLockstep.Managers.GameState
             }
         }
 
-        public static void SavePlayerResources(JsonWriter writer, Dictionary<ResourceType, long> resources, Dictionary<ResourceType, long> resourceLimits)
+        public static void SavePlayerResources(JsonWriter writer, Dictionary<EnvironmentResourceType, long> resources, Dictionary<EnvironmentResourceType, long> resourceLimits)
         {
             if (writer == null)
             {
@@ -42,13 +42,13 @@ namespace RTSLockstep.Managers.GameState
 
             writer.WritePropertyName("Resources");
             writer.WriteStartArray();
-            foreach (KeyValuePair<ResourceType, long> pair in resources)
+            foreach (KeyValuePair<EnvironmentResourceType, long> pair in resources)
             {
                 writer.WriteStartObject();
                 WriteLong(writer, pair.Key.ToString(), pair.Value);
                 writer.WriteEndObject();
             }
-            foreach (KeyValuePair<ResourceType, long> pair in resourceLimits)
+            foreach (KeyValuePair<EnvironmentResourceType, long> pair in resourceLimits)
             {
                 writer.WriteStartObject();
                 WriteLong(writer, pair.Key.ToString() + "_Limit", pair.Value);

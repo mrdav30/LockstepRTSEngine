@@ -49,27 +49,9 @@ namespace RTSLockstep.Managers
             return new Rect(selectBoxLeft, selectBoxTop, selectBoxWidth, selectBoxHeight);
         }
 
-        public static ResourceType GetResourceType(string type)
+        public static EnvironmentResourceType GetResourceType(string resourceName)
         {
-            switch (type)
-            {
-                case "Gold":
-                    return ResourceType.Gold;
-                case "Army":
-                    return ResourceType.Provision;
-                case "Ore":
-                    return ResourceType.Ore;
-                case "Crystal":
-                    return ResourceType.Crystal;
-                case "Stone":
-                    return ResourceType.Stone;
-                case "Wood":
-                    return ResourceType.Wood;
-                case "Food":
-                    return ResourceType.Food;
-                default:
-                    return ResourceType.Unknown;
-            }
+            return (EnvironmentResourceType)Enum.Parse(typeof(EnvironmentResourceType), resourceName);            
         }
 
         public static FlagState GetFlagState(string type)

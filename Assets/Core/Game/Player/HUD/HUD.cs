@@ -46,10 +46,10 @@ namespace RTSLockstep.Player
         private const int _selectionNameHeight = 15;
         private CursorState _activeCursorState;
         private int _currentFrame = 0;
-        private Dictionary<ResourceType, long> _resourceValues;
-        private Dictionary<ResourceType, long> _resourceLimits;
+        private Dictionary<EnvironmentResourceType, long> _resourceValues;
+        private Dictionary<EnvironmentResourceType, long> _resourceLimits;
         private const int _iconWidth = 32, _iconHeight = 32, _textWidth = 128, _textHeight = 32;
-        private static Dictionary<ResourceType, Texture2D> _resourceImages;
+        private static Dictionary<EnvironmentResourceType, Texture2D> _resourceImages;
         private LSAgent _lastSelection;
         private float _sliderValue;
         private const int _buildImageWidth = 64, _buildImageHeight = 64;
@@ -68,74 +68,74 @@ namespace RTSLockstep.Player
             _cachedPlayer = GetComponentInParent<LSPlayer>();
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {
-                _resourceValues = new Dictionary<ResourceType, long>();
-                _resourceLimits = new Dictionary<ResourceType, long>();
-                _resourceImages = new Dictionary<ResourceType, Texture2D>();
+                _resourceValues = new Dictionary<EnvironmentResourceType, long>();
+                _resourceLimits = new Dictionary<EnvironmentResourceType, long>();
+                _resourceImages = new Dictionary<EnvironmentResourceType, Texture2D>();
                 for (int i = 0; i < Resources.Length; i++)
                 {
                     switch (Resources[i].name)
                     {
                         case "Gold":
-                            _resourceImages.Add(ResourceType.Gold, Resources[i]);
-                            _resourceValues.Add(ResourceType.Gold, 0);
-                            _resourceLimits.Add(ResourceType.Gold, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Gold, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Gold, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Gold, 0);
                             break;
                         case "Ore":
-                            _resourceImages.Add(ResourceType.Ore, Resources[i]);
-                            _resourceValues.Add(ResourceType.Ore, 0);
-                            _resourceLimits.Add(ResourceType.Ore, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Ore, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Ore, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Ore, 0);
                             break;
                         case "Stone":
-                            _resourceImages.Add(ResourceType.Stone, Resources[i]);
-                            _resourceValues.Add(ResourceType.Stone, 0);
-                            _resourceLimits.Add(ResourceType.Stone, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Stone, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Stone, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Stone, 0);
                             break;
                         case "Wood":
-                            _resourceImages.Add(ResourceType.Wood, Resources[i]);
-                            _resourceValues.Add(ResourceType.Wood, 0);
-                            _resourceLimits.Add(ResourceType.Wood, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Wood, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Wood, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Wood, 0);
                             break;
                         case "Crystal":
-                            _resourceImages.Add(ResourceType.Crystal, Resources[i]);
-                            _resourceValues.Add(ResourceType.Crystal, 0);
-                            _resourceLimits.Add(ResourceType.Crystal, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Crystal, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Crystal, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Crystal, 0);
                             break;
                         case "Food":
-                            _resourceImages.Add(ResourceType.Food, Resources[i]);
-                            _resourceValues.Add(ResourceType.Food, 0);
-                            _resourceLimits.Add(ResourceType.Food, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Food, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Food, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Food, 0);
                             break;
                         case "Army":
-                            _resourceImages.Add(ResourceType.Provision, Resources[i]);
-                            _resourceValues.Add(ResourceType.Provision, 0);
-                            _resourceLimits.Add(ResourceType.Provision, 0);
+                            _resourceImages.Add(EnvironmentResourceType.Provision, Resources[i]);
+                            _resourceValues.Add(EnvironmentResourceType.Provision, 0);
+                            _resourceLimits.Add(EnvironmentResourceType.Provision, 0);
                             break;
                         default: break;
                     }
                 }
 
-                Dictionary<ResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<ResourceType, Texture2D>();
+                Dictionary<EnvironmentResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<EnvironmentResourceType, Texture2D>();
                 for (int i = 0; i < ResourceHealthBars.Length; i++)
                 {
                     switch (ResourceHealthBars[i].name)
                     {
                         case "ore":
-                            resourceHealthBarTextures.Add(ResourceType.Ore, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Ore, ResourceHealthBars[i]);
                             break;
                         case "stone":
-                            resourceHealthBarTextures.Add(ResourceType.Stone, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Stone, ResourceHealthBars[i]);
                             break;
                         case "gold":
-                            resourceHealthBarTextures.Add(ResourceType.Gold, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Gold, ResourceHealthBars[i]);
                             break;
                         case "crystal":
-                            resourceHealthBarTextures.Add(ResourceType.Crystal, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Crystal, ResourceHealthBars[i]);
                             break;
                         case "food":
-                            resourceHealthBarTextures.Add(ResourceType.Food, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Food, ResourceHealthBars[i]);
                             break;
                         case "wood":
-                            resourceHealthBarTextures.Add(ResourceType.Wood, ResourceHealthBars[i]);
+                            resourceHealthBarTextures.Add(EnvironmentResourceType.Wood, ResourceHealthBars[i]);
                             break;
                         default: break;
                     }
@@ -280,7 +280,7 @@ namespace RTSLockstep.Player
             }
         }
 
-        public void SetResourceValues(Dictionary<ResourceType, long> resourceValues, Dictionary<ResourceType, long> resourceLimits)
+        public void SetResourceValues(Dictionary<EnvironmentResourceType, long> resourceValues, Dictionary<EnvironmentResourceType, long> resourceLimits)
         {
             _resourceValues = resourceValues;
             _resourceLimits = resourceLimits;
@@ -468,25 +468,25 @@ namespace RTSLockstep.Player
             GUI.BeginGroup(new Rect(0, 0, Screen.width, _resourceBarHeight));
             GUI.Box(new Rect(0, 0, Screen.width, _resourceBarHeight), "");
             int topPos = 4, iconLeft = 4, textLeft = 15;
-            DrawResourceIcon(ResourceType.Gold, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Gold, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Food, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Food, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Ore, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Ore, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Stone, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Stone, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Wood, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Wood, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Crystal, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Crystal, iconLeft, textLeft, topPos);
             iconLeft += _textWidth;
             textLeft += _textWidth;
-            DrawResourceIcon(ResourceType.Provision, iconLeft, textLeft, topPos);
+            DrawResourceIcon(EnvironmentResourceType.Provision, iconLeft, textLeft, topPos);
             int padding = 7;
             int buttonWidth = _ordersBarWidth - 2 * padding - _scrollBarWidth;
             int buttonHeight = _resourceBarHeight - 2 * padding;
@@ -511,7 +511,7 @@ namespace RTSLockstep.Player
             GUI.EndGroup();
         }
 
-        private void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topPos)
+        private void DrawResourceIcon(EnvironmentResourceType type, int iconLeft, int textLeft, int topPos)
         {
             Texture2D icon = _resourceImages[type];
             string text = _resourceValues[type].ToString() + "/" + _resourceLimits[type].ToString();

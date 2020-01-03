@@ -16,7 +16,7 @@ namespace RTSLockstep.Abilities.Essential
         public bool provisioner;
         public int provisionAmount;
         [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
-        private ResourceType[] _resourceStorage;
+        private EnvironmentResourceType[] _resourceStorage;
         public StructureType StructureType;
         /// <summary>
         /// Every wall pillar needs a corresponding section of wall to hold up.
@@ -74,7 +74,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace RTSLockstep.Abilities.Essential
                 if (provisioner && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(ResourceType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerResourceManager.IncrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
                 }
             }
         }
@@ -113,7 +113,7 @@ namespace RTSLockstep.Abilities.Essential
             return upgradeLevel;
         }
 
-        public bool CanStoreResources(ResourceType resourceType)
+        public bool CanStoreResources(EnvironmentResourceType resourceType)
         {
 
             if (_resourceStorage.Length > 0)
@@ -143,7 +143,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             if (provisioner)
             {
-                Agent.GetControllingPlayer().PlayerResourceManager.DecrementResourceLimit(ResourceType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().PlayerResourceManager.DecrementResourceLimit(EnvironmentResourceType.Provision, provisionAmount);
             }
 
             GridBuilder.Unbuild(this);

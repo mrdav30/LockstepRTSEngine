@@ -50,9 +50,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e1b577b86a62d74c959725b3fdd2315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BasePriority: 0
   Username: 
-  IsHuman: 0
+  IsCurrentPlayer: 0
   PlayerHUD: {fileID: 4771793385981513702}
   PlayerResourceManager: {fileID: 1664733367458406862}
   TeamColor: {r: 0, g: 0, b: 0, a: 0}
@@ -117,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21af70c1fdb88bf4d979ae9654184fa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startingResources:
+  CurrentResources:
     reorderableList:
       canAdd: 1
       canRemove: 1
@@ -140,8 +139,8 @@ MonoBehaviour:
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
     isExpanded: 1
-    _keyValues: 00000000020000000400000005000000060000000300000001000000
-    _keys: 00000000020000000400000005000000060000000300000001000000
+    _keyValues: 00000000010000000200000003000000040000000500000006000000
+    _keys: 00000000010000000200000003000000040000000500000006000000
     _values:
     - startValue: 0
       startLimit: 0

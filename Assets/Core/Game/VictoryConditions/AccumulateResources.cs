@@ -7,7 +7,7 @@ namespace RTSLockstep.VictoryConditions
     {
         public int amount = 1050;
 
-        private ResourceType type = ResourceType.Gold;
+        private EnvironmentResourceType type = EnvironmentResourceType.Gold;
 
         public override string GetDescription()
         {

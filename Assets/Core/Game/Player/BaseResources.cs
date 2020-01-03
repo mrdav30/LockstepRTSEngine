@@ -15,5 +15,5 @@ namespace RTSLockstep.Player
     }
 
     [Serializable]
-    public class BaseResources : SerializableDictionaryBase<ResourceType, BaseResourceInfo> { };
+    public class BaseResources : SerializableDictionaryBase<EnvironmentResourceType, BaseResourceInfo> { };
 }

@@ -28,7 +28,7 @@ namespace RTSLockstep.Abilities.Essential
         [HideInInspector]
         public bool IsEmptying;
 
-        public ResourceType HarvestType { get; private set; }
+        public EnvironmentResourceType HarvestType { get; private set; }
         public LSAgent CurrentTarget { get; private set; }
         public LSAgent LastResourceTarget { get; private set; }
         public LSAgent LastStorageTarget { get; private set; }
@@ -111,10 +111,6 @@ namespace RTSLockstep.Abilities.Essential
                 {
                     CurrentTarget = obj;
                 }
-            }
-            else
-            {
-                HarvestType = ResourceType.Unknown;
             }
         }
 
@@ -206,7 +202,7 @@ namespace RTSLockstep.Abilities.Essential
 
             _currentLoadAmount -= deposit;
 
-            ResourceType depositType = HarvestType;
+            EnvironmentResourceType depositType = HarvestType;
             Agent.Controller.ControllingPlayer.PlayerResourceManager.AddResource(depositType, deposit);
 
             if (_currentLoadAmount <= 0)
@@ -304,10 +300,10 @@ namespace RTSLockstep.Abilities.Essential
 
                 if (IsHarvesting)
                 {
-                    ResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
+                    EnvironmentResourceType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
 
                     // we can only collect one resource at a time, other resources are lost
-                    if (resourceType == ResourceType.Unknown || resourceType != HarvestType)
+                    if (resourceType != HarvestType)
                     {
                         HarvestType = resourceType;
                         _currentLoadAmount = 0;
@@ -529,7 +525,7 @@ namespace RTSLockstep.Abilities.Essential
         {
             switch (HarvestType)
             {
-                case ResourceType.Wood:
+                case EnvironmentResourceType.Wood:
                     HarvestingAnimState = AnimState.EngagingWood;
                     MovingAnimState = AnimState.MovingWood;
                     IdlingAnimState = AnimState.IdlingWood;

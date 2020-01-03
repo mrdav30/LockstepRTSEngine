@@ -28,7 +28,7 @@ using Coroutine = RTSLockstep.Utility.Coroutine;
 namespace RTSLockstep.Agents
 {
     [Serializable]
-    public class ResourceCost : SerializableDictionaryBase<ResourceType, int> { };
+    public class ResourceCost : SerializableDictionaryBase<EnvironmentResourceType, int> { };
 
     [RequireComponent(typeof(UnityLSBody))]
     /// <summary>
@@ -63,13 +63,13 @@ namespace RTSLockstep.Agents
         [SerializeField]
         public ResourceCost resourceCost = new ResourceCost
         {
-            {ResourceType.Gold, 0 },
-            {ResourceType.Ore, 0 },
-            {ResourceType.Stone, 0 },
-            {ResourceType.Wood, 0 },
-            {ResourceType.Food, 0 },
-            {ResourceType.Crystal, 0 },
-            {ResourceType.Provision, 0 }
+            {EnvironmentResourceType.Gold, 0 },
+            {EnvironmentResourceType.Ore, 0 },
+            {EnvironmentResourceType.Stone, 0 },
+            {EnvironmentResourceType.Wood, 0 },
+            {EnvironmentResourceType.Food, 0 },
+            {EnvironmentResourceType.Crystal, 0 },
+            {EnvironmentResourceType.Provision, 0 }
         };
 
         public string MyAgentCode { get; private set; }
@@ -317,7 +317,7 @@ namespace RTSLockstep.Agents
             if (!_provisioned)
             {
                 _provisioned = true;
-                _cachedPlayer.PlayerResourceManager.AddResource(ResourceType.Provision, resourceCost[ResourceType.Provision]);
+                _cachedPlayer.PlayerResourceManager.AddResource(EnvironmentResourceType.Provision, resourceCost[EnvironmentResourceType.Provision]);
             }
 
             if (Influencer.IsNotNull())

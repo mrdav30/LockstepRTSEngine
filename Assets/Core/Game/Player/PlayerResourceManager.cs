@@ -8,24 +8,15 @@ using RTSLockstep.Utility;
 
 namespace RTSLockstep.Player
 {
-    public class ResourceManager : MonoBehaviour
+    public class PlayerResourceManager : MonoBehaviour
     {
         #region Properties
         [SerializeField]
-        private BaseResources _startingResources = new BaseResources
-        {
-            {ResourceType.Gold, null},
-            {ResourceType.Ore, null},
-            {ResourceType.Stone, null},
-            {ResourceType.Wood, null},
-            {ResourceType.Food, null},
-            {ResourceType.Crystal, null},
-            {ResourceType.Provision, null}
-        };
+        public BaseResources CurrentResources;
 
         private LSPlayer _cachedPlayer;
-        private Dictionary<ResourceType, long> _resources;
-        private Dictionary<ResourceType, long> _resourceLimits;
+        private Dictionary<EnvironmentResourceType, long> _resources;
+        private Dictionary<EnvironmentResourceType, long> _resourceLimits;
         #endregion
 
         #region Behavior
@@ -51,50 +42,50 @@ namespace RTSLockstep.Player
         #endregion
 
         #region Public
-        public void AddResource(ResourceType type, long amount)
+        public void AddResource(EnvironmentResourceType type, long amount)
         {
             _resources[type] += amount;
         }
 
-        public void IncrementResourceLimit(ResourceType type, long amount)
+        public void IncrementResourceLimit(EnvironmentResourceType type, long amount)
         {
             _resourceLimits[type] += amount;
         }
 
-        public Dictionary<ResourceType, long> GetResources()
+        public Dictionary<EnvironmentResourceType, long> GetResources()
         {
             return _resources;
         }
 
-        public long GetResourceAmount(ResourceType type)
+        public long GetResourceAmount(EnvironmentResourceType type)
         {
             return _resources[type];
         }
 
-        public Dictionary<ResourceType, long> GetResourceLimits()
+        public Dictionary<EnvironmentResourceType, long> GetResourceLimits()
         {
             return _resourceLimits;
         }
 
-        public long GetResourceLimit(ResourceType type)
+        public long GetResourceLimit(EnvironmentResourceType type)
         {
             return _resourceLimits[type];
         }
 
-        public void RemoveResource(ResourceType type, int amount)
+        public void RemoveResource(EnvironmentResourceType type, int amount)
         {
             _resources[type] -= amount;
         }
 
-        public void DecrementResourceLimit(ResourceType type, int amount)
+        public void DecrementResourceLimit(EnvironmentResourceType type, int amount)
         {
             _resourceLimits[type] -= amount;
         }
 
-        public bool CheckResources(LSAgent agent)
+        public bool CheckPlayerResources(LSAgent agent)
         {
             bool validResources = true;
-            foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
+            foreach (KeyValuePair<EnvironmentResourceType, int> entry in agent.resourceCost)
             {
                 if (entry.Value > 0)
                 {
@@ -111,18 +102,19 @@ namespace RTSLockstep.Player
                             if (entry.Value > GetResourceAmount(entry.Key))
                             {
                                 validResources = false;
-                                Debug.Log("not enough _resources!");
+                                Debug.Log("not enough resources!");
                             }
                             break;
                     };
                 };
             }
+
             return validResources;
         }
 
         public void RemoveResources(LSAgent agent)
         {
-            foreach (KeyValuePair<ResourceType, int> entry in agent.resourceCost)
+            foreach (KeyValuePair<EnvironmentResourceType, int> entry in agent.resourceCost)
             {
                 if (entry.Value > 0)
                 {
@@ -141,41 +133,41 @@ namespace RTSLockstep.Player
         #endregion
 
         #region Private
-        private Dictionary<ResourceType, long> InitResourceList()
+        private Dictionary<EnvironmentResourceType, long> InitResourceList()
         {
-            Dictionary<ResourceType, long> list = new Dictionary<ResourceType, long>
+            Dictionary<EnvironmentResourceType, long> list = new Dictionary<EnvironmentResourceType, long>
             {
-                { ResourceType.Gold, 0 },
-                { ResourceType.Ore, 0 },
-                { ResourceType.Stone, 0 },
-                { ResourceType.Wood, 0 },
-                { ResourceType.Crystal, 0 },
-                { ResourceType.Food, 0 },
-                { ResourceType.Provision, 0 }
+                { EnvironmentResourceType.Gold, 0 },
+                { EnvironmentResourceType.Ore, 0 },
+                { EnvironmentResourceType.Stone, 0 },
+                { EnvironmentResourceType.Wood, 0 },
+                { EnvironmentResourceType.Crystal, 0 },
+                { EnvironmentResourceType.Food, 0 },
+                { EnvironmentResourceType.Provision, 0 }
             };
             return list;
         }
 
         private void AddStartResourceLimits()
         {
-            IncrementResourceLimit(ResourceType.Gold, _startingResources[ResourceType.Gold].startLimit);
-            IncrementResourceLimit(ResourceType.Ore, _startingResources[ResourceType.Ore].startLimit);
-            IncrementResourceLimit(ResourceType.Stone, _startingResources[ResourceType.Stone].startLimit);
-            IncrementResourceLimit(ResourceType.Wood, _startingResources[ResourceType.Wood].startLimit);
-            IncrementResourceLimit(ResourceType.Crystal, _startingResources[ResourceType.Crystal].startLimit);
-            IncrementResourceLimit(ResourceType.Food, _startingResources[ResourceType.Food].startLimit);
-            IncrementResourceLimit(ResourceType.Provision, _startingResources[ResourceType.Provision].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Gold, CurrentResources[EnvironmentResourceType.Gold].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Ore, CurrentResources[EnvironmentResourceType.Ore].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Stone, CurrentResources[EnvironmentResourceType.Stone].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Wood, CurrentResources[EnvironmentResourceType.Wood].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Crystal, CurrentResources[EnvironmentResourceType.Crystal].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Food, CurrentResources[EnvironmentResourceType.Food].startLimit);
+            IncrementResourceLimit(EnvironmentResourceType.Provision, CurrentResources[EnvironmentResourceType.Provision].startLimit);
         }
 
         private void AddStartResources()
         {
-            AddResource(ResourceType.Gold, _startingResources[ResourceType.Gold].startValue);
-            AddResource(ResourceType.Ore, _startingResources[ResourceType.Ore].startValue);
-            AddResource(ResourceType.Stone, _startingResources[ResourceType.Stone].startValue);
-            AddResource(ResourceType.Wood, _startingResources[ResourceType.Wood].startValue);
-            AddResource(ResourceType.Crystal, _startingResources[ResourceType.Crystal].startValue);
-            AddResource(ResourceType.Food, _startingResources[ResourceType.Food].startValue);
-            AddResource(ResourceType.Provision, _startingResources[ResourceType.Provision].startValue);
+            AddResource(EnvironmentResourceType.Gold, CurrentResources[EnvironmentResourceType.Gold].startValue);
+            AddResource(EnvironmentResourceType.Ore, CurrentResources[EnvironmentResourceType.Ore].startValue);
+            AddResource(EnvironmentResourceType.Stone, CurrentResources[EnvironmentResourceType.Stone].startValue);
+            AddResource(EnvironmentResourceType.Wood, CurrentResources[EnvironmentResourceType.Wood].startValue);
+            AddResource(EnvironmentResourceType.Crystal, CurrentResources[EnvironmentResourceType.Crystal].startValue);
+            AddResource(EnvironmentResourceType.Food, CurrentResources[EnvironmentResourceType.Food].startValue);
+            AddResource(EnvironmentResourceType.Provision, CurrentResources[EnvironmentResourceType.Provision].startValue);
         }
 
         public void LoadResources(JsonTextReader reader)
@@ -199,46 +191,46 @@ namespace RTSLockstep.Player
                         switch (currValue)
                         {
                             case "Gold":
-                                _startingResources[ResourceType.Gold].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Gold].startValue = (int)(long)reader.Value;
                                 break;
                             case "Gold_Limit":
-                                _startingResources[ResourceType.Gold].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Gold].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Army":
-                                _startingResources[ResourceType.Provision].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Provision].startValue = (int)(long)reader.Value;
                                 break;
                             case "Army_Limit":
-                                _startingResources[ResourceType.Provision].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Provision].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Ore":
-                                _startingResources[ResourceType.Ore].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Ore].startValue = (int)(long)reader.Value;
                                 break;
                             case "Ore_Limit":
-                                _startingResources[ResourceType.Ore].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Ore].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Crystal":
-                                _startingResources[ResourceType.Crystal].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Crystal].startValue = (int)(long)reader.Value;
                                 break;
                             case "Crystal_Limit":
-                                _startingResources[ResourceType.Crystal].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Crystal].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Wood":
-                                _startingResources[ResourceType.Wood].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Wood].startValue = (int)(long)reader.Value;
                                 break;
                             case "Wood_Limit":
-                                _startingResources[ResourceType.Wood].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Wood].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Stone":
-                                _startingResources[ResourceType.Stone].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Stone].startValue = (int)(long)reader.Value;
                                 break;
                             case "Stone_Limit":
-                                _startingResources[ResourceType.Stone].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Stone].startLimit = (int)(long)reader.Value;
                                 break;
                             case "Food":
-                                _startingResources[ResourceType.Food].startValue = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Food].startValue = (int)(long)reader.Value;
                                 break;
                             case "Food_Limit":
-                                _startingResources[ResourceType.Food].startLimit = (int)(System.Int64)reader.Value;
+                                CurrentResources[EnvironmentResourceType.Food].startLimit = (int)(long)reader.Value;
                                 break;
                             default:
                                 break;

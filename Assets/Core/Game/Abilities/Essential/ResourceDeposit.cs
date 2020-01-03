@@ -13,7 +13,7 @@ namespace RTSLockstep.Abilities.Essential
 
         #region Serialized Values (Further description in properties)
         public long Capacity;
-        public ResourceType ResourceType;
+        public EnvironmentResourceType ResourceType;
         [SerializeField]
         private GameObject resourceFull, resourceHalf, resourceQuarter, resourceEmpty;
         #endregion
