@@ -46,9 +46,11 @@ namespace RTSLockstep.Agents.Player
 
                 bool isPlayerManaged = item.Name == SelectedController ? true : false;
 
-                PlayerManager.CreatePlayer(controller, isPlayerManaged);
+                PlayerManager.AddPlayer(controller, isPlayerManaged);
                 CodeIDMap.Add(item.Name, controller.ControllerID);
             }
+
+            PlayerManager.InitializePlayers();
         }
 
         public LocalAgentController GetInstanceManager(string controllerCode)

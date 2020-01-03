@@ -10,7 +10,7 @@ using RTSLockstep.Utility;
 
 namespace RTSLockstep.Player
 {
-    public class LSPlayer : BehaviourHelper
+    public class LSPlayer : MonoBehaviour
     {
         #region Properties
         public string Username;
@@ -28,8 +28,8 @@ namespace RTSLockstep.Player
         #region MonoBehavior
         protected void Setup()
         {
-            PlayerResourceManager.Setup();
-            PlayerHUD.Setup();
+            PlayerResourceManager.OnSetup();
+            PlayerHUD.OnSetup();
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
             {
@@ -47,29 +47,29 @@ namespace RTSLockstep.Player
         }
 
         // Use this for initialization
-        protected override void OnInitialize()
+        public void OnInitialize()
         {
             if (!IsSetup)
             {
                 Setup();
             }
 
-            PlayerResourceManager.Initialize();
+            PlayerResourceManager.OnInitialize();
         }
 
         // Update is called once per frame
-        protected override void OnVisualize()
+        public void OnVisualize()
         {
             if (IsCurrentPlayer)
             {
-                PlayerResourceManager.Visualize();
-                PlayerHUD.Visualize();
+                PlayerResourceManager.OnVisualize();
+                PlayerHUD.OnVisualize();
             }
         }
 
-        protected override void OnUpdateGUI()
+        public void OnUpdateGUI()
         {
-            PlayerHUD.DoGUI();
+            PlayerHUD.OnUpdateGUI();
         }
         #endregion
 

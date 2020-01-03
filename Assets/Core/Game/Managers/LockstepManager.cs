@@ -275,6 +275,7 @@ namespace RTSLockstep.Managers
 
         internal static void UpdateGUI()
         {
+            PlayerManager.UpdateGUI();
             BehaviourHelperManager.UpdateGUI();
         }
 
@@ -337,7 +338,6 @@ namespace RTSLockstep.Managers
 
         internal static void InfluenceSimulate()
         {
-            PlayerManager.Simulate();
             CommandManager.Simulate();
             ClientManager.Simulate();
         }

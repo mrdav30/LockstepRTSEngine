@@ -63,7 +63,7 @@ namespace RTSLockstep.Player
 
         #region MonoBehavior
         // Use this for initialization
-        public void Setup()
+        public void OnSetup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
@@ -154,13 +154,13 @@ namespace RTSLockstep.Player
             }
         }
 
-        public void Visualize()
+        public void OnVisualize()
         {
             IsMouseOverHUD = !MouseInBounds() && _activeCursorState != CursorState.PanRight && _activeCursorState != CursorState.PanUp;
         }
 
         // Update is called once per frame
-        public void DoGUI()
+        public void OnUpdateGUI()
         {
             if (_cachedPlayer
                 && _cachedPlayer.IsCurrentPlayer

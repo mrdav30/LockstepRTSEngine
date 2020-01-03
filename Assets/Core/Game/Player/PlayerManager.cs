@@ -21,20 +21,31 @@ namespace RTSLockstep.Player
         public static LocalAgentController CurrentPlayerController;
         #endregion
 
-        #region Public
+        #region Event Behavior
         public static void Initialize()
         {
             CurrentPlayerController = null;
             _savedPlayerProfiles.FastClear();
         }
 
-        public static void Simulate()
-        {
-        }
-
         public static void Visualize()
         {
+            for (int i = 0; i < _allPlayers.Count; i++)
+            {
+                _allPlayers[i].OnVisualize();
+            }
         }
+
+        public static void UpdateGUI()
+        {
+            for (int i = 0; i < _allPlayers.Count; i++)
+            {
+                _allPlayers[i].OnUpdateGUI();
+            }
+        }
+        #endregion
+
+        #region Public
 
         public static void SelectPlayer(string name, int avatar, int controllerId, int playerIndex)
         {
@@ -199,7 +210,7 @@ namespace RTSLockstep.Player
             return savedGames;
         }
 
-        public static void CreatePlayer(LocalAgentController controller, bool isPlayerManaged = false)
+        public static void AddPlayer(LocalAgentController controller, bool isPlayerManaged = false)
         {
             if (controller.ControllingPlayer.IsNotNull())
             {
@@ -232,8 +243,14 @@ namespace RTSLockstep.Player
             controller.ControllingPlayer = playerClone;
 
             _allPlayers.Add(playerClone);
+        }
 
-            BehaviourHelperManager.InitializeOnDemand(controller.ControllingPlayer);
+        public static void InitializePlayers()
+        {
+            for(int i = 0; i < _allPlayers.Count; i++)
+            {
+                _allPlayers[i].OnInitialize();
+            }
         }
         #endregion
 

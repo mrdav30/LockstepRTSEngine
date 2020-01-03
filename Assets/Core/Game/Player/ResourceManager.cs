@@ -13,15 +13,15 @@ namespace RTSLockstep.Player
         #region Properties
         [SerializeField]
         private BaseResources _startingResources = new BaseResources
-    {
-        {ResourceType.Gold, null},
-        {ResourceType.Ore, null},
-        {ResourceType.Stone, null},
-        {ResourceType.Wood, null},
-        {ResourceType.Food, null},
-        {ResourceType.Crystal, null},
-        {ResourceType.Provision, null}
-    };
+        {
+            {ResourceType.Gold, null},
+            {ResourceType.Ore, null},
+            {ResourceType.Stone, null},
+            {ResourceType.Wood, null},
+            {ResourceType.Food, null},
+            {ResourceType.Crystal, null},
+            {ResourceType.Provision, null}
+        };
 
         private LSPlayer _cachedPlayer;
         private Dictionary<ResourceType, long> _resources;
@@ -30,21 +30,21 @@ namespace RTSLockstep.Player
 
         #region Behavior
         // Use this for initialization
-        public void Setup()
+        public void OnSetup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
             _resources = InitResourceList();
             _resourceLimits = InitResourceList();
         }
 
-        public void Initialize()
+        public void OnInitialize()
         {
             AddStartResourceLimits();
             AddStartResources();
         }
 
         // Update is called once per frame
-        public void Visualize()
+        public void OnVisualize()
         {
             _cachedPlayer.PlayerHUD.SetResourceValues(_resources, _resourceLimits);
         }
