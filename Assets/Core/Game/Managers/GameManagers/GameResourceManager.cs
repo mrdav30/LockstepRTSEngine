@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
+using System;
 
 namespace RTSLockstep.Managers.GameManagers
 {
@@ -44,6 +45,14 @@ namespace RTSLockstep.Managers.GameManagers
         public static float Padding { get { return _padding; } }
         public static string LevelName { get; set; }
 
+        public static RawMaterialType[] GameRawMaterials
+        {
+            get
+            {
+                return (RawMaterialType[])Enum.GetValues(typeof(RawMaterialType));
+            }
+        }
+
         private static GUISkin _selectBoxSkin;
         private static Vector3d _invalidPosition = new Vector3d(-99999, -99999, -99999);
         private static Bounds _invalidBounds = new Bounds(new Vector3(-99999, -99999, -99999), new Vector3(0, 0, 0));
@@ -79,8 +88,7 @@ namespace RTSLockstep.Managers.GameManagers
         #region MonoBehavior
         public static void Setup()
         {
-            IAgentDataProvider agentDatabase;
-            if (LSDatabaseManager.TryGetDatabase(out agentDatabase))
+            if (LSDatabaseManager.TryGetDatabase(out IAgentDataProvider agentDatabase))
             {
                 AgentData = agentDatabase.AgentData;
                 AgentCodes = new string[AgentData.Length];
@@ -91,7 +99,7 @@ namespace RTSLockstep.Managers.GameManagers
                 OrganizerObject.gameObject.name = "OrganizerObject";
                 OrganizerObject.gameObject.SetActive(false);
 
-                Object.DontDestroyOnLoad(OrganizerObject);
+                UnityEngine.Object.DontDestroyOnLoad(OrganizerObject);
                 for (int i = 0; i < AgentData.Length; i++)
                 {
                     IAgentData interfacer = AgentData[i];
@@ -167,7 +175,7 @@ namespace RTSLockstep.Managers.GameManagers
             LSAgent template;
             if (!AgentCodeTemplateMap.TryGetValue(agentCode, out template))
             {
-                template = Object.Instantiate(GetAgentSource(agentCode));
+                template = UnityEngine.Object.Instantiate(GetAgentSource(agentCode));
                 AgentCodeTemplateMap.Add(agentCode, template);
                 template.transform.parent = OrganizerObject.transform;
             }

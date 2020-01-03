@@ -4,12 +4,13 @@
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12001, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ResourceSkin
+  m_Name: RawMaterialSkin
   m_EditorClassIdentifier: 
   m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
   m_box:

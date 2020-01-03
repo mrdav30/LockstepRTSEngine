@@ -43,10 +43,10 @@ namespace RTSLockstep.Managers.GameState
             foreach (var pair in currentResources)
             {
                 writer.WriteStartObject();
-                WriteLong(writer, pair.Key.ToString(), pair.Value.currentValue);
+                WriteLong(writer, pair.Key.ToString(), pair.Value.CurrentValue);
                 writer.WriteEndObject();
                 writer.WriteStartObject();
-                WriteLong(writer, pair.Key.ToString() + "_Limit", pair.Value.currentLimit);
+                WriteLong(writer, pair.Key.ToString() + "_Limit", pair.Value.CurrentLimit);
                 writer.WriteEndObject();
             }
 

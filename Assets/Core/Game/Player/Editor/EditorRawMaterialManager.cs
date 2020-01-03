@@ -2,8 +2,7 @@
 
 using RTSLockstep.Utility;
 using RTSLockstep.Player;
-using RTSLockstep.LSResources;
-using System;
+using RTSLockstep.Managers.GameManagers;
 
 namespace RTSLockstep
 {
@@ -16,10 +15,10 @@ namespace RTSLockstep
         {
             targetValue = (RawMaterialManager)target;
 
-            RawMaterialType[] values = (RawMaterialType[])Enum.GetValues(typeof(RawMaterialType));
-            if (targetValue.BaseRawMaterials.IsNull() || targetValue.BaseRawMaterials.Count != values.Length)
+            if (targetValue.BaseRawMaterials.IsNull() || targetValue.BaseRawMaterials.Count != GameResourceManager.GameRawMaterials.Length)
             {
-                foreach (var type in values)
+                targetValue.BaseRawMaterials = new RawMaterials();
+                foreach (var type in GameResourceManager.GameRawMaterials)
                 {
                     targetValue.BaseRawMaterials.Add(type, null);
                 }

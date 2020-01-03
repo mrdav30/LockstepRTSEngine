@@ -25,6 +25,6 @@ namespace RotaryHeart.Lib.SerializableDictionary
         [SerializeField]
         private RawMaterialType _resourceType;
         [SerializeField]
-        private RawMaterialInfo _startingResourceInfo;
+        private RawMaterialValues _startingResourceInfo;
     }
 }

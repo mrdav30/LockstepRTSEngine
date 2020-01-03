@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
 using RTSLockstep.Agents;
 using RTSLockstep.LSResources;
 using RTSLockstep.Utility;
+using RTSLockstep.Managers.GameManagers;
 
 namespace RTSLockstep.Player
 {
@@ -30,12 +30,12 @@ namespace RTSLockstep.Player
         #region Public
         public void AddRawMaterial(RawMaterialType type, long amount)
         {
-            CurrentRawMaterials[type].currentValue += amount;
+            CurrentRawMaterials[type].CurrentValue += amount;
         }
 
         public void IncreaseRawMaterialLimit(RawMaterialType type, long amount)
         {
-            CurrentRawMaterials[type].currentLimit += amount;
+            CurrentRawMaterials[type].CurrentLimit += amount;
         }
 
         public RawMaterials GetCurrentRawMaterials()
@@ -45,22 +45,22 @@ namespace RTSLockstep.Player
 
         public long GetRawMaterialAmount(RawMaterialType type)
         {
-            return CurrentRawMaterials[type].currentValue;
+            return CurrentRawMaterials[type].CurrentValue;
         }
 
         public long GetRawMaterialLimit(RawMaterialType type)
         {
-            return CurrentRawMaterials[type].currentLimit;
+            return CurrentRawMaterials[type].CurrentLimit;
         }
 
         public void RemoveRawMaterial(RawMaterialType type, int amount)
         {
-            CurrentRawMaterials[type].currentValue -= amount;
+            CurrentRawMaterials[type].CurrentValue -= amount;
         }
 
         public void DecrementRawMaterialLimit(RawMaterialType type, int amount)
         {
-            CurrentRawMaterials[type].currentLimit -= amount;
+            CurrentRawMaterials[type].CurrentLimit -= amount;
         }
 
         public bool CheckPlayersRawMaterials(LSAgent agent)
@@ -130,17 +130,15 @@ namespace RTSLockstep.Player
                     }
                     else
                     {
-                        RawMaterialType[] values = (RawMaterialType[])Enum.GetValues(typeof(RawMaterialType));
-
-                        foreach (var type in values)
+                        foreach (var type in GameResourceManager.GameRawMaterials)
                         {
                             if(currValue == type.ToString())
                             {
-                                CurrentRawMaterials[type].currentValue = (int)(long)reader.Value;
+                                CurrentRawMaterials[type].CurrentValue = (int)(long)reader.Value;
                             }
                             else if ((currValue + "_Limit") == type.ToString())
                             {
-                                CurrentRawMaterials[type].currentLimit = (int)(long)reader.Value;
+                                CurrentRawMaterials[type].CurrentLimit = (int)(long)reader.Value;
                             }
                         }                        
                     }

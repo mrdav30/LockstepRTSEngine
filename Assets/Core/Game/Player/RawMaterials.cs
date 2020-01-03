@@ -1,19 +1,20 @@
-﻿using RotaryHeart.Lib.SerializableDictionary;
-using RTSLockstep.LSResources;
-using System;
+﻿using System;
 using UnityEngine;
+using RotaryHeart.Lib.SerializableDictionary;
+
+using RTSLockstep.LSResources;
 
 namespace RTSLockstep.Player
 {
     [Serializable]
-    public class RawMaterialInfo
+    public class RawMaterialValues
     {
         [Range(0, 5000)]
-        public long currentValue;
+        public long CurrentValue;
         [Range(0, 5000)]
-        public long currentLimit;
+        public long CurrentLimit;
     }
 
     [Serializable]
-    public class RawMaterials : SerializableDictionaryBase<RawMaterialType, RawMaterialInfo> { };
+    public class RawMaterials : SerializableDictionaryBase<RawMaterialType, RawMaterialValues> { };
 }

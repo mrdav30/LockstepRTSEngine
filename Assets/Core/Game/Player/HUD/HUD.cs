@@ -13,7 +13,6 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
 using RTSLockstep.LSResources.Audio;
-using System;
 
 namespace RTSLockstep.Player
 {
@@ -26,7 +25,7 @@ namespace RTSLockstep.Player
         public Texture2D PointerCursor, SelectCursor, LeftCursor, RightCursor, UpCursor, DownCursor;
         public Texture2D[] MoveCursors, AttackCursors, HarvestCursors, DepositCursors, ConstructCursors, GarrisonCursors;
         public GUISkin MouseCursorSkin;
-        public Texture2D[] RawMaterialIcons;
+        public RawMaterialsHUD RawMaterialIcons;
         // buildFrame provides a border around each buildImage
         // buildMask is used to show the user how far through the current build the object at the front of the queue is
         public Texture2D ButtonHover, ButtonClick;
@@ -34,7 +33,6 @@ namespace RTSLockstep.Player
         public Texture2D SmallButtonHover, SmallButtonClick;
         public Texture2D RallyPointCursor;
         public Texture2D Healthy, Damaged, Critical;
-        public Texture2D[] RawMaterialHealthBars;
         public Material NotAllowedMaterial, AllowedMaterial;
         public GUISkin PlayerDetailsSkin;
         public AudioClip ClickSound;
@@ -48,14 +46,12 @@ namespace RTSLockstep.Player
         private const int _selectionNameHeight = 15;
         private CursorState _activeCursorState;
         private int _currentFrame = 0;
-        // private Dictionary<EnvironmentResourceType, long> _resourceValues;
-        // private Dictionary<EnvironmentResourceType, long> _resourceLimits;
         private const int _iconWidth = 32, _iconHeight = 32, _textWidth = 128, _textHeight = 32;
-        private static Dictionary<RawMaterialType, Texture2D> _rawMaterialImages;
         private LSAgent _lastSelection;
         private float _sliderValue;
         private const int _buildImageWidth = 64, _buildImageHeight = 64;
-        private int _buildAreaHeight = 0;    // value for determining the height of the area we will draw the actions in
+        // value for determining the height of the area we will draw the actions in
+        private int _buildAreaHeight = 0;
         private int _statusAreaHeight = 0;
         private const int _buttonSpacing = 7;
         private const int _scrollBarWidth = 22;
@@ -72,31 +68,10 @@ namespace RTSLockstep.Player
 
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {
-                _rawMaterialImages = new Dictionary<RawMaterialType, Texture2D>();
-
-                RawMaterialType[] values = (RawMaterialType[])Enum.GetValues(typeof(RawMaterialType));
-
-                for (int i = 0; i < RawMaterialIcons.Length; i++)
-                {
-                    foreach (var type in values)
-                    {
-                        if (RawMaterialIcons[i].name == type.ToString())
-                        {
-                            _rawMaterialImages.Add(type, RawMaterialIcons[i]);
-                        }
-                    }
-                }
-
                 Dictionary<RawMaterialType, Texture2D> resourceHealthBarTextures = new Dictionary<RawMaterialType, Texture2D>();
-                for (int i = 0; i < RawMaterialHealthBars.Length; i++)
+                foreach (var keyValuePair in RawMaterialIcons)
                 {
-                    foreach (var type in values)
-                    {
-                        if (RawMaterialHealthBars[i].name == type.ToString())
-                        {
-                            resourceHealthBarTextures.Add(type, RawMaterialHealthBars[i]);
-                        }
-                    }
+                    resourceHealthBarTextures.Add(keyValuePair.Key, keyValuePair.Value.RawMaterialHealthBar);
                 }
 
                 GameResourceManager.SetResourceHealthBarTextures(resourceHealthBarTextures);
@@ -421,9 +396,9 @@ namespace RTSLockstep.Player
             GUI.BeginGroup(new Rect(0, 0, Screen.width, _resourceBarHeight));
             GUI.Box(new Rect(0, 0, Screen.width, _resourceBarHeight), "");
             int topPos = 4, iconLeft = 4, textLeft = 15;
-            foreach (KeyValuePair<RawMaterialType, Texture2D> keyValuePair in _rawMaterialImages)
+            foreach (var keyValuePair in RawMaterialIcons)
             {
-                DrawResourceIcon(keyValuePair.Key, iconLeft, textLeft, topPos);
+                DrawResourceIcon(keyValuePair.Key, keyValuePair.Value.RawMaterialIcon, iconLeft, textLeft, topPos);
                 iconLeft += _textWidth;
                 textLeft += _textWidth;
             }
@@ -452,11 +427,9 @@ namespace RTSLockstep.Player
             GUI.EndGroup();
         }
 
-        private void DrawResourceIcon(RawMaterialType type, int iconLeft, int textLeft, int topPos)
+        private void DrawResourceIcon(RawMaterialType type, Texture2D icon, int iconLeft, int textLeft, int topPos)
         {
-            Texture2D icon = _rawMaterialImages[type];
-
-            string text = _cachedResourceManager.CurrentRawMaterials[type].currentValue.ToString() + "/" + _cachedResourceManager.CurrentRawMaterials[type].currentLimit.ToString();
+            string text = _cachedResourceManager.CurrentRawMaterials[type].CurrentValue.ToString() + "/" + _cachedResourceManager.CurrentRawMaterials[type].CurrentLimit.ToString();
 
             GUI.DrawTexture(new Rect(iconLeft, topPos, _iconWidth, _iconHeight), icon);
             GUI.Label(new Rect(textLeft, topPos, _textWidth, _textHeight), text);
