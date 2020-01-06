@@ -353,7 +353,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 0
+      isExpanded: 1
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -368,7 +368,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 0
+    isExpanded: 1
     _keyValues: 00000000020000000400000005000000060000000300000001000000
     _keys: 00000000020000000400000005000000060000000300000001000000
     _values: 00000000000000000000000000000000000000000000000000000000
@@ -520,7 +520,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &114084417549043994
 MonoBehaviour:
   m_ObjectHideFlags: 0
