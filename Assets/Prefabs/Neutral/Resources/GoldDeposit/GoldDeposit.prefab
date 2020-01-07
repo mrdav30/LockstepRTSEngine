@@ -217,10 +217,8 @@ MonoBehaviour:
   Tag: 0
   _selectionRadius: -1
   _visualCenter: {fileID: 4541798942617490}
-  objectName: GoldDeposit
   AgentDescription: 
-  destroyImage: {fileID: 0}
-  resourceCost:
+  RawMaterialCost:
     reorderableList:
       canAdd: 1
       canRemove: 1
@@ -242,9 +240,9 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 0
-    _keyValues: 00000000020000000400000005000000060000000300000001000000
-    _keys: 00000000020000000400000005000000060000000300000001000000
+    isExpanded: 1
+    _keyValues: 00000000010000000200000003000000040000000500000006000000
+    _keys: 00000000010000000200000003000000040000000500000006000000
     _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114625934437660894
 MonoBehaviour:
@@ -330,7 +328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff973f3729a37bf40a7575f30bb51503, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strikeRange: 393216
+  _actionRange: 393216
   _sight: 655360
 --- !u!114 &114905450173827076
 MonoBehaviour:

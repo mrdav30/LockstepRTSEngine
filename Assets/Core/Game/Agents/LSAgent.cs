@@ -307,6 +307,7 @@ namespace RTSLockstep.Agents
 
         public virtual void Simulate()
         {
+            // Increase the owners provision count to account for this agent 
             if (!_provisioned)
             {
                 _provisioned = true;

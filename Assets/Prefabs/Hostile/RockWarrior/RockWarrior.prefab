@@ -1836,7 +1836,7 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 0}
   AgentDescription: 
-  resourceCost:
+  RawMaterialCost:
     reorderableList:
       canAdd: 1
       canRemove: 1
@@ -1859,8 +1859,8 @@ MonoBehaviour:
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
     isExpanded: 0
-    _keyValues: 00000000020000000400000005000000060000000300000001000000
-    _keys: 00000000020000000400000005000000060000000300000001000000
+    _keyValues: 00000000010000000200000003000000040000000500000006000000
+    _keys: 00000000010000000200000003000000040000000500000006000000
     _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114614306233172148
 MonoBehaviour:
@@ -2010,7 +2010,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
-  DestroyIcon: {fileID: 2800000, guid: 3cb0214eba0ff3c4aa39d3e41c4363d9, type: 3}
 --- !u!114 &114500290942403552
 MonoBehaviour:
   m_ObjectHideFlags: 0

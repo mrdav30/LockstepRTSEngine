@@ -346,14 +346,14 @@ MonoBehaviour:
   _selectionRadius: -1
   _visualCenter: {fileID: 4916245628546948}
   AgentDescription: 
-  resourceCost:
+  RawMaterialCost:
     reorderableList:
       canAdd: 1
       canRemove: 1
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 1
+      isExpanded: 0
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -368,9 +368,9 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
-    _keyValues: 00000000020000000400000005000000060000000300000001000000
-    _keys: 00000000020000000400000005000000060000000300000001000000
+    isExpanded: 0
+    _keyValues: 00000000010000000200000003000000040000000500000006000000
+    _keys: 00000000010000000200000003000000040000000500000006000000
     _values: 00000000000000000000000000000000000000000000000000000000
 --- !u!114 &114644781022417000
 MonoBehaviour:
