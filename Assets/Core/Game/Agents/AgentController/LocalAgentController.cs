@@ -13,6 +13,7 @@ using RTSLockstep.Simulation.Influence;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Abilities.Essential;
 
 namespace RTSLockstep.Agents.AgentController
 {
@@ -225,6 +226,11 @@ namespace RTSLockstep.Agents.AgentController
 
             // remove the clone tag and replace with global ID
             agent.gameObject.name = agent.gameObject.name.Replace("(Clone)", "") + "_" + agent.GlobalID;
+
+            agent.transform.parent = agent.MyAgentType == AgentType.Unit ? ControllingPlayer.LocalAgentContainer.UnitsContainer 
+                : agent.MyAgentType == AgentType.Structure && agent.GetComponent<Structure>().StructureType == StructureType.Wall ? ControllingPlayer.LocalAgentContainer.WallsContainer
+                : agent.MyAgentType == AgentType.Structure ? ControllingPlayer.LocalAgentContainer.StructuresContainer 
+                : ControllingPlayer.LocalAgentContainer.transform;
 
             return agent;
         }

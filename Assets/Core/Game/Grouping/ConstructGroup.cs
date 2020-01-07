@@ -184,10 +184,6 @@ namespace RTSLockstep.Grouping
 
                         newRTSAgent.SetControllingPlayer(GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer);
 
-                     //   newRTSAgent.gameObject.name = newRTSAgent.ObjectName;
-                        newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? controllingPlayer.LocalAgentContainer.WallsContainer.transform
-                            : controllingPlayer.LocalAgentContainer.StructuresContainer.transform;
-
                         newStructure.AwaitConstruction();
                         // Set to transparent material until constructor is in range to start
                         ConstructionHandler.SetTransparentMaterial(newStructure.gameObject, GameResourceManager.AllowedMaterial, true);

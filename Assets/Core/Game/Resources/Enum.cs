@@ -10,13 +10,6 @@
         Environment
     }
 
-    public enum AgentType
-    {
-        Unit,
-        Structure,
-        Resource
-    }
-
     public enum CursorState
     {
         Pointer,
@@ -42,6 +35,13 @@
         Stone,
         Wood,
         Food
+    }
+
+    public enum AgentType
+    {
+        Unit,
+        Structure,
+        Resource
     }
 
     // Used to determine influence on structure
