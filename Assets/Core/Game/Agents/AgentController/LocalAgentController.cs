@@ -223,6 +223,9 @@ namespace RTSLockstep.Agents.AgentController
             InitializeAgent(agent, position, rotation);
             OnCreateAgent?.Invoke(agent);
 
+            // remove the clone tag and replace with global ID
+            agent.gameObject.name = agent.gameObject.name.Replace("(Clone)", "") + "_" + agent.GlobalID;
+
             return agent;
         }
 

@@ -273,7 +273,7 @@ namespace RTSLockstep.Agents
             CheckCasting = true;
 
             // place game object under it's agent commander
-            CachedGameObject.transform.parent = Controller.ControllingPlayer.LocalAgentContainerTransform;
+            CachedGameObject.transform.parent = Controller.ControllingPlayer.LocalAgentContainer.UnitsContainer;
 
             CachedGameObject.SetActive(true);
 

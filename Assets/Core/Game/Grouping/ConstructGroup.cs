@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
+using RTSLockstep.Player;
 
 namespace RTSLockstep.Grouping
 {
@@ -178,13 +179,14 @@ namespace RTSLockstep.Grouping
 
                     if (GridBuilder.Place(newRTSAgent.GetAbility<Structure>(), newRTSAgent.Body.Position))
                     {
-                        GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer.PlayerRawMaterialManager.RemovePlayersRawMaterials(newRTSAgent);
+                        LSPlayer controllingPlayer = GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer;
+                        controllingPlayer.PlayerRawMaterialManager.RemovePlayersRawMaterials(newRTSAgent);
 
                         newRTSAgent.SetControllingPlayer(GlobalAgentController.InstanceManagers[_controllerID].ControllingPlayer);
 
-                        newRTSAgent.gameObject.name = newRTSAgent.ObjectName;
-                        newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? WallPositioningHelper.OrganizerWalls.transform
-                            : ConstructionHandler.OrganizerStructures.transform;
+                     //   newRTSAgent.gameObject.name = newRTSAgent.ObjectName;
+                        newRTSAgent.transform.parent = newStructure.StructureType == StructureType.Wall ? controllingPlayer.LocalAgentContainer.WallsContainer.transform
+                            : controllingPlayer.LocalAgentContainer.StructuresContainer.transform;
 
                         newStructure.AwaitConstruction();
                         // Set to transparent material until constructor is in range to start

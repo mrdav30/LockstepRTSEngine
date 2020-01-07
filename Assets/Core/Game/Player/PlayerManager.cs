@@ -14,9 +14,10 @@ namespace RTSLockstep.Player
         #region Properties
         private static FastBucket<PlayerDetails> _savedPlayerProfiles = new FastBucket<PlayerDetails>();
         private static FastBucket<LSPlayer> _allPlayers = new FastBucket<LSPlayer>();
-        private static PlayerDetails _currentPlayer;
+        private static PlayerDetails _currentPlayerDetails;
         private static Texture2D[] _avatars;
 
+        public static LSPlayer CurrentPlayer;
         public static LocalAgentController CurrentPlayerController;
         #endregion
 
@@ -54,11 +55,11 @@ namespace RTSLockstep.Player
             {
                 if (_savedPlayerProfiles.arrayAllocation[i])
                 {
-                    PlayerDetails player = _savedPlayerProfiles[i];
+                    PlayerDetails savedProfile = _savedPlayerProfiles[i];
 
-                    if (player.Name == name)
+                    if (savedProfile.UserName == name)
                     {
-                        _currentPlayer = player;
+                        _currentPlayerDetails = savedProfile;
                         playerExists = true;
                     }
                 }
@@ -68,7 +69,7 @@ namespace RTSLockstep.Player
             {
                 PlayerDetails newPlayer = new PlayerDetails(name, avatar, controllerId, playerIndex);
                 _savedPlayerProfiles.Add(newPlayer);
-                _currentPlayer = newPlayer;
+                _currentPlayerDetails = newPlayer;
                 Directory.CreateDirectory("SavedGames" + Path.DirectorySeparatorChar + name);
             }
 
@@ -79,7 +80,7 @@ namespace RTSLockstep.Player
         // search through players list
         public static string GetPlayerName()
         {
-            return _currentPlayer.Name == "" ? "Unknown" : _currentPlayer.Name;
+            return _currentPlayerDetails.UserName == "" ? "Unknown" : _currentPlayerDetails.UserName;
         }
 
         public static void SetAvatarTextures(Texture2D[] avatarTextures)
@@ -96,9 +97,9 @@ namespace RTSLockstep.Player
                 return null;
             }
 
-            if (_currentPlayer.Avatar >= 0 && _currentPlayer.Avatar < _avatars.Length)
+            if (_currentPlayerDetails.Avatar >= 0 && _currentPlayerDetails.Avatar < _avatars.Length)
             {
-                return _avatars[_currentPlayer.Avatar];
+                return _avatars[_currentPlayerDetails.Avatar];
             }
 
             return null;
@@ -174,7 +175,7 @@ namespace RTSLockstep.Player
             string[] playerNames = new string[_savedPlayerProfiles.Count];
             for (int i = 0; i < playerNames.Length; i++)
             {
-                playerNames[i] = _savedPlayerProfiles[i].Name;
+                playerNames[i] = _savedPlayerProfiles[i].UserName;
             }
             return playerNames;
         }
@@ -185,7 +186,7 @@ namespace RTSLockstep.Player
             {
                 if (_savedPlayerProfiles.arrayAllocation[i])
                 {
-                    if (_savedPlayerProfiles[i].Name == playerName)
+                    if (_savedPlayerProfiles[i].UserName == playerName)
                     {
                         return _savedPlayerProfiles[i].Avatar;
                     }
@@ -197,7 +198,7 @@ namespace RTSLockstep.Player
 
         public static string[] GetSavedGames()
         {
-            DirectoryInfo directory = new DirectoryInfo("SavedGames" + Path.DirectorySeparatorChar + _currentPlayer.Name);
+            DirectoryInfo directory = new DirectoryInfo("SavedGames" + Path.DirectorySeparatorChar + _currentPlayerDetails.UserName);
             FileInfo[] files = directory.GetFiles();
             string[] savedGames = new string[files.Length];
             for (int i = 0; i < files.Length; i++)
@@ -235,6 +236,7 @@ namespace RTSLockstep.Player
             {
                 GlobalAgentController.AddLocalController(controller);
                 playerClone.IsCurrentPlayer = true;
+                CurrentPlayer = playerClone;
                 CurrentPlayerController = controller;
                 SelectPlayer(playerClone.Username, 0, controller.ControllerID, controller.PlayerIndex);
             }
@@ -259,7 +261,7 @@ namespace RTSLockstep.Player
             writer.WriteStartObject();
 
             writer.WritePropertyName("Name");
-            writer.WriteValue(commander.Name);
+            writer.WriteValue(commander.UserName);
             writer.WritePropertyName("Avatar");
             writer.WriteValue(commander.Avatar);
 

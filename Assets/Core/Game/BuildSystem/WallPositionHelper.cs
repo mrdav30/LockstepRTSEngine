@@ -1,6 +1,7 @@
 ﻿using RTSLockstep.Abilities.Essential;
 using RTSLockstep.BuildSystem.BuildGrid;
 using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.Player;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
@@ -43,15 +44,6 @@ namespace RTSLockstep.BuildSystem
 
         private static long _originalWallLength;
         private static long _lastWallLength = 0;
-
-        public static Transform OrganizerWalls { get; private set; }
-
-        public static void Initialize()
-        {
-            OrganizerWalls = LSUtility.CreateEmpty().transform;
-            OrganizerWalls.transform.parent = ConstructionHandler.OrganizerStructures;
-            OrganizerWalls.gameObject.name = "OrganizerWalls";
-        }
 
         public static void Setup()
         {
@@ -111,7 +103,7 @@ namespace RTSLockstep.BuildSystem
             if (!_startSnapped)
             {
                 _startPillar = UnityEngine.Object.Instantiate(tempWallPillarGO, startPos, Quaternion.identity) as GameObject;
-                _startPillar.transform.parent = OrganizerWalls;
+                _startPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
             }
             else
             {
@@ -267,7 +259,7 @@ namespace RTSLockstep.BuildSystem
                 newPillar.transform.LookAt(_startPillar.transform);
             }
             _pillarPrefabs.Add(newPillar);
-            newPillar.transform.parent = OrganizerWalls;
+            newPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
 
             if (isLast)
             {
@@ -293,7 +285,7 @@ namespace RTSLockstep.BuildSystem
                 _originalWallLength = (long)newWall.transform.localScale.z;
                 newWall.SetActive(true);
                 _wallPrefabs.Add(ndx, newWall);
-                newWall.transform.parent = OrganizerWalls;
+                newWall.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
             }
         }
 
@@ -422,8 +414,8 @@ namespace RTSLockstep.BuildSystem
         public static GameObject ClosestPillar(Vector3 worldPoint, float distance)
         {
             GameObject closest = null;
-            float currentDistance = Mathf.Infinity;
-            foreach (Transform child in OrganizerWalls)
+            float currentDistance;
+            foreach (Transform child in PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer)
             {
                 currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody.Position.ToVector3());
                 if (currentDistance < distance)
@@ -431,6 +423,7 @@ namespace RTSLockstep.BuildSystem
                     closest = child.gameObject;
                 }
             }
+
             return closest;
         }
 

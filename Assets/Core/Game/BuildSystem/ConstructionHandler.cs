@@ -30,20 +30,12 @@ namespace RTSLockstep.BuildSystem
         private static Dictionary<string, Material> oldMaterials = new Dictionary<string, Material>();
 
         private static FastList<QStructure> constructionQueue = new FastList<QStructure>();
-
-        public static Transform OrganizerStructures { get; private set; }
         #endregion
 
         public static void Initialize()
         {
             _cachedPlayer = PlayerManager.CurrentPlayerController.ControllingPlayer;
             GridBuilder.Initialize();
-
-            OrganizerStructures = LSUtility.CreateEmpty().transform;
-            OrganizerStructures.transform.parent = PlayerManager.CurrentPlayerController.ControllingPlayer.LocalAgentContainerTransform;
-            OrganizerStructures.gameObject.name = "OrganizerStructures";
-
-            WallPositioningHelper.Initialize();
 
             PlayerInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
             PlayerInputHelper.OnSingleRightTapDown += HandleSingleRightClick;
