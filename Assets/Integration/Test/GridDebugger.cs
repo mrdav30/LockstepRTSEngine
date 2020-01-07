@@ -1,19 +1,24 @@
-﻿using RTSLockstep.BuildSystem.BuildGrid;
+﻿using UnityEngine;
+
+using RTSLockstep.BuildSystem.BuildGrid;
+using RTSLockstep.Integration.CustomComparion;
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
-using UnityEngine;
 
 namespace RTSLockstep.Integration
 {
     public class GridDebugger : MonoBehaviour
     {
         //Show the grid debugging?
-        public bool Show;
+        public bool ShowGrid;
         //type of grid to show... can be changed in runtime. Possibilities: Construct grid, LOS grid
         public GridType LeGridType;
+        [DrawIf("LeGridType", ComparisonType.Equals, GridType.Pathfinding)]
+        public bool ShowClearanceDegree;
         //Height of the grid
         //Size of each shown grid node
+        [Range(1, 25)]
         public float LeHeight;
         [Range(.1f, .9f)]
         public float NodeSize = .4f;
@@ -28,7 +33,7 @@ namespace RTSLockstep.Integration
 
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying && Show)
+            if (Application.isPlaying && ShowGrid)
             {
                 nodeScale = new Vector3(NodeSize, NodeSize, NodeSize);
                 //Switch for which grid to show
@@ -40,7 +45,7 @@ namespace RTSLockstep.Integration
                     case GridType.Building:
                         if (BuildGridAPI.MainBuildGrid.IsNotNull())
                         {
-                            DrawBuilding();
+                            DrawBuildingSites();
                         }
 
                         break;
@@ -48,7 +53,7 @@ namespace RTSLockstep.Integration
             }
         }
 
-        private void DrawBuilding()
+        private void DrawBuildingSites()
         {
             int length = BuildGridAPI.MainBuildGrid.GridLength;
             for (int i = 0; i < length; i++)
@@ -88,13 +93,14 @@ namespace RTSLockstep.Integration
 
                 Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
 
-#if UNITY_EDITOR
-                if (node.ClearanceDegree != GridNode.DEFAULT_DEGREE)
+                if (ShowClearanceDegree)
                 {
-                    UnityEditor.Handles.color = Color.red;
-                    UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());
+                    if (node.ClearanceDegree != GridNode.DEFAULT_DEGREE)
+                    {
+                        UnityEditor.Handles.color = Color.red;
+                        UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());
+                    }
                 }
-#endif
             }
         }
     }
