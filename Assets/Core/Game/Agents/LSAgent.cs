@@ -27,9 +27,6 @@ using Coroutine = RTSLockstep.Utility.Coroutine;
 
 namespace RTSLockstep.Agents
 {
-    [Serializable]
-    public class RawMaterialCost : SerializableDictionaryBase<RawMaterialType, int> { };
-
     [RequireComponent(typeof(UnityLSBody))]
     /// <summary>
     /// LSAgents manage abilities and interpret commands.
@@ -66,16 +63,7 @@ namespace RTSLockstep.Agents
         [HideInInspector]
         public string AgentDescription;
         [SerializeField]
-        public RawMaterialCost rawMaterialCost = new RawMaterialCost
-        {
-            {RawMaterialType.Gold, 0 },
-            {RawMaterialType.Ore, 0 },
-            {RawMaterialType.Stone, 0 },
-            {RawMaterialType.Wood, 0 },
-            {RawMaterialType.Food, 0 },
-            {RawMaterialType.Crystal, 0 },
-            {RawMaterialType.Provision, 0 }
-        };
+        public RawMaterialCost RawMaterialCost;
 
         public string MyAgentCode { get; private set; }
         public AgentType MyAgentType { get { return _agentType; } private set { _agentType = value; } }
@@ -322,7 +310,7 @@ namespace RTSLockstep.Agents
             if (!_provisioned)
             {
                 _provisioned = true;
-                _cachedPlayer.PlayerRawMaterialManager.AddRawMaterial(RawMaterialType.Provision, rawMaterialCost[RawMaterialType.Provision]);
+                _cachedPlayer.PlayerRawMaterialManager.AddRawMaterial(RawMaterialType.Provision, RawMaterialCost[RawMaterialType.Provision]);
             }
 
             if (Influencer.IsNotNull())

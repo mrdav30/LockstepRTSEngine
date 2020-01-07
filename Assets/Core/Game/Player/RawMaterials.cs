@@ -17,4 +17,7 @@ namespace RTSLockstep.Player
 
     [Serializable]
     public class RawMaterials : SerializableDictionaryBase<RawMaterialType, RawMaterialValues> { };
+
+    [Serializable]
+    public class RawMaterialCost : SerializableDictionaryBase<RawMaterialType, int> { };
 }

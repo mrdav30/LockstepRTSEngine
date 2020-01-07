@@ -66,7 +66,7 @@ namespace RTSLockstep.Player
         public bool CheckPlayersRawMaterials(LSAgent agent)
         {
             bool validResources = true;
-            foreach (KeyValuePair<RawMaterialType, int> entry in agent.rawMaterialCost)
+            foreach (KeyValuePair<RawMaterialType, int> entry in agent.RawMaterialCost)
             {
                 if (entry.Value > 0)
                 {
@@ -95,7 +95,7 @@ namespace RTSLockstep.Player
 
         public void RemovePlayersRawMaterials(LSAgent agent)
         {
-            foreach (KeyValuePair<RawMaterialType, int> entry in agent.rawMaterialCost)
+            foreach (KeyValuePair<RawMaterialType, int> entry in agent.RawMaterialCost)
             {
                 if (entry.Value > 0)
                 {
