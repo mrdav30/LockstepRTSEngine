@@ -1,20 +1,19 @@
-﻿using RTSLockstep.Abilities.Essential;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+using RTSLockstep.Abilities.Essential;
 using RTSLockstep.BuildSystem.BuildGrid;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Player;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+using RTSLockstep.LSResources;
 
-/*
- * Attaches to wall base prefab 
- */
 namespace RTSLockstep.BuildSystem
 {
-    public static class WallPositioningHelper
+    public static class WallPlacementManager
     {
         /// <summary>
         /// Empty wall prefabs to assist in wall building.
@@ -103,7 +102,7 @@ namespace RTSLockstep.BuildSystem
             if (!_startSnapped)
             {
                 _startPillar = UnityEngine.Object.Instantiate(tempWallPillarGO, startPos, Quaternion.identity) as GameObject;
-                _startPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
+                _startPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
             }
             else
             {
@@ -259,7 +258,7 @@ namespace RTSLockstep.BuildSystem
                 newPillar.transform.LookAt(_startPillar.transform);
             }
             _pillarPrefabs.Add(newPillar);
-            newPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
+            newPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
 
             if (isLast)
             {
@@ -285,7 +284,7 @@ namespace RTSLockstep.BuildSystem
                 _originalWallLength = (long)newWall.transform.localScale.z;
                 newWall.SetActive(true);
                 _wallPrefabs.Add(ndx, newWall);
-                newWall.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer;
+                newWall.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
             }
         }
 
@@ -415,12 +414,15 @@ namespace RTSLockstep.BuildSystem
         {
             GameObject closest = null;
             float currentDistance;
-            foreach (Transform child in PlayerManager.CurrentPlayer.LocalAgentContainer.WallsContainer)
+            foreach (Transform child in PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer)
             {
-                currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody.Position.ToVector3());
-                if (currentDistance < distance)
+                if(child.gameObject.GetComponent<Structure>().StructureType == StructureType.Wall)
                 {
-                    closest = child.gameObject;
+                    currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody.Position.ToVector3());
+                    if (currentDistance < distance)
+                    {
+                        closest = child.gameObject;
+                    }
                 }
             }
 

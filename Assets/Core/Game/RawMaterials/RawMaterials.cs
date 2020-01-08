@@ -4,10 +4,10 @@ using RotaryHeart.Lib.SerializableDictionary;
 
 using RTSLockstep.LSResources;
 
-namespace RTSLockstep.Player
+namespace RTSLockstep.RawMaterials
 {
     [Serializable]
-    public class RawMaterialValues
+    public class RawMaterialLimited
     {
         [Range(0, 5000)]
         public long CurrentValue;
@@ -16,8 +16,8 @@ namespace RTSLockstep.Player
     }
 
     [Serializable]
-    public class RawMaterials : SerializableDictionaryBase<RawMaterialType, RawMaterialValues> { };
+    public class RawMaterialSetLimit : SerializableDictionaryBase<RawMaterialType, RawMaterialLimited> { };
 
     [Serializable]
-    public class RawMaterialCost : SerializableDictionaryBase<RawMaterialType, int> { };
+    public class RawMaterialSetValue : SerializableDictionaryBase<RawMaterialType, int> { };
 }

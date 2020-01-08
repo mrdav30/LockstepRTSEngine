@@ -1,6 +1,7 @@
-﻿using RTSLockstep.Player;
+﻿using UnityEngine;
+
 using RTSLockstep.LSResources;
-using UnityEngine;
+using RTSLockstep.RawMaterials;
 
 namespace RotaryHeart.Lib.SerializableDictionary
 {
@@ -25,6 +26,6 @@ namespace RotaryHeart.Lib.SerializableDictionary
         [SerializeField]
         private RawMaterialType _resourceType;
         [SerializeField]
-        private RawMaterialValues _startingResourceInfo;
+        private RawMaterialLimited _startingResourceInfo;
     }
 }

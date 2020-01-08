@@ -79,7 +79,7 @@ namespace RTSLockstep.BuildSystem
                 {
                     if (_constructingWall)
                     {
-                        WallPositioningHelper.OnLeftClick();
+                        WallPlacementManager.OnLeftClick();
                     }
                     else
                     {
@@ -132,7 +132,7 @@ namespace RTSLockstep.BuildSystem
                             // walls require a little help since they are click and drag
                             _constructingWall = true;
                             tempStructure.IsOverlay = true;
-                            WallPositioningHelper.Setup();
+                            WallPlacementManager.Setup();
                         }
 
                         tempStructureBody = tempObject.GetComponent<UnityLSBody>().InternalBody;
@@ -201,7 +201,7 @@ namespace RTSLockstep.BuildSystem
 
                 if (_constructingWall)
                 {
-                    WallPositioningHelper.Visualize();
+                    WallPlacementManager.Visualize();
                 }
             }
         }
@@ -257,7 +257,7 @@ namespace RTSLockstep.BuildSystem
             if (_constructingWall)
             {
                 _constructingWall = false;
-                WallPositioningHelper.Reset();
+                WallPlacementManager.Reset();
             }
 
             constructionQueue.Clear();

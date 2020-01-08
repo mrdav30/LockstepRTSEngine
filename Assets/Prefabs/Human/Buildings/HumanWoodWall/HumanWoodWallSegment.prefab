@@ -83,7 +83,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
+    isExpanded: 0
     _keyValues: 00000000010000000200000003000000040000000500000006000000
     _keys: 00000000010000000200000003000000040000000500000006000000
     _values: 00000000000000000000000000000000000000000000000000000000
@@ -163,9 +163,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6188705609e5c904fa7598e381bce66d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provisioner: 0
-  provisionAmount: 0
-  _resourceStorage: 
+  CanProvision: 0
+  ProvisionAmount: 0
+  CanStoreRawMaterial: 0
+  RawMaterialStorageDetails:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 0
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 0
+    _keyValues: 00000000010000000200000003000000040000000500000006000000
+    _keys: 
+    _values: []
   StructureType: 2
   WallSegmentGO: {fileID: 0}
 --- !u!114 &3016354350036366436

@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using UnityEngine;
+using Newtonsoft.Json;
+
 using RTSLockstep.BuildSystem.BuildGrid;
 using RTSLockstep.Managers.GameState;
 using RTSLockstep.LSResources;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
-using RTSLockstep.Integration.CustomComparion;
+using RTSLockstep.Utility;
+using RTSLockstep.RawMaterials;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -13,16 +15,19 @@ namespace RTSLockstep.Abilities.Essential
      */
     public class Structure : Ability, IBuildable
     {
-        public bool provisioner;
-        public int provisionAmount;
+        [SerializeField]
+        public bool CanProvision;
+        [SerializeField, Range(0, int.MaxValue)]
+        public int ProvisionAmount;
+        [SerializeField]
+        public bool CanStoreRawMaterial;
         [SerializeField, Tooltip("Enter object names for resources this structure can store.")]
-        private RawMaterialType[] _resourceStorage;
+        public RawMaterialSetLimit RawMaterialStorageDetails;
         public StructureType StructureType;
         /// <summary>
         /// Every wall pillar needs a corresponding section of wall to hold up.
         /// </summary>
         /// <value>The game object of the wall segement prefab</value>
-        [DrawIf("StructureType", ComparisonType.Equals, StructureType.Wall)]
         public GameObject WallSegmentGO;
         /// <summary>
         /// Describes the width and height of the buildable. This value does not change on the buildable.
@@ -71,10 +76,10 @@ namespace RTSLockstep.Abilities.Essential
 
             if (Agent.MyStats.CurrentHealth == Agent.MyStats.MaxHealth)
             {
-                if (provisioner && !_provisioned)
+                if (CanProvision && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, ProvisionAmount);
                 }
             }
         }
@@ -100,10 +105,10 @@ namespace RTSLockstep.Abilities.Essential
                 NeedsConstruction = false;
                 IsCasting = false;
                 Agent.SetTeamColor();
-                if (provisioner && !_provisioned)
+                if (CanProvision && !_provisioned)
                 {
                     _provisioned = true;
-                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                    Agent.GetControllingPlayer().PlayerRawMaterialManager.IncreaseRawMaterialLimit(RawMaterialType.Provision, ProvisionAmount);
                 }
             }
         }
@@ -115,22 +120,7 @@ namespace RTSLockstep.Abilities.Essential
 
         public bool CanStoreResources(RawMaterialType resourceType)
         {
-
-            if (_resourceStorage.Length > 0)
-            {
-                for (int i = 0; i < _resourceStorage.Length; i++)
-                {
-                    if (_resourceStorage[i] == resourceType)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            return false;
-
+            return RawMaterialStorageDetails.IsNotNull() && RawMaterialStorageDetails[resourceType].IsNotNull();
         }
 
         public void SetGridPosition(Vector2d pos)
@@ -141,9 +131,9 @@ namespace RTSLockstep.Abilities.Essential
 
         protected override void OnDeactivate()
         {
-            if (provisioner)
+            if (CanProvision)
             {
-                Agent.GetControllingPlayer().PlayerRawMaterialManager.DecrementRawMaterialLimit(RawMaterialType.Provision, provisionAmount);
+                Agent.GetControllingPlayer().PlayerRawMaterialManager.DecrementRawMaterialLimit(RawMaterialType.Provision, ProvisionAmount);
             }
 
             GridBuilder.Unbuild(this);

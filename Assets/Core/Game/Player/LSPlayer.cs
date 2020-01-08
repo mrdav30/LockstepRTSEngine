@@ -13,7 +13,7 @@ namespace RTSLockstep.Player
     {
         #region Properties
         public HUD PlayerHUD;
-        public RawMaterialManager PlayerRawMaterialManager;
+        public PlayerMaterialManager PlayerRawMaterialManager;
         public LSAgents LocalAgentContainer;
 
         public RallyPoint RallyPointOjbect;
@@ -47,13 +47,6 @@ namespace RTSLockstep.Player
                 LocalAgentContainer.UnitsContainer = LSUtility.CreateEmpty().transform;
                 LocalAgentContainer.UnitsContainer.transform.parent = LocalAgentContainer.transform;
                 LocalAgentContainer.UnitsContainer.gameObject.name = "UnitsContainer";
-            }
-
-            if (LocalAgentContainer.WallsContainer.IsNull())
-            {
-                LocalAgentContainer.WallsContainer = LSUtility.CreateEmpty().transform;
-                LocalAgentContainer.WallsContainer.transform.parent = LocalAgentContainer.transform;
-                LocalAgentContainer.WallsContainer.gameObject.name = "WallsContainer";
             }
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))

@@ -40,7 +40,7 @@ namespace RTSLockstep.Player
         public bool IsMouseOverHUD { get; private set; }
 
         private LSPlayer _cachedPlayer;
-        private RawMaterialManager _cachedResourceManager;
+        private PlayerMaterialManager _cachedResourceManager;
 
         private Texture2D _activeCursor;
         private bool _cursorLocked;
@@ -68,7 +68,7 @@ namespace RTSLockstep.Player
         public void OnSetup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
-            _cachedResourceManager = GetComponentInParent<RawMaterialManager>();
+            _cachedResourceManager = GetComponentInParent<PlayerMaterialManager>();
 
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {

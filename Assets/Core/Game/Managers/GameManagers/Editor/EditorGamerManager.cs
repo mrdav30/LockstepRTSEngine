@@ -1,8 +1,9 @@
-﻿using RTSLockstep.BehaviourHelpers;
+﻿using System.Linq;
+using UnityEditor;
+
+using RTSLockstep.BehaviourHelpers;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Utility;
-using System.Linq;
-using UnityEditor;
 
 namespace RTSLockstep
 {

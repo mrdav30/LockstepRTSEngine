@@ -6,17 +6,18 @@ using RTSLockstep.Agents;
 using RTSLockstep.LSResources;
 using RTSLockstep.Utility;
 using RTSLockstep.Managers.GameManagers;
+using RTSLockstep.RawMaterials;
 
 namespace RTSLockstep.Player
 {
-    public class RawMaterialManager : MonoBehaviour
+    public class PlayerMaterialManager : MonoBehaviour
     {
         #region Properties
         [SerializeField]
-        public RawMaterials BaseRawMaterials;
+        public RawMaterialSetLimit BaseRawMaterials;
 
         [HideInInspector]
-        public RawMaterials CurrentRawMaterials;
+        public RawMaterialSetLimit CurrentRawMaterials;
         #endregion
 
         #region Behavior
@@ -38,7 +39,7 @@ namespace RTSLockstep.Player
             CurrentRawMaterials[type].CurrentLimit += amount;
         }
 
-        public RawMaterials GetCurrentRawMaterials()
+        public RawMaterialSetLimit GetCurrentRawMaterials()
         {
             return CurrentRawMaterials;
         }

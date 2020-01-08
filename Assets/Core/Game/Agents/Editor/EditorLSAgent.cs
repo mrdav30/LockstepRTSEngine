@@ -1,9 +1,9 @@
 ﻿using UnityEditor;
 
 using RTSLockstep.Utility;
-using RTSLockstep.Player;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Agents;
+using RTSLockstep.RawMaterials;
 
 namespace RTSLockstep
 {
@@ -18,7 +18,7 @@ namespace RTSLockstep
 
             if (targetValue.RawMaterialCost.IsNull() || targetValue.RawMaterialCost.Count != GameResourceManager.GameRawMaterials.Length)
             {
-                targetValue.RawMaterialCost = new RawMaterialCost();
+                targetValue.RawMaterialCost = new RawMaterialSetValue();
                 foreach (var type in GameResourceManager.GameRawMaterials)
                 {
                     targetValue.RawMaterialCost.Add(type, 0);

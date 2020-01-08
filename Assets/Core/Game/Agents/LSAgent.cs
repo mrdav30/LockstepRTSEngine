@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
-using RotaryHeart.Lib.SerializableDictionary;
 
 using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities;
@@ -22,6 +21,7 @@ using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
+using RTSLockstep.RawMaterials;
 
 using Coroutine = RTSLockstep.Utility.Coroutine;
 
@@ -63,7 +63,7 @@ namespace RTSLockstep.Agents
         [HideInInspector]
         public string AgentDescription;
         [SerializeField]
-        public RawMaterialCost RawMaterialCost;
+        public RawMaterialSetValue RawMaterialCost;
 
         public string MyAgentCode { get; private set; }
         public AgentType MyAgentType { get { return _agentType; } private set { _agentType = value; } }

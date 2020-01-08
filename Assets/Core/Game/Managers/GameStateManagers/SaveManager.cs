@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+
 using RTSLockstep.Agents;
 using RTSLockstep.Abilities;
 using RTSLockstep.Player;
 using RTSLockstep.Environment;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
+using RTSLockstep.RawMaterials;
 
 namespace RTSLockstep.Managers.GameState
 {
@@ -31,7 +33,7 @@ namespace RTSLockstep.Managers.GameState
             }
         }
 
-        public static void SavePlayerResources(JsonWriter writer, RawMaterials currentResources)
+        public static void SavePlayerResources(JsonWriter writer, RawMaterialSetLimit currentResources)
         {
             if (writer.IsNull())
             {
