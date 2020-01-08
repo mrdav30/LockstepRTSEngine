@@ -34,7 +34,7 @@ namespace RTSLockstep.Simulation.Grid
             {
                 for (long y = yMin; y <= yMax; y += FixedMath.One)
                 {
-                    var node = GridManager.GetNode(x, y);
+                    var node = GridManager.GetNodeByPos(x, y);
                     if (node.IsNotNull())
                     {
                         node.AddObstacle();

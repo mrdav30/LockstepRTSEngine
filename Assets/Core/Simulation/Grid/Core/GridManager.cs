@@ -77,7 +77,7 @@ namespace RTSLockstep.Simulation.Grid
 
             if (_settingsChanged)
             {
-                if (_settings == null)
+                if (_settings.IsNull())
                 {
                     _settings = DefaultSettings;
                 }
@@ -132,7 +132,7 @@ namespace RTSLockstep.Simulation.Grid
         private static void Generate()
         {
             #region Pooling; no need to create all those nodes again
-            if (Grid != null)
+            if (Grid.IsNotNull())
             {
                 int min = Grid.Length;
                 CachedGridNodes.EnsureCapacity(min);
@@ -194,7 +194,7 @@ namespace RTSLockstep.Simulation.Grid
             return ret;
         }
 
-        public static GridNode GetNode(int xGrid, int yGrid)
+        public static GridNode GetNodeByIndex(int xGrid, int yGrid)
         {
             if (xGrid < 0 || xGrid >= Width || yGrid < 0 || yGrid >= Height)
             {
@@ -204,7 +204,7 @@ namespace RTSLockstep.Simulation.Grid
             return Grid[GetGridIndex(xGrid, yGrid)];
         }
 
-        public static GridNode GetNode(long xPos, long yPos)
+        public static GridNode GetNodeByPos(long xPos, long yPos)
         {
             GetCoordinates(xPos, yPos, out indexX, out indexY);
             if (!ValidateCoordinates(indexX, indexY))
@@ -213,7 +213,7 @@ namespace RTSLockstep.Simulation.Grid
                 return null;
             }
 
-            return (GetNode(indexX, indexY));
+            return GetNodeByIndex(indexX, indexY);
         }
 
         public static bool ValidateCoordinates(int xGrid, int yGrid)
@@ -242,7 +242,7 @@ namespace RTSLockstep.Simulation.Grid
             //xGrid = (int)((((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT) + ScanResolution / 2) / ScanResolution);
             //yGrid = (int)((((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT) + ScanResolution / 2) / ScanResolution);
 
-            GridNode gridNode = GetNode(xPos, yPos);
+            GridNode gridNode = GetNodeByPos(xPos, yPos);
             if (gridNode.IsNull())
             {
                 xGrid = 0;

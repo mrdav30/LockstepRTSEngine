@@ -60,9 +60,9 @@ namespace RTSLockstep.Simulation.Influence
 
         public void Initialize()
         {
-            LocatedNode = GridManager.GetNode(Body.Position.x, Body.Position.y);
+            LocatedNode = GridManager.GetNodeByPos(Body.Position.x, Body.Position.y);
 
-            LocatedNode.Add(this);
+            LocatedNode.AddLinkedAgent(this);
 
             foreach (var AI in AgentAI)
             {
@@ -74,7 +74,7 @@ namespace RTSLockstep.Simulation.Influence
         {
             if (Body.PositionChangedBuffer)
             {
-                tempNode = GridManager.GetNode(Body.Position.x, Body.Position.y);
+                tempNode = GridManager.GetNodeByPos(Body.Position.x, Body.Position.y);
 
                 if (tempNode.IsNull())
                 {
@@ -85,10 +85,10 @@ namespace RTSLockstep.Simulation.Influence
                 {
                     if (LocatedNode.IsNotNull())
                     {
-                        LocatedNode.Remove(this);
+                        LocatedNode.RemoveLinkedAgent(this);
                     }
 
-                    tempNode.Add(this);
+                    tempNode.AddLinkedAgent(this);
                     LocatedNode = tempNode;
                 }
             }
@@ -107,7 +107,7 @@ namespace RTSLockstep.Simulation.Influence
         {
             if (LocatedNode.IsNotNull())
             {
-                LocatedNode.Remove(this);
+                LocatedNode.RemoveLinkedAgent(this);
                 LocatedNode = null;
             }
         }

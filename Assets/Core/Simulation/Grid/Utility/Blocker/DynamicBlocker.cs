@@ -1,8 +1,10 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using UnityEngine;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
-using UnityEngine;
+using RTSLockstep.Utility;
 
 namespace RTSLockstep.Simulation.Grid
 {
@@ -62,7 +64,11 @@ namespace RTSLockstep.Simulation.Grid
             {
                 GridNode node = _lastCoordinates[i];
                 node.RemoveObstacle();
+
+                var test = GridManager.Grid[node.gridIndex];
+                continue;
             }
+
             _lastCoordinates.FastClear();
         }
 
@@ -73,9 +79,9 @@ namespace RTSLockstep.Simulation.Grid
             _cachedBody.GetCoveredSnappedPositions(gridSpacing, _bufferCoordinates);
             foreach (Vector2d vec in _bufferCoordinates)
             {
-                GridNode node = GridManager.GetNode(vec.x, vec.y);
+                GridNode node = GridManager.GetNodeByPos(vec.x, vec.y);
 
-                if (node == null)
+                if (node.IsNull())
                 {
                     continue;
                 }

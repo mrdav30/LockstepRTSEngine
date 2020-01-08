@@ -127,6 +127,18 @@ namespace RTSLockstep.Simulation.Grid
             }
         }
 
+        /// <summary>
+        /// Returns true if clearance degree changed.
+        /// </summary>
+        /// <returns></returns>
+        private void UpdateValues()
+        {
+            GridVersion = GridManager.GridVersion;
+
+            //fast enough to just do it
+            UpdateClearance();
+        }
+
         private void UpdateClearance()
         {
             if (Unwalkable)
@@ -139,10 +151,10 @@ namespace RTSLockstep.Simulation.Grid
                 if (ClearanceSource <= 7)
                 {
                     //refresh source in case the map changed
-                    var source = NeighborNodes[ClearanceSource];
+                    GridNode source = NeighborNodes[ClearanceSource];
                     if (source.IsNotNull())
                     {
-                        var prevSourceDegree = source.ClearanceDegree;
+                        byte prevSourceDegree = source.ClearanceDegree;
                         if (source.ClearanceDegree < ClearanceDegree)
                         {
                             source.UpdateValues();
@@ -165,7 +177,7 @@ namespace RTSLockstep.Simulation.Grid
                 // TODO: Test this thoroughly and visualize
                 for (int i = 7; i >= 0; i--)
                 {
-                    var neighbor = NeighborNodes[i];
+                    GridNode neighbor = NeighborNodes[i];
                     if (neighbor.IsNull() || neighbor.Unwalkable)
                     {
                         ClearanceDegree = 1;
@@ -180,18 +192,6 @@ namespace RTSLockstep.Simulation.Grid
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns true if clearance degree changed.
-        /// </summary>
-        /// <returns></returns>
-        private void UpdateValues()
-        {
-            GridVersion = GridManager.GridVersion;
-
-            //fast enough to just do it
-            UpdateClearance();
         }
 
         //Prepare Unpassable check optimizations
@@ -218,14 +218,15 @@ namespace RTSLockstep.Simulation.Grid
 
         public void AddObstacle()
         {
-#if DEBUG
             if (_obstacleCount == byte.MaxValue)
             {
                 Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(gridX, gridY));
             }
-#endif
-            _obstacleCount++;
-            GridManager.NotifyGridChanged();
+            else
+            {
+                _obstacleCount++;
+                GridManager.NotifyGridChanged();
+            }
         }
 
         public void RemoveObstacle()
@@ -234,11 +235,19 @@ namespace RTSLockstep.Simulation.Grid
             {
                 Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(gridX, gridY));
             }
-            _obstacleCount--;
-            GridManager.NotifyGridChanged();
+            else
+            {
+                _obstacleCount--;
+                GridManager.NotifyGridChanged();
+
+                if (_obstacleCount == 0)
+                {
+                    UpdateValues();
+                }
+            }
         }
 
-        private void GenerateNeighbors()
+        public void GenerateNeighbors()
         {
             //0-3 = sides, 4-7 = diagonals
             //0 = (-1, 0)   // West
@@ -369,12 +378,12 @@ namespace RTSLockstep.Simulation.Grid
         #endregion
 
         #region Influence
-        public void Add(LSInfluencer influencer)
+        public void AddLinkedAgent(LSInfluencer influencer)
         {
             LinkedScanNode.Add(influencer);
         }
 
-        public void Remove(LSInfluencer influencer)
+        public void RemoveLinkedAgent(LSInfluencer influencer)
         {
             LinkedScanNode.Remove(influencer);
         }

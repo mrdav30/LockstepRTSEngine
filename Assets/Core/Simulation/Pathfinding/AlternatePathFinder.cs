@@ -85,7 +85,7 @@ namespace RTSLockstep.Simulation.Pathfinding
 
             for (_layer = 1; _layer <= _maxTestDistance;)
             {
-                GridNode checkNode = GridManager.GetNode(_xGrid + _dirX, _yGrid + _dirY);
+                GridNode checkNode = GridManager.GetNodeByIndex(_xGrid + _dirX, _yGrid + _dirY);
                 if (checkNode.IsNotNull())
                 {
                     CheckPathNode(checkNode);

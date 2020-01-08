@@ -33,7 +33,7 @@ namespace RTSLockstep.Simulation.Grid
                 foreach (Vector2d vec in bufferCoordinates)
                 {
                     GridManager.GetCoordinates(vec.x, vec.y, out int gridX, out int gridY);
-                    GridNode node = GridManager.GetNode(gridX, gridY);
+                    GridNode node = GridManager.GetNodeByIndex(gridX, gridY);
 
                     if (node == null)
                     {

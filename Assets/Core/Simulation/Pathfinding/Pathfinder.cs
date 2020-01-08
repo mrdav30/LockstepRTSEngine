@@ -117,13 +117,13 @@ namespace RTSLockstep.Simulation.Pathfinding
         /// <returns></returns>
         public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false)
         {
-            outputNode = GridManager.GetNode(dest.x, dest.y);
+            outputNode = GridManager.GetNodeByPos(dest.x, dest.y);
             if (outputNode.IsNull())
             {
                 //If null, it is off the grid. Raycast back onto grid for closest viable node to the destination.
                 foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
-                    outputNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
+                    outputNode = GridManager.GetNodeByPos(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
                     if (outputNode.IsNotNull())
                     {
                         return true;
@@ -153,7 +153,7 @@ namespace RTSLockstep.Simulation.Pathfinding
         /// <returns></returns>
         public static bool GetStartNode(Vector2d dest, out GridNode returnNode)
         {
-            returnNode = GridManager.GetNode(dest.x, dest.y);
+            returnNode = GridManager.GetNodeByPos(dest.x, dest.y);
             if (returnNode.IsNull() || returnNode.Unwalkable)
             {
                 return StarCast(dest, out returnNode);
@@ -184,7 +184,7 @@ namespace RTSLockstep.Simulation.Pathfinding
 
         public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false)
         {
-            returnNode = GridManager.GetNode(dest.x, dest.y);
+            returnNode = GridManager.GetNodeByPos(dest.x, dest.y);
 
             if (returnNode.IsNull())
             {
@@ -202,7 +202,7 @@ namespace RTSLockstep.Simulation.Pathfinding
 
                 foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
-                    currentNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
+                    currentNode = GridManager.GetNodeByPos(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
                     if (!validTriggered)
                     {
                         if (currentNode.IsNotNull() && !currentNode.Unwalkable)

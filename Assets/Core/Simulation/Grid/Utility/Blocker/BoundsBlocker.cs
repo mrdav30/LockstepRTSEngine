@@ -69,7 +69,7 @@ namespace RTSLockstep.Simulation.Grid
 
         private void BlockNode(long x, long y)
         {
-            var node = GridManager.GetNode(x, y);
+            var node = GridManager.GetNodeByPos(x, y);
             if (node.IsNotNull())
             {
                 node.AddObstacle();
