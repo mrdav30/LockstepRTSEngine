@@ -65,7 +65,6 @@ namespace RTSLockstep.Simulation.Grid
                 GridNode node = _lastCoordinates[i];
                 node.RemoveObstacle();
 
-                var test = GridManager.Grid[node.gridIndex];
                 continue;
             }
 

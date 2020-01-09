@@ -53,6 +53,14 @@ namespace RTSLockstep.Managers.GameManagers
             }
         }
 
+        public static UserInputKeyMappings[] GameInputKeys
+        {
+            get
+            {
+                return (UserInputKeyMappings[])Enum.GetValues(typeof(UserInputKeyMappings));
+            }
+        }
+
         private static GUISkin _selectBoxSkin;
         private static Vector3d _invalidPosition = new Vector3d(-99999, -99999, -99999);
         private static Bounds _invalidBounds = new Bounds(new Vector3(-99999, -99999, -99999), new Vector3(0, 0, 0));

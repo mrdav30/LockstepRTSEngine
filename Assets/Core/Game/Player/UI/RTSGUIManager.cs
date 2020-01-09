@@ -1,5 +1,4 @@
-﻿using RTSLockstep.Agents.Visuals;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RTSLockstep.Player.UI
 {

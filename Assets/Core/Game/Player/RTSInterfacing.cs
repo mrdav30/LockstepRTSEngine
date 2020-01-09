@@ -1,13 +1,14 @@
-﻿using RTSLockstep.Agents;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+using RTSLockstep.Agents;
 using RTSLockstep.Data;
 using RTSLockstep.LSResources;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace RTSLockstep.Player
 {
@@ -34,9 +35,9 @@ namespace RTSLockstep.Player
 
         public static void Visualize()
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNotNull())
+            if (RTSInputHelper.GUIManager.MainCam.IsNotNull())
             {
-                CachedRay = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
+                CachedRay = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
                 CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
 
                 MousedAgent = GetScreenAgent(Input.mousePosition);
@@ -115,21 +116,21 @@ namespace RTSLockstep.Player
             IEnumerable<LSBody> raycast = Raycaster.RaycastAll(start, end);
 
             foreach (var body in raycast)
-            { 
-                    if (body.Agent.IsNull())
-                    {
-                        continue;
-                    }
+            {
+                if (body.Agent.IsNull())
+                {
+                    continue;
+                }
 
-                    LSAgent agent = body.Agent;
+                LSAgent agent = body.Agent;
 
-                    if (agent.IsVisible)
+                if (agent.IsVisible)
+                {
+                    if (conditional(agent))
                     {
-                        if (conditional(agent))
-                        {
-                            return agent;
-                        }
+                        return agent;
                     }
+                }
             }
 
             return null;
@@ -137,8 +138,11 @@ namespace RTSLockstep.Player
 
         public static Vector2d GetWorldPosHeight(Vector2 screenPos, float height = 0)
         {
-            if (PlayerInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (RTSInputHelper.GUIManager.MainCam.IsNull())
+            {
+                return Vector2d.zero;
+            }
+            Ray ray = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             //RaycastHit hit;
 
             Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
@@ -148,10 +152,11 @@ namespace RTSLockstep.Player
 
         public static Vector2d GetWorldPosD(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam == null) return Vector2d.zero;
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
-            RaycastHit hit;
-            if (NDRaycast.Raycast(ray, out hit))
+            if (RTSInputHelper.GUIManager.MainCam.IsNull()) {
+                return Vector2d.zero;
+            }
+            Ray ray = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2d(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
                 return new Vector2d(hit.point.x, hit.point.z);
@@ -164,10 +169,12 @@ namespace RTSLockstep.Player
 
         public static Vector2 GetWorldPos(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam == null) return default(Vector2);
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
-            RaycastHit hit;
-            if (NDRaycast.Raycast(ray, out hit))
+            if (RTSInputHelper.GUIManager.MainCam.IsNull())
+            {
+                return default;
+            }
+            Ray ray = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
                 return new Vector2(hit.point.x, hit.point.z);
@@ -179,10 +186,12 @@ namespace RTSLockstep.Player
 
         public static Vector3 GetWorldPos3(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam == null) return default(Vector2);
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
-            RaycastHit hit;
-            if (NDRaycast.Raycast(ray, out hit))
+            if (RTSInputHelper.GUIManager.MainCam.IsNull())
+            {
+                return default(Vector2);
+            }
+            Ray ray = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
                 return hit.point;
@@ -194,20 +203,21 @@ namespace RTSLockstep.Player
 
         public static bool HitPointIsGround(Vector3 origin)
         {
-            if (PlayerInputHelper.GUIManager.MainCam == null) return false;
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
-            RaycastHit hit;
-            if (NDRaycast.Raycast(ray, out hit))
+            if (RTSInputHelper.GUIManager.MainCam.IsNull())
+            {
+                return false;
+            }
+            Ray ray = RTSInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
+            if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 GameObject obj = hit.collider.gameObject;
                 //  did we hit the defined ground layer?
-                if (obj
-                    && obj.layer == LayerMask.NameToLayer("Ground"))
+                if (obj && obj.layer == LayerMask.NameToLayer("Ground"))
                 {
                     return true;
                 }
-
             }
+
             return false;
         }
 
@@ -227,6 +237,7 @@ namespace RTSLockstep.Player
                     return true;
                 }
             }
+
             return false;
         }
     }

@@ -47,6 +47,7 @@ namespace RTSLockstep.Player.Utility
             PlayerInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
             PlayerInputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
             PlayerInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
+            PlayerInputHelper.OnLeftTapUp += HandleLeftClickUp;
             _selectionLocked = true;
         }
 
@@ -55,93 +56,92 @@ namespace RTSLockstep.Player.Utility
             MousePosition = Input.mousePosition;
             MouseWorldPosition = RTSInterfacing.GetWorldPos(MousePosition);
             GetMousedAgent();
-            if (Boxing)
+            if (Boxing && CanBox)
             {
-                if (CanBox)
+                //if (CanBox)
+                //{
+                if (MousePosition != BoxEnd)
                 {
-                    if (MousePosition != BoxEnd)
-                    {
-                        Vector2 RaycastTopLeft;
-                        Vector2 RaycastTopRight;
-                        Vector2 RaycastBotLeft;
-                        Vector2 RaycastBotRight;
+                    Vector2 RaycastTopLeft;
+                    Vector2 RaycastTopRight;
+                    Vector2 RaycastBotLeft;
+                    Vector2 RaycastBotRight;
 
-                        BoxEnd = MousePosition;
-                        if (BoxStart.x < BoxEnd.x)
-                        {
-                            RaycastTopLeft.x = BoxStart.x;
-                            RaycastBotLeft.x = BoxStart.x;
-                            RaycastTopRight.x = BoxEnd.x;
-                            RaycastBotRight.x = BoxEnd.x;
-                        }
-                        else
-                        {
-                            RaycastTopLeft.x = BoxEnd.x;
-                            RaycastBotLeft.x = BoxEnd.x;
-                            RaycastTopRight.x = BoxStart.x;
-                            RaycastBotRight.x = BoxStart.x;
-                        }
-                        if (BoxStart.y < BoxEnd.y)
-                        {
-                            RaycastBotLeft.y = BoxStart.y;
-                            RaycastBotRight.y = BoxStart.y;
-                            RaycastTopLeft.y = BoxEnd.y;
-                            RaycastTopRight.y = BoxEnd.y;
-                        }
-                        else
-                        {
-                            RaycastBotLeft.y = BoxEnd.y;
-                            RaycastBotRight.y = BoxEnd.y;
-                            RaycastTopLeft.y = BoxStart.y;
-                            RaycastTopRight.y = BoxStart.y;
-                        }
-                        Box_TopLeft = RTSInterfacing.GetWorldPos(RaycastTopLeft);
-                        Box_TopRight = RTSInterfacing.GetWorldPos(RaycastTopRight);
-                        Box_BottomLeft = RTSInterfacing.GetWorldPos(RaycastBotLeft);
-                        Box_BottomRight = RTSInterfacing.GetWorldPos(RaycastBotRight);
-                    }
-                    ClearBox();
-                    //int lecount = 0;
-                    if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
+                    BoxEnd = MousePosition;
+                    if (BoxStart.x < BoxEnd.x)
                     {
-                        bufferSelectedAgents.Clear();
-                        for (int i = 0; i < GlobalAgentController.LocalAgentControllersCount; i++)
+                        RaycastTopLeft.x = BoxStart.x;
+                        RaycastBotLeft.x = BoxStart.x;
+                        RaycastTopRight.x = BoxEnd.x;
+                        RaycastBotRight.x = BoxEnd.x;
+                    }
+                    else
+                    {
+                        RaycastTopLeft.x = BoxEnd.x;
+                        RaycastBotLeft.x = BoxEnd.x;
+                        RaycastTopRight.x = BoxStart.x;
+                        RaycastBotRight.x = BoxStart.x;
+                    }
+                    if (BoxStart.y < BoxEnd.y)
+                    {
+                        RaycastBotLeft.y = BoxStart.y;
+                        RaycastBotRight.y = BoxStart.y;
+                        RaycastTopLeft.y = BoxEnd.y;
+                        RaycastTopRight.y = BoxEnd.y;
+                    }
+                    else
+                    {
+                        RaycastBotLeft.y = BoxEnd.y;
+                        RaycastBotRight.y = BoxEnd.y;
+                        RaycastTopLeft.y = BoxStart.y;
+                        RaycastTopRight.y = BoxStart.y;
+                    }
+                    Box_TopLeft = RTSInterfacing.GetWorldPos(RaycastTopLeft);
+                    Box_TopRight = RTSInterfacing.GetWorldPos(RaycastTopRight);
+                    Box_BottomLeft = RTSInterfacing.GetWorldPos(RaycastBotLeft);
+                    Box_BottomRight = RTSInterfacing.GetWorldPos(RaycastBotRight);
+                }
+                ClearBox();
+                //int lecount = 0;
+                if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
+                {
+                    bufferSelectedAgents.Clear();
+                    for (int i = 0; i < GlobalAgentController.LocalAgentControllersCount; i++)
+                    {
+                        var agentController = GlobalAgentController.GetAgentController(i);
+                        for (int j = 0; j < LocalAgentController.MaxAgents; j++)
                         {
-                            var agentController = GlobalAgentController.GetAgentController(i);
-                            for (int j = 0; j < LocalAgentController.MaxAgents; j++)
+                            if (agentController.LocalAgentActive[j])
                             {
-                                if (agentController.LocalAgentActive[j])
+                                curAgent = agentController.LocalAgents[j];
+                                if (curAgent.CanSelect)
                                 {
-                                    curAgent = agentController.LocalAgents[j];
-                                    if (curAgent.CanSelect)
+                                    //always add mousedagent
+                                    if (curAgent.RefEquals(MousedAgent))
                                     {
-                                        //always add mousedagent
-                                        if (curAgent.RefEquals(MousedAgent))
+                                        bufferSelectedAgents.Add(curAgent);
+                                    }
+                                    else if (curAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
+                                    {
+                                        agentPos = curAgent.Position2;
+                                        Edge = Box_TopRight - Box_TopLeft;
+                                        Point = agentPos - Box_TopLeft;
+                                        if (DotEdge() < 0)
                                         {
-                                            bufferSelectedAgents.Add(curAgent);
-                                        }
-                                        else if (curAgent.IsOwnedBy(PlayerManager.CurrentPlayerController))
-                                        {
-                                            agentPos = curAgent.Position2;
-                                            Edge = Box_TopRight - Box_TopLeft;
-                                            Point = agentPos - Box_TopLeft;
+                                            Edge = Box_BottomRight - Box_TopRight;
+                                            Point = agentPos - Box_TopRight;
                                             if (DotEdge() < 0)
                                             {
-                                                Edge = Box_BottomRight - Box_TopRight;
-                                                Point = agentPos - Box_TopRight;
+                                                Edge = Box_BottomLeft - Box_BottomRight;
+                                                Point = agentPos - Box_BottomRight;
                                                 if (DotEdge() < 0)
                                                 {
-                                                    Edge = Box_BottomLeft - Box_BottomRight;
-                                                    Point = agentPos - Box_BottomRight;
+                                                    Edge = Box_TopLeft - Box_BottomLeft;
+                                                    Point = agentPos - Box_BottomLeft;
                                                     if (DotEdge() < 0)
                                                     {
-                                                        Edge = Box_TopLeft - Box_BottomLeft;
-                                                        Point = agentPos - Box_BottomLeft;
-                                                        if (DotEdge() < 0)
-                                                        {
-                                                            bufferSelectedAgents.Add(curAgent);
-                                                            continue;
-                                                        }
+                                                        bufferSelectedAgents.Add(curAgent);
+                                                        continue;
                                                     }
                                                 }
                                             }
@@ -150,41 +150,42 @@ namespace RTSLockstep.Player.Utility
                                 }
                             }
                         }
+                    }
 
-                        if (bufferSelectedAgents.Count > 0)
+                    if (bufferSelectedAgents.Count > 0)
+                    {
+                        int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
+                        while (bufferSelectedAgents.Count > 0)
                         {
-                            int peakBoxPriority = bufferSelectedAgents.PeekMax().BoxPriority;
-                            while (bufferSelectedAgents.Count > 0)
+                            LSAgent agent = bufferSelectedAgents.PopMax();
+                            if (agent.BoxPriority < peakBoxPriority)
                             {
-                                LSAgent agent = bufferSelectedAgents.PopMax();
-                                if (agent.BoxPriority < peakBoxPriority)
-                                {
-                                    break;
-                                }
-                                BoxAgent(agent);
+                                break;
                             }
+                            BoxAgent(agent);
                         }
                     }
-                    else
-                    {
-                        BoxAgent(MousedAgent);
-                    }
                 }
-
-                if (Input.GetMouseButtonUp(0))
+                else
                 {
-                    if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
-                    {
-                        ClearSelection();
-                    }
-
-                    if (!IsGathering)
-                    {
-                        SelectSelectedAgents();
-                    }
-
-                    Boxing = false;
+                    BoxAgent(MousedAgent);
                 }
+                //   }
+
+                //if (Input.GetMouseButtonUp(0))
+                //{
+                //    if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                //    {
+                //        ClearSelection();
+                //    }
+
+                //    if (!IsGathering)
+                //    {
+                //        SelectSelectedAgents();
+                //    }
+
+                //    Boxing = false;
+                //}
             }
         }
 
@@ -198,6 +199,24 @@ namespace RTSLockstep.Player.Utility
         public static void HandleLeftClickHoldDown()
         {
             StartBoxing(MousePosition);
+        }
+
+        public static void HandleLeftClickUp()
+        {
+            if (Boxing)
+            {
+                if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
+                {
+                    ClearSelection();
+                }
+
+                if (!IsGathering)
+                {
+                    SelectSelectedAgents();
+                }
+
+                Boxing = false;
+            }
         }
 
         // do double click things
