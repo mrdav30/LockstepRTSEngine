@@ -18,8 +18,6 @@ namespace RTSLockstep.Player
 {
     public class RTSInputHelper : PlayerInputHelper
     {
-        public static RTSGUIManager GUIManager;
-
         public static AbilityDataItem QuickMove;
         public static AbilityDataItem QuickTarget;
         public static AbilityDataItem QuickHarvest;

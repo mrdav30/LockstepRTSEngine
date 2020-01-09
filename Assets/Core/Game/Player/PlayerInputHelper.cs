@@ -34,6 +34,7 @@ namespace RTSLockstep.Player
         [SerializeField]
         public PlayerInputKeys UserInputKeys;
 #pragma warning restore 0649
+        public static GUIManager GUIManager;
         /// <summary>
         /// The current ability to cast. Set this to a non-null value to automatically start the gathering process.
         /// </summary>
@@ -87,6 +88,11 @@ namespace RTSLockstep.Player
         #region BehaviorHelper
         protected virtual void Setup()
         {
+            if (GUIManager.IsNull())
+            {
+                GUIManager = new ExampleGUIManager();
+            }
+
             Setted = true;
         }
 
