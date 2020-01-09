@@ -48,7 +48,7 @@ namespace RTSLockstep.Player.Utility
             PlayerInputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
             PlayerInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
             PlayerInputHelper.OnLeftTapUp += HandleLeftClickUp;
-            _selectionLocked = true;
+            _selectionLocked = false;
         }
 
         public static void Update()
@@ -58,8 +58,6 @@ namespace RTSLockstep.Player.Utility
             GetMousedAgent();
             if (Boxing && CanBox)
             {
-                //if (CanBox)
-                //{
                 if (MousePosition != BoxEnd)
                 {
                     Vector2 RaycastTopLeft;
@@ -170,22 +168,6 @@ namespace RTSLockstep.Player.Utility
                 {
                     BoxAgent(MousedAgent);
                 }
-                //   }
-
-                //if (Input.GetMouseButtonUp(0))
-                //{
-                //    if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
-                //    {
-                //        ClearSelection();
-                //    }
-
-                //    if (!IsGathering)
-                //    {
-                //        SelectSelectedAgents();
-                //    }
-
-                //    Boxing = false;
-                //}
             }
         }
 
@@ -198,6 +180,11 @@ namespace RTSLockstep.Player.Utility
         // do left click hold things
         public static void HandleLeftClickHoldDown()
         {
+            if (!Input.GetKey(KeyCode.LeftShift))
+            {
+                ClearSelection();
+            }
+
             StartBoxing(MousePosition);
         }
 
@@ -205,11 +192,6 @@ namespace RTSLockstep.Player.Utility
         {
             if (Boxing)
             {
-                if (!_selectionLocked && !Input.GetKey(KeyCode.LeftShift))
-                {
-                    ClearSelection();
-                }
-
                 if (!IsGathering)
                 {
                     SelectSelectedAgents();
