@@ -19,6 +19,6 @@ namespace RTSLockstep.BuildSystem.BuildGrid
         /// <summary>
         /// Set to true to allow buildable to build on top of other structures.
         /// </summary>
-        bool IsOverlay { get; set; }
+        bool CanOverlay { get; set; }
     }
 }

@@ -190,23 +190,9 @@ MonoBehaviour:
     reqReferences: {fileID: 0}
     isExpanded: 0
     _keyValues: 00000000010000000200000003000000040000000500000006000000
-    _keys: 00000000010000000200000003000000040000000500000006000000
-    _values:
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-    - CurrentValue: 0
-      CurrentLimit: 0
-  StructureType: 2
+    _keys: 
+    _values: []
+  StructureType: 3
   WallSegmentGO: {fileID: 6754609871906906199, guid: cda6769975c749048b581c54cd10f1c8,
     type: 3}
 --- !u!114 &4139659409858952994

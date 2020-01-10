@@ -83,7 +83,7 @@ namespace RTSLockstep.Abilities.Extra
                             }
                         }
                         else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.CurrentPlayerController.SelectedAgents.Count > 0
-                            && Agent.MyAgentType != AgentType.Resource)
+                            && Agent.MyAgentType != AgentType.RawMaterial)
                         {
                             if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Structure) && Selector.MainSelectedAgent.IsActive
                                 && Selector.MainSelectedAgent.GetAbility<Attack>())
@@ -93,7 +93,7 @@ namespace RTSLockstep.Abilities.Extra
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Harvest>())
                         {
-                            if (Agent.MyAgentType == AgentType.Resource && !Agent.GetAbility<ResourceDeposit>().IsEmpty())
+                            if (Agent.MyAgentType == AgentType.RawMaterial && !Agent.GetAbility<ResourceDeposit>().IsEmpty())
                             {
                                 PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Harvest);
                             }
@@ -170,7 +170,7 @@ namespace RTSLockstep.Abilities.Extra
                     healthStyle.normal.background = GameResourceManager.CriticalTexture;
                 }
             }
-            else if (Agent.MyAgentType == AgentType.Resource)
+            else if (Agent.MyAgentType == AgentType.RawMaterial)
             {
                 healthPercentage = Agent.GetAbility<ResourceDeposit>().AmountLeft / (float)Agent.GetAbility<ResourceDeposit>().Capacity;
                 healthStyle.normal.background = GameResourceManager.GetResourceHealthBar(Agent.GetAbility<ResourceDeposit>().ResourceType);

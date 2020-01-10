@@ -241,7 +241,7 @@ namespace RTSLockstep.Player
                     {
                         // if moused agent is a resource, send selected agent to harvest
                         if (Selector.MainSelectedAgent.GetAbility<Harvest>()
-                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.Resource)
+                            && RTSInterfacing.MousedAgent.MyAgentType == AgentType.RawMaterial)
                         {
                             //call harvest command
                             ProcessInterfacer((QuickHarvest));
@@ -270,7 +270,7 @@ namespace RTSLockstep.Player
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Attack>()
                             && !RTSInterfacing.MousedAgent.IsOwnedBy(PlayerManager.CurrentPlayerController)
-                            && RTSInterfacing.MousedAgent.MyAgentType != AgentType.Resource)
+                            && RTSInterfacing.MousedAgent.MyAgentType != AgentType.RawMaterial)
                         {
                             //If the selected agent has Attack (the ability behind attacking) and the mouse is over an agent, send a target command - right clicking on a unit
                             ProcessInterfacer((QuickTarget));

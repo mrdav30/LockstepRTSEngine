@@ -14,7 +14,7 @@ namespace RTSLockstep.Player
         #region Properties
         public HUD PlayerHUD;
         public PlayerMaterialManager PlayerRawMaterialManager;
-        public LSAgents LocalAgentContainer;
+        public LSAgentsOrganizer LocalAgentContainer;
 
         public RallyPoint RallyPointOjbect;
 
@@ -32,22 +32,10 @@ namespace RTSLockstep.Player
         #region MonoBehavior
         protected void Setup()
         {
+            LocalAgentContainer.Setup();
+
             PlayerRawMaterialManager.OnSetup();
             PlayerHUD.OnSetup();
-
-            if (LocalAgentContainer.StructuresContainer.IsNull())
-            {
-                LocalAgentContainer.StructuresContainer = LSUtility.CreateEmpty().transform;
-                LocalAgentContainer.StructuresContainer.transform.parent = LocalAgentContainer.transform;
-                LocalAgentContainer.StructuresContainer.gameObject.name = "StructuresContainer";
-            }
-
-            if (LocalAgentContainer.UnitsContainer.IsNull())
-            {
-                LocalAgentContainer.UnitsContainer = LSUtility.CreateEmpty().transform;
-                LocalAgentContainer.UnitsContainer.transform.parent = LocalAgentContainer.transform;
-                LocalAgentContainer.UnitsContainer.gameObject.name = "UnitsContainer";
-            }
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
             {
@@ -97,7 +85,7 @@ namespace RTSLockstep.Player
             SaveManager.WriteColor(writer, "TeamColor", TeamColor);
             //  SaveManager.SavePlayerResources(writer, PlayerResourceManager.GetCurrentResources(), PlayerResourceManager.GetResourceLimits());
             SaveManager.SavePlayerResources(writer, PlayerRawMaterialManager.GetCurrentRawMaterials());
-            SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgents>().GetComponentsInChildren<LSAgent>());
+            SaveManager.SavePlayerRTSAgents(writer, GetComponent<LSAgentsOrganizer>().GetComponentsInChildren<LSAgent>());
         }
 
         public LSAgent GetObjectForId(int id)
@@ -171,7 +159,7 @@ namespace RTSLockstep.Player
 
         public bool IsDead()
         {
-            LSAgent[] agents = GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>();
+            LSAgent[] agents = GetComponentInChildren<LSAgentsOrganizer>().GetComponentsInChildren<LSAgent>();
             if (agents.IsNotNull() && agents.Length > 0)
             {
                 return false;
@@ -200,7 +188,7 @@ namespace RTSLockstep.Player
                 return;
             }
 
-            LSAgents agents = GetComponentInChildren<LSAgents>();
+            LSAgentsOrganizer agents = GetComponentInChildren<LSAgentsOrganizer>();
             string currValue = "";
             while (reader.Read())
             {

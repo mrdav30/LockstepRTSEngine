@@ -192,7 +192,7 @@ MonoBehaviour:
     _keyValues: 00000000010000000200000003000000040000000500000006000000
     _keys: 
     _values: []
-  StructureType: 2
+  StructureType: 4
   WallSegmentGO: {fileID: 0}
 --- !u!114 &3016354350036366436
 MonoBehaviour:

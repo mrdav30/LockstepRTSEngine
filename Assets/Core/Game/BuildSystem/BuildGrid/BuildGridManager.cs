@@ -103,7 +103,7 @@ namespace RTSLockstep.BuildSystem.BuildGrid
             {
                 Coordinate coor = bufferNeighborCoordinates[i];
 
-                if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
+                if (Grid[coor.x, coor.y].Occupied && !buildable.CanOverlay)
                 {
                     return false;
                 }
@@ -114,7 +114,7 @@ namespace RTSLockstep.BuildSystem.BuildGrid
                 Coordinate coor = bufferBuildCoordinates[i];
                 if (IsOnGrid(coor.x, coor.y))
                 {
-                    if (Grid[coor.x, coor.y].Occupied && !buildable.IsOverlay)
+                    if (Grid[coor.x, coor.y].Occupied && !buildable.CanOverlay)
                     {
                         return false;
                     }

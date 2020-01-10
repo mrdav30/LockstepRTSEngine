@@ -34,7 +34,7 @@ namespace RTSLockstep.Grouping
             {
                 if (GlobalAgentController.TryGetAgentInstance((ushort)target.Value, out LSAgent tempTarget))
                 {
-                    if (tempTarget.MyAgentType == AgentType.Resource
+                    if (tempTarget.MyAgentType == AgentType.RawMaterial
                         || tempTarget.MyAgentType == AgentType.Structure)
                     {
                         _currentGroupTarget = tempTarget;
@@ -120,7 +120,7 @@ namespace RTSLockstep.Grouping
 
         private bool CalculateAndExecuteBehaviors()
         {
-            if (_currentGroupTarget.MyAgentType == AgentType.Resource)
+            if (_currentGroupTarget.MyAgentType == AgentType.RawMaterial)
             {
                 ExecuteHarvest();
             }

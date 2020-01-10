@@ -62,7 +62,7 @@ namespace RTSLockstep
                 targetValue.RawMaterialStorageDetails.Clear();
             }
             LSEditorUtility.PropertyField(serializedObject, "StructureType");
-            if(targetValue.StructureType == StructureType.Wall)
+            if(targetValue.StructureType == StructureType.WallPillar)
             {
                 LSEditorUtility.PropertyField(serializedObject, "WallSegmentGO");
             }

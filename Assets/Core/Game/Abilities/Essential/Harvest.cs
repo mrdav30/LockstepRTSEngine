@@ -107,7 +107,7 @@ namespace RTSLockstep.Abilities.Essential
             if (Agent.GetControllingPlayer() && loadedSavedValues && _loadedDepositId >= 0)
             {
                 LSAgent obj = Agent.GetControllingPlayer().GetObjectForId(_loadedDepositId);
-                if (obj.MyAgentType == AgentType.Resource)
+                if (obj.MyAgentType == AgentType.RawMaterial)
                 {
                     CurrentTarget = obj;
                 }

@@ -1,4 +1,7 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
@@ -10,8 +13,6 @@ using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
-using System.Collections.Generic;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.Player;
@@ -165,10 +166,11 @@ namespace RTSLockstep.Grouping
                         newRTSAgent.GetAbility<DynamicBlocker>().SetTransparent(true);
                     }
 
-                    if (newStructure.StructureType == StructureType.Wall)
+                    // wall segments can shrink and expand
+                    if (newStructure.StructureType == StructureType.WallSegment)//(newStructure.StructureType == StructureType.WallPillar || 
                     {
                         newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
-                        newStructure.IsOverlay = true;
+                        newStructure.CanOverlay = true;
                     }
 
                     newRTSAgent.Body.HalfWidth = qStructure.HalfWidth;

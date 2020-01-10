@@ -15,7 +15,7 @@ namespace RTSLockstep.VictoryConditions
         {
             // Wonder wonder = commander.GetComponentInChildren<Wonder>();
 
-            LSAgent[] agents = player.GetComponentInChildren<LSAgents>().GetComponentsInChildren<LSAgent>();
+            LSAgent[] agents = player.GetComponentInChildren<LSAgentsOrganizer>().GetComponentsInChildren<LSAgent>();
             foreach (LSAgent agent in agents)
             {
                 if (agent.GetAbility<Wonder>())

@@ -1,5 +1,12 @@
 ﻿namespace RTSLockstep.LSResources
 {
+    public enum AgentType
+    {
+        Unit,
+        Structure,
+        RawMaterial
+    }
+
     public enum AgentTag
     {
         None,
@@ -37,19 +44,14 @@
         Food
     }
 
-    public enum AgentType
-    {
-        Unit,
-        Structure,
-        Resource
-    }
-
     // Used to determine influence on structure
     public enum StructureType
     {
         None,
+        Temporary,
         Defensive,
-        Wall,
+        WallPillar,
+        WallSegment,
         Blocker,
         SpawnAndResearch
     }

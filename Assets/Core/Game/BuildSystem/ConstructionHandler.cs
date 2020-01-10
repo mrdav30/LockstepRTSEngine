@@ -127,11 +127,11 @@ namespace RTSLockstep.BuildSystem
                         tempObject.gameObject.name = buildingName;
 
                         tempStructure = tempObject.GetComponent<Structure>();
-                        if (tempStructure.StructureType == StructureType.Wall)
+                        if (tempStructure.StructureType == StructureType.WallPillar)
                         {
                             // walls require a little help since they are click and drag
                             _constructingWall = true;
-                            tempStructure.IsOverlay = true;
+                            tempStructure.CanOverlay = true;
                             WallPlacementManager.Setup();
                         }
 

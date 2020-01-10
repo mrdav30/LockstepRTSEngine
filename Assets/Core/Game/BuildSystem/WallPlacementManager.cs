@@ -102,7 +102,7 @@ namespace RTSLockstep.BuildSystem
             if (!_startSnapped)
             {
                 _startPillar = UnityEngine.Object.Instantiate(tempWallPillarGO, startPos, Quaternion.identity) as GameObject;
-                _startPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
+                _startPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.AgentContainers[AgentType.Structure];
             }
             else
             {
@@ -258,7 +258,7 @@ namespace RTSLockstep.BuildSystem
                 newPillar.transform.LookAt(_startPillar.transform);
             }
             _pillarPrefabs.Add(newPillar);
-            newPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
+            newPillar.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.AgentContainers[AgentType.Structure];
 
             if (isLast)
             {
@@ -284,7 +284,7 @@ namespace RTSLockstep.BuildSystem
                 _originalWallLength = (long)newWall.transform.localScale.z;
                 newWall.SetActive(true);
                 _wallPrefabs.Add(ndx, newWall);
-                newWall.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer;
+                newWall.transform.parent = PlayerManager.CurrentPlayer.LocalAgentContainer.AgentContainers[AgentType.Structure];
             }
         }
 
@@ -414,9 +414,9 @@ namespace RTSLockstep.BuildSystem
         {
             GameObject closest = null;
             float currentDistance;
-            foreach (Transform child in PlayerManager.CurrentPlayer.LocalAgentContainer.StructuresContainer)
+            foreach (Transform child in PlayerManager.CurrentPlayer.LocalAgentContainer.AgentContainers[AgentType.Structure])
             {
-                if(child.gameObject.GetComponent<Structure>().StructureType == StructureType.Wall)
+                if(child.gameObject.GetComponent<Structure>().StructureType == StructureType.WallPillar)
                 {
                     currentDistance = Vector3.Distance(worldPoint, child.GetComponent<UnityLSBody>().InternalBody.Position.ToVector3());
                     if (currentDistance < distance)

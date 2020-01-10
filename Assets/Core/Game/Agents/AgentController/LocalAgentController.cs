@@ -227,8 +227,7 @@ namespace RTSLockstep.Agents.AgentController
             // remove the clone tag and replace with global ID
             agent.gameObject.name = agent.gameObject.name.Replace("(Clone)", "") + "_" + agent.GlobalID;
 
-            agent.transform.parent = agent.MyAgentType == AgentType.Unit ? ControllingPlayer.LocalAgentContainer.UnitsContainer
-                : agent.MyAgentType == AgentType.Structure ? ControllingPlayer.LocalAgentContainer.StructuresContainer 
+            agent.transform.parent = ControllingPlayer.LocalAgentContainer.AgentContainers.ContainsKey(agent.MyAgentType) ? ControllingPlayer.LocalAgentContainer.AgentContainers[agent.MyAgentType]
                 : ControllingPlayer.LocalAgentContainer.transform;
 
             return agent;
