@@ -42,7 +42,7 @@ namespace RTSLockstep.Abilities.Essential
         /// </summary>
         public bool IsValidOnGrid { get; set; }
         public bool IsMoving { get; set; }
-        public bool IsOverlay { get; set; }
+        public bool CanOverlay { get; set; }
 
         public bool ValidPlacement { get; set; }
         public bool ConstructionStarted { get; set; }
@@ -120,7 +120,7 @@ namespace RTSLockstep.Abilities.Essential
 
         public bool CanStoreResources(RawMaterialType resourceType)
         {
-            return RawMaterialStorageDetails.IsNotNull() && RawMaterialStorageDetails[resourceType].IsNotNull();
+            return RawMaterialStorageDetails.IsNotNull() && RawMaterialStorageDetails.ContainsKey(resourceType);
         }
 
         public void SetGridPosition(Vector2d pos)
