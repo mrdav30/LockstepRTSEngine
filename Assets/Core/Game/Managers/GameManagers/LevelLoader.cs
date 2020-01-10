@@ -8,6 +8,7 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Agents.Player;
+using RTSLockstep.BuildSystem.BuildGrid;
 
 namespace RTSLockstep.Managers.GameManagers
 {
@@ -66,6 +67,17 @@ namespace RTSLockstep.Managers.GameManagers
                 for (int j = 0; j < info.Count; j++)
                 {
                     LSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
+
+                    if (agent.GetAbility<Structure>())
+                    {
+                        agent.GetAbility<Structure>().BuildSizeLow = (agent.Body.HalfWidth.CeilToInt() * 2);
+                        agent.GetAbility<Structure>().BuildSizeHigh = (agent.Body.HalfLength.CeilToInt() * 2);
+                        if (!GridBuilder.Place(agent.GetAbility<Structure>(), agent.Body.Position))
+                        {
+                            agent.Die();
+                        }
+                    }
+
                     if (AutoCommand)
                     {
                         Selector.Add(agent);
