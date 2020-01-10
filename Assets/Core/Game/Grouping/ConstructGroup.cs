@@ -167,7 +167,7 @@ namespace RTSLockstep.Grouping
                     }
 
                     // wall segments can shrink and expand
-                    if (newStructure.StructureType == StructureType.WallSegment)//(newStructure.StructureType == StructureType.WallPillar || 
+                    if (newStructure.StructureType == StructureType.WallPillar || newStructure.StructureType == StructureType.WallSegment)
                     {
                         newRTSAgent.transform.localScale = qStructure.LocalScale.ToVector3();
                         newStructure.CanOverlay = true;
