@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 4194013975892204290}
   - component: {fileID: 3016354350036366436}
   - component: {fileID: -2961817347470828444}
-  - component: {fileID: 3825574529060809207}
   - component: {fileID: 7409490820694846983}
   m_Layer: 11
   m_Name: HumanWoodWallSegment
@@ -32,8 +31,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6754609871906906199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 8, z: 9}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1, y: 9, z: 9}
   m_Children:
   - {fileID: 7406366410536477363}
   m_Father: {fileID: 0}
@@ -221,18 +220,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
---- !u!114 &3825574529060809207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6754609871906906199}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7409490820694846983
 MonoBehaviour:
   m_ObjectHideFlags: 0

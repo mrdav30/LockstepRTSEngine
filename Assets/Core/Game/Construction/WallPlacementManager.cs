@@ -1,4 +1,11 @@
-﻿using System;
+﻿//=======================================================================
+// Copyright (c) 2019 David Oravsky
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,7 +51,7 @@ namespace RTSLockstep.BuildSystem
         private static long _originalWallLength;
         private static long _lastWallLength = 0;
 
-        public static void Setup()
+        public static void OnSetup()
         {
             tempWallPillarGO = ConstructionHandler.GetTempStructureGO();
             tempWallSegmentGO = tempWallPillarGO.GetComponent<Structure>().WallSegmentGO;
@@ -57,7 +64,7 @@ namespace RTSLockstep.BuildSystem
             _pillarOffset = (int)Math.Round(tempWallSegmentGO.transform.localScale.z);
         }
 
-        public static void Visualize()
+        public static void OnVisualize()
         {
             _currentPos = tempWallPillarGO.transform.position;
 
@@ -142,9 +149,6 @@ namespace RTSLockstep.BuildSystem
                     GameObject wallSegement;
                     if (_wallPrefabs.TryGetValue(i, out wallSegement) && wallSegement.GetComponent<Structure>().ValidPlacement)
                     {
-                        long adjustHalfWidth = 0;
-                        long adjustHalfLength = 0;
-
                         long currentHalfWidth = tempWallSegmentBody.HalfWidth;
                         long currentHalfLength = tempWallSegmentBody.HalfLength;
 
@@ -153,8 +157,8 @@ namespace RTSLockstep.BuildSystem
                             currentHalfLength = (long)wallSegement.transform.localScale.z * FixedMath.Half;
                         }
 
-                        adjustHalfWidth = currentHalfWidth;
-                        adjustHalfLength = currentHalfLength;
+                        long adjustHalfWidth = currentHalfWidth;
+                        long adjustHalfLength = currentHalfLength;
                         float currentRotation = wallSegement.transform.localEulerAngles.y;
 
                         // if segment has rotated past 45 degree angle, need to rotate length & width
@@ -311,6 +315,7 @@ namespace RTSLockstep.BuildSystem
             }
         }
 
+        // resize wall segments based on postion from starting pillar
         private static void AdjustWallSegments()
         {
             _startPillar.transform.LookAt(tempWallPillarGO.transform);
@@ -346,8 +351,7 @@ namespace RTSLockstep.BuildSystem
                     if (_wallPrefabs.Count > 0)
                     {
                         int ndx = _pillarPrefabs.IndexOf(_pillarPrefabs[i]);
-                        GameObject wallSegement;
-                        if (_wallPrefabs.TryGetValue(ndx, out wallSegement))
+                        if (_wallPrefabs.TryGetValue(ndx, out GameObject wallSegement))
                         {
                             GameObject nextPillar;
                             if (i + 1 < _pillarPrefabs.Count)

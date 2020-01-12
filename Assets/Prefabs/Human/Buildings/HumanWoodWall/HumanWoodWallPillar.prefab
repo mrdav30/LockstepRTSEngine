@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 242638430047052249}
   - component: {fileID: 4139659409858952994}
   - component: {fileID: 4491695735153125104}
-  - component: {fileID: 5471459949468220228}
   - component: {fileID: 1422794587854036375}
   m_Layer: 11
   m_Name: HumanWoodWallPillar
@@ -32,8 +31,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5530549526402322929}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 9, z: 1.5}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalScale: {x: 1.5, y: 10, z: 1.5}
   m_Children:
   - {fileID: 2284310376607450240}
   m_Father: {fileID: 0}
@@ -68,7 +67,7 @@ MonoBehaviour:
       draggable: 1
       expandable: 1
       multipleSelection: 1
-      isExpanded: 1
+      isExpanded: 0
       label:
         m_Text: Keys
         m_Image: {fileID: 0}
@@ -83,7 +82,7 @@ MonoBehaviour:
       elementNameOverride: 
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
-    isExpanded: 1
+    isExpanded: 0
     _keyValues: 00000000010000000200000003000000040000000500000006000000
     _keys: 00000000010000000200000003000000040000000500000006000000
     _values: 00000000000000000000000000000000000000000000000000000000
@@ -117,7 +116,7 @@ MonoBehaviour:
     RealPoints: []
     Edges: []
     EdgeNorms: []
-    _shape: 2
+    _shape: 0
     _isTrigger: 0
     _layer: 0
     _halfWidth: 98304
@@ -222,18 +221,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cooldown: 0
---- !u!114 &5471459949468220228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5530549526402322929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3c352dce1ca80e4a9b216e36ea6b5b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1422794587854036375
 MonoBehaviour:
   m_ObjectHideFlags: 0

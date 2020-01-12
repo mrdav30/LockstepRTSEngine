@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+﻿//=======================================================================
+// Copyright (c) 2019 David Oravsky
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
+
+using System.Collections.Generic;
 using UnityEngine;
 
 using RTSLockstep.Utility.FastCollections;
@@ -132,10 +139,10 @@ namespace RTSLockstep.BuildSystem
                         tempStructure = tempObject.GetComponent<Structure>();
                         if (tempStructure.StructureType == StructureType.WallPillar)
                         {
-                            // walls require a little help since they are click and drag
+                            // walls require a little help since they can be dragged
                             _constructingWall = true;
                             tempStructure.CanOverlay = true;
-                            WallPlacementManager.Setup();
+                            WallPlacementManager.OnSetup();
                         }
 
                         tempStructureBody = tempObject.GetComponent<UnityLSBody>().InternalBody;
@@ -204,7 +211,7 @@ namespace RTSLockstep.BuildSystem
 
                 if (_constructingWall)
                 {
-                    WallPlacementManager.Visualize();
+                    WallPlacementManager.OnVisualize();
                 }
             }
         }

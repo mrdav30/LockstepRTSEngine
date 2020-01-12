@@ -398,7 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6188705609e5c904fa7598e381bce66d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CanProvision: 0
+  CanProvision: 1
   ProvisionAmount: 0
   CanStoreRawMaterial: 1
   RawMaterialStorageDetails:
