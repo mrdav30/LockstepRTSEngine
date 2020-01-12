@@ -64,6 +64,12 @@ namespace RTSLockstep.Player
 
         public override void OnVisualize()
         {
+            // don't do anything while menus are open
+            if (GameResourceManager.MenuOpen)
+            {
+                return;
+            }
+
             if (ConstructionHandler.IsFindingBuildingLocation())
             {
                 SelectionManager.CanBox = false;

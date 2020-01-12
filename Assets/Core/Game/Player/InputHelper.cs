@@ -13,6 +13,7 @@ using RTSLockstep.LSResources;
 using RTSLockstep.Menu.UI;
 using RTSLockstep.Utility;
 using RTSLockstep.Agents.AgentController;
+using RTSLockstep.Managers;
 
 /// <summary>
 /// Handles user input outside of HUD
@@ -163,61 +164,64 @@ namespace RTSLockstep.Player
 
                     MouseHover();
 
-                    if (Input.GetMouseButtonDown(0))
+                    if (!ReplayManager.IsPlayingBack)
                     {
-                        if (Time.time < tapTimer + tapThreshold)
+                        if (Input.GetMouseButtonDown(0))
                         {
-                            // left double click action
-                            OnDoubleLeftTapDown?.Invoke(); tap = false;
-                            return;
-                        }
-
-                        tap = true;
-                        tapTimer = Time.time;
-                    }
-                    // right click action
-                    else if (Input.GetMouseButtonDown(1))
-                    {
-                        HandleSingleRightClick();
-                        OnSingleRightTapDown?.Invoke();
-                    }
-                    else if (Input.GetMouseButtonUp(0))
-                    {
-                        _isDragging = false;
-                        OnLeftTapUp?.Invoke();
-                    }
-
-                    if (tap && Time.time > (tapTimer + tapThreshold))
-                    {
-                        tap = false;
-
-                        // left click hold action
-                        if (Input.GetMouseButton(0))
-                        {
-                            _isDragging = true;
-                            OnLeftTapHoldDown?.Invoke();
-                        }
-                        else
-                        {
-                            // left click action
-                            _isDragging = false;
-                            HandleSingleLeftClick();
-                            OnSingleLeftTapDown?.Invoke();
-                        }
-                    }
-
-                    // other defined keys
-                    foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in UserInputKeys)
-                    {
-                        if (Input.GetKeyDown(inputKey.Value))
-                        {
-                            switch (inputKey.Key)
+                            if (Time.time < tapTimer + tapThreshold)
                             {
-                                case UserInputKeyMappings.PauseMenuShortCut:
-                                    OpenPauseMenu();
-                                    break;
-                                default:
-                                    break;
+                                // left double click action
+                                OnDoubleLeftTapDown?.Invoke(); tap = false;
+                                return;
+                            }
+
+                            tap = true;
+                            tapTimer = Time.time;
+                        }
+                        // right click action
+                        else if (Input.GetMouseButtonDown(1))
+                        {
+                            HandleSingleRightClick();
+                            OnSingleRightTapDown?.Invoke();
+                        }
+                        else if (Input.GetMouseButtonUp(0))
+                        {
+                            _isDragging = false;
+                            OnLeftTapUp?.Invoke();
+                        }
+
+                        if (tap && Time.time > (tapTimer + tapThreshold))
+                        {
+                            tap = false;
+
+                            // left click hold action
+                            if (Input.GetMouseButton(0))
+                            {
+                                _isDragging = true;
+                                OnLeftTapHoldDown?.Invoke();
+                            }
+                            else
+                            {
+                                // left click action
+                                _isDragging = false;
+                                HandleSingleLeftClick();
+                                OnSingleLeftTapDown?.Invoke();
+                            }
+                        }
+
+                        // other defined keys
+                        foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in UserInputKeys)
+                        {
+                            if (Input.GetKeyDown(inputKey.Value))
+                            {
+                                switch (inputKey.Key)
+                                {
+                                    case UserInputKeyMappings.PauseMenuShortCut:
+                                        OpenPauseMenu();
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }

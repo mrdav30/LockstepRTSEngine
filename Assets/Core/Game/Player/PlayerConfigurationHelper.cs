@@ -22,7 +22,7 @@ namespace RTSLockstep.Agents.Player
         public string SelectedController;
 
         public static PlayerConfigurationHelper Instance { get; private set; }
-        BiDictionary<string, byte> CodeIDMap = new BiDictionary<string, byte>();
+        private BiDictionary<string, byte> CodeIDMap = new BiDictionary<string, byte>();
 
         protected override void OnInitialize()
         {

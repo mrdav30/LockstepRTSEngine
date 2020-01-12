@@ -11,6 +11,7 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
 using RTSLockstep.LSResources.Audio;
+using RTSLockstep.Managers;
 
 namespace RTSLockstep.Player
 {
@@ -101,7 +102,7 @@ namespace RTSLockstep.Player
             DrawPlayerDetails();
             if (!GameResourceManager.MenuOpen)
             {
-                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
+                if (!ReplayManager.IsPlayingBack && Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
                 {
                     DrawOrdersBar();
                 }

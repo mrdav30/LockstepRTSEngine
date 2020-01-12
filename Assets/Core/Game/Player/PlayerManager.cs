@@ -24,9 +24,12 @@ namespace RTSLockstep.Player
         #region Event Behavior
         public static void Initialize()
         {
-            CurrentPlayerController = null;
             _savedPlayerProfiles.FastClear();
-        }
+            _allPlayers.FastClear();
+
+            CurrentPlayer = null;
+            CurrentPlayerController = null;
+    }
 
         public static void Visualize()
         {
