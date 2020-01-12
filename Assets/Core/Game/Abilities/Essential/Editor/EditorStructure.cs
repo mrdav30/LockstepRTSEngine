@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using UnityEngine;
+using UnityEditor;
 
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Abilities.Essential;
@@ -30,47 +31,50 @@ namespace RTSLockstep
 
         public override void OnInspectorGUI()
         {
-            EditorGUI.BeginChangeCheck();
+            if (!Application.isPlaying)
+            {
+                EditorGUI.BeginChangeCheck();
 
-            LSEditorUtility.PropertyField(serializedObject, "CanProvision");
-            if (targetValue.CanProvision)
-            {
-                LSEditorUtility.PropertyField(serializedObject, "ProvisionAmount");
-            }
-            else if (targetValue.ProvisionAmount > 0)
-            {
-                targetValue.ProvisionAmount = 0;
-            }
-            LSEditorUtility.PropertyField(serializedObject, "CanStoreRawMaterial");
-            if (targetValue.CanStoreRawMaterial)
-            {
-                if (targetValue.RawMaterialStorageDetails.Count == 0)
+                LSEditorUtility.PropertyField(serializedObject, "CanProvision");
+                if (targetValue.CanProvision)
                 {
-                    targetValue.RawMaterialStorageDetails = new RawMaterialSetLimit();
-                    foreach (var type in GameResourceManager.GameRawMaterials)
+                    LSEditorUtility.PropertyField(serializedObject, "ProvisionAmount");
+                }
+                else if (targetValue.ProvisionAmount > 0)
+                {
+                    targetValue.ProvisionAmount = 0;
+                }
+                LSEditorUtility.PropertyField(serializedObject, "CanStoreRawMaterial");
+                if (targetValue.CanStoreRawMaterial)
+                {
+                    if (targetValue.RawMaterialStorageDetails.Count == 0)
                     {
-                        targetValue.RawMaterialStorageDetails.Add(type, null);
+                        targetValue.RawMaterialStorageDetails = new RawMaterialSetLimit();
+                        foreach (var type in GameResourceManager.GameRawMaterials)
+                        {
+                            targetValue.RawMaterialStorageDetails.Add(type, null);
+                        }
+                    }
+                    else
+                    {
+                        LSEditorUtility.PropertyField(serializedObject, "RawMaterialStorageDetails");
                     }
                 }
-                else
+                else if (targetValue.RawMaterialStorageDetails.Count > 0)
                 {
-                    LSEditorUtility.PropertyField(serializedObject, "RawMaterialStorageDetails");
+                    targetValue.RawMaterialStorageDetails.Clear();
                 }
-            }
-            else if (targetValue.RawMaterialStorageDetails.Count > 0)
-            {
-                targetValue.RawMaterialStorageDetails.Clear();
-            }
-            LSEditorUtility.PropertyField(serializedObject, "StructureType");
-            if(targetValue.StructureType == StructureType.WallPillar)
-            {
-                LSEditorUtility.PropertyField(serializedObject, "WallSegmentGO");
-            }
+                LSEditorUtility.PropertyField(serializedObject, "StructureType");
+                if (targetValue.StructureType == StructureType.WallPillar)
+                {
+                    LSEditorUtility.PropertyField(serializedObject, "WallSegmentGO");
+                }
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(targetValue);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(targetValue);
+                }
             }
         }
     }

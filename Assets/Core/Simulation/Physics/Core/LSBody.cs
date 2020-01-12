@@ -18,6 +18,7 @@ using RTSLockstep.Integration;
 
 namespace RTSLockstep.Simulation.LSPhysics
 {
+    [DisallowMultipleComponent]
     [System.Serializable]
     public partial class LSBody
     {
@@ -539,7 +540,7 @@ namespace RTSLockstep.Simulation.LSPhysics
             }
             else if (Shape == ColliderType.AABox)
             {
-                _radius = FixedMath.Sqrt((HalfLength * HalfLength + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
+                _radius = FixedMath.Round(FixedMath.Sqrt((HalfLength * HalfLength + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT));
             }
             else if (Shape == ColliderType.Polygon)
             {
@@ -552,7 +553,8 @@ namespace RTSLockstep.Simulation.LSPhysics
                         BiggestSqrRadius = sqrRadius;
                     }
                 }
-                _radius = FixedMath.Sqrt(BiggestSqrRadius);
+
+                _radius = FixedMath.Round(FixedMath.Sqrt(BiggestSqrRadius));
                 FastRadius = Radius * Radius;
             }
         }
