@@ -51,7 +51,7 @@ namespace RTSLockstep.Abilities.Extra
                 return;
             }
 
-            Agent.SetPlayingArea(Agent.Controller.GetPlayerHUD().GetPlayingArea());
+            Agent.SetPlayingArea(Agent.Controller.ControllingPlayer.PlayerHUD.GetPlayingArea());
         }
 
         public void HandleHighlightedChange()
@@ -74,12 +74,12 @@ namespace RTSLockstep.Abilities.Extra
                             {
                                 if (Agent.MyAgentType == AgentType.Structure && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().NeedsConstruction)
                                 {
-                                    PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Construct);
+                                    PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Construct);
                                 }
                             }
                             else
                             {
-                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Select);
                             }
                         }
                         else if (Agent.Controller.GetAllegiance(Selector.MainSelectedAgent.Controller) != AllegianceType.Friendly && PlayerManager.CurrentPlayerController.SelectedAgents.Count > 0
@@ -88,27 +88,27 @@ namespace RTSLockstep.Abilities.Extra
                             if ((Agent.MyAgentType == AgentType.Unit || Agent.MyAgentType == AgentType.Structure) && Selector.MainSelectedAgent.IsActive
                                 && Selector.MainSelectedAgent.GetAbility<Attack>())
                             {
-                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Attack);
+                                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Attack);
                             }
                         }
                         else if (Selector.MainSelectedAgent.GetAbility<Harvest>())
                         {
                             if (Agent.MyAgentType == AgentType.RawMaterial && !Agent.GetAbility<ResourceDeposit>().IsEmpty())
                             {
-                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Harvest);
+                                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Harvest);
                             }
                             else if (Agent.MyAgentType == AgentType.Structure 
                                 && Agent.GetAbility<Structure>() && Agent.GetAbility<Structure>().CanStoreResources(Selector.MainSelectedAgent.GetAbility<Harvest>().HarvestType)
                                 && Selector.MainSelectedAgent.GetAbility<Harvest>().GetCurrentLoad() > 0)
                             {
-                                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Deposit);
+                                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Deposit);
                             }
                         }
                     }
                     else
                     {
                         //agent doesn't belong to player
-                        PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                        PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Select);
                     }
                 }
             }

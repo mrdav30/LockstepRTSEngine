@@ -7,14 +7,14 @@ using RTSLockstep.Managers.GameManagers;
 
 namespace RTSLockstep
 {
-    [CustomEditor(typeof(PlayerInputHelper), true)]
+    [CustomEditor(typeof(InputHelper), true)]
     public class EditorPlayerInputHelper : Editor
     {
-        private PlayerInputHelper targetValue;
+        private InputHelper targetValue;
 
         protected virtual void OnEnable()
         {
-            targetValue = (PlayerInputHelper)target;
+            targetValue = (InputHelper)target;
 
             if (targetValue.UserInputKeys.IsNull() || targetValue.UserInputKeys.Count != GameResourceManager.GameInputKeys.Length)
             {

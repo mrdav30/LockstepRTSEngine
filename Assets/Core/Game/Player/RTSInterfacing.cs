@@ -35,9 +35,9 @@ namespace RTSLockstep.Player
 
         public static void Visualize()
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNotNull())
+            if (InputHelper.GUIManager.MainCam.IsNotNull())
             {
-                CachedRay = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
+                CachedRay = InputHelper.GUIManager.MainCam.ScreenPointToRay(Input.mousePosition);
                 CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
 
                 MousedAgent = GetScreenAgent(Input.mousePosition);
@@ -117,7 +117,7 @@ namespace RTSLockstep.Player
 
             foreach (var body in raycast)
             {
-                if (body.Agent.IsNull())
+                if (body.IsNull() || body.Agent.IsNull())
                 {
                     continue;
                 }
@@ -138,11 +138,11 @@ namespace RTSLockstep.Player
 
         public static Vector2d GetWorldPosHeight(Vector2 screenPos, float height = 0)
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNull())
+            if (InputHelper.GUIManager.MainCam.IsNull())
             {
                 return Vector2d.zero;
             }
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            Ray ray = InputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             //RaycastHit hit;
 
             Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
@@ -152,10 +152,10 @@ namespace RTSLockstep.Player
 
         public static Vector2d GetWorldPosD(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNull()) {
+            if (InputHelper.GUIManager.MainCam.IsNull()) {
                 return Vector2d.zero;
             }
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            Ray ray = InputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2d(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
@@ -169,11 +169,11 @@ namespace RTSLockstep.Player
 
         public static Vector2 GetWorldPos(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNull())
+            if (InputHelper.GUIManager.MainCam.IsNull())
             {
                 return default;
             }
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            Ray ray = InputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
@@ -186,11 +186,11 @@ namespace RTSLockstep.Player
 
         public static Vector3 GetWorldPos3(Vector2 screenPos)
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNull())
+            if (InputHelper.GUIManager.MainCam.IsNull())
             {
                 return default(Vector2);
             }
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
+            Ray ray = InputHelper.GUIManager.MainCam.ScreenPointToRay(screenPos);
             if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 //return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
@@ -203,11 +203,11 @@ namespace RTSLockstep.Player
 
         public static bool HitPointIsGround(Vector3 origin)
         {
-            if (PlayerInputHelper.GUIManager.MainCam.IsNull())
+            if (InputHelper.GUIManager.MainCam.IsNull())
             {
                 return false;
             }
-            Ray ray = PlayerInputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
+            Ray ray = InputHelper.GUIManager.MainCam.ScreenPointToRay(origin);
             if (NDRaycast.Raycast(ray, out RaycastHit hit))
             {
                 GameObject obj = hit.collider.gameObject;

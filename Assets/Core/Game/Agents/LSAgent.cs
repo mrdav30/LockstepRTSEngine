@@ -192,7 +192,7 @@ namespace RTSLockstep.Agents
             //  get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
             get
             {
-                Vector3 screenPoint = PlayerInputHelper.GUIManager.MainCam.WorldToViewportPoint(Body.VisualPosition);
+                Vector3 screenPoint = InputHelper.GUIManager.MainCam.WorldToViewportPoint(Body.VisualPosition);
                 if (screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1)
                 {
                     return true;

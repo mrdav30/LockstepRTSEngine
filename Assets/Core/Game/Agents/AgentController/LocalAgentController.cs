@@ -13,7 +13,6 @@ using RTSLockstep.Simulation.Influence;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.Utility.FastCollections;
-using RTSLockstep.Abilities.Essential;
 
 namespace RTSLockstep.Agents.AgentController
 {
@@ -81,49 +80,6 @@ namespace RTSLockstep.Agents.AgentController
         #endregion
         
         #region Public
-        public HUD GetPlayerHUD()
-        {
-            return ControllingPlayer.PlayerHUD;
-        }
-
-        //// move to player manager
-        //public void CreatePlayer()
-        //{
-        //    if (Player.IsNotNull())
-        //    {
-        //        Debug.LogError("A player called '" + Player.gameObject.name + "' already exists for '" + ToString() + "'.");
-        //    }
-
-        //    if (!UnityEngine.Object.FindObjectOfType<RTSGameManager>())
-        //    {
-        //        Debug.LogError("A game manager has not been initialized!");
-        //    }
-
-        //    //load from ls db
-        //    GameObject playerObject = UnityEngine.Object.Instantiate(GameResourceManager.GetPlayerObject(), UnityEngine.Object.FindObjectOfType<RTSGameManager>().GetComponentInChildren<LSPlayers>().transform);
-
-        //    playerObject.name = ControllerName;
-
-        //    LSPlayer playerClone = playerObject.GetComponent<LSPlayer>();
-        //    //change to user's selected username
-        //    playerClone.Username = ControllerName;
-        //    playerClone.SetController(this);
-
-        //    if (PlayerManager.ContainsController(this))
-        //    {
-        //        playerClone.IsHuman = true;
-        //    }
-
-        //    //come up with better way to set selected player to the current player
-        //    if (this == PlayerManager.MainController)
-        //    {
-        //        PlayerManager.SelectPlayer(playerClone.Username, 0, ControllerID, PlayerIndex);
-        //    }
-
-        //    _player = playerClone;
-        //    BehaviourHelperManager.InitializeOnDemand(_player);
-        //}
-
         public void AddToSelection(LSAgent agent)
         {
             if (!agent.IsSelected)

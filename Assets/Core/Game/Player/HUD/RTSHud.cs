@@ -2,8 +2,6 @@
 using UnityEngine;
 
 using RTSLockstep.Simulation.LSMath;
-using RTSLockstep.Menu.UI;
-using RTSLockstep.Utility;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.BuildSystem;
@@ -16,7 +14,7 @@ using RTSLockstep.LSResources.Audio;
 
 namespace RTSLockstep.Player
 {
-    public class HUD : MonoBehaviour
+    public class RTSHud : MonoBehaviour
     {
         #region Properties
         // public 
@@ -68,7 +66,7 @@ namespace RTSLockstep.Player
         public void OnSetup()
         {
             _cachedPlayer = GetComponentInParent<LSPlayer>();
-            _cachedResourceManager = GetComponentInParent<PlayerMaterialManager>();
+            _cachedResourceManager = _cachedPlayer.PlayerRawMaterialManager;
 
             if (_cachedPlayer && _cachedPlayer.IsCurrentPlayer)
             {
@@ -100,22 +98,16 @@ namespace RTSLockstep.Player
         // Update is called once per frame
         public void OnUpdateGUI()
         {
-            if (_cachedPlayer
-                && _cachedPlayer.IsCurrentPlayer
-                && PlayerManager.CurrentPlayerController.IsNotNull()
-                && _cachedPlayer == PlayerManager.CurrentPlayerController.ControllingPlayer)
+            DrawPlayerDetails();
+            if (!GameResourceManager.MenuOpen)
             {
-                DrawPlayerDetails();
-                if (!GameResourceManager.MenuOpen)
+                if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
                 {
-                    if (Selector.MainSelectedAgent && Selector.MainSelectedAgent.IsActive)
-                    {
-                        DrawOrdersBar();
-                    }
-                    DrawRawMaterialBar();
-                    // call last to ensure that the custom mouse cursor is seen on top of everything
-                    DrawMouseCursor();
+                    DrawOrdersBar();
                 }
+                DrawTopScreenBar();
+                // call last to ensure that the custom mouse cursor is seen on top of everything
+                DrawMouseCursor();
             }
         }
         #endregion
@@ -367,7 +359,7 @@ namespace RTSLockstep.Player
             int width = _buildImageWidth / 2;
             int height = _buildImageHeight / 2;
 
-            if (_cachedPlayer.GetController().SelectedAgents.Count == 1 
+            if (_cachedPlayer.GetController().SelectedAgents.Count == 1
                 && agent.GetAbility<Destroy>()
                 && GUI.Button(new Rect(leftPos, topPos, width, height), DestroyIcon))
             {
@@ -376,7 +368,7 @@ namespace RTSLockstep.Player
                 // send destroy command
                 Command destroyCom = new Command(AbilityDataItem.FindInterfacer("Destroy").ListenInputID);
                 destroyCom.Add(new DefaultData(DataType.UShort, agent.LocalID));
-                PlayerInputHelper.SendCommand(destroyCom);
+                InputHelper.SendCommand(destroyCom);
             }
 
             if (agent.GetAbility<Rally>() && agent.GetAbility<Rally>().HasSpawnPoint() && !agent.GetAbility<Structure>().NeedsConstruction)
@@ -401,7 +393,7 @@ namespace RTSLockstep.Player
             }
         }
 
-        private void DrawRawMaterialBar()
+        private void DrawTopScreenBar()
         {
             GUI.skin = RawMaterialSkin;
             GUI.BeginGroup(new Rect(0, 0, Screen.width, _resourceBarHeight));
@@ -423,17 +415,7 @@ namespace RTSLockstep.Player
             if (GUI.Button(menuButtonPosition, "Menu"))
             {
                 PlayClick();
-                Time.timeScale = 0.0f;
-                PauseMenu pauseMenu = GetComponent<PauseMenu>();
-                if (pauseMenu)
-                {
-                    pauseMenu.enabled = true;
-                }
-                PlayerInputHelper userInput = _cachedPlayer.GetComponent<PlayerInputHelper>();
-                if (userInput)
-                {
-                    userInput.enabled = false;
-                }
+                _cachedPlayer.PlayerInputHelper.OpenPauseMenu();
             }
             GUI.EndGroup();
         }
@@ -569,7 +551,7 @@ namespace RTSLockstep.Player
                                 // send spawn command
                                 Command spawnCom = new Command(AbilityDataItem.FindInterfacer("Spawner").ListenInputID);
                                 spawnCom.Add(new DefaultData(DataType.String, actions[i]));
-                                PlayerInputHelper.SendCommand(spawnCom);
+                                InputHelper.SendCommand(spawnCom);
                             }
                         }
                     }

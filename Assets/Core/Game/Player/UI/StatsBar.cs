@@ -49,7 +49,7 @@ namespace RTSLockstep.Player.UI
 
         public void Visualize()
         {
-            if (PlayerInputHelper.GUIManager.CameraChanged && TrackedAgent.IsVisible)
+            if (InputHelper.GUIManager.CameraChanged && TrackedAgent.IsVisible)
             {
                 UpdatePos();
                 UpdateScale();
@@ -60,7 +60,7 @@ namespace RTSLockstep.Player.UI
             }
         }
 
-        static GUIManager GUIManager { get { return PlayerInputHelper.GUIManager; } }
+        static GUIManager GUIManager { get { return InputHelper.GUIManager; } }
         static Camera MainCam { get { return GUIManager.MainCam; } }
 
         static Vector3 screenPos;

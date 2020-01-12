@@ -6,7 +6,7 @@ namespace RTSLockstep.VictoryConditions
 {
     public abstract class VictoryCondition : BehaviourHelper
     {
-        private HUD hud;
+        private RTSHud hud;
         private static bool Setted = false;
 
         protected LSPlayer[] Players;
@@ -87,7 +87,7 @@ namespace RTSLockstep.VictoryConditions
         private void LoadDetails()
         {
             LSPlayer[] players = FindObjectsOfType(typeof(LSPlayer)) as LSPlayer[];
-            hud = PlayerManager.CurrentPlayerController.ControllingPlayer.GetComponentInChildren<HUD>();
+            hud = PlayerManager.CurrentPlayerController.ControllingPlayer.GetComponentInChildren<RTSHud>();
 
             SetCommanders(players);
         }

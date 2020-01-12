@@ -6,14 +6,14 @@ using RTSLockstep.Managers.GameManagers;
 
 namespace RTSLockstep
 {
-    [CustomEditor(typeof(HUD))]
+    [CustomEditor(typeof(RTSHud))]
     public class EditorHUD : Editor
     {
-        private HUD targetValue;
+        private RTSHud targetValue;
 
         private void OnEnable()
         {
-            targetValue = (HUD)target;
+            targetValue = (RTSHud)target;
 
             if (targetValue.RawMaterialIcons.IsNull() || targetValue.RawMaterialIcons.Count != GameResourceManager.GameRawMaterials.Length)
             {

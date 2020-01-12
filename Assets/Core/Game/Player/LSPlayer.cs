@@ -12,7 +12,8 @@ namespace RTSLockstep.Player
     public class LSPlayer : MonoBehaviour
     {
         #region Properties
-        public HUD PlayerHUD;
+        public RTSHud PlayerHUD;
+        public InputHelper PlayerInputHelper;
         public PlayerMaterialManager PlayerRawMaterialManager;
         public LSAgentsOrganizer LocalAgentContainer;
 
@@ -35,7 +36,12 @@ namespace RTSLockstep.Player
             LocalAgentContainer.Setup();
 
             PlayerRawMaterialManager.OnSetup();
-            PlayerHUD.OnSetup();
+
+            if (IsCurrentPlayer)
+            {
+                PlayerInputHelper.OnSetup();
+                PlayerHUD.OnSetup();
+            }
 
             if (!GameResourceManager.AssignedTeamColors.Contains(TeamColor))
             {
@@ -58,7 +64,10 @@ namespace RTSLockstep.Player
                 Setup();
             }
 
-            // PlayerResourceManager.OnInitialize();
+            if (IsCurrentPlayer)
+            {
+                PlayerInputHelper.OnInitialize();
+            }
         }
 
         // Update is called once per frame
@@ -66,14 +75,18 @@ namespace RTSLockstep.Player
         {
             if (IsCurrentPlayer)
             {
-                //  PlayerResourceManager.OnVisualize();
                 PlayerHUD.OnVisualize();
+                PlayerInputHelper.OnVisualize();
             }
         }
 
         public void OnUpdateGUI()
         {
-            PlayerHUD.OnUpdateGUI();
+            if (IsCurrentPlayer)
+            {
+                PlayerHUD.OnUpdateGUI();
+                PlayerInputHelper.OnUpdateGUI();
+            }
         }
         #endregion
 

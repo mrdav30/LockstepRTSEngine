@@ -4,8 +4,6 @@ using UnityEngine;
 using RotaryHeart.Lib.SerializableDictionary;
 
 using RTSLockstep.Abilities;
-using RTSLockstep.BehaviourHelpers;
-using RTSLockstep.BuildSystem;
 using RTSLockstep.Data;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Player.Commands;
@@ -25,7 +23,7 @@ namespace RTSLockstep.Player
     [Serializable]
     public class PlayerInputKeys : SerializableDictionaryBase<UserInputKeyMappings, KeyCode> { };
 
-    public class PlayerInputHelper : BehaviourHelper
+    public class InputHelper : MonoBehaviour
     {
         #region Properties
 #pragma warning disable 0649
@@ -63,6 +61,10 @@ namespace RTSLockstep.Player
         public static event Action OnSingleRightTapDown;
         public static event Action OnDoubleLeftTapDown;
 
+        public static event Action OnOpenPauseMenu;
+
+        protected LSPlayer _cachedPlayer;
+
         //Defines the maximum time between two taps to make it double tap
         protected static float tapThreshold = 0.25f;
         protected static float tapTimer = 0.0f;
@@ -86,8 +88,10 @@ namespace RTSLockstep.Player
         #endregion
 
         #region BehaviorHelper
-        protected virtual void Setup()
+        public virtual void OnSetup()
         {
+            _cachedPlayer = GetComponentInParent<LSPlayer>();
+
             if (GUIManager.IsNull())
             {
                 GUIManager = new ExampleGUIManager();
@@ -96,21 +100,22 @@ namespace RTSLockstep.Player
             Setted = true;
         }
 
-        protected override void OnInitialize()
+        public virtual void OnInitialize()
         {
-            if (!Setted)
-            {
-                Setup();
-            }
-
             SelectionManager.Initialize();
 
             IsGathering = false;
             CurrentInterfacer = null;
         }
 
-        protected override void OnVisualize()
+        public virtual void OnVisualize()
         {
+            // don't do anything while menus are open
+            if (GameResourceManager.MenuOpen)
+            {
+                return;
+            }
+
             //Update the SelectionManager which handles mouse-selection.
             SelectionManager.Update();
 
@@ -137,16 +142,10 @@ namespace RTSLockstep.Player
             else
             {
                 //We are not gathering information. Instead, allow quickcasted abilities with the mouse. I.e. Right click to move or attack.
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    OpenPauseMenu();
-                }
-
                 MoveCamera();
 
                 // prevent user input if mouse is over hud
-                bool mouseOverHud = PlayerManager.CurrentPlayerController.GetPlayerHUD().IsMouseOverHUD;
-                if (!mouseOverHud)
+                if (!_cachedPlayer.PlayerHUD.IsMouseOverHUD)
                 {
                     // detect rotation amount if no agents selected & Right mouse button is down
                     if (PlayerManager.CurrentPlayerController.SelectedAgents.Count <= 0 && Input.GetMouseButton(1)
@@ -214,12 +213,8 @@ namespace RTSLockstep.Player
                         {
                             switch (inputKey.Key)
                             {
-                                // these should probably be switched to events...
-                                case UserInputKeyMappings.RotateLeftShortCut:
-                                    ConstructionHandler.HandleRotationTap(UserInputKeyMappings.RotateLeftShortCut);
-                                    break;
-                                case UserInputKeyMappings.RotateRightShortCut:
-                                    ConstructionHandler.HandleRotationTap(UserInputKeyMappings.RotateRightShortCut);
+                                case UserInputKeyMappings.PauseMenuShortCut:
+                                    OpenPauseMenu();
                                     break;
                                 default:
                                     break;
@@ -229,6 +224,8 @@ namespace RTSLockstep.Player
                 }
             }
         }
+
+        public virtual void OnUpdateGUI() { }
         #endregion
 
         #region Public
@@ -266,13 +263,14 @@ namespace RTSLockstep.Player
         {
         }
 
-        private void OpenPauseMenu()
+        public void OpenPauseMenu()
         {
             Time.timeScale = 0.0f;
-            GetComponentInChildren<PauseMenu>().enabled = true;
-            GetComponent<PlayerInputHelper>().enabled = false;
-            Cursor.visible = true;
+            _cachedPlayer.GetComponent<PauseMenu>().enabled = true;
+            _cachedPlayer.GetComponent<InputHelper>().enabled = false;
             GameResourceManager.MenuOpen = true;
+
+            OnOpenPauseMenu?.Invoke();
         }
 
         //LSF

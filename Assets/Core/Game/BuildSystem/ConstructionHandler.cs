@@ -1,4 +1,7 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.BuildSystem.BuildGrid;
@@ -8,8 +11,6 @@ using RTSLockstep.Player;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.LSResources;
-using System.Collections.Generic;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
@@ -37,8 +38,10 @@ namespace RTSLockstep.BuildSystem
             _cachedPlayer = PlayerManager.CurrentPlayerController.ControllingPlayer;
             GridBuilder.Initialize();
 
-            PlayerInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
-            PlayerInputHelper.OnSingleRightTapDown += HandleSingleRightClick;
+            InputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
+            InputHelper.OnSingleRightTapDown += HandleSingleRightClick;
+            RTSInputHelper.OnRotateLeft += HandleRotationTap;
+            RTSInputHelper.OnRotateRight += HandleRotationTap;
         }
 
         // Update is called once per frame
@@ -232,7 +235,7 @@ namespace RTSLockstep.BuildSystem
                 constructCom.Add(new QueueStructure(constructionQueue[i]));
             }
 
-            PlayerInputHelper.SendCommand(constructCom);
+            InputHelper.SendCommand(constructCom);
 
             //Reset construction handler
             Reset();
@@ -248,7 +251,7 @@ namespace RTSLockstep.BuildSystem
 
             constructCom.Add(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
 
-            PlayerInputHelper.SendCommand(constructCom);
+            InputHelper.SendCommand(constructCom);
         }
 
         public static void Reset()

@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+﻿//=======================================================================
+// Copyright (c) 2019 David Oravsky
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
+
+using System.Collections.Generic;
 using System;
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Simulation.LSMath;

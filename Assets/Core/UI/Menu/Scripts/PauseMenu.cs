@@ -17,8 +17,9 @@ namespace RTSLockstep.Menu.UI
             player = transform.root.GetComponent<LSPlayer>();
         }
 
-        void Update()
+        private void Update()
         {
+            Cursor.visible = true;
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Resume();
@@ -62,7 +63,7 @@ namespace RTSLockstep.Menu.UI
             GetComponent<PauseMenu>().enabled = false;
             if (player)
             {
-                player.GetComponent<PlayerInputHelper>().enabled = true;
+                player.GetComponent<InputHelper>().enabled = true;
             }
             Cursor.visible = false;
             GameResourceManager.MenuOpen = false;

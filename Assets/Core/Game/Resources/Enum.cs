@@ -115,7 +115,7 @@
     {
         RotateLeftShortCut,
         RotateRightShortCut,
-        MainMenuShortCut,
+        PauseMenuShortCut,
         SpawnMenuShortCut,
         ConstructMenuShortCut,
         RepairShortCut,

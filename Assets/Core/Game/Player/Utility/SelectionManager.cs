@@ -44,10 +44,10 @@ namespace RTSLockstep.Player.Utility
         public static void Initialize()
         {
             ClearSelection();
-            PlayerInputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
-            PlayerInputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
-            PlayerInputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
-            PlayerInputHelper.OnLeftTapUp += HandleLeftClickUp;
+            InputHelper.OnSingleLeftTapDown += HandleSingleLeftClick;
+            InputHelper.OnLeftTapHoldDown += HandleLeftClickHoldDown;
+            InputHelper.OnDoubleLeftTapDown += HandleDoubleLeftClickDown;
+            InputHelper.OnLeftTapUp += HandleLeftClickUp;
             _selectionLocked = false;
         }
 

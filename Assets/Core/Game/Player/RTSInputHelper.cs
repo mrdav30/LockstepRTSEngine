@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.BuildSystem;
@@ -16,12 +18,15 @@ using RTSLockstep.Player.UI;
 
 namespace RTSLockstep.Player
 {
-    public class RTSInputHelper : PlayerInputHelper
+    public class RTSInputHelper : InputHelper
     {
         public static AbilityDataItem QuickMove;
         public static AbilityDataItem QuickTarget;
         public static AbilityDataItem QuickHarvest;
         public static AbilityDataItem QuickRally;
+
+        public static event Action<UserInputKeyMappings> OnRotateLeft;
+        public static event Action<UserInputKeyMappings> OnRotateRight;
 
         // limits for angle in tilt x axis
         protected float yaw = 0f;
@@ -30,7 +35,7 @@ namespace RTSLockstep.Player
         protected float maxPitch = 60f;
 
         #region BehaviorHelper
-        protected override void Setup()
+        public override void OnSetup()
         {
             if (GUIManager.IsNull())
             {
@@ -47,17 +52,17 @@ namespace RTSLockstep.Player
             QuickHarvest = AbilityDataItem.FindInterfacer("Harvest");
             QuickRally = AbilityDataItem.FindInterfacer("Rally");
 
-            base.Setup();
+            base.OnSetup();
         }
 
-        protected override void OnInitialize()
+        public override void OnInitialize()
         {
             base.OnInitialize();
             RTSInterfacing.Initialize();
             ConstructionHandler.Initialize();
         }
 
-        protected override void OnVisualize()
+        public override void OnVisualize()
         {
             if (ConstructionHandler.IsFindingBuildingLocation())
             {
@@ -72,9 +77,29 @@ namespace RTSLockstep.Player
             //Update Construction handler which handles placing buildings on a grid
             ConstructionHandler.Visualize();
             base.OnVisualize();
+
+            // other defined keys
+            foreach (KeyValuePair<UserInputKeyMappings, KeyCode> inputKey in UserInputKeys)
+            {
+                if (Input.GetKeyDown(inputKey.Value))
+                {
+                    switch (inputKey.Key)
+                    {
+                        // these should probably be switched to events...
+                        case UserInputKeyMappings.RotateLeftShortCut:
+                            OnRotateLeft?.Invoke(UserInputKeyMappings.RotateLeftShortCut);
+                            break;
+                        case UserInputKeyMappings.RotateRightShortCut:
+                            OnRotateRight?.Invoke(UserInputKeyMappings.RotateRightShortCut);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
-        protected override void OnUpdateGUI()
+        public override void OnUpdateGUI()
         {
             if (_boxStyle.IsNull())
             {
@@ -98,13 +123,13 @@ namespace RTSLockstep.Player
             if (xpos >= 0 && xpos < GameResourceManager.ScrollWidth)
             {
                 movement.x -= GameResourceManager.ScrollSpeed;
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.PanLeft);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.PanLeft);
                 mouseScroll = true;
             }
             else if (xpos <= Screen.width && xpos > Screen.width - GameResourceManager.ScrollWidth)
             {
                 movement.x += GameResourceManager.ScrollSpeed;
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.PanRight);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.PanRight);
                 mouseScroll = true;
             }
 
@@ -112,13 +137,13 @@ namespace RTSLockstep.Player
             if (ypos >= 0 && ypos < GameResourceManager.ScrollWidth)
             {
                 movement.z -= GameResourceManager.ScrollSpeed;
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.PanDown);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.PanDown);
                 mouseScroll = true;
             }
             else if (ypos <= Screen.height && ypos > Screen.height - GameResourceManager.ScrollWidth)
             {
                 movement.z += GameResourceManager.ScrollSpeed;
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.PanUp);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.PanUp);
                 mouseScroll = true;
             }
 
@@ -155,10 +180,10 @@ namespace RTSLockstep.Player
 
             if (!SelectionManager.MousedAgent
                 && !mouseScroll
-                && !PlayerManager.CurrentPlayerController.GetPlayerHUD().GetCursorLockState()
-                && !PlayerManager.CurrentPlayerController.GetPlayerHUD().IsMouseOverHUD)
+                && !PlayerManager.CurrentPlayer.PlayerHUD.GetCursorLockState()
+                && !PlayerManager.CurrentPlayer.PlayerHUD.IsMouseOverHUD)
             {
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Select);
             }
         }
 
@@ -184,7 +209,7 @@ namespace RTSLockstep.Player
 
         protected override void HandleSingleLeftClick()
         {
-            if (PlayerManager.CurrentPlayerController.GetPlayerHUD().MouseInBounds())
+            if (PlayerManager.CurrentPlayer.PlayerHUD.MouseInBounds())
             {
                 if (!ConstructionHandler.IsFindingBuildingLocation())
                 {
@@ -214,7 +239,7 @@ namespace RTSLockstep.Player
 
         protected override void HandleSingleRightClick()
         {
-            if (PlayerManager.CurrentPlayerController.GetPlayerHUD().MouseInBounds()
+            if (PlayerManager.CurrentPlayer.PlayerHUD.MouseInBounds()
                 && Selector.MainSelectedAgent
                 && !ConstructionHandler.IsFindingBuildingLocation())
             {
@@ -227,8 +252,8 @@ namespace RTSLockstep.Player
                         if (Selector.MainSelectedAgent.GetAbility<Rally>().GetFlagState() == FlagState.SettingFlag)
                         {
                             Selector.MainSelectedAgent.GetAbility<Rally>().SetFlagState(FlagState.SetFlag);
-                            PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorLock(false);
-                            PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Select);
+                            PlayerManager.CurrentPlayer.PlayerHUD.SetCursorLock(false);
+                            PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Select);
                         }
                         else
                         {
@@ -287,7 +312,7 @@ namespace RTSLockstep.Player
 
         protected override void MouseHover()
         {
-            if (PlayerManager.CurrentPlayerController.GetPlayerHUD().MouseInBounds()
+            if (PlayerManager.CurrentPlayer.PlayerHUD.MouseInBounds()
                 && Selector.MainSelectedAgent
                     && Selector.MainSelectedAgent.IsActive
                     && Selector.MainSelectedAgent.GetAbility<Move>()
@@ -295,7 +320,7 @@ namespace RTSLockstep.Player
                     && Selector.MainSelectedAgent.IsOwnedBy(PlayerManager.CurrentPlayerController)
                     && !SelectionManager.MousedAgent)
             {
-                PlayerManager.CurrentPlayerController.GetPlayerHUD().SetCursorState(CursorState.Move);
+                PlayerManager.CurrentPlayer.PlayerHUD.SetCursorState(CursorState.Move);
             }
         }
 
