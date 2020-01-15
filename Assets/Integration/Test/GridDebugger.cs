@@ -95,7 +95,7 @@ namespace RTSLockstep.Integration
 
                 if (ShowClearanceDegree)
                 {
-                    if (node.ClearanceDegree != GridNode.DEFAULT_DEGREE)
+                    if (node.ClearanceDegree != GridNode.DefaultDegree)
                     {
                         UnityEditor.Handles.color = Color.red;
                         UnityEditor.Handles.Label(node.WorldPos.ToVector3(LeHeight), "d" + node.ClearanceDegree.ToString());

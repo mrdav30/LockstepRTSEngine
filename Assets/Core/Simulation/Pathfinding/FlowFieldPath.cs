@@ -21,8 +21,8 @@ namespace RTSLockstep.Simulation.Pathfinding
             EndNode.FlowField.Distance = 0;
             EndNode.FlowField.HasLOS = true;
 
-            StartNodeIndex = StartNode.gridIndex;
-            EndNodeIndex = EndNode.gridIndex;
+            StartNodeIndex = StartNode.GridIndex;
+            EndNodeIndex = EndNode.GridIndex;
 
             OutputVectorPath = new Dictionary<Vector2d, FlowField>();
         }

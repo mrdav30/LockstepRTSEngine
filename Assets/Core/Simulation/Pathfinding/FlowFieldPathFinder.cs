@@ -116,19 +116,19 @@ namespace RTSLockstep.Simulation.Pathfinding
                         if (_neighbor.IsNotNull() && !_closedSet.Contains(_neighbor))
                         {
                             // if neighbor is passable or is start node, add to marked nodes
-                            if (!_neighbor.Unpassable() || _neighbor.gridIndex == _flowFieldPath.StartNodeIndex)
+                            if (!_neighbor.Unpassable() || _neighbor.GridIndex == _flowFieldPath.StartNodeIndex)
                             {
                                 _neighbor.FlowField.Distance = _rawNode.FlowField.Distance + 1;
 
                                 _rawMarkedNodes.Add(_neighbor);
                                 _closedSet.Add(_neighbor);
 
-                                if (_rawNode.gridIndex != _flowFieldPath.EndNodeIndex)
+                                if (_rawNode.GridIndex != _flowFieldPath.EndNodeIndex)
                                 {
                                     _rawNode.FlowField.HasLOS = Pathfinder.NeedsPath(_rawNode, _flowFieldPath.EndNode, _unitHalfSize) ? false : true;
                                 }
 
-                                if (_neighbor.gridIndex == _flowFieldPath.StartNodeIndex)
+                                if (_neighbor.GridIndex == _flowFieldPath.StartNodeIndex)
                                 {
                                     //We found our way to the start node!
                                     _destinationIsReached = true;
@@ -166,7 +166,7 @@ namespace RTSLockstep.Simulation.Pathfinding
                 {
                     _rawNode = _markedNodes[i];
 
-                    if (_rawNode.gridIndex != _flowFieldPath.EndNodeIndex)
+                    if (_rawNode.GridIndex != _flowFieldPath.EndNodeIndex)
                     {
                         _neighbors = _rawNode.UnblockedNeighboursOf();
 

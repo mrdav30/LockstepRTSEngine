@@ -28,10 +28,10 @@ namespace RTSLockstep.Simulation.Pathfinding
             bool steep;
 
             //Tests if there is a direct path. If there is, no need to run AStar.
-            x0 = startNode.gridX;
-            y0 = startNode.gridY;
-            x1 = endNode.gridX;
-            y1 = endNode.gridY;
+            x0 = startNode.GridX;
+            y0 = startNode.GridY;
+            x1 = endNode.GridX;
+            y1 = endNode.GridY;
             if (y1 > y0)
             {
                 compare1 = y1 - y0;

@@ -59,7 +59,7 @@ namespace RTSLockstep.Abilities.Essential
 
         public bool CanMove { get; private set; }
         public bool IsMoving { get; private set; }
-        public bool IsStuck { get; private set; } 
+        public bool IsStuck { get; private set; }
 
         [HideInInspector]
         public Vector2d Destination;
@@ -136,7 +136,7 @@ namespace RTSLockstep.Abilities.Essential
         protected override void OnSetup()
         {
             CanMove = true;
-            //   Agent.Body.onContact += HandleCollision;
+            Agent.Body.OnContact += HandleCollision;
 
             DrawPath = false;
 
@@ -571,6 +571,7 @@ namespace RTSLockstep.Abilities.Essential
                 {
                     // check to make sure we didn't find ourselves and that the other agent can move
                     if (Agent.GlobalID != other.GlobalID
+                    && other.Body.Radius > 0
                     && other.GetAbility<Move>())
                     {
                         (other.Body.Position - Position).Normalize(out long distanceMag);
@@ -630,42 +631,31 @@ namespace RTSLockstep.Abilities.Essential
                 return Vector2d.zero;
             }
 
-            //Steer to go around it
-            ColliderType otherType = closetAgent.Body.Shape;
-            if (otherType == ColliderType.Circle)
+            Vector2d vectorInOtherDirection = collisionBody.Position - Position;
+
+            //Are we more left or right of them
+            bool isLeft = false;
+            if (closetAgent.GetAbility<Move>().IsAvoidingLeft)
             {
-                Vector2d vectorInOtherDirection = collisionBody.Position - Position;
-
-                //Are we more left or right of them
-                bool isLeft = false;
-                if (closetAgent.GetAbility<Move>().IsAvoidingLeft)
-                {
-                    //If they are avoiding, avoid with the same direction as them, so we go the opposite way
-                    isLeft = closetAgent.GetAbility<Move>().IsAvoidingLeft;
-                }
-                else
-                {
-                    //http://stackoverflow.com/questions/13221873/determining-if-one-2d-vector-is-to-the-right-or-left-of-another
-                    long dot = Agent.Body.Velocity.x * -vectorInOtherDirection.y + Agent.Body.Velocity.y * vectorInOtherDirection.x;
-                    isLeft = dot > 0;
-                }
-                IsAvoidingLeft = isLeft;
-
-                //Calculate a right angle of the vector between us
-                //http://www.gamedev.net/topic/551175-rotate-vector-90-degrees-to-the-right/#entry4546571
-                resultVector = isLeft ? new Vector2d(-vectorInOtherDirection.y, vectorInOtherDirection.x) : new Vector2d(vectorInOtherDirection.y, -vectorInOtherDirection.x);
-                resultVector.Normalize();
-
-                //Move it out based on our radius + theirs
-                resultVector *= (Agent.Body.Radius + closetAgent.Body.Radius);
+                //If they are avoiding, avoid with the same direction as them, so we go the opposite way
+                isLeft = closetAgent.GetAbility<Move>().IsAvoidingLeft;
             }
             else
             {
-                //Not supported
-                //otherType == B2Shape.e_polygonShape
-                Debug.Log("Collider not supported for avoidance");
+                //http://stackoverflow.com/questions/13221873/determining-if-one-2d-vector-is-to-the-right-or-left-of-another
+                long dot = Agent.Body.Velocity.x * -vectorInOtherDirection.y + Agent.Body.Velocity.y * vectorInOtherDirection.x;
+                isLeft = dot > 0;
             }
+            IsAvoidingLeft = isLeft;
 
+            //Calculate a right angle of the vector between us
+            //http://www.gamedev.net/topic/551175-rotate-vector-90-degrees-to-the-right/#entry4546571
+            resultVector = isLeft ? new Vector2d(-vectorInOtherDirection.y, vectorInOtherDirection.x) : new Vector2d(vectorInOtherDirection.y, -vectorInOtherDirection.x);
+            resultVector.Normalize();
+
+            //Move it out based on our radius + theirs
+            resultVector *= (Agent.Body.Radius + closetAgent.Body.Radius);
+ 
             //Steer torwards it, increasing force based on how close we are
             return (resultVector / _minAvoidanceDistance);
         }

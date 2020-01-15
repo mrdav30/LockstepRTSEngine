@@ -31,14 +31,14 @@ namespace RTSLockstep.Simulation.Grid
 
         #region Pathfinding Variables
         public Vector2d GridPos;
-        public int gridX;
-        public int gridY;
-        public uint gridIndex;
+        public int GridX;
+        public int GridY;
+        public uint GridIndex;
 
         public FlowField FlowField;
 
-        public const byte DEFAULT_DEGREE = byte.MaxValue;
-        public const byte DEFAULT_SOURCE = byte.MaxValue;
+        public const byte DefaultDegree = byte.MaxValue;
+        public const byte DefaultSource = byte.MaxValue;
 
         private byte _obstacleCount;
 
@@ -86,12 +86,12 @@ namespace RTSLockstep.Simulation.Grid
             {
                 Debug.LogError("Cannot be negative!");
             }
-            gridX = _x;
-            gridY = _y;
-            GridPos = new Vector2d(gridX, gridY);
-            gridIndex = GridManager.GetGridIndex(gridX, gridY);
-            WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
-            WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
+            GridX = _x;
+            GridY = _y;
+            GridPos = new Vector2d(GridX, GridY);
+            GridIndex = GridManager.GetGridIndex(GridX, GridY);
+            WorldPos.x = GridX * FixedMath.One + GridManager.OffsetX;
+            WorldPos.y = GridY * FixedMath.One + GridManager.OffsetY;
 
             FlowField = new FlowField(WorldPos, 0, Vector2d.zero);
         }
@@ -99,9 +99,9 @@ namespace RTSLockstep.Simulation.Grid
         public void Initialize()
         {
             GenerateNeighbors();
-            LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
-            ClearanceDegree = DEFAULT_DEGREE;
-            ClearanceSource = DEFAULT_SOURCE;
+            LinkedScanNode = GridManager.GetScanNode(GridX / GridManager.ScanResolution, GridY / GridManager.ScanResolution);
+            ClearanceDegree = DefaultDegree;
+            ClearanceSource = DefaultSource;
             FastInitialize();
         }
 
@@ -144,7 +144,7 @@ namespace RTSLockstep.Simulation.Grid
             if (Unwalkable)
             {
                 ClearanceDegree = 0;
-                ClearanceSource = DEFAULT_SOURCE;
+                ClearanceSource = DefaultSource;
             }
             else
             {
@@ -161,8 +161,8 @@ namespace RTSLockstep.Simulation.Grid
                             //Clearance from source can no longer be trusted!
                             if (source.ClearanceDegree != prevSourceDegree)
                             {
-                                ClearanceDegree = DEFAULT_DEGREE;
-                                ClearanceSource = DEFAULT_SOURCE;
+                                ClearanceDegree = DefaultDegree;
+                                ClearanceSource = DefaultSource;
                             }
                         }
                         else
@@ -220,7 +220,7 @@ namespace RTSLockstep.Simulation.Grid
         {
             if (_obstacleCount == byte.MaxValue)
             {
-                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(gridX, gridY));
+                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(GridX, GridY));
             }
             else
             {
@@ -233,7 +233,7 @@ namespace RTSLockstep.Simulation.Grid
         {
             if (_obstacleCount == 0)
             {
-                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(gridX, gridY));
+                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(GridX, GridY));
             }
             else
             {
@@ -270,8 +270,8 @@ namespace RTSLockstep.Simulation.Grid
                         continue;
                     }
 
-                    checkX = gridX + x;
-                    checkY = gridY + y;
+                    checkX = GridX + x;
+                    checkY = GridY + y;
 
                     if (GridManager.ValidateCoordinates(checkX, checkY))
                     {
@@ -391,17 +391,17 @@ namespace RTSLockstep.Simulation.Grid
 
         public override int GetHashCode()
         {
-            return (int)gridIndex;
+            return (int)GridIndex;
         }
 
         public bool DoesEqual(GridNode obj)
         {
-            return obj.gridIndex == gridIndex;
+            return obj.GridIndex == GridIndex;
         }
 
         public override string ToString()
         {
-            return "(" + gridX.ToString() + ", " + gridY.ToString() + ")";
+            return "(" + GridX.ToString() + ", " + GridY.ToString() + ")";
         }
     }
 }
