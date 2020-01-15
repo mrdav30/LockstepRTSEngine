@@ -160,7 +160,7 @@ namespace RTSLockstep.Abilities.Essential
                 IsHarvestMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination, true);
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination, true, false);
             }
         }
 

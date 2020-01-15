@@ -64,17 +64,6 @@ namespace RTSLockstep.Grouping
                 {
                     _calculatedBehaviors = CalculateAndExecuteBehaviors();
                 }
-                else
-                {
-                    // reset movement and avoidance every game tick
-                    // should reset before move ability
-                    Move mover;
-                    for (int i = 0; i < _movers.Count; i++)
-                    {
-                        mover = _movers[i];
-                        mover.IsAvoidingLeft = false;
-                    }
-                }
             }
         }
 

@@ -64,8 +64,8 @@ namespace RTSLockstep.Abilities.Essential
         [HideInInspector]
         public Vector2d Destination;
         [HideInInspector]
-        public bool IsAvoidingLeft;
-        private long _minAvoidanceDistance;
+        public bool IsAvoidingLeft { get; set; }
+        private long MinAvoidanceDistance { get; set; }
 
         private const int _minimumOtherStopTime = LockstepManager.FrameRate / 4;
         private const int _stuckTimeThreshold = LockstepManager.FrameRate / 4;
@@ -98,6 +98,7 @@ namespace RTSLockstep.Abilities.Essential
         private GridNode _currentNode;
         private GridNode _destinationNode;
         private bool _allowUnwalkableEndNode;
+        private bool _allowOccupiedEndNode;
         private bool _viableDestination;
 
         // How far we move each update
@@ -237,7 +238,8 @@ namespace RTSLockstep.Abilities.Essential
                             // If agent is moving towards an unwalkable node, we can't use that to determine
                             // if they need a path.  Flowfield LOS will pick up the straight path.
                             if (_allowUnwalkableEndNode
-                                && Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out GridNode closestViableNode))
+                                && !_allowOccupiedEndNode
+                                && Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out GridNode closestViableNode, false, false))
                             {
                                 targetNode = closestViableNode;
                             }
@@ -569,16 +571,17 @@ namespace RTSLockstep.Abilities.Essential
             {
                 bool agentConditional(LSAgent other)
                 {
-                    // check to make sure we didn't find ourselves and that the other agent can move
+                    // check to make sure we didn't find ourselves 
+                    // and the other agent can move
                     if (Agent.GlobalID != other.GlobalID
                     && other.Body.Radius > 0
                     && other.GetAbility<Move>())
                     {
                         (other.Body.Position - Position).Normalize(out long distanceMag);
 
-                        if (distanceMag < _minAvoidanceDistance)
+                        if (distanceMag < MinAvoidanceDistance)
                         {
-                            _minAvoidanceDistance = distanceMag;
+                            MinAvoidanceDistance = distanceMag;
                             return true;
                         }
                     }
@@ -593,12 +596,11 @@ namespace RTSLockstep.Abilities.Essential
 
         private Vector2d SteeringBehaviourAvoid()
         {
+            // we're not moving...
             if (Agent.Body.Velocity.SqrMagnitude() <= Agent.Body.Radius)
             {
                 return Vector2d.zero;
             }
-
-            _minAvoidanceDistance = FixedMath.One * 6;
 
             Func<LSAgent, bool> avoidAgentConditional = AvoidAgentConditional;
 
@@ -657,7 +659,7 @@ namespace RTSLockstep.Abilities.Essential
             resultVector *= (Agent.Body.Radius + closetAgent.Body.Radius);
  
             //Steer torwards it, increasing force based on how close we are
-            return (resultVector / _minAvoidanceDistance);
+            return (resultVector / MinAvoidanceDistance);
         }
 
         #region Autostopping
@@ -748,7 +750,7 @@ namespace RTSLockstep.Abilities.Essential
             OnMoveGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false)
+        public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
         {
             _flowFields.Clear();
             _straightPath = false;
@@ -757,22 +759,25 @@ namespace RTSLockstep.Abilities.Essential
             StoppedTime = 0;
             Arrived = false;
 
+            IsAvoidingLeft = false;
+            MinAvoidanceDistance = FixedMath.One * 6;
+
             // handle override with onStartMove action
             Agent.Animator.SetMovingState(AnimState.Moving);
 
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distanceToMove
             _stuckTime = 0;
-            _repathTries = 0;
             IsCasting = true;
 
             _allowUnwalkableEndNode = allowUnwalkableEndNode;
+            _allowOccupiedEndNode = allowOccupiedEndNode;
 
             // still need to check for viable destination for agents in group
             // if size requires consideration, use old next-best-node system
             // also a catch in case GetEndNode returns null
-            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode)
-                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode));
+            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode, _allowOccupiedEndNode)
+                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode, _allowOccupiedEndNode));
 
             Destination = _destinationNode.IsNotNull() ? _destinationNode.WorldPos : Vector2d.zero;
 
@@ -858,7 +863,7 @@ namespace RTSLockstep.Abilities.Essential
             {
                 //if agent is assigned move group and the other mover is moving to a similar point
                 if (otherMover.MyMovementGroupID == MyMovementGroupID
-                    || otherMover.Destination.FastDistance(Destination) <= (_closingDistance * _closingDistance))
+                    && otherMover.Destination.FastDistance(Destination) <= (_closingDistance * _closingDistance))
                 {
                     if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)
                     {

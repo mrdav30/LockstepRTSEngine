@@ -115,7 +115,7 @@ namespace RTSLockstep.Simulation.Pathfinding
         /// <param name="dest"></param>
         /// <param name="returnNode"></param>
         /// <returns></returns>
-        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false)
+        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
         {
             outputNode = GridManager.GetNodeByPos(dest.x, dest.y);
             if (outputNode.IsNull())
@@ -134,12 +134,19 @@ namespace RTSLockstep.Simulation.Pathfinding
             }
             else if (outputNode.Unwalkable)
             {
-                if (allowUnwalkableEndNode) // && AlternativeNodeFinder.Instance.CheckValidNeighbor(outputNode)
+                if (allowUnwalkableEndNode)
                 {
                     return true;
                 }
+                else
+                {
+                    return StarCast(dest, out outputNode);
+                }
+            }
 
-                return StarCast(dest, out outputNode);
+            else if (outputNode.Occupied && !allowOccupiedEndNode)
+            {
+                return false;
             }
 
             return true;
@@ -182,7 +189,7 @@ namespace RTSLockstep.Simulation.Pathfinding
             }
         }
 
-        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false)
+        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
         {
             returnNode = GridManager.GetNodeByPos(dest.x, dest.y);
 
@@ -218,6 +225,59 @@ namespace RTSLockstep.Simulation.Pathfinding
                     if (validTriggered)
                     {
                         if (currentNode.IsNotNull() || !currentNode.Unwalkable)
+                        {
+                            //calculate sqrMag to last invalid node
+                            int testMag = coordinate.X - cacheCoord.X;
+                            testMag *= testMag;
+                            int buffer = coordinate.Y - cacheCoord.Y;
+                            buffer *= buffer;
+                            testMag += buffer;
+                            if (testMag >= minSqrMag)
+                            {
+                                valid = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!valid)
+                {
+                    return false;
+                }
+                else
+                {
+                    returnNode = currentNode;
+                    return true;
+                }
+            }
+            else if (!allowOccupiedEndNode && returnNode.Occupied)
+            {
+                bool valid = false;
+                LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();
+                bool validTriggered = false;
+                pathingSize = (pathingSize + 1) / 2;
+                int minSqrMag = pathingSize * pathingSize;
+                minSqrMag *= 2;
+
+                foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
+                {
+                    currentNode = GridManager.GetNodeByPos(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
+                    if (!validTriggered)
+                    {
+                        if (currentNode.IsNotNull() && !currentNode.Occupied)
+                        {
+                            validTriggered = true;
+                        }
+                        else
+                        {
+                            cacheCoord = coordinate;
+                        }
+                    }
+
+                    if (validTriggered)
+                    {
+                        if (currentNode.IsNotNull() || !currentNode.Occupied)
                         {
                             //calculate sqrMag to last invalid node
                             int testMag = coordinate.X - cacheCoord.X;
