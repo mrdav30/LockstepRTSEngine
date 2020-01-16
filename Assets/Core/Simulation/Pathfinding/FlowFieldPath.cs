@@ -29,7 +29,7 @@ namespace RTSLockstep.Simulation.Pathfinding
 
         public bool CheckValid()
         {
-            if (EndNode.Unwalkable || StartNode.Unwalkable)
+            if (StartNode.Unwalkable)
             {
                 return false;
             }

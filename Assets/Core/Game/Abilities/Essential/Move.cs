@@ -97,8 +97,7 @@ namespace RTSLockstep.Abilities.Essential
 
         private GridNode _currentNode;
         private GridNode _destinationNode;
-        private bool _allowUnwalkableEndNode;
-        private bool _allowOccupiedEndNode;
+        public bool _allowUnwalkableEndNode;
         private bool _viableDestination;
 
         // How far we move each update
@@ -234,21 +233,14 @@ namespace RTSLockstep.Abilities.Essential
                         }
                         else
                         {
-                            GridNode targetNode = _destinationNode;
-                            // If agent is moving towards an unwalkable node, we can't use that to determine
-                            // if they need a path.  Flowfield LOS will pick up the straight path.
-                            if (_allowUnwalkableEndNode
-                                && !_allowOccupiedEndNode
-                                && Pathfinder.GetClosestViableNode(Position, Destination, GridSize, out GridNode closestViableNode, false, false))
-                            {
-                                targetNode = closestViableNode;
-                            }
-
-                            if (Pathfinder.NeedsPath(_currentNode, targetNode, GridSize))
+                            //if (Pathfinder.NeedsPath(_currentNode, targetNode, GridSize))
+                            if (_destinationNode.Unwalkable || Pathfinder.NeedsPath(_currentNode, _destinationNode, GridSize))
                             {
                                 _straightPath = false;
 
-                                PathRequestManager.RequestPath(_currentNode, targetNode, GridSize, (flowFields, success) =>
+                                //PathRequestManager.RequestPath(_currentNode, targetNode, GridSize, (flowFields, success) =>
+
+                                PathRequestManager.RequestPath(_currentNode, _destinationNode, GridSize, (flowFields, success) =>
                                 {
                                     _flowFields.Clear();
                                     if (success)
@@ -737,6 +729,8 @@ namespace RTSLockstep.Abilities.Essential
 
         public void MoveGroupProcessed(Vector2d _destination)
         {
+            _allowUnwalkableEndNode = MyMovementGroup.AllowUnwalkableEndNode;
+
             if (MoveOnGroupProcessed)
             {
                 StartMove(_destination);
@@ -750,7 +744,7 @@ namespace RTSLockstep.Abilities.Essential
             OnMoveGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
+        public void StartMove(Vector2d _destination)
         {
             _flowFields.Clear();
             _straightPath = false;
@@ -770,14 +764,11 @@ namespace RTSLockstep.Abilities.Essential
             _stuckTime = 0;
             IsCasting = true;
 
-            _allowUnwalkableEndNode = allowUnwalkableEndNode;
-            _allowOccupiedEndNode = allowOccupiedEndNode;
-
             // still need to check for viable destination for agents in group
             // if size requires consideration, use old next-best-node system
             // also a catch in case GetEndNode returns null
-            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode, _allowOccupiedEndNode)
-                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode, _allowOccupiedEndNode));
+            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode)
+                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode));
 
             Destination = _destinationNode.IsNotNull() ? _destinationNode.WorldPos : Vector2d.zero;
 

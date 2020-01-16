@@ -135,18 +135,26 @@ namespace RTSLockstep.Grouping
                     }
                 }
 
-                // check to make sure the group is moving to a good area
-                if (_groupGridSize <= 1 && Pathfinder.GetEndNode(_farthestPosition, _destination, out _groupDestinationNode, AllowUnwalkableEndNode)
-                    || Pathfinder.GetClosestViableNode(_farthestPosition, _destination, _groupGridSize, out _groupDestinationNode, AllowUnwalkableEndNode))
+                if (_radius == 0)
                 {
-                    _destination = _groupDestinationNode.WorldPos;
-                    // Generate a flow field for the entire movement group
-                    ValidateGroupMovementPath();
+                    // we must not have a group then...
+                    ExecuteGroupIndividualMove();
                 }
                 else
                 {
-                    // can't get there as a group, try to find the individual agent path
-                    ExecuteIndividualMove();
+                    // check to make sure the group is moving to a good area
+                    if (_groupGridSize <= 1 && Pathfinder.GetEndNode(_farthestPosition, _destination, out _groupDestinationNode, AllowUnwalkableEndNode)
+                        || Pathfinder.GetClosestViableNode(_farthestPosition, _destination, _groupGridSize, out _groupDestinationNode, AllowUnwalkableEndNode))
+                    {
+                        _destination = _groupDestinationNode.WorldPos;
+                        // Generate a flow field for the entire movement group
+                        ValidateGroupMovementPath();
+                    }
+                    else
+                    {
+                        // can't get there as a group, try to find the individual agent path
+                        ExecuteIndividualMove();
+                    }
                 }
             }
             else
@@ -170,13 +178,6 @@ namespace RTSLockstep.Grouping
                     {
                         GroupFlowFields.Clear();
                         GroupFlowFields = _flowField;
-
-                        if (_radius == 0)
-                        {
-                            // we must not have a group then...
-                            ExecuteGroupIndividualMove();
-                            return;
-                        }
 
                         long expectedSize = _averageCollisionSize.Mul(_averageCollisionSize).Mul(FixedMath.One * 2).Mul(_movers.Count);
                         long groupSize = _radius.Mul(_radius);

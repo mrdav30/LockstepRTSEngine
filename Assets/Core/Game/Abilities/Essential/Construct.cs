@@ -171,7 +171,7 @@ namespace RTSLockstep.Abilities.Essential
                 IsBuildMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination, true);
+                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
             }
         }
 

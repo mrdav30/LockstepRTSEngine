@@ -115,7 +115,7 @@ namespace RTSLockstep.Simulation.Pathfinding
         /// <param name="dest"></param>
         /// <param name="returnNode"></param>
         /// <returns></returns>
-        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
+        public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode, bool allowUnwalkableEndNode = false)
         {
             outputNode = GridManager.GetNodeByPos(dest.x, dest.y);
             if (outputNode.IsNull())
@@ -144,11 +144,6 @@ namespace RTSLockstep.Simulation.Pathfinding
                 }
             }
 
-            else if (outputNode.Occupied && !allowOccupiedEndNode)
-            {
-                return false;
-            }
-
             return true;
         }
 
@@ -171,11 +166,10 @@ namespace RTSLockstep.Simulation.Pathfinding
             }
         }
 
-        public static bool StarCast(Vector2d dest, out GridNode returnNode)
+        public static bool StarCast(Vector2d dest, out GridNode returnNode, int maxTestDistance = 3)
         {
             GridManager.GetCoordinates(dest.x, dest.y, out int xGrid, out int yGrid);
             // set to the highest height or width value of any game object
-            const int maxTestDistance = 3;
             AlternativeNodeFinder.Instance.SetValues(dest, xGrid, yGrid, maxTestDistance);
 
             returnNode = AlternativeNodeFinder.Instance.GetNode();
@@ -189,7 +183,7 @@ namespace RTSLockstep.Simulation.Pathfinding
             }
         }
 
-        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false, bool allowOccupiedEndNode = true)
+        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode, bool allowUnwalkableEndNode = false)
         {
             returnNode = GridManager.GetNodeByPos(dest.x, dest.y);
 
@@ -215,6 +209,7 @@ namespace RTSLockstep.Simulation.Pathfinding
                         if (currentNode.IsNotNull() && !currentNode.Unwalkable)
                         {
                             validTriggered = true;
+
                         }
                         else
                         {
@@ -224,72 +219,16 @@ namespace RTSLockstep.Simulation.Pathfinding
 
                     if (validTriggered)
                     {
-                        if (currentNode.IsNotNull() || !currentNode.Unwalkable)
+                        //calculate sqrMag to last invalid node
+                        int testMag = coordinate.X - cacheCoord.X;
+                        testMag *= testMag;
+                        int buffer = coordinate.Y - cacheCoord.Y;
+                        buffer *= buffer;
+                        testMag += buffer;
+                        if (testMag >= minSqrMag)
                         {
-                            //calculate sqrMag to last invalid node
-                            int testMag = coordinate.X - cacheCoord.X;
-                            testMag *= testMag;
-                            int buffer = coordinate.Y - cacheCoord.Y;
-                            buffer *= buffer;
-                            testMag += buffer;
-                            if (testMag >= minSqrMag)
-                            {
-                                valid = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (!valid)
-                {
-                    return false;
-                }
-                else
-                {
-                    returnNode = currentNode;
-                    return true;
-                }
-            }
-            else if (!allowOccupiedEndNode && returnNode.Occupied)
-            {
-                bool valid = false;
-                LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();
-                bool validTriggered = false;
-                pathingSize = (pathingSize + 1) / 2;
-                int minSqrMag = pathingSize * pathingSize;
-                minSqrMag *= 2;
-
-                foreach (var coordinate in LSMath.PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
-                {
-                    currentNode = GridManager.GetNodeByPos(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
-                    if (!validTriggered)
-                    {
-                        if (currentNode.IsNotNull() && !currentNode.Occupied)
-                        {
-                            validTriggered = true;
-                        }
-                        else
-                        {
-                            cacheCoord = coordinate;
-                        }
-                    }
-
-                    if (validTriggered)
-                    {
-                        if (currentNode.IsNotNull() || !currentNode.Occupied)
-                        {
-                            //calculate sqrMag to last invalid node
-                            int testMag = coordinate.X - cacheCoord.X;
-                            testMag *= testMag;
-                            int buffer = coordinate.Y - cacheCoord.Y;
-                            buffer *= buffer;
-                            testMag += buffer;
-                            if (testMag >= minSqrMag)
-                            {
-                                valid = true;
-                                break;
-                            }
+                            valid = true;
+                            break;
                         }
                     }
                 }

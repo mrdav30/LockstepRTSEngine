@@ -80,7 +80,7 @@ namespace RTSLockstep.Simulation.Pathfinding
 
             _closedSet.Clear();
 
-            _flowFieldPath = new FlowFieldPath(_startNode, _endNode);
+
 
             if (!_flowFieldPath.CheckValid())
             {
@@ -88,6 +88,17 @@ namespace RTSLockstep.Simulation.Pathfinding
             }
 
             //flood fill out from the end point with a distance of 0
+
+            if (_flowFieldPath.EndNode.Unwalkable
+                && Pathfinder.StarCast(_flowFieldPath.EndNode.WorldPos, out GridNode closestNode, 10))
+            {
+                _flowFieldPath = new FlowFieldPath(_startNode, closestNode);
+            }
+            else
+            {
+                _flowFieldPath = new FlowFieldPath(_startNode, _endNode);
+            }
+
             _rawMarkedNodes.Add(_flowFieldPath.EndNode);
             _closedSet.Add(_flowFieldPath.EndNode);
 
@@ -107,6 +118,11 @@ namespace RTSLockstep.Simulation.Pathfinding
                 {
                     _rawNode.FlowField.HasLOS = false;
 
+                    if (_rawNode.GridIndex != _flowFieldPath.EndNodeIndex)
+                    {
+                        _rawNode.FlowField.HasLOS = Pathfinder.NeedsPath(_rawNode, _flowFieldPath.EndNode, _unitHalfSize) ? false : true;
+                    }
+
                     // for each straight line neighbour of this node (no diagonals)
                     for (int i = 0; i < 4; i++)
                     {
@@ -122,11 +138,6 @@ namespace RTSLockstep.Simulation.Pathfinding
 
                                 _rawMarkedNodes.Add(_neighbor);
                                 _closedSet.Add(_neighbor);
-
-                                if (_rawNode.GridIndex != _flowFieldPath.EndNodeIndex)
-                                {
-                                    _rawNode.FlowField.HasLOS = Pathfinder.NeedsPath(_rawNode, _flowFieldPath.EndNode, _unitHalfSize) ? false : true;
-                                }
 
                                 if (_neighbor.GridIndex == _flowFieldPath.StartNodeIndex)
                                 {
