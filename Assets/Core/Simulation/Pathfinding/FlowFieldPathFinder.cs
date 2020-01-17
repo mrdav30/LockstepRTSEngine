@@ -81,22 +81,20 @@ namespace RTSLockstep.Simulation.Pathfinding
             _closedSet.Clear();
 
 
-
-            if (!_flowFieldPath.CheckValid())
-            {
-                return false;
-            }
-
             //flood fill out from the end point with a distance of 0
-
-            if (_flowFieldPath.EndNode.Unwalkable
-                && Pathfinder.StarCast(_flowFieldPath.EndNode.WorldPos, out GridNode closestNode, 10))
+            if (_endNode.Unwalkable
+                && Pathfinder.StarCast(_endNode.WorldPos, out GridNode closestNode, 10))
             {
                 _flowFieldPath = new FlowFieldPath(_startNode, closestNode);
             }
             else
             {
                 _flowFieldPath = new FlowFieldPath(_startNode, _endNode);
+            }
+
+            if (!_flowFieldPath.CheckValid())
+            {
+                return false;
             }
 
             _rawMarkedNodes.Add(_flowFieldPath.EndNode);

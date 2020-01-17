@@ -224,7 +224,15 @@ namespace RTSLockstep.Abilities.Essential
                 IsAttackMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                // if we're part of a movement group, destination already set
+                if (Agent.MyStats.CachedMove.MyMovementType != MovementType.Individual)
+                {
+                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                }
+                else
+                {
+                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
+                }
             }
         }
 

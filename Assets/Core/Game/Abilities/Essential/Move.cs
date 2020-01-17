@@ -233,12 +233,10 @@ namespace RTSLockstep.Abilities.Essential
                         }
                         else
                         {
-                            //if (Pathfinder.NeedsPath(_currentNode, targetNode, GridSize))
+                            // require a path if destination is unwalkable
                             if (_destinationNode.Unwalkable || Pathfinder.NeedsPath(_currentNode, _destinationNode, GridSize))
                             {
                                 _straightPath = false;
-
-                                //PathRequestManager.RequestPath(_currentNode, targetNode, GridSize, (flowFields, success) =>
 
                                 PathRequestManager.RequestPath(_currentNode, _destinationNode, GridSize, (flowFields, success) =>
                                 {
@@ -649,7 +647,7 @@ namespace RTSLockstep.Abilities.Essential
 
             //Move it out based on our radius + theirs
             resultVector *= (Agent.Body.Radius + closetAgent.Body.Radius);
- 
+
             //Steer torwards it, increasing force based on how close we are
             return (resultVector / MinAvoidanceDistance);
         }
@@ -736,7 +734,7 @@ namespace RTSLockstep.Abilities.Essential
                 StartMove(_destination);
                 MoveOnGroupProcessed = false;
             }
-            else
+            else if (MyMovementType != MovementType.Individual)
             {
                 Destination = _destination;
             }

@@ -34,12 +34,12 @@ namespace RTSLockstep.Abilities.Essential
         //Called whenever construction is stopped... i.e. to attack
         public event Action OnStopConstruct;
 
-        private LSAgent _currentProject;
-        private Structure _projectStructure
+        public LSAgent CurrentTarget { get; private set; }
+        private Structure ProjectStructure
         {
             get
             {
-                return _currentProject.IsNotNull() ? _currentProject.GetAbility<Structure>() : null;
+                return CurrentTarget.IsNotNull() ? CurrentTarget.GetAbility<Structure>() : null;
             }
         }
 
@@ -101,7 +101,7 @@ namespace RTSLockstep.Abilities.Essential
             MyConstructGroup = null;
             MyConstructGroupID = -1;
 
-            _currentProject = null;
+            CurrentTarget = null;
 
             _inRange = false;
             IsFocused = false;
@@ -120,7 +120,7 @@ namespace RTSLockstep.Abilities.Essential
                 LSAgent obj = Agent.GetControllingPlayer().GetObjectForId(_loadedProjectId);
                 if (obj.MyAgentType == AgentType.Structure)
                 {
-                    _currentProject = obj;
+                    CurrentTarget = obj;
                 }
             }
         }
@@ -165,13 +165,21 @@ namespace RTSLockstep.Abilities.Essential
         protected virtual void OnStartConstructMove()
         {
             if (Agent.MyStats.CanMove
-                && _projectStructure.IsNotNull()
+                && ProjectStructure.IsNotNull()
                 && !CheckRange())
             {
                 IsBuildMoving = true;
                 IsFocused = false;
 
-                Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                // if we're part of a movement group, destination already set
+                if (Agent.MyStats.CachedMove.MyMovementType != MovementType.Individual)
+                {
+                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
+                }
+                else
+                {
+                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
+                }
             }
         }
 
@@ -207,9 +215,9 @@ namespace RTSLockstep.Abilities.Essential
         {
             SaveDetails(writer);
             SaveManager.WriteBoolean(writer, "BuildMoving", IsBuildMoving);
-            if (_projectStructure)
+            if (ProjectStructure)
             {
-                SaveManager.WriteInt(writer, "currentProjectId", _currentProject.GlobalID);
+                SaveManager.WriteInt(writer, "currentProjectId", CurrentTarget.GlobalID);
             }
             SaveManager.WriteBoolean(writer, "Focused", IsFocused);
             SaveManager.WriteBoolean(writer, "InRange", _inRange);
@@ -251,14 +259,14 @@ namespace RTSLockstep.Abilities.Essential
 
             if (currentTarget.IsNotNull())
             {
-                _currentProject = currentTarget;
+                CurrentTarget = currentTarget;
 
                 IsFocused = true;
                 IsBuildMoving = false;
 
-                _targetVersion = _currentProject.SpawnVersion;
+                _targetVersion = CurrentTarget.SpawnVersion;
 
-                _fastRangeToTarget = Agent.MyStats.ActionRange + (_currentProject.Body.IsNotNull() ? _currentProject.Body.Radius : 0) + Agent.Body.Radius;
+                _fastRangeToTarget = Agent.MyStats.ActionRange + (CurrentTarget.Body.IsNotNull() ? CurrentTarget.Body.Radius : 0) + Agent.Body.Radius;
                 _fastRangeToTarget *= _fastRangeToTarget;
 
                 OnStartConstructMove();
@@ -289,9 +297,9 @@ namespace RTSLockstep.Abilities.Essential
         private void BehaveWithTarget()
         {
             // only stop construct when groups queue is empty
-            if (!_currentProject.IsActive
-                || _currentProject.SpawnVersion != _targetVersion
-                || !_projectStructure.NeedsConstruction)
+            if (!CurrentTarget.IsActive
+                || CurrentTarget.SpawnVersion != _targetVersion
+                || !ProjectStructure.NeedsConstruction)
             {
                 // Target's lifecycle has ended
                 StopConstruct();
@@ -313,22 +321,22 @@ namespace RTSLockstep.Abilities.Essential
                         }
                         Agent.Animator.SetState(ConstructingAnimState);
 
-                        if (!_projectStructure.ConstructionStarted)
+                        if (!ProjectStructure.ConstructionStarted)
                         {
-                            _projectStructure.ConstructionStarted = true;
+                            ProjectStructure.ConstructionStarted = true;
 
-                            if (_currentProject.Animator.IsNotNull())
+                            if (CurrentTarget.Animator.IsNotNull())
                             {
-                                _currentProject.Animator.SetState(AnimState.Building);
+                                CurrentTarget.Animator.SetState(AnimState.Building);
                             }
 
                             // Restore material
-                            ConstructionHandler.RestoreMaterial(_currentProject.gameObject);
+                            ConstructionHandler.RestoreMaterial(CurrentTarget.gameObject);
 
                             // restore bounds so structure is included in path & build grid
-                            if (_currentProject.GetAbility<DynamicBlocker>())
+                            if (CurrentTarget.GetAbility<DynamicBlocker>())
                             {
-                                _currentProject.GetAbility<DynamicBlocker>().SetTransparent(false);
+                                CurrentTarget.GetAbility<DynamicBlocker>().SetTransparent(false);
                             }
                         }
 
@@ -367,8 +375,8 @@ namespace RTSLockstep.Abilities.Essential
                         }
                         else if (!_inRange && _repathTimer.AdvanceFrame())
                         {
-                            if (_currentProject.Body.PositionChangedBuffer &&
-                                _currentProject.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (_repathDistance * _repathDistance))
+                            if (CurrentTarget.Body.PositionChangedBuffer &&
+                                CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (_repathDistance * _repathDistance))
                             {
                                 needsRepath = true;
                                 //So units don't sync up and path on the same frame
@@ -378,7 +386,7 @@ namespace RTSLockstep.Abilities.Essential
 
                         if (needsRepath)
                         {
-                            Agent.MyStats.CachedMove.Destination = _currentProject.Body.Position;
+                            Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
                             Agent.MyStats.CachedMove.PauseAutoStop();
                             Agent.MyStats.CachedMove.PauseCollisionStop();
                             OnStartConstructMove();
@@ -397,7 +405,7 @@ namespace RTSLockstep.Abilities.Essential
                     _windupCount += LockstepManager.DeltaTime;
                     if (Agent.MyStats.CanTurn)
                     {
-                        Vector2d targetVector = _currentProject.Body.Position - Agent.Body.Position;
+                        Vector2d targetVector = CurrentTarget.Body.Position - Agent.Body.Position;
                         Agent.MyStats.CachedTurn.StartTurnVector(targetVector);
                     }
 
@@ -429,7 +437,7 @@ namespace RTSLockstep.Abilities.Essential
 
         private bool CheckRange()
         {
-            _targetDirection = _currentProject.Body.Position - Agent.Body.Position;
+            _targetDirection = CurrentTarget.Body.Position - Agent.Body.Position;
             _fastMag = _targetDirection.FastMagnitude();
 
             return _fastMag <= _fastRangeToTarget;
@@ -451,7 +459,7 @@ namespace RTSLockstep.Abilities.Essential
             }
             Agent.Body.Priority = _increasePriority ? _basePriority + 1 : _basePriority;
 
-            OnConstruct(_projectStructure);
+            OnConstruct(ProjectStructure);
         }
 
         private void StopConstruct(bool complete = false)
@@ -473,7 +481,7 @@ namespace RTSLockstep.Abilities.Essential
             {
                 Agent.Tag = AgentTag.None;
             }
-            else if (_currentProject.IsNotNull())
+            else if (CurrentTarget.IsNotNull())
             {
                 if (Agent.MyStats.CanMove && !_inRange)
                 {
@@ -481,7 +489,7 @@ namespace RTSLockstep.Abilities.Essential
                 }
             }
 
-            _currentProject = null;
+            CurrentTarget = null;
 
             IsCasting = false;
 
