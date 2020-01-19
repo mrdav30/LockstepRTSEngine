@@ -30,6 +30,8 @@ namespace RTSLockstep.Abilities.Essential
 
         public LSAgent CurrentTarget { get; private set; }
 
+        public Vector2d Destination { get; private set; }
+
         public virtual Vector3d[] ProjectileOffsets
         {
             get
@@ -224,15 +226,7 @@ namespace RTSLockstep.Abilities.Essential
                 IsAttackMoving = true;
                 IsFocused = false;
 
-                // if we're part of a movement group, destination already set
-                if (Agent.MyStats.CachedMove.MyMovementType != MovementType.Individual)
-                {
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
-                }
+                Agent.MyStats.CachedMove.StartMove(Destination);
             }
         }
 
@@ -358,6 +352,7 @@ namespace RTSLockstep.Abilities.Essential
             if (currentTarget.IsNotNull())
             {
                 CurrentTarget = currentTarget;
+                Destination = CurrentTarget.Body.Position;
 
                 IsFocused = true;
                 IsAttackMoving = false;

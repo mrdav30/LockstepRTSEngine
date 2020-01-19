@@ -1,20 +1,23 @@
 //=======================================================================
 // Copyright (c) 2015 John Pan
+// Modified 2020 by David Oravsky
 // Distributed under the MIT License.
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-using RTSLockstep.Utility.FastCollections;
-using RTSLockstep.Agents;
 using System.Collections.Generic;
 using UnityEngine;
+
+using RTSLockstep.Utility.FastCollections;
+using RTSLockstep.Agents;
 using RTSLockstep.Determinism;
 using RTSLockstep.Managers;
 using RTSLockstep.LSResources;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
+using RTSLockstep.Simulation.Grid;
 
 namespace RTSLockstep.Simulation.LSPhysics
 {
@@ -378,10 +381,10 @@ namespace RTSLockstep.Simulation.LSPhysics
             if (Shape == ColliderType.Polygon)
             {
                 // TODO
+                GeneratePoints();
             }
             if (Shape != ColliderType.None)
             {
-                GeneratePoints();
                 GenerateBounds();
             }
             Agent = agent;
@@ -859,6 +862,28 @@ namespace RTSLockstep.Simulation.LSPhysics
                     if (IsPositionCovered(checkPos))
                     {
                         output.Add(checkPos);
+                    }
+                }
+            }
+        }
+
+        public void GetOutsideBoundNodes(long snapSpacing, FastList<GridNode> output)
+        {
+            long xmin = GetFlooredSnap(XMin - FixedMath.Half, snapSpacing);
+            long ymin = GetFlooredSnap(YMin - FixedMath.Half, snapSpacing);
+
+            long xmax = GetCeiledSnap(XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
+            long ymax = GetCeiledSnap(YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
+
+            //Used for getting snapped positions this body covered
+            for (long x = xmax; x <= xmax + (HalfWidth * 2); x += snapSpacing)
+            {
+                for (long y = ymax; y <= ymax + (HalfLength * 2); y += snapSpacing)
+                {
+                    GridNode checkNode = GridManager.GetNodeByPos(x, y);
+                    if (!checkNode.Unwalkable)
+                    {
+                        output.Add(checkNode);
                     }
                 }
             }

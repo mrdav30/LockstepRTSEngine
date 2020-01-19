@@ -43,6 +43,8 @@ namespace RTSLockstep.Abilities.Essential
             }
         }
 
+        public Vector2d Destination { get; private set; }
+
         private const int _searchRate = LockstepManager.FrameRate / 2;
 
         //Stuff for the logic
@@ -171,15 +173,7 @@ namespace RTSLockstep.Abilities.Essential
                 IsBuildMoving = true;
                 IsFocused = false;
 
-                // if we're part of a movement group, destination already set
-                if (Agent.MyStats.CachedMove.MyMovementType != MovementType.Individual)
-                {
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
-                }
+                Agent.MyStats.CachedMove.StartMove(Destination);
             }
         }
 
@@ -260,6 +254,7 @@ namespace RTSLockstep.Abilities.Essential
             if (currentTarget.IsNotNull())
             {
                 CurrentTarget = currentTarget;
+                Destination = CurrentTarget.Body.Position;
 
                 IsFocused = true;
                 IsBuildMoving = false;
@@ -468,11 +463,15 @@ namespace RTSLockstep.Abilities.Essential
             IsWindingUp = false;
             IsFocused = false;
 
-            if (MyConstructGroup.IsNotNull()
-                && MyConstructGroup.GroupConstructionQueue.Count == 0)
+            if(MyConstructGroup.GroupConstructionQueue.Count == 0)
             {
-                // Only remove from construction group if their queue is empty
-                MyConstructGroup.Remove(this);
+                if (MyConstructGroup.IsNotNull())
+                {
+                    // Only remove from construction group if their queue is empty
+                    MyConstructGroup.Remove(this);
+                }
+
+                IsCasting = false;
             }
 
             IsBuildMoving = false;
@@ -490,8 +489,6 @@ namespace RTSLockstep.Abilities.Essential
             }
 
             CurrentTarget = null;
-
-            IsCasting = false;
 
             Agent.Body.Priority = _basePriority;
 

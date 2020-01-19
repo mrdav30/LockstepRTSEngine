@@ -1,4 +1,6 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System.Collections.Generic;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents.AgentController;
 using RTSLockstep.Simulation.Grid;
@@ -7,17 +9,16 @@ using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Utility;
 using RTSLockstep.LSResources;
-using System.Collections.Generic;
 using RTSLockstep.Simulation.LSMath;
 
 namespace RTSLockstep.Grouping
 {
     public class MovementGroup
     {
-        private Vector2d _destination;
-        private Vector2d _groupPosition;
+        private Vector2d _destinationPos;
+        private Vector2d _groupPos;
 
-        private Vector2d _farthestPosition;
+        private Vector2d _farthestGroupPos;
 
         private GridNode _groupCurrentNode;
         private GridNode _groupDestinationNode;
@@ -27,7 +28,7 @@ namespace RTSLockstep.Grouping
 
         public int IndexID { get; set; }
 
-        public bool AllowUnwalkableEndNode = false;
+        public bool AllowUnwalkableEndNode { get; set; } = false;
 
         private const int _minGroupSize = 2;
         private int _groupGridSize;
@@ -41,7 +42,7 @@ namespace RTSLockstep.Grouping
 
         public void Initialize(Command com)
         {
-            _destination = com.GetData<Vector2d>();
+            _destinationPos = com.GetData<Vector2d>();
             _calculatedBehaviors = false;
             Selection selection = GlobalAgentController.InstanceManagers[com.ControllerID].GetSelection(com);
             _movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
@@ -98,15 +99,15 @@ namespace RTSLockstep.Grouping
 
                 _averageCollisionSize = 0;
                 _radius = 0;
-                _groupPosition = Vector2d.zero;
+                _groupPos = Vector2d.zero;
                 for (int i = 0; i < _movers.Count; i++)
                 {
                     mover = _movers[i];
-                    _groupPosition += mover.Position;
+                    _groupPos += mover.Position;
                     _averageCollisionSize += mover.CollisionSize;
                 }
 
-                _groupPosition /= _movers.Count;
+                _groupPos /= _movers.Count;
                 _averageCollisionSize = (_averageCollisionSize / _movers.Count) + FixedMath.Create(0.5f);
 
                 //pass the largest unit or just average?
@@ -118,7 +119,7 @@ namespace RTSLockstep.Grouping
                 {
                     mover = _movers[i];
 
-                    long currentSqrDistance = mover.Position.SqrDistance(_groupPosition.x, _groupPosition.y);
+                    long currentSqrDistance = mover.Position.SqrDistance(_groupPos.x, _groupPos.y);
                     if (currentSqrDistance > biggestSqrDistance)
                     {
                         long currentDistance = FixedMath.Sqrt(currentSqrDistance);
@@ -127,34 +128,46 @@ namespace RTSLockstep.Grouping
                         _radius = currentDistance;
                     }
 
-                    long destinationSqrDistance = mover.Position.SqrDistance(_destination.x, _destination.y);
+                    long destinationSqrDistance = mover.Position.SqrDistance(_destinationPos.x, _destinationPos.y);
                     if (destinationSqrDistance > farthestSqrDistance)
                     {
                         farthestSqrDistance = destinationSqrDistance;
-                        _farthestPosition = mover.Position;
+                        _farthestGroupPos = mover.Position;
                     }
                 }
 
-                if (_radius == 0)
+                if (_radius > 0)
                 {
-                    // we must not have a group then...
-                    ExecuteGroupIndividualMove();
-                }
-                else
-                {
-                    // check to make sure the group is moving to a good area
-                    if (_groupGridSize <= 1 && Pathfinder.GetEndNode(_farthestPosition, _destination, out _groupDestinationNode, AllowUnwalkableEndNode)
-                        || Pathfinder.GetClosestViableNode(_farthestPosition, _destination, _groupGridSize, out _groupDestinationNode, AllowUnwalkableEndNode))
+                    // check everyone is huddled together for group movement
+                    long expectedSize = _averageCollisionSize.Mul(_averageCollisionSize).Mul(FixedMath.One * 2).Mul(_movers.Count);
+                    long groupSize = _radius.Mul(_radius);
+
+                    if (groupSize > expectedSize || _groupPos.FastDistance(_destinationPos.x, _destinationPos.y) < (_radius.Mul(_radius)))
                     {
-                        _destination = _groupDestinationNode.WorldPos;
-                        // Generate a flow field for the entire movement group
-                        ValidateGroupMovementPath();
+                        // group members are spread to far out
+                        ExecuteGroupIndividualMove();
                     }
                     else
                     {
-                        // can't get there as a group, try to find the individual agent path
-                        ExecuteIndividualMove();
+                        // check to make sure the group is moving to a good area
+                        if (_groupGridSize <= 1 && Pathfinder.GetEndNode(_farthestGroupPos, _destinationPos, out _groupDestinationNode, AllowUnwalkableEndNode)
+                            || Pathfinder.GetClosestViableNode(_farthestGroupPos, _destinationPos, _groupGridSize, out _groupDestinationNode, AllowUnwalkableEndNode))
+                        {
+                            _destinationPos = _groupDestinationNode.WorldPos;
+                            // Generate a flow field for the entire movement group
+                            ValidateGroupMovementPath();
+                        }
+                        else
+                        {
+                            // can't get there as a group, try to find the individual agent path
+                            ExecuteIndividualMove();
+                        }
                     }
+                }
+                else
+                {
+                    // we must not have a group then...
+                    ExecuteGroupIndividualMove();
                 }
             }
             else
@@ -169,8 +182,8 @@ namespace RTSLockstep.Grouping
 
         public void ValidateGroupMovementPath()
         {
-            if (_groupGridSize <= 1 && Pathfinder.GetStartNode(_farthestPosition, out _groupCurrentNode)
-                || Pathfinder.GetClosestViableNode(_farthestPosition, _farthestPosition, _groupGridSize, out _groupCurrentNode))
+            if (_groupGridSize <= 1 && Pathfinder.GetStartNode(_farthestGroupPos, out _groupCurrentNode)
+                || Pathfinder.GetClosestViableNode(_farthestGroupPos, _farthestGroupPos, _groupGridSize, out _groupCurrentNode))
             {
                 PathRequestManager.RequestPath(_groupCurrentNode, _groupDestinationNode, _groupGridSize, (_flowField, success) =>
                 {
@@ -179,27 +192,12 @@ namespace RTSLockstep.Grouping
                         GroupFlowFields.Clear();
                         GroupFlowFields = _flowField;
 
-                        long expectedSize = _averageCollisionSize.Mul(_averageCollisionSize).Mul(FixedMath.One * 2).Mul(_movers.Count);
-                        long groupSize = _radius.Mul(_radius);
-
-                        if (groupSize > expectedSize || _groupPosition.FastDistance(_destination.x, _destination.y) < (_radius.Mul(_radius)))
-                        {
-                            // group members are spread to far out
-                            ExecuteGroupIndividualMove();
-                            return;
-                        }
-                        else
-                        {
-                            // everyone is huddled together for group movement
-                            ExecuteGroupMove();
-                            return;
-                        }
+                        ExecuteGroupMove();
                     }
                     else
                     {
                         // unable to find path, try having each agent find their own path
                         ExecuteIndividualMove();
-                        return;
                     }
                 });
             }
@@ -229,13 +227,13 @@ namespace RTSLockstep.Grouping
                 Move mover = _movers[i];
                 mover.MyMovementType = MovementType.Individual;
                 mover.StopMultiplier = Move.DirectStop;
-                mover.MoveGroupProcessed(_destination);
+                mover.MoveGroupProcessed(_destinationPos);
             }
         }
 
         private void ExecuteGroupMove()
         {
-            _groupDirection = _destination - _groupPosition;
+            _groupDirection = _destinationPos - _groupPos;
 
             for (int i = 0; i < _movers.Count; i++)
             {
@@ -253,7 +251,7 @@ namespace RTSLockstep.Grouping
                 Move mover = _movers[i];
                 mover.MyMovementType = MovementType.GroupIndividual;
                 mover.StopMultiplier = Move.GroupDirectStop;
-                mover.MoveGroupProcessed(_destination);
+                mover.MoveGroupProcessed(_destinationPos);
             }
         }
     }

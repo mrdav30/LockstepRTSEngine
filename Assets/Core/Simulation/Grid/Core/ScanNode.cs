@@ -1,7 +1,8 @@
-﻿using RTSLockstep.Utility.FastCollections;
+﻿using System;
+
+using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Simulation.Influence;
 using RTSLockstep.Utility;
-using System;
 
 namespace RTSLockstep.Simulation.Grid
 {

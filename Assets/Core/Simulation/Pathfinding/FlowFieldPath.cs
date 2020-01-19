@@ -1,6 +1,7 @@
-﻿using RTSLockstep.Simulation.Grid;
+﻿using System.Collections.Generic;
+
+using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Simulation.LSMath;
-using System.Collections.Generic;
 
 namespace RTSLockstep.Simulation.Pathfinding
 {

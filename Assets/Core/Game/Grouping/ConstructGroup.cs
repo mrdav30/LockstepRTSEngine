@@ -7,7 +7,6 @@ using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
 using RTSLockstep.BuildSystem;
 using RTSLockstep.BuildSystem.BuildGrid;
-using RTSLockstep.Data;
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Managers.GameManagers;
 using RTSLockstep.Player.Commands;
@@ -21,10 +20,10 @@ namespace RTSLockstep.Grouping
 {
     public class ConstructGroup
     {
-        private MovementGroup _constructMoveGroup;
         public Queue<LSAgent> GroupConstructionQueue = new Queue<LSAgent>();
 
         private LSAgent _currentGroupTarget;
+        public FastList<GridNode> GroupTargetDestinations;
 
         public int IndexID { get; set; }
 
@@ -33,6 +32,8 @@ namespace RTSLockstep.Grouping
         private FastList<Construct> _constructors;
 
         private bool _calculatedBehaviors;
+
+        private const long gridSpacing = FixedMath.One;
 
         public void Initialize(Command com)
         {
@@ -56,24 +57,10 @@ namespace RTSLockstep.Grouping
                     if (tempTarget && tempTarget.GetAbility<Structure>().NeedsConstruction)
                     {
                         _currentGroupTarget = tempTarget;
+                        GroupTargetDestinations = new FastList<GridNode>();
+
+                        tempTarget.Body.GetOutsideBoundNodes(gridSpacing, GroupTargetDestinations);
                     }
-                }
-            }
-
-            if (_currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
-            {
-                // create a movement group for constructors based on the current project
-                Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
-                {
-                    ControllerID = _controllerID
-                };
-
-                moveCommand.Add(_currentGroupTarget.Body.Position);
-
-                _constructMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
-                if (_constructMoveGroup.IsNotNull())
-                {
-                    _constructMoveGroup.AllowUnwalkableEndNode = true;
                 }
             }
         }
@@ -93,7 +80,8 @@ namespace RTSLockstep.Grouping
                     {
                         _calculatedBehaviors = CalculateAndExecuteBehaviors();
                     }
-                    else if ((_currentGroupTarget.IsNull() || !_currentGroupTarget.GetAbility<Structure>().NeedsConstruction) && GroupConstructionQueue.Count > 0)
+                    else if ((_currentGroupTarget.IsNull() 
+                        || !_currentGroupTarget.GetAbility<Structure>().NeedsConstruction) && GroupConstructionQueue.Count > 0)
                     {
                         _currentGroupTarget = GroupConstructionQueue.Dequeue();
                         _calculatedBehaviors = false;
@@ -120,12 +108,6 @@ namespace RTSLockstep.Grouping
                 constructor.MyConstructGroupID = IndexID;
 
                 _constructors.Add(constructor);
-
-                if (_constructMoveGroup.IsNotNull())
-                {
-                    // add the constructor to our contructor move group too!
-                    _constructMoveGroup.Add(constructor.Agent.MyStats.CachedMove);
-                }
             }
         }
 
@@ -134,18 +116,13 @@ namespace RTSLockstep.Grouping
             if (constructor.MyConstructGroup.IsNotNull() && constructor.MyConstructGroupID == IndexID)
             {
                 _constructors.Remove(constructor);
-
-                if (_constructMoveGroup.IsNotNull())
-                {
-                    // Remove the constructor from our contructor move group too!
-                    _constructMoveGroup.Remove(constructor.Agent.MyStats.CachedMove);
-                }
+                constructor.MyConstructGroup = null;
+                constructor.MyConstructGroupID = -1;
             }
         }
 
         private bool CalculateAndExecuteBehaviors()
         {
-
             ExecuteConstruction();
             return true;
         }
@@ -221,7 +198,6 @@ namespace RTSLockstep.Grouping
             _constructors.FastClear();
             GroupConstructionQueue.Clear();
             _currentGroupTarget = null;
-            _constructMoveGroup = null;
             ConstructGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;

@@ -4,11 +4,12 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+using System;
+using UnityEngine;
 
 using RTSLockstep.Utility.FastCollections;
 using RTSLockstep.Simulation.Pathfinding;
 using RTSLockstep.Simulation.Influence;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 
@@ -50,13 +51,7 @@ namespace RTSLockstep.Simulation.Grid
             }
         }
 
-        public bool Occupied
-        {
-            get
-            {
-                return LinkedScanNode.IsNotNull() && LinkedScanNode.AgentCount > 0;
-            }
-        }
+        public bool Occupied;
 
         public byte ClearanceSource;
         /// <summary>
@@ -386,6 +381,16 @@ namespace RTSLockstep.Simulation.Grid
         public void RemoveLinkedAgent(LSInfluencer influencer)
         {
             LinkedScanNode.Remove(influencer);
+        }
+
+        private long GetCeiledSnap(object p, long snapSpacing)
+        {
+            throw new NotImplementedException();
+        }
+
+        private long GetFlooredSnap(object p, long snapSpacing)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

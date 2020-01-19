@@ -17,6 +17,7 @@ using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
+using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -60,6 +61,7 @@ namespace RTSLockstep.Abilities.Essential
         public bool CanMove { get; private set; }
         public bool IsMoving { get; private set; }
         public bool IsStuck { get; private set; }
+        public bool AllowUnwalkableEndNode { get; set; } = false;
 
         [HideInInspector]
         public Vector2d Destination;
@@ -97,7 +99,6 @@ namespace RTSLockstep.Abilities.Essential
 
         private GridNode _currentNode;
         private GridNode _destinationNode;
-        public bool _allowUnwalkableEndNode;
         private bool _viableDestination;
 
         // How far we move each update
@@ -248,6 +249,7 @@ namespace RTSLockstep.Abilities.Essential
                                     }
                                     else
                                     {
+                                        Debug.Log("No Path found!");
                                         // no path found, will have to start over
                                         _hasPath = false;
                                     }
@@ -600,8 +602,8 @@ namespace RTSLockstep.Abilities.Essential
                      avoidAgentConditional,
                      (bite) =>
                      {
-                         // trying to avoid all agents, we don't care about alliances!
-                         return true;
+                 // trying to avoid all agents, we don't care about alliances!
+                 return true;
                      }
                  );
 
@@ -727,14 +729,13 @@ namespace RTSLockstep.Abilities.Essential
 
         public void MoveGroupProcessed(Vector2d _destination)
         {
-            _allowUnwalkableEndNode = MyMovementGroup.AllowUnwalkableEndNode;
-
+            AllowUnwalkableEndNode = MyMovementGroup.AllowUnwalkableEndNode;
             if (MoveOnGroupProcessed)
             {
                 StartMove(_destination);
                 MoveOnGroupProcessed = false;
             }
-            else if (MyMovementType != MovementType.Individual)
+            else
             {
                 Destination = _destination;
             }
@@ -742,17 +743,16 @@ namespace RTSLockstep.Abilities.Essential
             OnMoveGroupProcessed?.Invoke();
         }
 
-        public void StartMove(Vector2d _destination)
+        public void StartMove(Vector2d _destination, bool allowUnwalkableEndNode = false)
         {
+            AllowUnwalkableEndNode = allowUnwalkableEndNode;
+
             _flowFields.Clear();
             _straightPath = false;
 
             IsMoving = true;
             StoppedTime = 0;
             Arrived = false;
-
-            IsAvoidingLeft = false;
-            MinAvoidanceDistance = FixedMath.One * 6;
 
             // handle override with onStartMove action
             Agent.Animator.SetMovingState(AnimState.Moving);
@@ -762,34 +762,47 @@ namespace RTSLockstep.Abilities.Essential
             _stuckTime = 0;
             IsCasting = true;
 
+            IsAvoidingLeft = false;
+            MinAvoidanceDistance = FixedMath.One * 6;
+
             // still need to check for viable destination for agents in group
             // if size requires consideration, use old next-best-node system
             // also a catch in case GetEndNode returns null
-            _viableDestination = (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, _allowUnwalkableEndNode)
-                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, _allowUnwalkableEndNode));
-
-            Destination = _destinationNode.IsNotNull() ? _destinationNode.WorldPos : Vector2d.zero;
-
-            if (MyMovementType == MovementType.Individual)
+            _viableDestination = false;
+            if (GridSize <= 1 && Pathfinder.GetEndNode(Position, _destination, out _destinationNode, AllowUnwalkableEndNode)
+                || Pathfinder.GetClosestViableNode(Position, _destination, GridSize, out _destinationNode, AllowUnwalkableEndNode))
             {
-                _doPathfind = true;
-                _hasPath = false;
-            }
-            else
-            {
-                // we must be group moving
-                _doPathfind = false;
-                _hasPath = true;
-            }
+                if (_destinationNode.IsNotNull())
+                {
+                    _viableDestination = true;
 
-            OnStartMove?.Invoke();
+                    Destination = _destinationNode.WorldPos;
+
+                    if (MyMovementType == MovementType.Individual)
+                    {
+                        _doPathfind = true;
+                        _hasPath = false;
+                    }
+                    else
+                    {
+                        // we must be group moving
+                        _doPathfind = false;
+                        _hasPath = true;
+                    }
+
+                    OnStartMove?.Invoke();
+                }
+                else
+                {
+                    Arrive();
+                }
+            }
         }
 
         public void Arrive()
         {
             StopMove();
 
-            //TODO: Reset these variables when changing destination/command
             _autoStopPauser = 0;
             _collisionStopPauser = 0;
             _stopPauseLooker = 0;
@@ -851,7 +864,7 @@ namespace RTSLockstep.Abilities.Essential
             if (otherMover.IsNotNull() && IsMoving)
             {
                 //if agent is assigned move group and the other mover is moving to a similar point
-                if (otherMover.MyMovementGroupID == MyMovementGroupID
+                if (MyMovementGroupID > -1 && otherMover.MyMovementGroupID == MyMovementGroupID
                     && otherMover.Destination.FastDistance(Destination) <= (_closingDistance * _closingDistance))
                 {
                     if (!otherMover.IsMoving && !otherMover.Agent.IsCasting)

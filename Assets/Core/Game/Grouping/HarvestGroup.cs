@@ -2,18 +2,19 @@
 using RTSLockstep.Abilities.Essential;
 using RTSLockstep.Agents;
 using RTSLockstep.Agents.AgentController;
-using RTSLockstep.Data;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.Player.Utility;
 using RTSLockstep.Utility;
 using RTSLockstep.LSResources;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Simulation.Grid;
 
 namespace RTSLockstep.Grouping
 {
     public class HarvestGroup
     {
-        private MovementGroup _harvestMoveGroup;
         private LSAgent _currentGroupTarget;
+        public FastList<GridNode> GroupTargetDestinations;
 
         public int IndexID { get; set; }
 
@@ -22,6 +23,8 @@ namespace RTSLockstep.Grouping
         private FastList<Harvest> harvesters;
 
         private bool _calculatedBehaviors;
+
+        private const long gridSpacing = FixedMath.One;
 
         public void Initialize(Command com)
         {
@@ -38,24 +41,10 @@ namespace RTSLockstep.Grouping
                         || tempTarget.MyAgentType == AgentType.Structure)
                     {
                         _currentGroupTarget = tempTarget;
+                        GroupTargetDestinations = new FastList<GridNode>();
+
+                        tempTarget.Body.GetOutsideBoundNodes(gridSpacing, GroupTargetDestinations);
                     }
-                }
-            }
-
-            if (_currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
-            {
-                // create a movement group for harvesters based on the current project
-                Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
-                {
-                    ControllerID = controllerID
-                };
-
-                moveCommand.Add(_currentGroupTarget.Body.Position);
-
-                _harvestMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
-                if (_harvestMoveGroup.IsNotNull())
-                {
-                    _harvestMoveGroup.AllowUnwalkableEndNode = true;
                 }
             }
         }
@@ -94,11 +83,6 @@ namespace RTSLockstep.Grouping
 
                 harvesters.Add(harvester);
 
-                if (_harvestMoveGroup.IsNotNull())
-                {
-                    // add the harvester to our harvester move group too!
-                    _harvestMoveGroup.Add(harvester.Agent.MyStats.CachedMove);
-                }
             }
         }
 
@@ -109,12 +93,6 @@ namespace RTSLockstep.Grouping
                 harvesters.Remove(harvester);
                 harvester.MyHarvestGroup = null;
                 harvester.MyHarvestGroupID = -1;
-
-                if (_harvestMoveGroup.IsNotNull())
-                {
-                    // Remove the harvester from our harvester move group too!
-                    _harvestMoveGroup.Remove(harvester.Agent.MyStats.CachedMove);
-                }
             }
         }
 
@@ -144,7 +122,7 @@ namespace RTSLockstep.Grouping
             }
             harvesters.FastClear();
             _currentGroupTarget = null;
-            _harvestMoveGroup = null;
+            //_harvestMoveGroup = null;
             HarvestGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;

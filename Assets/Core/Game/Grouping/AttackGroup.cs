@@ -11,7 +11,6 @@ namespace RTSLockstep.Grouping
 {
     public class AttackGroup
     {
-        private MovementGroup attackMoveGroup;
         private LSAgent currentGroupTarget;
 
         public int IndexID { get; set; }
@@ -35,19 +34,6 @@ namespace RTSLockstep.Grouping
                 {
                     currentGroupTarget = tempTarget;
                 }
-            }
-
-            if (currentGroupTarget.IsNotNull() && MovementGroupHelper.CheckValidAndAlert())
-            {
-                // create a movement group for attackers based on the current project
-                Command moveCommand = new Command(AbilityDataItem.FindInterfacer(typeof(Move)).ListenInputID)
-                {
-                    ControllerID = controllerID
-                };
-
-                moveCommand.Add(currentGroupTarget.Body.Position);
-
-                attackMoveGroup = MovementGroupHelper.CreateGroup(moveCommand);
             }
         }
 
@@ -88,12 +74,6 @@ namespace RTSLockstep.Grouping
                 attacker.MyAttackGroupID = IndexID;
 
                 attackers.Add(attacker);
-
-                if (attackMoveGroup.IsNotNull())
-                {
-                    // add the attacker to our attacker move group too!
-                    attackMoveGroup.Add(attacker.Agent.MyStats.CachedMove);
-                }
             }
         }
 
@@ -104,12 +84,6 @@ namespace RTSLockstep.Grouping
                 attackers.Remove(attacker);
                 attacker.MyAttackGroup = null;
                 attacker.MyAttackGroupID = -1;
-
-                if (attackMoveGroup.IsNotNull())
-                {
-                    // Remove the attacker from our attacker move group too!
-                    attackMoveGroup.Remove(attacker.Agent.MyStats.CachedMove);
-                }
             }
         }
 
@@ -130,7 +104,6 @@ namespace RTSLockstep.Grouping
             }
             attackers.FastClear();
             currentGroupTarget = null;
-            attackMoveGroup = null;
             AttackGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;

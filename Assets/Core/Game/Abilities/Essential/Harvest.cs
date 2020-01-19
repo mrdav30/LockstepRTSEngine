@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using UnityEngine;
+using Newtonsoft.Json;
+
 using RTSLockstep.Agents;
 using RTSLockstep.Determinism;
 using RTSLockstep.Grouping;
@@ -6,7 +8,6 @@ using RTSLockstep.Managers;
 using RTSLockstep.Managers.GameState;
 using RTSLockstep.Player.Commands;
 using RTSLockstep.LSResources;
-using UnityEngine;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
@@ -32,6 +33,8 @@ namespace RTSLockstep.Abilities.Essential
         public LSAgent CurrentTarget { get; private set; }
         public LSAgent LastResourceTarget { get; private set; }
         public LSAgent LastStorageTarget { get; private set; }
+
+        public Vector2d Destination { get; private set; }
 
         private const int _searchRate = LockstepManager.FrameRate / 2;
         private long _currentLoadAmount = 0;
@@ -160,15 +163,7 @@ namespace RTSLockstep.Abilities.Essential
                 IsHarvestMoving = true;
                 IsFocused = false;
 
-                // if we're part of a movement group, destination already set
-                if (Agent.MyStats.CachedMove.MyMovementType != MovementType.Individual)
-                {
-                    Agent.MyStats.CachedMove.StartMove(Agent.MyStats.CachedMove.Destination);
-                }
-                else
-                {
-                    Agent.MyStats.CachedMove.StartMove(CurrentTarget.Body.Position);
-                }
+                Agent.MyStats.CachedMove.StartMove(Destination, true);
             }
         }
 
@@ -302,6 +297,7 @@ namespace RTSLockstep.Abilities.Essential
             if (currentTarget.IsNotNull())
             {
                 CurrentTarget = currentTarget;
+                Destination = CurrentTarget.Body.Position;
 
                 IsFocused = true;
                 IsHarvestMoving = false;
