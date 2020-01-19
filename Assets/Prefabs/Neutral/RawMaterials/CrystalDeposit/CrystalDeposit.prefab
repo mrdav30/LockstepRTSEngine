@@ -370,6 +370,7 @@ MonoBehaviour:
   _boxPriority: 0
   _selectionPriority: 0
   _selectable: 1
+  _hasInfluence: 0
   Tag: 5
   _selectionRadius: -1
   _visualCenter: {fileID: 4255305627525500}

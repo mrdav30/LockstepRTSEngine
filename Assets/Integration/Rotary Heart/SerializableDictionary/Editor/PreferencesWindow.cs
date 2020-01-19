@@ -21,7 +21,7 @@ namespace RotaryHeart.Lib.SerializableDictionary
         private static int pageCount;
 
         // Add preferences section named "My Preferences" to the Preferences Window
-        [PreferenceItem("RHSD")]
+        [SettingsProvider]
         public static void PreferencesGUI()
         {
             if (!prefsLoaded)

@@ -46,6 +46,8 @@ namespace RTSLockstep.Agents
         private int _selectionPriority = 0;
         [SerializeField]
         private bool _selectable = true;
+        [SerializeField]
+        private bool _hasInfluence = true;
         public AgentTag Tag;
         [SerializeField]
         private float _selectionRadius = -1f;
@@ -54,7 +56,8 @@ namespace RTSLockstep.Agents
         private Transform _visualCenter;
         public Transform VisualCenter { get { return _visualCenter; } }
         [HideInInspector]
-        public string ObjectName {
+        public string ObjectName
+        {
             get
             {
                 return gameObject.name;
@@ -258,8 +261,11 @@ namespace RTSLockstep.Agents
             Body.Setup(this);
             abilityManager.Setup(this);
 
-            Influencer = new LSInfluencer();
-            Influencer.Setup(this);
+            if (_hasInfluence)
+            {
+                Influencer = new LSInfluencer();
+                Influencer.Setup(this);
+            }
 
             SelectionRadiusSquared = SelectionRadius * SelectionRadius;
 
@@ -417,7 +423,7 @@ namespace RTSLockstep.Agents
             {
                 Animator.SetDyingState();
                 // TODO: Now call in LockstepManager.LateVisualize ()
-                Animator.Visualize(); 
+                Animator.Visualize();
             }
         }
 
