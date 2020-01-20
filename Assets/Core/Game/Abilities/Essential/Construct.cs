@@ -463,13 +463,10 @@ namespace RTSLockstep.Abilities.Essential
             IsWindingUp = false;
             IsFocused = false;
 
-            if(MyConstructGroup.GroupConstructionQueue.Count == 0)
+            if (MyConstructGroup.IsNotNull() && MyConstructGroup.GroupConstructionQueue.Count == 0)
             {
-                if (MyConstructGroup.IsNotNull())
-                {
-                    // Only remove from construction group if their queue is empty
-                    MyConstructGroup.Remove(this);
-                }
+                // Only remove from construction group if groups queue is empty
+                MyConstructGroup.Remove(this);
 
                 IsCasting = false;
             }

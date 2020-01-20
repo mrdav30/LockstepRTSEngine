@@ -59,7 +59,7 @@ namespace RTSLockstep.Grouping
                         _currentGroupTarget = tempTarget;
                         GroupTargetDestinations = new FastList<GridNode>();
 
-                        tempTarget.Body.GetOutsideBoundNodes(gridSpacing, GroupTargetDestinations);
+                     //   tempTarget.Body.GetOutsideBoundNodes(gridSpacing, GroupTargetDestinations);
                     }
                 }
             }

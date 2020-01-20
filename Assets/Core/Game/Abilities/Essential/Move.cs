@@ -17,7 +17,6 @@ using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
-using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -228,9 +227,10 @@ namespace RTSLockstep.Abilities.Essential
                         if (_currentNode.DoesEqual(_destinationNode))
                         {
                             if (_repathTries >= 1)
-                            {
+                           {
                                 Arrive();
-                            }
+                                return;
+                           }
                         }
                         else
                         {
@@ -413,8 +413,6 @@ namespace RTSLockstep.Abilities.Essential
                 }
                 else
                 {
-                    IsStuck = false;
-
                     if (_stuckTime > 0)
                     {
                         _stuckTime -= 1;
@@ -760,6 +758,7 @@ namespace RTSLockstep.Abilities.Essential
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distanceToMove
             _stuckTime = 0;
+            IsStuck = false;
             IsCasting = true;
 
             IsAvoidingLeft = false;

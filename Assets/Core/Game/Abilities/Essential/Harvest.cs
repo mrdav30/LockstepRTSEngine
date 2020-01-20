@@ -12,6 +12,7 @@ using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Simulation.LSPhysics;
 using RTSLockstep.Utility;
 using RTSLockstep.Integration;
+using System.Linq;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -34,7 +35,8 @@ namespace RTSLockstep.Abilities.Essential
         public LSAgent LastResourceTarget { get; private set; }
         public LSAgent LastStorageTarget { get; private set; }
 
-        public Vector2d Destination { get; private set; }
+        [HideInInspector]
+        public Vector2d Destination;
 
         private const int _searchRate = LockstepManager.FrameRate / 2;
         private long _currentLoadAmount = 0;
@@ -190,6 +192,8 @@ namespace RTSLockstep.Abilities.Essential
 
                 // The harvest AI will determine what to do next
                 LastResourceTarget = CurrentTarget;
+                CurrentTarget.GetAbility<ResourceDeposit>().OccupiedNodes[Destination] = false;
+
                 StopHarvest();
             }
         }
@@ -215,6 +219,8 @@ namespace RTSLockstep.Abilities.Essential
 
                 // The harvest AI will determine what to do next
                 LastStorageTarget = CurrentTarget;
+                CurrentTarget.GetAbility<Structure>().OccupiedNodes[Destination] = false;
+
                 StopHarvest();
             }
         }
@@ -297,13 +303,15 @@ namespace RTSLockstep.Abilities.Essential
             if (currentTarget.IsNotNull())
             {
                 CurrentTarget = currentTarget;
-                Destination = CurrentTarget.Body.Position;
 
                 IsFocused = true;
                 IsHarvestMoving = false;
 
                 if (IsHarvesting)
                 {
+                    Destination = CurrentTarget.GetAbility<ResourceDeposit>().OccupiedNodes.FirstOrDefault(x => x.Value == false).Key;
+                    CurrentTarget.GetAbility<ResourceDeposit>().OccupiedNodes[Destination] = true;
+
                     RawMaterialType resourceType = CurrentTarget.GetAbility<ResourceDeposit>().ResourceType;
 
                     // we can only collect one resource at a time, other resources are lost
@@ -314,6 +322,11 @@ namespace RTSLockstep.Abilities.Essential
                     }
 
                     SetHarvestAnimState();
+                }
+                else
+                {
+                    Destination = CurrentTarget.GetAbility<Structure>().OccupiedNodes.FirstOrDefault(x => x.Value == false).Key;
+                    CurrentTarget.GetAbility<Structure>().OccupiedNodes[Destination] = true;
                 }
 
                 _targetVersion = currentTarget.SpawnVersion;
@@ -415,6 +428,7 @@ namespace RTSLockstep.Abilities.Essential
                         {
                             if (Agent.MyStats.CachedMove.IsStuck)
                             {
+                                Debug.Log("Agent stuck! stop harvesting");
                                 StopHarvest();
                             }
                             else
@@ -426,8 +440,8 @@ namespace RTSLockstep.Abilities.Essential
                         }
                         else if (!_inRange && _repathTimer.AdvanceFrame())
                         {
-                            if (CurrentTarget.Body.PositionChangedBuffer &&
-                                CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (_repathDistance * _repathDistance))
+                            if (CurrentTarget.Body.PositionChangedBuffer 
+                                && CurrentTarget.Body.Position.FastDistance(Agent.MyStats.CachedMove.Destination.x, Agent.MyStats.CachedMove.Destination.y) >= (_repathDistance * _repathDistance))
                             {
                                 needsRepath = true;
                                 //So units don't sync up and path on the same frame
@@ -437,9 +451,10 @@ namespace RTSLockstep.Abilities.Essential
 
                         if (needsRepath)
                         {
-                            Agent.MyStats.CachedMove.Destination = CurrentTarget.Body.Position;
+                            Destination = CurrentTarget.Body.Position;
                             Agent.MyStats.CachedMove.PauseAutoStop();
                             Agent.MyStats.CachedMove.PauseCollisionStop();
+
                             OnStartHarvestMove();
                         }
                     }

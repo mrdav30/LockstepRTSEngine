@@ -867,8 +867,10 @@ namespace RTSLockstep.Simulation.LSPhysics
             }
         }
 
-        public void GetOutsideBoundNodes(long snapSpacing, FastList<GridNode> output)
+        public void GetOutsideBoundsPositions(long snapSpacing, out FastList<Vector2d> output)
         {
+            output = new FastList<Vector2d>();
+
             long xmin = GetFlooredSnap(XMin - FixedMath.Half, snapSpacing);
             long ymin = GetFlooredSnap(YMin - FixedMath.Half, snapSpacing);
 
@@ -876,14 +878,14 @@ namespace RTSLockstep.Simulation.LSPhysics
             long ymax = GetCeiledSnap(YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
 
             //Used for getting snapped positions this body covered
-            for (long x = xmax; x <= xmax + (HalfWidth * 2); x += snapSpacing)
+            for (long x = xmin; x <= xmax + snapSpacing; x += snapSpacing)
             {
-                for (long y = ymax; y <= ymax + (HalfLength * 2); y += snapSpacing)
+                for (long y = ymin; y <= ymax + snapSpacing; y += snapSpacing)
                 {
                     GridNode checkNode = GridManager.GetNodeByPos(x, y);
-                    if (!checkNode.Unwalkable)
+                    if(checkNode.IsNotNull() && !checkNode.Unwalkable)
                     {
-                        output.Add(checkNode);
+                        output.Add(checkNode.WorldPos);
                     }
                 }
             }

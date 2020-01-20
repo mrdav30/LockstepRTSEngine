@@ -7,6 +7,8 @@ using RTSLockstep.LSResources;
 using RTSLockstep.Simulation.LSMath;
 using RTSLockstep.Utility;
 using RTSLockstep.RawMaterials;
+using System.Collections.Generic;
+using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -47,15 +49,19 @@ namespace RTSLockstep.Abilities.Essential
         public bool ValidPlacement { get; set; }
         public bool ConstructionStarted { get; set; }
         public bool NeedsConstruction { get; private set; }
+
+        private const long gridSpacing = 2 * FixedMath.One;
+        public Dictionary<Vector2d, bool> OccupiedNodes;
+
         private bool _needsRepair;
         private bool _provisioned;
         private int upgradeLevel;
 
-        private Rally cachedRally;
+        private Rally cachedRallyPoint;
 
         protected override void OnSetup()
         {
-            cachedRally = Agent.GetAbility<Rally>();
+            cachedRallyPoint = Agent.GetAbility<Rally>();
 
             upgradeLevel = 1;
         }
@@ -65,6 +71,18 @@ namespace RTSLockstep.Abilities.Essential
             NeedsConstruction = false;
             _needsRepair = false;
             _provisioned = false;
+
+            if (CanStoreRawMaterial)
+            {
+                OccupiedNodes = new Dictionary<Vector2d, bool>();
+
+                Agent.Body.GetOutsideBoundsPositions(gridSpacing, out FastList<Vector2d> targetBoundaryPositions);
+
+                foreach (var pos in targetBoundaryPositions)
+                {
+                    OccupiedNodes.Add(pos, false);
+                }
+            }
         }
 
         protected override void OnSimulate()
@@ -90,9 +108,9 @@ namespace RTSLockstep.Abilities.Essential
             IsCasting = true;
             Agent.MyStats.CachedHealth.CurrentHealth = FixedMath.Create(0);
 
-            if (cachedRally)
+            if (cachedRallyPoint)
             {
-                cachedRally.SetSpawnPoint();
+                cachedRallyPoint.SetSpawnPoint();
             }
         }
 

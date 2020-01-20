@@ -7,14 +7,12 @@ using RTSLockstep.Player.Utility;
 using RTSLockstep.Utility;
 using RTSLockstep.LSResources;
 using RTSLockstep.Simulation.LSMath;
-using RTSLockstep.Simulation.Grid;
 
 namespace RTSLockstep.Grouping
 {
     public class HarvestGroup
     {
         private LSAgent _currentGroupTarget;
-        public FastList<GridNode> GroupTargetDestinations;
 
         public int IndexID { get; set; }
 
@@ -24,7 +22,7 @@ namespace RTSLockstep.Grouping
 
         private bool _calculatedBehaviors;
 
-        private const long gridSpacing = FixedMath.One;
+        private const long gridSpacing = 2 * FixedMath.One;
 
         public void Initialize(Command com)
         {
@@ -41,9 +39,6 @@ namespace RTSLockstep.Grouping
                         || tempTarget.MyAgentType == AgentType.Structure)
                     {
                         _currentGroupTarget = tempTarget;
-                        GroupTargetDestinations = new FastList<GridNode>();
-
-                        tempTarget.Body.GetOutsideBoundNodes(gridSpacing, GroupTargetDestinations);
                     }
                 }
             }
@@ -122,7 +117,6 @@ namespace RTSLockstep.Grouping
             }
             harvesters.FastClear();
             _currentGroupTarget = null;
-            //_harvestMoveGroup = null;
             HarvestGroupHelper.Pool(this);
             _calculatedBehaviors = false;
             IndexID = -1;

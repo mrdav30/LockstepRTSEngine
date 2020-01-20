@@ -51,8 +51,6 @@ namespace RTSLockstep.Simulation.Grid
             }
         }
 
-        public bool Occupied;
-
         public byte ClearanceSource;
         /// <summary>
         /// How many connections until the closest unwalkable node.

@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using Newtonsoft.Json;
+
 using RTSLockstep.Simulation.Grid;
 using RTSLockstep.Managers.GameState;
 using RTSLockstep.LSResources;
-using UnityEngine;
+using RTSLockstep.Simulation.LSMath;
+using RTSLockstep.Utility.FastCollections;
 
 namespace RTSLockstep.Abilities.Essential
 {
@@ -10,6 +14,9 @@ namespace RTSLockstep.Abilities.Essential
     {
         public long AmountLeft { get; private set; }
         private DynamicBlocker cachedBlocker;
+
+        private const long gridSpacing = 2 * FixedMath.One;
+        public Dictionary<Vector2d, bool> OccupiedNodes;
 
         #region Serialized Values (Further description in properties)
         public long Capacity;
@@ -21,6 +28,15 @@ namespace RTSLockstep.Abilities.Essential
         protected override void OnInitialize()
         {
             AmountLeft = Capacity;
+
+            OccupiedNodes = new Dictionary<Vector2d, bool>();
+
+            Agent.Body.GetOutsideBoundsPositions(gridSpacing, out FastList<Vector2d> targetBoundaryPositions);
+
+            foreach (var pos in targetBoundaryPositions)
+            {
+                OccupiedNodes.Add(pos, false);
+            }
         }
 
         protected override void OnVisualize()
