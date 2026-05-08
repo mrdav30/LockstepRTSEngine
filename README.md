@@ -1,3 +1,46 @@
+## 🚧 Project Status & Vision
+
+> ⚠️ This repository represents the original foundation of what has evolved into a much larger, modular deterministic simulation ecosystem.
+
+The **Lockstep RTS Engine (LRE)** began as a Unity-based framework for building deterministic, lockstep RTS games — including core systems such as physics, pathfinding, and simulation logic.
+
+Over time, this project has grown far beyond its original scope.
+
+### 🔄 Evolution
+
+This repository is now part of a broader effort to extract and refine its core ideas into **standalone, engine-agnostic libraries**, including:
+
+- **FixedMathSharp** → deterministic fixed-point math
+- **SwiftCollections** → high-performance deterministic collections
+- **GridForge** → voxel/grid-based spatial systems
+- **Trailblazer** → deterministic pathfinding and agent navigation
+
+These modules are being actively developed, tested, and productionized independently.
+
+### 🎯 Current Direction
+
+The long-term goal is to build a:
+
+> **Fully deterministic, lockstep-capable simulation framework**  
+> that is engine-agnostic, scalable, and suitable for RTS, simulation, and large-scale multiplayer systems.
+
+This repository will remain as:
+- A **historical reference**
+- A **prototype sandbox**
+- A **proof-of-concept integration layer**
+
+### 🧭 What to Expect
+
+- Core systems may be **deprecated or migrated**
+- New development is focused in the modular libraries listed above
+- Future integrations will favor **composition over monolithic design**
+
+---
+
+If you're exploring this repo, you're looking at the **origin of a much larger system**.
+
+---
+
 Lockstep RTS Engine
 ------------------------
 
