@@ -10,10 +10,11 @@ Over time, this project has grown far beyond its original scope.
 
 This repository is now part of a broader effort to extract and refine its core ideas into **standalone, engine-agnostic libraries**, including:
 
-- **FixedMathSharp** → deterministic fixed-point math
-- **SwiftCollections** → high-performance deterministic collections
-- **GridForge** → voxel/grid-based spatial systems
-- **Trailblazer** → deterministic pathfinding and agent navigation
+- **[FixedMathSharp](https://github.com/mrdav30/FixedMathSharp)** → deterministic fixed-point math
+- **[SwiftCollections](https://github.com/mrdav30/SwiftCollections)** → high-performance deterministic collections
+- **[GridForge](https://github.com/mrdav30/GridForge)** → voxel/grid-based spatial systems
+- **[Trailblazer](https://github.com/mrdav30/Trailblazer)** → deterministic pathfinding and agent navigation
+- **[Gravitas](https://github.com/mrdav30/Gravitas)** → deterministic 3d/2d/mixed physics
 
 These modules are being actively developed, tested, and productionized independently.
 
